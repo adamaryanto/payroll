@@ -20,9 +20,6 @@
                                         <th width="5%">No</th>
                                            <th >No. Absen</th>
                                            <th >Nama </th>
-                                           <th >Bagian</th>
-                                            <th >Sub Bagian</th>
-                                            <th >Shift</th>
                                             <th >OS/DHK</th>
                                             <th >Golongan</th>
                                            
@@ -53,9 +50,7 @@
 $no = 1;
 
 
-$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_sub_department.nama_sub_department , ms_departmen.nama_departmen, tb_jadwal.keterangan FROM ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen 
-left join tb_jadwal on ms_karyawan.id_jadwal = tb_jadwal.id_jadwal left join ms_sub_department on ms_karyawan.id_sub_department = ms_sub_department.id_sub_department
- ");
+$tampil = $koneksi->query("SELECT ms_karyawan.* FROM ms_karyawan");
     while ($datakaryawan=$tampil->fetch_assoc())
     {
 
@@ -66,9 +61,6 @@ left join tb_jadwal on ms_karyawan.id_jadwal = tb_jadwal.id_jadwal left join ms_
 <td><?php echo $no ?></td>
 <td><?php echo $datakaryawan['no_absen'] ?></td>
 <td><?php echo $datakaryawan['nama_karyawan'] ?></td>
-<td><?php echo $datakaryawan['nama_departmen'] ?></td>
-<td><?php echo $datakaryawan['nama_sub_department'] ?></td>
-<td><?php echo $datakaryawan['keterangan'] ?></td>
 <td><?php echo $datakaryawan['OS_DHK'] ?></td>
 <td><?php echo $datakaryawan['golongan'] ?></td>
 <td><?php echo $datakaryawan['no_ktp'] ?></td>
@@ -89,7 +81,6 @@ left join tb_jadwal on ms_karyawan.id_jadwal = tb_jadwal.id_jadwal left join ms_
 <td><?php echo number_format( $datakaryawan['upah_bulanan'],0,',','.') ?></td>
 <td class="text-center align-middle">
     <div class="flex flex-wrap gap-2 justify-center">
-        <a href="?page=karyawan&aksi=shift&id=<?php echo $datakaryawan['id_karyawan'];?>" class="btn btn-sm bg-teal-500 hover:bg-teal-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Atur Shift"><i class="fas fa-clock"></i></a>
         <a href="?page=karyawan&aksi=upah&id=<?php echo $datakaryawan['id_karyawan'];?>" class="btn btn-sm bg-emerald-500 hover:bg-emerald-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Atur Upah"><i class="fas fa-money-bill-wave"></i></a>
         <a href="?page=karyawan&aksi=ubah&id=<?php echo $datakaryawan['id_karyawan'];?>" class="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Ubah Data"><i class="fas fa-edit"></i></a>
         <a href="?page=karyawan&aksi=hapus&id=<?php echo $datakaryawan['id_karyawan'];?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Hapus Data"><i class="fas fa-trash"></i></a>

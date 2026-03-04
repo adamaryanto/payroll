@@ -1,7 +1,12 @@
 <?php
 
 
-$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
+$tampil = $koneksi->query("SELECT A.*, 
+(select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, 
+(select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl,
+(SELECT GROUP_CONCAT(DISTINCT d.nama_departmen SEPARATOR ', ') FROM tb_rkk_detail rd JOIN ms_departmen d ON rd.id_departmen = d.id_departmen WHERE rd.id_rkk = A.id_rkk) as list_bagian,
+(SELECT GROUP_CONCAT(DISTINCT j.keterangan SEPARATOR ', ') FROM tb_rkk_detail rd JOIN tb_jadwal j ON rd.id_jadwal = j.id_jadwal WHERE rd.id_rkk = A.id_rkk) as list_shift
+from tb_rkk A ORDER BY A.id_rkk DESC");
 if ($_SESSION['level'] != "OWNER") {
     $level =  "Hidden";
 } else {
@@ -206,6 +211,8 @@ if ($_SESSION['level'] == "OWNER") {
                             <th>Tanggal Input</th>
                             <th>Jam Kerja</th>
                             <th>Karyawan</th>
+                            <th>Bagian</th>
+                            <th>Shift</th>
                             <th>Total Upah</th>
                             <th>Keterangan</th>
                             <th width="15%">Aksi Data</th>
@@ -249,6 +256,8 @@ if ($_SESSION['level'] == "OWNER") {
                                 <td class="text-center"><?php echo $data['detail_rkk'] ?></td>
                                 <td class="text-center"><?php echo $data['jam_kerja'] ?> Jam</td>
                                 <td class="text-center"><?php echo $data['jml'] ?> Org</td>
+                                <td class="text-center"><?php echo $data['list_bagian'] ?: '-'; ?></td>
+                                <td class="text-center"><?php echo $data['list_shift'] ?: '-'; ?></td>
                                 <td>Rp <?php echo number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
                                 <td><?php echo $data['keterangan'] ?></td>
 

@@ -3,14 +3,11 @@
 
 if(isset($_GET['id'])){
     $idu = $_GET['id'];
-$tampil=$koneksi->query("SELECT  ms_karyawan.* , ms_sub_department.nama_sub_department , ms_sub_department.id_sub_department , ms_departmen.nama_departmen, ms_departmen.id_departmen  from ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen 
-  LEFT JOIN ms_sub_department on ms_karyawan.id_sub_department = ms_sub_department.id_sub_department  WHERE id_karyawan = '$idu' ");
+$tampil=$koneksi->query("SELECT ms_karyawan.* from ms_karyawan WHERE id_karyawan = '$idu' ");
 $data=$tampil->fetch_assoc();
 $idkaryawan =$data['id_karyawan'];
 $noabsen = $data['no_absen'];
 $namakaryawan = $data['nama_karyawan'];
-$namadepartment = $data['nama_departmen'];
-$namadepartmentsub = $data['nama_sub_department'];
 $tempatlahir = $data['tempat_lahir'];
 $tgllahir = $data['tgl_lahir'];
 $agama = $data['agama'];
@@ -75,16 +72,6 @@ $contupdate="hidden";
                  <div class="form-group col-md-4">
                     <label class="font-weight-bold">Nama </label>
                     <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $namakaryawan; ?>"  required class="form-control"/>
-                    
-                </div>
-                   <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Bagian </label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $namadepartment; ?>"  required class="form-control"/>
-                    
-                </div>
-                   <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Sub Bagian </label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $namadepartmentsub; ?>"  required class="form-control"/>
                     
                 </div>
                  <div class="form-group col-md-4">
@@ -203,7 +190,6 @@ $contupdate="hidden";
 $tid = @$_POST['tid'] ;
 $tnama = @$_POST ['tnama'];
 $tnoabsen = @$_POST ['tnoabsen'];
-$tdepartmen = @$_POST ['tdepartmen'];
 $tjabatan = @$_POST ['tjabatan'];
 $ttempatlahir = @$_POST ['ttempatlahir'];
 $ttanggallahir = @$_POST ['ttanggallahir'];
@@ -221,7 +207,7 @@ $simpan = @$_POST ['simpan'];
 $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('$tdepartmen','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">

@@ -51,14 +51,14 @@ $tampil = $koneksi->query("
  THEN (SELECT denda_istirahat FROM tb_denda) ELSE '0' END AS 'dendaistirahat' ,
   
   B.nama_karyawan , B.upah_harian, C.status_rkk, C.id_rkk_detail, 
-(SELECT nama_departmen FROM ms_departmen WHERE id_departmen = B.id_departmen) AS namadepartmen,
+(SELECT nama_departmen FROM ms_departmen WHERE id_departmen = C.id_departmen) AS namadepartmen,
 BB.nama_sub_department , C.status_rkk
 
    FROM tb_record A   
    LEFT JOIN ms_karyawan B ON A.userid = B.no_absen
    LEFT JOIN tb_rkk_detail C ON B.id_karyawan = C.id_karyawan
    LEFT JOIN tb_rkk D ON C.id_rkk = D.id_rkk
-   left join ms_sub_department BB on B.id_sub_department = BB.id_sub_department
+   left join ms_sub_department BB on C.id_sub_department = BB.id_sub_department
  WHERE A.tgl = '$tglrkk'  AND B.nama_karyawan <> ''
  AND C.id_rkk = '$idrkk' AND (C.status_rkk = 'Hadir' OR C.status_rkk = 'Pengganti')
  ORDER BY namadepartmen , A.tgl ASC

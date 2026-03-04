@@ -128,6 +128,14 @@ Berikut adalah ringkasan alur penggunaan aplikasi dari awal setup hingga proses 
 
 ## 🐛 Bug Fix Log
 
+### 4 Maret 2026
+1. **Migrasi Shift & Departemen (Bagian) ke Rencana Upah (RKK)** 
+   - Konsep database diubah: Pengelolaan **Bagian (Departemen)**, **Sub Bagian**, dan **Shift** tidak lagi terikat statis pada data pegawai (`ms_karyawan`), melainkan dicatat murni pada setiap periode Rencana Upah (`tb_rkk_detail`).
+   - Menambahkan kolom `id_departmen` dan `id_sub_department` pada tabel `tb_rkk_detail` untuk rekam jejak historis yang akurat.
+   - Form input dan tabel list pada seluruh **Modul Data Karyawan** (`karyawan.php`, `tambah.php`, `ubah.php`, `upah.php`, `view.php`, dan `shift.php`) telah dihapus secara menyeluruh dari atribut Shift & Bagian.
+   - Tabel list pada **Modul SIAC Employee** telah dibersihkan dari kolom Shift & Bagian.
+   - Tabel list list pada **Modul RKK Utama** (`page/rkk/rkk.php`) saat ini menampilkan rangkuman **Bagian** dan **Shift** secara otomatis.
+
 ### 3 Maret 2026
 1. **Error `Unknown database 'db_hr'`** — Database belum dibuat. Solusi: CREATE DATABASE + import SQL.
 2. **Error `Incorrect DATE value: ''`** di Absensi & Payroll — Default tanggal kosong diubah ke `date('Y-m-d')`.
@@ -144,11 +152,11 @@ Berikut adalah ringkasan alur penggunaan aplikasi dari awal setup hingga proses 
 Sistem saat ini telah melalui **Modernisasi UI (AdminLTE 3 + Tailwind CSS)**. Berikut adalah rincian fungsionalitas dan status dari pengembangan *logic backend* berdasarkan permintaan (Request) terbaru:
 
 ### 1. Master Data
-- [ ] **Karyawan:** (`page/karyawan/tambah.php`, `page/karyawan/ubah.php`)
-  - [ ] Form No. Absen hitung otomatis dari karyawan terakhir (tidak ketik manual).
-  - [ ] Sub Bagian dihapus dari form.
-  - [ ] OS/DHK diubah menjadi *dropdown* yang mengambil data dari tabel master (tidak ketik manual).
-  - [ ] Form Shift dihilangkan dari input.
+- [x] **Karyawan:** (`page/karyawan/tambah.php`, `page/karyawan/ubah.php`)
+  - [x] Form No. Absen hitung otomatis dari karyawan terakhir (tidak ketik manual).
+  - [x] Sub Bagian dihapus dari form.
+  - [x] OS/DHK diubah menjadi *dropdown* yang mengambil data dari tabel master (tidak ketik manual).
+  - [x] Form Shift dihilangkan dari input.
 - [ ] **Sub Bagian:** (`index.php`, `page/subbagian/`)
   - [ ] Menu & Master Sub Bagian dihilangkan.
 - [ ] **Jasa:** (`page/jasa/jasa.php`)
