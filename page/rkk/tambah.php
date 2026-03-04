@@ -113,6 +113,37 @@
                             </div>
                         </div>
                     </div>
+                    <?php
+// Cek apakah tombol simpan ditekan
+if (isset($_POST['simpan'])) {
+    
+    // Ambil data dari form
+    $tgl_rkk     = $_POST['ttgl1'];
+    $keterangan  = $_POST['tketerangan'];
+    $jam_kerja   = $_POST['tjamkerja'];
+    $detail_rkk  = date("Y-m-d H:i:s"); // Tanggal input otomatis saat ini
+    $tgl_status  = date("Y-m-d H:i:s"); // Tanggal status berubah dari owner
+
+    // Query simpan ke tb_rkk
+    $sql = $koneksi->query("INSERT INTO tb_rkk (tgl_rkk, keterangan, jam_kerja, detail_rkk, status_rkk, tgl_status) 
+                            VALUES ('$tgl_rkk', '$keterangan', '$jam_kerja', '$detail_rkk', '0', '$tgl_status')");
+
+    if ($sql) {
+        ?>
+        <script type="text/javascript">
+            alert("Data Berhasil Disimpan");
+            window.location.href = "?page=rkk";
+        </script>
+        <?php
+    } else {
+        ?>
+        <script type="text/javascript">
+            alert("Gagal Menyimpan Data: <?php echo $koneksi->error; ?>");
+        </script>
+        <?php
+    }
+}
+?>
                 </div>
             </form>
         </div>
