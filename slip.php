@@ -47,7 +47,9 @@ $sql = "SELECT
 FROM tb_realisasi_detail r
 JOIN ms_karyawan k ON r.id_karyawan = k.id_karyawan
 JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
-JOIN ms_departmen d ON k.id_departmen = d.id_departmen
+JOIN tb_realisasi rls ON r.id_realisasi = rls.id_realisasi
+JOIN tb_rkk rkk ON rls.id_rkk = rkk.id_rkk
+JOIN ms_departmen d ON rkk.id_departmen = d.id_departmen
 WHERE r.id_karyawan = '$id_karyawan'
   AND r.tgl_realisasi_detail BETWEEN '$tanggal_mulai' AND '$tanggal_akhir'
 ORDER BY r.tgl_realisasi_detail ASC;

@@ -12,7 +12,7 @@ if(isset($_GET['id'])){
                                   left join tb_jadwal C on A.id_jadwal = C.id_jadwal
                                   LEFT JOIN ms_karyawan BB on A.id_karyawan = BB.id_karyawan
                                  
-                                  LEFT JOIN ms_departmen BD on BB.id_departmen = BD.id_departmen
+                                  LEFT JOIN ms_departmen BD on B.id_departmen = BD.id_departmen
 
                                      left join ms_sub_department BC on BB.id_sub_department = BC.id_sub_department
                                    where A.id_rkk_detail = '$id' ");

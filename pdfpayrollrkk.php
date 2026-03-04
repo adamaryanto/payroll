@@ -23,7 +23,7 @@ end as upahkaryawan
 FROM tb_rkk_detail A 
 LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
-LEFT JOIN ms_departmen D on B.id_departmen = D.id_departmen
+LEFT JOIN ms_departmen D on C.id_departmen = D.id_departmen
 
    left join ms_sub_department BB on B.id_sub_department = BB.id_sub_department
 

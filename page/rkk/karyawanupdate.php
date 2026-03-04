@@ -62,8 +62,12 @@ $idrkkkaryawan = $datadetail['id_karyawan'];
 $no = 0;
 
 
-$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_departmen.nama_departmen FROM ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen 
-where ms_karyawan.status_karyawan = 'Aktif' ");
+$tampil = $koneksi->query("SELECT ms_karyawan.*, ms_departmen.nama_departmen 
+FROM ms_karyawan 
+LEFT JOIN tb_rkk_detail ON tb_rkk_detail.id_karyawan = ms_karyawan.id_karyawan AND tb_rkk_detail.id_rkk = '$idrkk'
+LEFT JOIN tb_rkk ON tb_rkk_detail.id_rkk = tb_rkk.id_rkk
+LEFT JOIN ms_departmen ON tb_rkk.id_departmen = ms_departmen.id_departmen 
+WHERE ms_karyawan.status_karyawan = 'Aktif'");
     while ($datakaryawan=$tampil->fetch_assoc())
     {
 

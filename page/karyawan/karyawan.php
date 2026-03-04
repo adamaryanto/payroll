@@ -20,7 +20,6 @@
                                         <th width="5%">No</th>
                                            <th >No. Absen</th>
                                            <th >Nama </th>
-                                           <th >Bagian</th>
                                             <th >Sub Bagian</th>
                                             <th >Shift</th>
                                             <th >OS/DHK</th>
@@ -53,7 +52,7 @@
 $no = 1;
 
 
-$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_sub_department.nama_sub_department , ms_departmen.nama_departmen, tb_jadwal.keterangan FROM ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen 
+$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_sub_department.nama_sub_department, tb_jadwal.keterangan FROM ms_karyawan 
 left join tb_jadwal on ms_karyawan.id_jadwal = tb_jadwal.id_jadwal left join ms_sub_department on ms_karyawan.id_sub_department = ms_sub_department.id_sub_department
  ");
     while ($datakaryawan=$tampil->fetch_assoc())
@@ -66,7 +65,6 @@ left join tb_jadwal on ms_karyawan.id_jadwal = tb_jadwal.id_jadwal left join ms_
 <td><?php echo $no ?></td>
 <td><?php echo $datakaryawan['no_absen'] ?></td>
 <td><?php echo $datakaryawan['nama_karyawan'] ?></td>
-<td><?php echo $datakaryawan['nama_departmen'] ?></td>
 <td><?php echo $datakaryawan['nama_sub_department'] ?></td>
 <td><?php echo $datakaryawan['keterangan'] ?></td>
 <td><?php echo $datakaryawan['OS_DHK'] ?></td>

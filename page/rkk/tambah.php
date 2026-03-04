@@ -94,6 +94,29 @@
                                 <span class="input-group-addon" style="border-radius: 0 8px 8px 0; background: #f9f9f9;">Jam</span>
                             </div>
                         </div>
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Bagian (Departemen) <span class="text-danger">*</span></label>
+                            <select class="form-control custom-input" name="tdepartmen" required>
+                                <option value="">- Pilih Bagian -</option>
+                                <?php 
+                                $sql_dept = $koneksi->query("SELECT * FROM ms_departmen");
+                                while ($dataRow = $sql_dept->fetch_array()) {
+                                    echo "<option value='".$dataRow['id_departmen']."'>".$dataRow['nama_departmen']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label class="label-text">Shift Laporan <span class="text-danger">*</span></label>
+                            <select class="form-control custom-input" name="tshift" required>
+                                <option value="">- Pilih Shift -</option>
+                                <option value="Pagi">Shift Pagi</option>
+                                <option value="Siang">Shift Siang</option>
+                                <option value="Malam">Shift Malam</option>
+                                <option value="Non-Shift">Non-Shift</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row" style="margin-top: 20px;">
@@ -113,8 +136,29 @@
                             </div>
                         </div>
                     </div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<?php
+$tketerangan = @$_POST['tketerangan'];
+$tdepartmen = @$_POST['tdepartmen'];
+$tshift = @$_POST['tshift'];
+
+$simpan = @$_POST['simpan'];
+if ($simpan) {
+    // Modify to insert into tb_rkk instead since this is the form to create a new one
+    $koneksi->query("INSERT INTO tb_rkk (tgl_rkk, detail_rkk, id_departmen, shift, jam_kerja, keterangan, status_rkk) VALUES ('$ttgl1', NOW(), '$tdepartmen', '$tshift', '$tjamkerja', '$tketerangan', '0')");
+    $id_rkk_baru = $koneksi->insert_id;
+?>
+    <script type="text/javascript">
+        alert("Rencana Upah Berhasil Dibuat");
+        window.location.href = "?page=rkk&aksi=karyawan&id=<?php echo $id_rkk_baru; ?>";
+    </script>
+<?php
+}
+?>
