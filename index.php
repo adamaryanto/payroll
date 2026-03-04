@@ -275,7 +275,7 @@ include "koneksi.php";
           </li>
 
           <li class="nav-item"><a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i> <p>Setting Device</p></a></li>
-         <!--
+<!--          
          <li class="treeview">
           <a href="#">
             <i class="fa fa-file-text-o"></i> <span style="background-color: white; color:black;">Report</span>
@@ -292,8 +292,6 @@ include "koneksi.php";
         </li>
       -->
         
-                                
-<li><a href="?page=mesin"><i style="background-color: white; color:black;" class="fa fa-cog"></i> <span style="background-color: white; color:black;">Setting Device</span></a></li> 
  <!--
          <li class="treeview">
           <a href="#">
