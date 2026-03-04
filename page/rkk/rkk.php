@@ -1,12 +1,7 @@
 <?php
 
 
-$tampil = $koneksi->query("SELECT A.*, 
-(select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, 
-(select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl,
-(SELECT GROUP_CONCAT(DISTINCT d.nama_departmen SEPARATOR ', ') FROM tb_rkk_detail rd JOIN ms_departmen d ON rd.id_departmen = d.id_departmen WHERE rd.id_rkk = A.id_rkk) as list_bagian,
-(SELECT GROUP_CONCAT(DISTINCT j.keterangan SEPARATOR ', ') FROM tb_rkk_detail rd JOIN tb_jadwal j ON rd.id_jadwal = j.id_jadwal WHERE rd.id_rkk = A.id_rkk) as list_shift
-from tb_rkk A ORDER BY A.id_rkk DESC");
+$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
 if ($_SESSION['level'] != "OWNER") {
     $level =  "Hidden";
 } else {
@@ -199,110 +194,6 @@ if ($_SESSION['level'] == "OWNER") {
                     <span class="d-inline d-md-none">&nbsp;Tambah</span>
                 </a>
             </div>
-<<<<<<< HEAD
-
-            <div class="table-responsive">
-                <div class="row" style=" background-color:whitesmoke; border:1px ; color:black; ">
-
-                </div>
-                <table class="table table-bordered table-striped" id="dataTables-example">
-                    <thead>
-                        <tr class="text-center">
-                            <th width="5%">No</th>
-                            <th>Tanggal</th>
-                            <th>Tanggal Input</th>
-                            <th>Jam Kerja</th>
-                            <th>Karyawan</th>
-                            <th>Bagian</th>
-                            <th>Shift</th>
-                            <th>Total Upah</th>
-                            <th>Keterangan</th>
-                            <th width="15%">Aksi Data</th>
-                            <th width="15%">Otorisasi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        $no = 1;
-                        while ($data = $tampil->fetch_assoc()) {
-                            // Logika Warna & Tombol
-                            if ($data['status_rkk'] == "1") {
-                                $bg = "#FFEBCD";
-                                $pro = "hidden";
-                                $app = "";
-                                $unpro = "";
-                                $unapp = "hidden";
-                            } elseif ($data['status_rkk'] == "2") {
-                                $bg = "#F0FFFF";
-                                $pro = "hidden";
-                                $app = "hidden";
-                                $unpro = "hidden";
-                                $unapp = "";
-                            } elseif ($data['status_rkk'] == "3") {
-                                $bg = "#98FB98";
-                                $pro = "hidden";
-                                $app = "hidden";
-                                $unpro = "hidden";
-                                $unapp = "hidden";
-                            } else {
-                                $bg = "transparent";
-                                $pro = "";
-                                $app = "hidden";
-                                $unpro = "hidden";
-                                $unapp = "hidden";
-                            }
-                        ?>
-                            <tr style="background-color:<?php echo $bg ?>; color:black;">
-                                <td class="text-center"><?php echo $no++; ?></td>
-                                <td class="text-center"><strong><?php echo $data['tgl_rkk'] ?></strong></td>
-                                <td class="text-center"><?php echo $data['detail_rkk'] ?></td>
-                                <td class="text-center"><?php echo $data['jam_kerja'] ?> Jam</td>
-                                <td class="text-center"><?php echo $data['jml'] ?> Org</td>
-                                <td class="text-center"><?php echo $data['list_bagian'] ?: '-'; ?></td>
-                                <td class="text-center"><?php echo $data['list_shift'] ?: '-'; ?></td>
-                                <td>Rp <?php echo number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
-                                <td><?php echo $data['keterangan'] ?></td>
-
-                                <td class="text-center">
-                                    <a href="?page=rkk&aksi=kelola&id=<?php echo $data['id_rkk']; ?>" class="btn btn-warning btn-xs">
-                                        <i class="fa fa-search"></i> <span class="d-none d-lg-inline"> Detail </span>
-                                    </a>
-                                    <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>" class="btn btn-info btn-xs">
-                                        <i class="fa fa-print"></i> <span class="d-none d-lg-inline">Cetak </span>
-                                    </a>
-                                </td>
-
-                                <td class="text-center">
-                                    <div <?php echo $hr ?>>
-                                        <div <?php echo $pro ?>>
-                                            <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=pro"
-                                                class="btn btn-danger btn-xs" onclick="return confirm('Propose data ini?');">Propose</a>
-                                        </div>
-                                        <div <?php echo $unpro ?>>
-                                            <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unpro"
-                                                class="btn btn-default btn-xs" onclick="return confirm('Batalkan Propose?');">UnPropose</a>
-                                        </div>
-                                    </div>
-
-                                    <div <?php echo $level ?>>
-                                        <div <?php echo $app ?>>
-                                            <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=app"
-                                                class="btn btn-success btn-xs" onclick="return confirm('Approve data ini?');">Approve</a>
-                                        </div>
-                                        <div <?php echo $unapp ?>>
-                                            <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unapp"
-                                                class="btn btn-default btn-xs" onclick="return confirm('Batalkan Approve?');">Un-Approve</a>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
-
-=======
->>>>>>> e62fcb0d8d10506e891e245fe8c57c61ff2a7b07
         </div>
 
         <div class="table-responsive">
