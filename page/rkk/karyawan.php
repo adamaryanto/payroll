@@ -1,205 +1,170 @@
 <?php
+// 1. Ambil ID RKK dari URL
+$idrkk = isset($_GET['id']) ? $_GET['id'] : "";
 
-if(isset($_GET['id'])){
-   $idrkk = $_GET['id'];
- }else{$idrkk = "";}
+// 2. Logika Simpan
+if (isset($_POST['simpan_karyawan'])) {
+    $idkaryawan = $_POST['id_karyawan'];
+    $id_dept    = $_POST['id_departmen'];
+    $id_sub     = $_POST['id_sub_department'];
+    $id_jadwal  = $_POST['id_jadwal']; // Ini adalah ID dari tabel jadwal
+    $upah       = $_POST['upah_manual'];
 
-   ?>
+    if (!empty($idkaryawan) && !empty($id_jadwal)) {
+        // Ambil data detail jam dari tabel jadwal
+        $ambil_jadwal = $koneksi->query("SELECT * FROM tb_jadwal WHERE id_jadwal = '$id_jadwal'");
+        $dj = $ambil_jadwal->fetch_assoc();
+        
+        $nama_shift = $dj['shift']; // Inilah variabel 'shift' yang akan disimpan ke tb_rkk_detail
+        $j_masuk    = $dj['jam_masuk'];
+        $j_keluar   = $dj['jam_keluar'];
+        $i_masuk    = $dj['istirahat_masuk'];
+        $i_keluar   = $dj['istirahat_keluar'];
+
+        // Cek duplikat
+        $cek = $koneksi->query("SELECT id_karyawan FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$idkaryawan'");
+
+        if ($cek->num_rows == 0) {
+            // INSERT dengan menyertakan tgl_updt menggunakan NOW() agar tidak error
+            $insert = $koneksi->query("INSERT INTO tb_rkk_detail 
+                (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, shift, status_rkk, 
+                 jam_masuk, jam_keluar, istirahat_masuk, istirahat_keluar, 
+                 potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
+                VALUES 
+                ('$idrkk', '$idkaryawan', '$upah', '$id_dept', '$id_sub', '$id_jadwal', '$nama_shift', 'Hadir', 
+                 '$j_masuk', '$j_keluar', '$i_masuk', '$i_keluar', 
+                 '0', '0', '0', NOW())");
+
+            if ($insert) {
+                echo "<script>
+                        alert('Karyawan Berhasil Ditambahkan');
+                        window.location.href = '?page=rkk&aksi=kelola&id=$idrkk';
+                      </script>";
+                exit;
+            } else {
+                die("Error simpan: " . $koneksi->error);
+            }
+        } else {
+            echo "<script>alert('Karyawan ini sudah ada!');</script>";
+        }
+    } else {
+        echo "<script>alert('Lengkapi data karyawan dan pilih shift!');</script>";
+    }
+}
+
+// Ambil data master
+$list_dept   = $koneksi->query("SELECT * FROM ms_departmen ORDER BY nama_departmen ASC");
+$list_sub    = $koneksi->query("SELECT * FROM ms_sub_department ORDER BY nama_sub_department ASC");
+$list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC");
+?>
+
+<style>
+    .custom-card { border-radius: 12px; border: none; box-shadow: 0 8px 20px rgba(0,0,0,0.08); background: #fff; margin-bottom: 30px; }
+    .custom-header { background: linear-gradient(45deg, #5F9EA0, #4d8284); color: white; padding: 15px 20px; border-radius: 12px 12px 0 0; }
+    .form-section { padding: 25px; }
+    .label-text { font-weight: bold; color: #555; margin-bottom: 8px; display: block; }
+    .btn-submit { background-color: #5F9EA0; border: none; color: white; padding: 10px 25px; border-radius: 8px; font-weight: bold; width: 100%; }
+</style>
 
 <div class="row">
-                <div class="col-md-12">
-                    <!-- Advanced Tables -->
-                    <div class="panel panel-primary"  >
-                    <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
-              <h3 class="box-title">Kelola Data Karyawan</h3>
+    <div class="col-md-8 col-md-offset-2">
+        <div class="panel custom-card">
+            <div class="panel-heading custom-header">
+                <h3 style="margin:0; font-size: 18px;"><i class="fa fa-user-plus"></i> Tambah Karyawan ke RKK</h3>
             </div>
-             <form method="POST"  enctype="multipart/form-data">
-                        <div class="panel-body">
-                           
-                      
-              
-            <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                  
-                </div>
-<input type="submit" name="simpan"  value="Simpan" class="btn btn-primary">
-                
-                                    </form>
-                                    <div class="form-group "></div>
+            <form method="POST">
+                <div class="panel-body form-section">
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="label-text">Cari No. Absen / Nama Karyawan</label>
+                            <input list="karyawan_list" id="search_karyawan" class="form-control" placeholder="Ketik NIK atau Nama..." autocomplete="off">
+                            <datalist id="karyawan_list">
+                                <?php
+                                $master = $koneksi->query("SELECT * FROM ms_karyawan WHERE status_karyawan = 'Aktif'");
+                                while ($row = $master->fetch_assoc()) {
+                                    // Simpan upah di attribute data-upah
+                                    echo "<option value='" . $row['no_absen'] . " | " . $row['nama_karyawan'] . "' data-id='" . $row['id_karyawan'] . "' data-jk='" . $row['jenis_kelamin'] . "' data-tgl='" . $row['tgl_aktif'] . "' data-upah='" . $row['upah_harian'] . "'>";
+                                }
+                                ?>
+                            </datalist>
+                            <input type="hidden" name="id_karyawan" id="id_karyawan">
+                        </div>
 
-                            <div class="table-responsive">
-                                
-                                <table class="table table-bordered table-striped" id="dataTables-example">
-                                    <thead >
-                                        <tr>
-                                          <th width="5%">Pilih</th>
-                                           <th hidden="hidden" >ID Karyawan</th>
-                                            <th >No. Absen</th>
-                                           <th >Nama </th>
-                                           <th >Bagian</th>
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Jenis Kelamin</label>
+                            <input type="text" id="jk" class="form-control" style="background:#f9f9f9" readonly>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Tanggal Aktif</label>
+                            <input type="text" id="tgl_aktif" class="form-control" style="background:#f9f9f9" readonly>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Upah Harian (Manual)</label>
+                            <input type="number" name="upah_manual" id="upah_manual" class="form-control" placeholder="Input Upah..." required>
+                        </div>
 
-                                        
-                                        <th >Jenis Kelamin</th> 
-                                          
-                                         
-                                           <th >Tanggal Aktif </th>
-                                             <th hidden="hidden">Upah Harian</th>
-                                             <th hidden="hidden">Upah Harian</th>
-                                              <th hidden="hidden">Status</th>
-                                              <th hidden="hidden">Kelola</th>
-                                              <th hidden="hidden">History</th>
-                         
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                                                <?php
+                        <div class="col-md-12"><hr></div>
 
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Pilih Shift Kerja</label>
+                            <select name="id_jadwal" class="form-control" required>
+                                <option value="">- Pilih Shift -</option>
+                                <?php 
+                                $list_jadwal->data_seek(0);
+                                while($j = $list_jadwal->fetch_assoc()) { ?>
+                                    <option value="<?= $j['id_jadwal']; ?>"><?= $j['keterangan']; ?> (<?= $j['jam_masuk']; ?> - <?= $j['jam_keluar']; ?>)</option>
+                                <?php } ?>
+                            </select>
+                        </div>
 
-$no = 0;
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Bagian (Departemen)</label>
+                            <select name="id_departmen" class="form-control" required>
+                                <option value="">- Pilih Departemen -</option>
+                                <?php $list_dept->data_seek(0); while ($d = $list_dept->fetch_assoc()) { ?>
+                                    <option value="<?= $d['id_departmen']; ?>"><?= $d['nama_departmen']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="label-text">Sub Bagian</label>
+                            <select name="id_sub_department" class="form-control" required>
+                                <option value="">- Pilih Sub Bagian -</option>
+                                <?php $list_sub->data_seek(0); while ($s = $list_sub->fetch_assoc()) { ?>
+                                    <option value="<?= $s['id_sub_department']; ?>"><?= $s['nama_sub_department']; ?></option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
 
-
-$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_departmen.nama_departmen FROM ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen  where ms_karyawan.status_karyawan = 'Aktif'
-  AND NOT EXISTS (SELECT 1 from tb_rkk_detail WHERE id_rkk = '$idrkk' and tb_rkk_detail.id_karyawan = ms_karyawan.id_karyawan )
- ");
-    while ($datakaryawan=$tampil->fetch_assoc())
-    {
-
-        $id = $datakaryawan['id_karyawan'] ;
-
- 
-
-
-?>
-
-
-                                        <tr>
-
-<td><input type="checkbox"
-
-
-  name="ck[]" value="<?php echo $no ; ?>" /></td>
-
-<td hidden="hidden"><input type="text" name="tidkaryawan[]" value="<?php echo $datakaryawan['id_karyawan'] ; ?>"/></td>
-<td><?php echo $datakaryawan['no_absen'] ?></td>
-
-<td><?php echo $datakaryawan['nama_karyawan'] ?></td>
-<td><?php echo $datakaryawan['nama_departmen'] ?></td>
-
-<td><?php echo $datakaryawan['jenis_kelamin'] ?></td>
-
-<td><?php echo $datakaryawan['tgl_aktif'] ?></td>
-
-<td hidden="hidden"><?php echo number_format( $datakaryawan['upah_harian'],0,',','.')  ?></td>
-<td hidden="hidden"><input type="text" name="tupah[]" value="<?php echo $datakaryawan['upah_harian'] ; ?>"/></td>
-<td hidden="hidden"><?php echo $datahasil2 ?></td>
-<td hidden="hidden">
-  <div
-<?php
-if($datahasil2 == "Hadir"){echo "checked";}elseif($datahasil2=="Pengganti"){echo "checked";}else{echo "hidden";}
-?>
-  ><a  href="?page=rkk&aksi=update&id=<?php echo $datadetail2['id_rkk_detail'];?>"  class="btn btn-warning"> Ganti</a></div>
-    
-</td>
-
-<td hidden="hidden">
-  <div
-<?php
-if($datahasil2=="Digantikan"){echo "checked";}else{echo "hidden";}
-?>
-  ><a  href="?page=rkk&aksi=history&id=<?php echo $datadetail2['id_rkk_detail'];?>"  class="btn btn-info"> History</a></div>
-    
-</td>
-<!--
-<td>
-    
-<a  href="?page=order&id=<?php echo $data['id_transaksi'];?>"  class="btn btn-success"> Update</a>
-
-
-</td>
--->
-                                      
-                                            
-                                        </tr>
-
-                                       <?php  $no++; } ?>
-
-                                    </tbody>   
-                                    </table>
-                            </div>
-
-                       
-
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-6">
+                            <a href="?page=rkk&aksi=kelola&id=<?= $idrkk; ?>" class="btn btn-default btn-block">Batal</a>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" name="simpan_karyawan" class="btn btn-submit">Simpan ke Daftar</button>
+                        </div>
                     </div>
                 </div>
+            </form>
         </div>
     </div>
-  
-    <script>
- $(document).ready( function () {
-$('#dataTables-example').DataTable({
-    scrollY: true,
-    
-    scrollY: 400,
-    pageLength: 1000,
-    "searching": true
-}
-);
+</div>
 
-} );
-   
-
-
+<script>
+    document.getElementById('search_karyawan').addEventListener('input', function() {
+        var val = this.value;
+        var opts = document.getElementById('karyawan_list').childNodes;
+        for (var i = 0; i < opts.length; i++) {
+            if (opts[i].value === val) {
+                document.getElementById('id_karyawan').value = opts[i].getAttribute('data-id');
+                document.getElementById('jk').value = opts[i].getAttribute('data-jk');
+                document.getElementById('tgl_aktif').value = opts[i].getAttribute('data-tgl');
+                
+                // Mengisi value awal upah dari data master, tapi masih bisa kamu ganti manual
+                document.getElementById('upah_manual').value = opts[i].getAttribute('data-upah');
+                break;
+            }
+        }
+    });
 </script>
-
-<?php
-  
-$simpan = @$_POST ['simpan'];
-if($simpan) {
-
-
-$tidkaryawan =$_POST['tidkaryawan'];
-$tupah = $_POST['tupah'];
-
-
-if(!empty($_POST['ck'])){
-foreach ($_POST['ck'] as $cek) {
- 
-
-$idkaryawan = $tidkaryawan[$cek];
-$upah = $tupah[$cek];
-$tampilcek=$koneksi->query("select COUNT(id_karyawan) as jml from tb_rkk_detail where id_rkk = '$idrkk' and id_karyawan = '$idkaryawan' ");
-$datacek=$tampilcek->fetch_assoc();
-$hasilcek = $datacek['jml'];
-
-if($hasilcek == "1"){}
-else{
-  $koneksi->query("insert into tb_rkk_detail (id_rkk,id_karyawan,upah,id_departmen,id_sub_department) select '$idrkk','$idkaryawan',upah_harian,id_departmen,id_sub_department from ms_karyawan where id_karyawan = '$idkaryawan' ");
-}
-   
-}
- ?>
-                <script type="text/javascript">
-                alert("Data Tersimpan");
-                window.location.href="?page=rkk&aksi=kelola&id=<?php echo $idrkk; ?>";
-
-            </script>
-            <?php
-
-
- 
-}else{
- ?>
-                <script type="text/javascript">
-                alert("Tidak Ada Data Yang Dipilih");
-
-            </script>
-            <?php
-
-}
-
- 
-
-
-}//simpan if
-
-
-?>
