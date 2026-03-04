@@ -12,9 +12,9 @@ if(isset($_GET['id'])){
                                   left join tb_jadwal C on A.id_jadwal = C.id_jadwal
                                   LEFT JOIN ms_karyawan BB on A.id_karyawan = BB.id_karyawan
                                  
-                                  LEFT JOIN ms_departmen BD on A.id_departmen = BD.id_departmen
+                                  LEFT JOIN ms_departmen BD on BB.id_departmen = BD.id_departmen
 
-                                     left join ms_sub_department BC on A.id_sub_department = BC.id_sub_department
+                                     left join ms_sub_department BC on BB.id_sub_department = BC.id_sub_department
                                    where A.id_rkk_detail = '$id' ");
 $datadetail=$tampildetail->fetch_assoc();
 $dataidrkk = $datadetail['id_rkk'];
@@ -35,8 +35,6 @@ $datanamakaryawan =$datadetail['nama_karyawan'];
 $databagian =$datadetail['nama_departmen'];
 $datasubbagian =$datadetail['nama_sub_department'];
 $datajenkel =$datadetail['jenis_kelamin'];
-$dataiddepartmen =$datadetail['id_departmen'];
-$dataidsubdepartment =$datadetail['id_sub_department'];
 
 $dataupah =$datadetail['upah'];
 $datapotongantelat =$datadetail['potongan_telat'];
@@ -62,8 +60,6 @@ $datanamakaryawan ="";
 $databagian ="";
 $datasubbagian ="";
 $datajenkel ="";
-$dataiddepartmen ="";
-$dataidsubdepartment ="";
 
 $dataupah ="";
 $datapotongantelat ="";
@@ -137,28 +133,12 @@ $datapotonganlainnya ="";
 
                      <div class="form-group col-md-4">
                     <label class="font-weight-bold">Bagian </label>
-                    <select class="form-control" name="tdepartmen">
-                     <option value="<?php echo $dataiddepartmen ?>"><?php echo $databagian ?></option>
-                                           <?php 
-                        $sqldept = $koneksi->query("select * from ms_departmen ");
-                        while ($datadeptRow =  $sqldept->fetch_array()) {
-                        echo "<option value='$datadeptRow[id_departmen]'>$datadeptRow[nama_departmen]</option>";
-                        }
-                        ?>
-                    </select>
+                    <input placeholder="*" autocomplete="off" type="text" name="tketerangan" value ="<?php echo $databagian ; ?>"  class="form-control"/>
                     </div>
 
                      <div class="form-group col-md-4">
                     <label class="font-weight-bold">Sub Bagian</label>
-                    <select class="form-control" name="tsubdepartment">
-                     <option value="<?php echo $dataidsubdepartment ?>"><?php echo $datasubbagian ?></option>
-                                           <?php 
-                        $sqlsubdept = $koneksi->query("select * from ms_sub_department ");
-                        while ($datasubdeptRow =  $sqlsubdept->fetch_array()) {
-                        echo "<option value='$datasubdeptRow[id_sub_department]'>$datasubdeptRow[nama_sub_department]</option>";
-                        }
-                        ?>
-                    </select>
+                    <input placeholder="*" autocomplete="off" type="text" name="tketerangan" value ="<?php echo $datasubbagian ; ?>"  class="form-control"/>
                     </div>
 
                      <div class="form-group col-md-4">
@@ -285,8 +265,6 @@ $tupah = @$_POST ['tupah'];
 $tpottelat = @$_POST ['tpottelat'];
 $tpotistirahat = @$_POST ['tpotistirahat'];
 $tpotlainnya = @$_POST ['tpotlainnya'];
-$tdepartmen = @$_POST ['tdepartmen'];
-$tsubdepartment = @$_POST ['tsubdepartment'];
 $simpan = @$_POST ['simpan'];
 
 
@@ -298,7 +276,7 @@ $tjamkeluar = $data['jam_keluar'];
 $tistirahatmasuk = $data['istirahat_masuk'];
 $tistirahatkeluar = $data['istirahat_keluar'];
 
-$sql = $koneksi->query("update tb_rkk_detail set upah = '$tupah',id_jadwal='$tshift',id_departmen='$tdepartmen',id_sub_department='$tsubdepartment',potongan_telat='$tpottelat',potongan_istirahat='$tpotistirahat',potongan_lainnya='$tpotlainnya' , jam_masuk ='$tjammasuk' , jam_keluar ='$tjamkeluar' , istirahat_masuk ='$tistirahatmasuk' , istirahat_keluar = '$tistirahatkeluar' , tgl_updt='$ttgl2' where id_rkk_detail = '$id' ");
+$sql = $koneksi->query("update tb_rkk_detail set upah = '$tupah',id_jadwal='$tshift',potongan_telat='$tpottelat',potongan_istirahat='$tpotistirahat',potongan_lainnya='$tpotlainnya' , jam_masuk ='$tjammasuk' , jam_keluar ='$tjamkeluar' , istirahat_masuk ='$tistirahatmasuk' , istirahat_keluar = '$tistirahatkeluar' , tgl_updt='$ttgl2' where id_rkk_detail = '$id' ");
 if($sql) {
         ?>
                 <script type="text/javascript">

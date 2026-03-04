@@ -172,7 +172,7 @@ $hasilcek = $datacek['jml'];
 
 if($hasilcek == "1"){}
 else{
-  $koneksi->query("insert into tb_rkk_detail (id_rkk,id_karyawan,upah,id_departmen,id_sub_department) select '$idrkk','$idkaryawan',upah_harian,id_departmen,id_sub_department from ms_karyawan where id_karyawan = '$idkaryawan' ");
+  $koneksi->query("insert into tb_rkk_detail (id_rkk,id_karyawan,upah) values('$idrkk','$idkaryawan','$upah') ");
 }
    
 }
