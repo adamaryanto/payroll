@@ -1,0 +1,16 @@
+[33m3955f6f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge main, fix id_jabatan empty string error and default foto value
+[33m7cd9713[m Draft pindah shift ke RKK
+[33me62fcb0[m update header
+[33m9e55b0a[m merge branch 'main' of https://github.com/adamaryanto/payroll
+[33mca05c25[m update button
+[33ma819ec0[m Revert "Migrate Shift and Department data to Rencana Upah"
+[33mb2386fe[m Merge branch 'main' of https://github.com/adamaryanto/payroll
+[33md7174ec[m Migrate Shift and Department data to Rencana Upah
+[33m27544f5[m Update frontend tech stack to AdminLTE 3 and Bootstrap 4
+[33m74d0a88[m feat: redesign dashboard widgets and update Upah query logic
+[33m3e36db1[m menu fixed
+[33mcc35970[m form tambah rkk
+[33m12f4eb8[m update ui rkk
+[33m6050354[m menu fixed
+[33m8cf9f5e[m add all files
+[33m37f1ed7[m first commit
