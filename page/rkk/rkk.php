@@ -1,7 +1,7 @@
 <?php
 
 
-$tampil = $koneksi->query("SELECT A.*, B.nama_departmen, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A LEFT JOIN ms_departmen B ON A.id_departmen = B.id_departmen ORDER BY A.id_rkk DESC");
+$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
 if ($_SESSION['level'] != "OWNER") {
     $level =  "Hidden";
 } else {
@@ -203,11 +203,11 @@ if ($_SESSION['level'] == "OWNER") {
                         <tr class="text-center">
                             <th width="5%">No</th>
                             <th>Tanggal</th>
-                            <th>Info Rencana</th>
-                            <th>Bagian</th>
-                            <th>Shift</th>
+                            <th>Tanggal Input</th>
+                            <th>Jam Kerja</th>
                             <th>Karyawan</th>
                             <th>Total Upah</th>
+                            <th>Keterangan</th>
                             <th width="15%">Aksi Data</th>
                             <th width="15%">Otorisasi</th>
                         </tr>
@@ -245,18 +245,12 @@ if ($_SESSION['level'] == "OWNER") {
                         ?>
                             <tr style="background-color:<?php echo $bg ?>; color:black;">
                                 <td class="text-center"><?php echo $no++; ?></td>
-                                <td class="text-center">
-                                    <strong><?php echo $data['tgl_rkk'] ?></strong><br>
-                                    <small class="text-muted"><?php echo $data['detail_rkk'] ?></small>
-                                </td>
-                                <td>
-                                    <?php echo $data['keterangan'] ?><br>
-                                    <small class="text-muted"><?php echo $data['jam_kerja'] ?> Jam Kerja</small>
-                                </td>
-                                <td class="text-center"><?php echo $data['nama_departmen'] ?></td>
-                                <td class="text-center"><?php echo $data['shift'] ?></td>
+                                <td class="text-center"><strong><?php echo $data['tgl_rkk'] ?></strong></td>
+                                <td class="text-center"><?php echo $data['detail_rkk'] ?></td>
+                                <td class="text-center"><?php echo $data['jam_kerja'] ?> Jam</td>
                                 <td class="text-center"><?php echo $data['jml'] ?> Org</td>
                                 <td>Rp <?php echo number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
+                                <td><?php echo $data['keterangan'] ?></td>
 
                                 <td class="text-center">
                                     <a href="?page=rkk&aksi=kelola&id=<?php echo $data['id_rkk']; ?>" class="btn btn-warning btn-xs">

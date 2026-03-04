@@ -56,7 +56,7 @@ $tampil = $koneksi->query("
  THEN (SELECT denda_istirahat FROM tb_denda) ELSE '0' END AS 'dendaistirahat' ,
   
   B.nama_karyawan , B.upah_harian, C.status_rkk, C.id_rkk_detail, 
-(SELECT nama_departmen FROM ms_departmen WHERE id_departmen = D.id_departmen) AS namadepartmen,
+(SELECT nama_departmen FROM ms_departmen WHERE id_departmen = B.id_departmen) AS namadepartmen,
 BB.nama_sub_department , C.status_rkk
 
    FROM tb_record A   

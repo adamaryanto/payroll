@@ -33,7 +33,23 @@
                     
                 </div>
           
-                  <!-- Bagian removed, will be injected on Rencana Upah creation instead -->
+             <div class="form-group col-md-4">
+                    <label class="font-weight-bold">Bagian</label>
+
+                     <select class="form-control" name="tdepartmen" required>
+                                           <?php 
+                        $sql = $koneksi->query("select * from ms_departmen");
+                            
+                        while ($dataRow =  $sql->fetch_array()) {
+                        if ($dataBagian == $dataRow['nama_departmen']) {
+                        $cek1 = " selected";
+                        } else { $cek1=""; }
+                        echo "<option value='$dataRow[id_departmen]' $cek>$dataRow[nama_departmen]</option>";
+                        }
+                        ?>
+                                            </select>
+                    
+                </div>
 
                  <div class="form-group col-md-4">
                     <label class="font-weight-bold">OS/DHK </label>
@@ -189,6 +205,7 @@
 $tid = @$_POST['tid'] ;
 $tnama = @$_POST ['tnama'];
 $tnoabsen = @$_POST ['tnoabsen'];
+$tdepartmen = @$_POST ['tdepartmen'];
 $tjabatan = @$_POST ['tjabatan'];
 $tos = @$_POST ['tos'];
 $tgolongan = @$_POST ['tgolongan'];
@@ -212,7 +229,7 @@ $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 //$idperusahaan = $_SESSION['idperusahaan'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs,upah_harian,upah_mingguan,upah_bulanan,OS_DHK,golongan) values('$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs','$tharian','$tmingguan','$tbulanan','$tos','$tgolongan')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs,upah_harian,upah_mingguan,upah_bulanan,OS_DHK,golongan) values('$tdepartmen','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs','$tharian','$tmingguan','$tbulanan','$tos','$tgolongan')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">

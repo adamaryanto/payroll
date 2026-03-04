@@ -35,7 +35,7 @@ if(isset($_GET['id'])){
                                            <th hidden="hidden" >ID Karyawan</th>
                                             <th >No. Absen</th>
                                            <th >Nama </th>
-                                           <th >Nama </th>
+                                           <th >Bagian</th>
 
                                         
                                         <th >Jenis Kelamin</th> 
@@ -57,7 +57,7 @@ if(isset($_GET['id'])){
 $no = 0;
 
 
-$tampil = $koneksi->query("SELECT * FROM ms_karyawan where status_karyawan = 'Aktif'
+$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_departmen.nama_departmen FROM ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen  where ms_karyawan.status_karyawan = 'Aktif'
   AND NOT EXISTS (SELECT 1 from tb_rkk_detail WHERE id_rkk = '$idrkk' and tb_rkk_detail.id_karyawan = ms_karyawan.id_karyawan )
  ");
     while ($datakaryawan=$tampil->fetch_assoc())
@@ -82,6 +82,7 @@ $tampil = $koneksi->query("SELECT * FROM ms_karyawan where status_karyawan = 'Ak
 <td><?php echo $datakaryawan['no_absen'] ?></td>
 
 <td><?php echo $datakaryawan['nama_karyawan'] ?></td>
+<td><?php echo $datakaryawan['nama_departmen'] ?></td>
 
 <td><?php echo $datakaryawan['jenis_kelamin'] ?></td>
 
