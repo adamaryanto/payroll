@@ -10,17 +10,30 @@ if (isset($_GET['id'])) {
   $datajamkerja   = $datadetail['jam_kerja'];
   $datastatusrkk   = $datadetail['status_rkk'];
 
-  $tampil = $koneksi->query("SELECT A.id_rkk_detail, B.no_absen , BB.nama_sub_department ,B.nama_karyawan , D.nama_departmen , C.tgl_rkk ,A.jam_masuk , A.jam_keluar , A.istirahat_keluar,
-A.istirahat_masuk , A.status_rkk,B.OS_DHK,B.golongan,
- A.upah as upahkaryawan, A.potongan_telat, A.potongan_istirahat, A.potongan_lainnya
+  $tampil = $koneksi->query("SELECT 
+    A.id_rkk_detail, 
+    B.no_absen, 
+    BB.nama_sub_department, 
+    B.nama_karyawan, 
+    D.nama_departmen, 
+    C.tgl_rkk, 
+    A.jam_masuk, 
+    A.jam_keluar, 
+    A.istirahat_keluar,
+    A.istirahat_masuk, 
+    A.status_rkk,
+    B.OS_DHK,
+    B.golongan,
+    A.upah as upahkaryawan, 
+    A.potongan_telat, 
+    A.potongan_istirahat, 
+    A.potongan_lainnya
 FROM tb_rkk_detail A 
-LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan
+LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
-LEFT JOIN ms_departmen D on A.id_departmen = D.id_departmen
-   left join ms_sub_department BB on A.id_sub_department = BB.id_sub_department
-
+LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
+LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department
 WHERE A.id_rkk = '$idrkk'
- 
 ");
 } else {
   $datatglrkk = "";
