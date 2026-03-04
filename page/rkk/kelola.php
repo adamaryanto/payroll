@@ -10,7 +10,7 @@ if (isset($_GET['id'])) {
   $datajamkerja   = $datadetail['jam_kerja'];
   $datastatusrkk   = $datadetail['status_rkk'];
 
-  $tampil = $koneksi->query("SELECT 
+ $tampil = $koneksi->query("SELECT 
     A.id_rkk_detail, 
     B.no_absen, 
     BB.nama_sub_department, 
@@ -24,6 +24,7 @@ if (isset($_GET['id'])) {
     A.status_rkk,
     B.OS_DHK,
     B.golongan,
+    J.keterangan as nama_shift, /* Mengambil Nama Shift dari tb_jadwal */
     A.upah as upahkaryawan, 
     A.potongan_telat, 
     A.potongan_istirahat, 
@@ -31,8 +32,9 @@ if (isset($_GET['id'])) {
 FROM tb_rkk_detail A 
 LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
-LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
-LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department
+LEFT JOIN ms_departmen D ON A.id_departmen = D.id_departmen
+LEFT JOIN ms_sub_department BB ON A.id_sub_department = BB.id_sub_department
+LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal /* Relasi lewat id_jadwal */
 WHERE A.id_rkk = '$idrkk'
 ");
 } else {
@@ -252,6 +254,7 @@ if ($datastatusrkk == 3) {
                 <th>Penempatan</th>
                 <th>OS/DHK</th>
                 <th>Gol</th>
+                <th>Shift</th>
                 <th>Jam Masuk/Pulang</th>
                 <th>Istirahat Keluar/Masuk</th>
                 <th>Upah (Rp)</th>
@@ -277,6 +280,11 @@ if ($datastatusrkk == 3) {
                   </td>
                   <td class="text-center"><?php echo $data['OS_DHK'] ?></td>
                   <td class="text-center"><?php echo $data['golongan'] ?></td>
+                 <td class="text-center">
+    <span class="label label-primary">
+        <?php echo ($data['nama_shift'] != "") ? $data['nama_shift'] : "Shift Tidak Set"; ?>
+    </span>
+</td>
                   <td class="text-center">
                     <span class="label label-success"><?php echo $data['jam_masuk'] ?></span> -
                     <span class="label label-danger"><?php echo $data['jam_keluar'] ?></span>
