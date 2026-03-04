@@ -5,7 +5,7 @@ Aplikasi web berbasis PHP untuk mengelola data karyawan, absensi, penggajian (pa
 ## Tech Stack
 - **Backend**: PHP 8.x (Native)
 - **Database**: MySQL 8.0
-- **Frontend**: AdminLTE 2, Bootstrap 3, jQuery, DataTables
+- **Frontend**: AdminLTE 3, Bootstrap 4, jQuery, DataTables
 - **Server**: Laragon (Apache)
 
 ---
