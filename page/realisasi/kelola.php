@@ -20,8 +20,9 @@ A.ra_istirahat_masuk ,
 FROM tb_realisasi_detail A 
 LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_realisasi C ON A.id_realisasi = C.id_realisasi
-LEFT JOIN ms_departmen D on A.id_departmen = D.id_departmen
-   left join ms_sub_department BB on A.id_sub_department = BB.id_sub_department
+LEFT JOIN tb_rkk_detail E ON A.id_rkk_detail = E.id_rkk_detail
+LEFT JOIN ms_departmen D on E.id_departmen = D.id_departmen
+   left join ms_sub_department BB on E.id_sub_department = BB.id_sub_department
 
 WHERE A.id_realisasi = '$idrealisasi'
  

@@ -165,7 +165,6 @@ $tagama = @$_POST ['tagama'];
 $tstatuskawin = @$_POST ['tstatuskawin'];
 $tjeniskelamin = @$_POST ['tjeniskelamin'];
 $tnoktp = @$_POST ['tnoktp'];
-$tnosim = @$_POST ['tnosim'];
 $talamatktp = @$_POST ['talamatktp'];
 $talamattinggal = @$_POST ['talamattinggal'];
 $ttanggalbergabung = @$_POST ['ttanggalbergabung'];
@@ -173,12 +172,11 @@ $tharian = @$_POST ['tharian'];
 $tmingguan = @$_POST ['tmingguan'];
 $tbulanan = @$_POST ['tbulanan'];
 $tbpjs = @$_POST ['tbpjs'];
-$tnpwp = @$_POST ['tnpwp'];
 $simpan = @$_POST ['simpan'];
 $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('0','0','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_bpjs) values('0','0','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tbpjs')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">

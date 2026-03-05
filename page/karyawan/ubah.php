@@ -21,9 +21,7 @@ $agama = $data['agama'];
 $statuskawin = $data['status_kawin'];
 $jeniskelamin = $data['jenis_kelamin'];
 $noktp = $data['no_ktp'];
-$nonpwp = $data['no_npwp'];
 $nobpjs = $data['no_bpjs'];
-$nosim = $data['no_sim'];
 $tos = $data['OS_DHK'];
 $golongan = $data['golongan'];
 $alamatktp = $data['alamat_ktp'];
@@ -48,7 +46,6 @@ $agama = "";
 $statuskawin = "";
 $jeniskelamin = "";
 $noktp = "";
-$nosim = "";
 $alamatktp = "";
 $alamattinggal = "";
 $statuskaryawan = "";
@@ -162,11 +159,6 @@ $contupdate="hidden";
                     
                 </div>
                   <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. SIM</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnosim" value="<?php echo $nosim; ?>"  class="form-control"/>
-                    
-                </div>
-                  <div class="form-group col-md-4">
                     <label class="font-weight-bold">Alamat KTP</label>
                     <input placeholder="*" autocomplete="off" type="text" name="talamatktp" value="<?php echo $alamatktp; ?>"  class="form-control"/>
                     
@@ -176,14 +168,9 @@ $contupdate="hidden";
                     <input placeholder="*" autocomplete="off" type="text" name="talamattinggal" value="<?php echo $alamattinggal; ?>"  class="form-control"/>
                     
                 </div>
-                  <div class="form-group col-md-4">
+                 <div class="form-group col-md-4">
                     <label class="font-weight-bold">Tanggal Bergabung</label>
                     <input placeholder="*" autocomplete="off" type="date" name="ttanggalbergabung" value="<?php echo $tglaktif; ?>"  class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. NPWP</label>
-                    <input  autocomplete="off" type="number" name="tnpwp" value="<?php echo $nonpwp; ?>" class="form-control"/>
                     
                 </div>
                 <div class="form-group col-md-4">
@@ -236,12 +223,10 @@ $tagama = @$_POST ['tagama'];
 $tstatuskawin = @$_POST ['tstatuskawin'];
 $tjeniskelamin = @$_POST ['tjeniskelamin'];
 $tnoktp = @$_POST ['tnoktp'];
-$tnosim = @$_POST ['tnosim'];
 $talamatktp = @$_POST ['talamatktp'];
 $talamattinggal = @$_POST ['talamattinggal'];
 $ttanggalbergabung = @$_POST ['ttanggalbergabung'];
 $tbpjs = @$_POST ['tbpjs'];
-$tnpwp = @$_POST ['tnpwp'];
 $ttos = @$_POST ['tos'];
 $tgolongan = @$_POST ['tgolongan'];
 $ttanggallahir = empty($ttanggallahir) ? 'NULL' : "'$ttanggallahir'";
@@ -252,7 +237,7 @@ $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 //$idperusahaan = $_SESSION['idperusahaan'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs,OS_DHK) values('0','0','$tnoabsen','$tnama','$ttempatlahir',$ttanggallahir,'$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif',$ttanggalbergabung,'$tnpwp','$tbpjs','$ttos')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_bpjs,OS_DHK) values('0','0','$tnoabsen','$tnama','$ttempatlahir',$ttanggallahir,'$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$talamatktp','$talamattinggal','Aktif',$ttanggalbergabung,'$tbpjs','$ttos')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">
@@ -264,8 +249,8 @@ if($sql) {
     }
 }//simpan if
 elseif($update) {
-$sql = $koneksi->query("update ms_karyawan set  no_absen ='$tnoabsen' ,nama_karyawan = '$tnama',tempat_lahir = '$ttempatlahir' ,tgl_lahir = $ttanggallahir,agama ='$tagama' ,status_kawin = '$tstatuskawin',jenis_kelamin = '$tjeniskelamin',no_ktp = '$tnoktp' ,no_sim = '$tnosim',alamat_ktp = '$talamatktp',alamat_tinggal = '$talamattinggal' , tgl_aktif = $ttanggalbergabung,
-  no_npwp = '$tnpwp' , no_bpjs = '$tbpjs',OS_DHK='$ttos',golongan='$tgolongan'
+$sql = $koneksi->query("update ms_karyawan set  no_absen ='$tnoabsen' ,nama_karyawan = '$tnama',tempat_lahir = '$ttempatlahir' ,tgl_lahir = $ttanggallahir,agama ='$tagama' ,status_kawin = '$tstatuskawin',jenis_kelamin = '$tjeniskelamin',no_ktp = '$tnoktp' ,alamat_ktp = '$talamatktp',alamat_tinggal = '$talamattinggal' , tgl_aktif = $ttanggalbergabung,
+  no_bpjs = '$tbpjs',OS_DHK='$ttos',golongan='$tgolongan'
  where id_karyawan = '$idu'  ");
 if($sql) {
         ?>

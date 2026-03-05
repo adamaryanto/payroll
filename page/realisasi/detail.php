@@ -11,10 +11,10 @@ if(isset($_GET['id'])){
                                   tb_realisasi B on A.id_realisasi = B.id_realisasi
                                   left join tb_jadwal C on A.id_jadwal = C.id_jadwal
                                   LEFT JOIN ms_karyawan BB on A.id_karyawan = BB.id_karyawan
-                                 
-                                  LEFT JOIN ms_departmen BD on A.id_departmen = BD.id_departmen
+                                  LEFT JOIN tb_rkk_detail RD on A.id_rkk_detail = RD.id_rkk_detail
+                                  LEFT JOIN ms_departmen BD on RD.id_departmen = BD.id_departmen
 
-                                     left join ms_sub_department BC on A.id_sub_department = BC.id_sub_department
+                                     left join ms_sub_department BC on RD.id_sub_department = BC.id_sub_department
                                    where A.id_realisasi_detail = '$id' ");
 
 

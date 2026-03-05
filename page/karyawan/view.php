@@ -16,9 +16,7 @@ $golongan = $data['golongan'];
 $statuskawin = $data['status_kawin'];
 $jeniskelamin = $data['jenis_kelamin'];
 $noktp = $data['no_ktp'];
-$nonpwp = $data['no_npwp'];
 $nobpjs = $data['no_bpjs'];
-$nosim = $data['no_sim'];
 $alamatktp = $data['alamat_ktp'];
 $alamattinggal = $data['alamat_tinggal'];
 $statuskaryawan = $data['status_karyawan'];
@@ -39,7 +37,6 @@ $golongan= "";
 $statuskawin = "";
 $jeniskelamin = "";
 $noktp = "";
-$nosim = "";
 $alamatktp = "";
 $alamattinggal = "";
 $statuskaryawan = "";
@@ -173,20 +170,6 @@ $contupdate="hidden";
                     </div>
 
                     <div class="form-group">
-                        <label class="block text-sm font-semibold text-gray-500 mb-2">No. SIM</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium font-mono">
-                            <?php echo $nosim ? $nosim : '-'; ?>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="block text-sm font-semibold text-gray-500 mb-2">No. NPWP</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium font-mono">
-                            <?php echo $nonpwp ? $nonpwp : '-'; ?>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
                         <label class="block text-sm font-semibold text-gray-500 mb-2">No. BPJS</label>
                         <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium font-mono">
                             <?php echo $nobpjs ? $nobpjs : '-'; ?>
@@ -247,17 +230,15 @@ $tagama = @$_POST ['tagama'];
 $tstatuskawin = @$_POST ['tstatuskawin'];
 $tjeniskelamin = @$_POST ['tjeniskelamin'];
 $tnoktp = @$_POST ['tnoktp'];
-$tnosim = @$_POST ['tnosim'];
 $talamatktp = @$_POST ['talamatktp'];
 $talamattinggal = @$_POST ['talamattinggal'];
 $ttanggalbergabung = @$_POST ['ttanggalbergabung'];
 $tbpjs = @$_POST ['tbpjs'];
-$tnpwp = @$_POST ['tnpwp'];
 $simpan = @$_POST ['simpan'];
 $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tbpjs')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">
@@ -269,7 +250,7 @@ if($sql) {
     }
 }//simpan if
 elseif($update) {
-$sql = $koneksi->query("update ms_karyawan set no_absen ='$tnoabsen' ,nama_karyawan = '$tnama',tempat_lahir = '$ttempatlahir' ,tgl_lahir = '$ttanggallahir',agama ='$tagama' ,status_kawin = '$tstatuskawin',jenis_kelamin = '$tjeniskelamin',no_ktp = '$tnoktp' ,no_sim = '$tnosim',alamat_ktp = '$talamatktp',alamat_tinggal = '$talamattinggal' , tgl_aktif = '$ttanggalbergabung' where id_karyawan = '$idu'  ");
+$sql = $koneksi->query("update ms_karyawan set no_absen ='$tnoabsen' ,nama_karyawan = '$tnama',tempat_lahir = '$ttempatlahir' ,tgl_lahir = '$ttanggallahir',agama ='$tagama' ,status_kawin = '$tstatuskawin',jenis_kelamin = '$tjeniskelamin',no_ktp = '$tnoktp' ,alamat_ktp = '$talamatktp',alamat_tinggal = '$talamattinggal' , tgl_aktif = '$ttanggalbergabung' where id_karyawan = '$idu'  ");
 if($sql) {
         ?>
                 <script type="text/javascript">

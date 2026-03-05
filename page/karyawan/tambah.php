@@ -101,14 +101,6 @@
                             <input type="text" name="tnoktp" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
                         </div>
                         <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. SIM</label>
-                            <input type="text" name="tnosim" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan No. SIM">
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. NPWP</label>
-                            <input type="number" name="tnpwp" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan No. NPWP">
-                        </div>
-                        <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. BPJS</label>
                             <input type="number" name="tbpjs" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan No. BPJS">
                         </div>
