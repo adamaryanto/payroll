@@ -354,17 +354,19 @@ CREATE TABLE `ms_login` (
   `id_perusahaan` int(10) NOT NULL,
   `user_login` varchar(225) NOT NULL,
   `lg_password` varchar(255) NOT NULL,
-  `level` enum('sa','admin','user','OWNER') DEFAULT NULL
+  `role` enum('kepala gudang','admin','admin master','OWNER') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `ms_login`
 --
 
-INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `level`) VALUES
-(1, 1, 'admin', '123', 'sa'),
-(2, 1, 'mahmudin', '123', 'sa'),
-(3, 1, 'owner', '123', 'OWNER');
+INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `role`) VALUES
+(1, 1, 'admin', '123', 'admin'),
+(2, 1, 'kepala gudang', '123', 'kepala gudang'),
+(3, 1, 'owner', '123', 'OWNER'),
+(4, 1, 'admin master', '123', 'admin master'),
+
 
 -- --------------------------------------------------------
 

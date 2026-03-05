@@ -37,13 +37,17 @@ $tpassword = $data['lg_password'];
                     
                 </div>
                 </div>
-                <div class="row" hidden="hidden" style=" border:1px ; color:black; "> 
+                <div class="row" style=" border:1px ; color:black; "> 
                  <div class="form-group col-md-12">
-                    <label class="font-weight-bold">Password</label>
-                    <input placeholder="*" autocomplete="off" type="password" name="tpassword" value="<?php echo $tpassword ; ?>"class="form-control"/>
-                    
+                    <label class="font-weight-bold">Role</label>
+                    <select name="trole" class="form-control select2" required>
+                        <option value="owner" <?php if($data['role'] == 'owner') echo 'selected'; ?>>Owner</option>
+                        <option value="Admin HRD" <?php if($data['role'] == 'Admin HRD') echo 'selected'; ?>>Admin HRD</option>
+                        <option value="Kepala Gudang" <?php if($data['role'] == 'Kepala Gudang') echo 'selected'; ?>>Kepala Gudang</option>
+                        <option value="Admin Master" <?php if($data['role'] == 'Admin Master') echo 'selected'; ?>>Admin Master</option>
+                    </select>
+                 </div>
                 </div>
-            </div>
          
                   <div class="row" style="  border:1px ; color:black; "> 
                     <div class="form-group col-md-4">
@@ -68,9 +72,10 @@ $tpassword = $data['lg_password'];
 <?php
 
 $tnama = @$_POST ['tnama'];
+$trole = @$_POST ['trole'];
 $simpan = @$_POST ['simpan'];
 if($simpan) {
-$sql = $koneksi->query("update ms_login set user_login='$tnama' where id_login = '$idu'  ");
+$sql = $koneksi->query("update ms_login set user_login='$tnama', role='$trole' where id_login = '$idu'  ");
 if($sql) {
         ?>
                 <script type="text/javascript">

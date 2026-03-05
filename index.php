@@ -251,6 +251,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 </a>
               </li>
 
+              <?php if ($_SESSION['role'] != 'Owner') : ?>
               <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-cogs"></i>
@@ -272,6 +273,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     </a></li>
                 </ul>
               </li>
+              <?php endif; ?>
 
               <li class="nav-item"><a href="?page=rkk" class="nav-link"><i class="nav-icon far fa-calendar-plus"></i>
                   <p>Rencana Upah</p>
@@ -283,6 +285,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <p>Cetak Slip</p>
                 </a></li>
 
+              <?php if ($_SESSION['role'] != 'Owner') : ?>
               <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="nav-icon far fa-clock"></i>
                   <p>Jadwal</p>
                 </a></li>
@@ -293,7 +296,9 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="nav-icon fas fa-exclamation-triangle"></i>
                   <p>Denda</p>
                 </a></li>
+              <?php endif; ?>
 
+              <?php if ($_SESSION['role'] != 'Owner') : ?>
               <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-clipboard-list"></i>
@@ -324,6 +329,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               <li class="nav-item"><a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i>
                   <p>Setting Device</p>
                 </a></li>
+              <?php endif; ?>
               <!--          
          <li class="treeview">
           <a href="#">
@@ -804,18 +810,26 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
             '</div>'
           );
 
-          $state.find('.btn-delete-item').on('click', function(e) {
+          $state.find('.btn-delete-item').on('mousedown', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            if (confirm('Hapus "' + state.text + '" dari master data?')) {
+            const $btn = $(this);
+            const itemId = $(state.element).data('id') || state.id; // Use data-id or fallback to value
+            const itemText = state.text;
+
+            if (confirm('Hapus "' + itemText + '" dari master data?')) {
               $.post('page/ajax/hapus_master.php', {
-                id: $(this).data('id'),
+                id: itemId,
                 route: deleteUrl
               }, function(res) {
                 if (res.success) {
-                  $select.find('option[value="' + state.id + '"]').remove();
+                  $select.find('option[data-id="' + itemId + '"], option[value="' + itemId + '"]').remove();
                   $select.trigger('change');
-                  $select.select2('close');
+                  // To force the results list to refresh, we briefly close/open or rebuild
+                  const currentOpen = $select.data('select2').isOpen();
+                  if (currentOpen) {
+                    $select.select2('close').select2('open');
+                  }
                 } else {
                   alert('Gagal menghapus: ' + (res.message || 'Data mungkin sedang digunakan.'));
                 }
@@ -831,15 +845,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
         }
       });
 
-      // Handle Quick Add in Dropdowns
-      $(document).on('change', 'select', function() {
-        if ($(this).val() === 'add_new') {
-          const url = $(this).find('option:selected').data('url');
-          if (url) {
-            window.location.href = url;
-          }
-        }
-      });
     });
   </script>
 

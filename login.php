@@ -111,47 +111,23 @@ include "koneksi.php";
   if (isset($_POST['login'])){
 
     $username = @$_POST['tusername'];
-      $idperusahaan = @$_POST['tidp'];
     $pass = @$_POST['tpass'];
   $uname=str_replace(' ','',$username) ;
 $tgl1 = date("Y-m-d-H-i-s");
 // if($cek =='user'){
  $sql = $koneksi -> query("SELECT * FROM ms_login WHERE user_login ='$uname' AND lg_password = '$pass' ");
 $tampil = $sql->fetch_assoc();
-
+$ketemu = $sql -> num_rows;
 
 
   
-  if(isset($tampil)){
-     session_start();
-
-
+  if($ketemu > 0){
      $_SESSION['iduser'] = $tampil['id_login'];
-    $_SESSION['nama'] = $tampil['user_login'];
-    $_SESSION['passuser']     = $tampil['lg_password'];
-     $_SESSION['level']     = $tampil['level'];
-     $id=$tampil['id_user'];
-     $lvl =$tampil['level'];
-//if($lvl=='superadmin'){
-//  $koneksi -> query("insert into app_user (id_user,nama_user,tgl) SELECT id_user , nama , '$tgl1'  from tb_user  where id_user ='$id'  ");
- // header("location:indexadmin.php"); 
-//}elseif($lvl=='manajer'){
- // $koneksi -> query("insert into app_user (id_user,nama_user,tgl) SELECT id_user , nama , '$tgl1'  from tb_user  where id_user ='$id'  ");
- // header("location:indexmanajer.php"); 
-//}elseif($lvl=='operator'){
- // $koneksi -> query("insert into app_user (id_user,nama_user,tgl) SELECT id_user , nama , '$tgl1'  from tb_user  where id_user ='$id'  ");
-  //header("location:indexoperator.php"); 
-//}elseif($lvl=='finance'){
-  //$koneksi -> query("insert into app_user (id_user,nama_user,tgl) SELECT id_user , nama , '$tgl1'  from tb_user  where id_user ='$id'  ");
-  //header("location:indexfinance.php"); 
-//}
+     $_SESSION['nama'] = $tampil['user_login'];
+     $_SESSION['passuser'] = $tampil['lg_password'];
+     $_SESSION['role'] = $tampil['role'];
 
-//else{
- // header("location:indexuser.php");
-///}
-
- //$koneksi -> query("insert into app_user (id_user,nama_user,tgl) SELECT id_user , nama , '$tgl1'  from tb_user  where id_user ='$id'  ");
-  header("location:index.php"); 
+     header("location:index.php"); 
 }else
 {
   ?>

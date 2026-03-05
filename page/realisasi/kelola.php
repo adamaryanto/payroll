@@ -45,9 +45,9 @@ $datastatusrealisasi   = 3;
 if($datastatusrealisasi == 3){
   $status="Hidden";
 }elseif($datastatusrealisasi == 2){
-  if($_SESSION['level'] !="OWNER"){ $status="Hidden";}else{$status="";}
+  if($_SESSION['role'] !="owner"){ $status="Hidden";}else{$status="";}
 }elseif($datastatusrealisasi == 1){
-  if($_SESSION['level'] !="OWNER"){ $status="Hidden";}else{$status="";}
+  if($_SESSION['role'] !="owner"){ $status="Hidden";}else{$status="";}
 }
 
 else{

@@ -1,43 +1,80 @@
 <?php
 if (isset($_POST['simpan'])) {
-    $nama = $_POST['tnama'];
-    $noabsen = $_POST['tnoabsen'];
-    $os = $_POST['tos'];
-    $golongan = $_POST['tgolongan'];
-    $jeniskelamin = $_POST['tjeniskelamin'];
-    $agama = $_POST['tagama'];
-    $tempatlahir = $_POST['ttempatlahir'];
-    $tanggallahir = $_POST['ttanggallahir'];
-    $statuskawin = $_POST['tstatuskawin'];
-    $noktp = $_POST['tnoktp'];
-    $bpjs = $_POST['tbpjs'];
-    $alamatktp = $_POST['talamatktp'];
-    $tanggalbergabung = $_POST['ttanggalbergabung'];
+    // ---------------------------------------------------------
+    // Inline Master Data Creation Logic
+    // ---------------------------------------------------------
+    
+    // Function to handle inline insert and return new ID
+    function getOrInsertMaster($koneksi, $postKey, $table, $column, $extraData = []) {
+        // Ambil dari input baru jika ada (dikirim via JavaScript)
+        $newValue = isset($_POST['new_' . $postKey]) ? trim($koneksi->real_escape_string($_POST['new_' . $postKey])) : '';
+        
+        if ($newValue !== '') {
+            // Check if exists
+            $check = $koneksi->query("SELECT * FROM $table WHERE $column = '$newValue'");
+            if ($check && $check->num_rows > 0) {
+                $existing = $check->fetch_assoc();
+                $pkResult = $koneksi->query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
+                $pk = $pkResult->fetch_assoc()['Column_name'];
+                return $existing[$pk];
+            }
+            
+            // Insert new
+            $cols = [$column];
+            $vals = ["'$newValue'"];
+            foreach ($extraData as $c => $v) {
+                $cols[] = $c;
+                $vals[] = "'$v'";
+            }
+            
+            $koneksi->query("INSERT INTO $table (" . implode(',', $cols) . ") VALUES (" . implode(',', $vals) . ")");
+            return $koneksi->insert_id;
+        }
+        
+        // Ambil nilai reguler. Jika 'add_new' (berarti gagal isi prompt), kembalikan 0 agar tidak error DB.
+        $selectedVal = isset($_POST[$postKey]) ? $koneksi->real_escape_string($_POST[$postKey]) : 0;
+        return ($selectedVal === 'add_new') ? 0 : $selectedVal;
+    }
+
+    $departmen = getOrInsertMaster($koneksi, 'tdepartmen', 'ms_departmen', 'nama_departmen', ['id_perusahaan' => '1']);
+    $subdept = getOrInsertMaster($koneksi, 'tsubdept', 'ms_sub_department', 'nama_sub_department', ['id_perusahaan' => '1']);
+    $jabatan = getOrInsertMaster($koneksi, 'tjabatan', 'ms_jabatan', 'jabatan', ['id_perusahaan' => '1']);
+    $os = getOrInsertMaster($koneksi, 'tos', 'ms_os_dhk', 'OS_DHK');
+    $golongan = getOrInsertMaster($koneksi, 'tgolongan', 'ms_golongan', 'golongan');
+    $agama = getOrInsertMaster($koneksi, 'tagama', 'ms_agama', 'agama');
+    $statuskawin = getOrInsertMaster($koneksi, 'tstatuskawin', 'ms_status_kawin', 'status_kawin');
+    
+    // ---------------------------------------------------------
+
+    $nama = $koneksi->real_escape_string($_POST['tnama']);
+    $noabsen = $koneksi->real_escape_string($_POST['tnoabsen']);
+    $jeniskelamin = $koneksi->real_escape_string($_POST['tjeniskelamin']);
+    $tempatlahir = $koneksi->real_escape_string($_POST['ttempatlahir']);
+    $tanggallahir = $koneksi->real_escape_string($_POST['ttanggallahir']);
+    $noktp = $koneksi->real_escape_string($_POST['tnoktp']);
+    $bpjs = $koneksi->real_escape_string($_POST['tbpjs']);
+    $alamatktp = $koneksi->real_escape_string($_POST['talamatktp']);
+    $tanggalbergabung = $koneksi->real_escape_string($_POST['ttanggalbergabung']);
     $harian = $_POST['tharian'] ?: 0;
     $mingguan = $_POST['tmingguan'] ?: 0;
     $bulanan = $_POST['tbulanan'] ?: 0;
-    
-    $departmen = isset($_POST['tdepartmen']) ? $_POST['tdepartmen'] : 0;
-    $jabatan = isset($_POST['tjabatan']) ? $_POST['tjabatan'] : 0;
-    $subdept = isset($_POST['tsubdept']) ? $_POST['tsubdept'] : 0;
-    $jadwal = isset($_POST['tjadwal']) ? $_POST['tjadwal'] : 0;
 
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
         status_kawin, jenis_kelamin, no_ktp, alamat_ktp, alamat_tinggal, 
         status_karyawan, tgl_aktif, foto, no_bpjs, upah_harian, upah_mingguan, 
-        upah_bulanan, id_jadwal, id_sub_department, OS_DHK, golongan
+        upah_bulanan, id_sub_department, OS_DHK, golongan
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
         '$statuskawin', '$jeniskelamin', '$noktp', '$alamatktp', '',
         'Aktif', '$tanggalbergabung', '', '$bpjs', '$harian', '$mingguan',
-        '$bulanan', '$jadwal', '$subdept', '$os', '$golongan'
+        '$bulanan', '$subdept', '$os', '$golongan'
     )");
 
     if ($sql) {
         echo "<script>alert('Data Berhasil Disimpan'); window.location='?page=karyawan';</script>";
     } else {
-        echo "<script>alert('Gagal Simpan Data');</script>";
+        echo "<script>alert('Gagal Simpan Data: " . $koneksi->error . "');</script>";
     }
 }
 ?>
@@ -50,7 +87,7 @@ if (isset($_POST['simpan'])) {
             <p class="text-sm text-gray-500 mt-1">Lengkapi formulir di bawah ini untuk mendaftarkan karyawan baru.</p>
         </div>
 
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" id="formTambahKaryawan">
             <div class="card-body p-6 bg-gray-50/30">
                 
                 <div class="mb-8">
@@ -69,7 +106,7 @@ if (isset($_POST['simpan'])) {
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. Absen</label>
                             <?php
-                                $q_absen = $koneksi->query("SELECT MAX(no_absen) as max_absen FROM ms_karyawan");
+                                $q_absen = $koneksi->query("SELECT MAX(CAST(no_absen AS UNSIGNED)) as max_absen FROM ms_karyawan");
                                 $dt_absen = $q_absen->fetch_assoc();
                                 $new_absen = (int)$dt_absen['max_absen'] + 1;
                             ?>
@@ -112,25 +149,13 @@ if (isset($_POST['simpan'])) {
                                 <?php
                                 $q_jab = $koneksi->query("SELECT * FROM ms_jabatan");
                                 while($d = $q_jab->fetch_assoc()) {
-                                    echo "<option value='".$d['id_jabatan']."'>".$d['jabatan']."</option>";
+                                    // Sudah diperbaiki: value menggunakan id_jabatan
+                                    echo "<option value='".$d['id_jabatan']."' data-id='".$d['id_jabatan']."'>".$d['jabatan']."</option>";
                                 }
                                 ?>
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Jadwal</label>
-                            <select name="tjadwal" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Jadwal -" data-delete-route="jadwal">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=jadwal&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Jadwal Baru...</option>
-                                <?php
-                                $q_jadwal = $koneksi->query("SELECT * FROM tb_jadwal");
-                                while($d = $q_jadwal->fetch_assoc()) {
-                                    echo "<option value='".$d['id_jadwal']."'>".$d['nama_jadwal']."</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
 
 
                         <div class="form-group">
@@ -141,7 +166,8 @@ if (isset($_POST['simpan'])) {
                                 <?php
                                 $q_os = $koneksi->query("SELECT * FROM ms_os_dhk");
                                 while($d = $q_os->fetch_assoc()) {
-                                    echo "<option value='".$d['nama_os_dhk']."'>".$d['nama_os_dhk']."</option>";
+                                    // Sudah diperbaiki: Menggunakan id_os_dhk
+                                    echo "<option value='".$d['id_os_dhk']."' data-id='".$d['id_os_dhk']."'>".$d['nama_os_dhk']."</option>";
                                 }
                                 ?>
                             </select>
@@ -155,7 +181,8 @@ if (isset($_POST['simpan'])) {
                                 <?php
                                 $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
                                 while($d = $q_gol->fetch_assoc()) {
-                                    echo "<option value='".$d['golongan']."'>".$d['golongan']."</option>";
+                                    // Sudah diperbaiki: menggunakan id_golongan
+                                    echo "<option value='".$d['id_golongan']."' data-id='".$d['id_golongan']."'>".$d['golongan']."</option>";
                                 }
                                 ?>
                             </select>
@@ -177,7 +204,8 @@ if (isset($_POST['simpan'])) {
                                 <?php
                                 $q_agama = $koneksi->query("SELECT * FROM ms_agama");
                                 while($d = $q_agama->fetch_assoc()) {
-                                    echo "<option value='".$d['agama']."'>".$d['agama']."</option>";
+                                    // Sudah diperbaiki: menggunakan id_agama
+                                    echo "<option value='".$d['id_agama']."' data-id='".$d['id_agama']."'>".$d['agama']."</option>";
                                 }
                                 ?>
                             </select>
@@ -201,7 +229,8 @@ if (isset($_POST['simpan'])) {
                                 <?php
                                 $q_status = $koneksi->query("SELECT * FROM ms_status_kawin");
                                 while($d = $q_status->fetch_assoc()) {
-                                    echo "<option value='".$d['status_kawin']."'>".$d['status_kawin']."</option>";
+                                    // Sudah diperbaiki: menggunakan id_status_kawin
+                                    echo "<option value='".$d['id_status_kawin']."' data-id='".$d['id_status_kawin']."'>".$d['status_kawin']."</option>";
                                 }
                                 ?>
                             </select>
@@ -290,3 +319,42 @@ if (isset($_POST['simpan'])) {
         -moz-appearance: textfield;
     }
 </style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('.select2-manage').on('change', function() {
+        var $select = $(this);
+        var selectName = $select.attr('name');
+        var selectedVal = $select.val();
+
+        if (selectedVal === 'add_new') {
+            // Mengambil label text (Misal: "Sub Departemen")
+            var label = $select.closest('.form-group').find('label').text().replace('*', '').trim();
+            
+            // Tampilkan prompt
+            var newData = prompt("Masukkan " + label + " Baru:");
+
+            if (newData && newData.trim() !== "") {
+                // Hapus input hidden lama jika user mencoba input berkali-kali
+                $('input[name="new_' + selectName + '"]').remove();
+                
+                // Tambahkan input hidden baru ke form
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'new_' + selectName,
+                    value: newData.trim()
+                }).appendTo('#formTambahKaryawan'); // ID Form
+
+                // Tambahkan opsi secara visual agar tidak "disabled" atau blank
+                var newOption = new Option(newData.trim(), newData.trim(), true, true);
+                $select.append(newOption).trigger('change');
+            } else {
+                // Jika batal, reset pilihan
+                $select.val('').trigger('change');
+            }
+        }
+    });
+});
+</script>

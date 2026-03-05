@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'jadwal' => ['table' => 'tb_jadwal', 'pk' => 'id_jadwal'],
         'agama' => ['table' => 'ms_agama', 'pk' => 'id_agama'],
         'golongan' => ['table' => 'ms_golongan', 'pk' => 'id_golongan'],
-        'statuskawin' => ['table' => 'ms_status_kawin', 'pk' => 'id_status_kawin'],
+        'status_kawin' => ['table' => 'ms_status_kawin', 'pk' => 'id_status_kawin'],
         'os_dhk' => ['table' => 'ms_os_dhk', 'pk' => 'id_os_dhk'],
     ];
 

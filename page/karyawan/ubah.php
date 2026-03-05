@@ -49,11 +49,42 @@ if (isset($_POST['update'])) {
     $tharian = $_POST['tharian'] ?: 0;
     $tmingguan = $_POST['tmingguan'] ?: 0;
     $tbulanan = $_POST['tbulanan'] ?: 0;
-    
-    $tdepartmen = isset($_POST['tdepartmen']) ? $_POST['tdepartmen'] : 0;
-    $tjabatan = isset($_POST['tjabatan']) ? $_POST['tjabatan'] : 0;
-    $tsubdept = isset($_POST['tsubdept']) ? $_POST['tsubdept'] : 0;
-    $tjadwal = isset($_POST['tjadwal']) ? $_POST['tjadwal'] : 0;
+    // Function to handle inline insert and return new ID
+    if (!function_exists('getOrInsertMaster')) {
+        function getOrInsertMaster($koneksi, $postKey, $table, $column, $extraData = []) {
+            $newValue = isset($_POST['new_' . $postKey]) ? trim($koneksi->real_escape_string($_POST['new_' . $postKey])) : '';
+            
+            if ($newValue !== '') {
+                // Check if exists
+                $check = $koneksi->query("SELECT * FROM $table WHERE $column = '$newValue'");
+                if ($check && $check->num_rows > 0) {
+                    $existing = $check->fetch_assoc();
+                    $pkResult = $koneksi->query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
+                    $pk = $pkResult->fetch_assoc()['Column_name'];
+                    return $existing[$pk];
+                }
+                
+                // Insert new
+                $cols = [$column];
+                $vals = ["'$newValue'"];
+                foreach ($extraData as $c => $v) {
+                    $cols[] = $c;
+                    $vals[] = "'$v'";
+                }
+                
+                $koneksi->query("INSERT INTO $table (" . implode(',', $cols) . ") VALUES (" . implode(',', $vals) . ")");
+                return $koneksi->insert_id;
+            }
+            
+            $selectedVal = isset($_POST[$postKey]) ? $koneksi->real_escape_string($_POST[$postKey]) : 0;
+            return ($selectedVal === 'add_new') ? 0 : $selectedVal;
+        }
+    }
+
+    $tdepartmen = getOrInsertMaster($koneksi, 'tdepartmen', 'ms_departmen', 'nama_departmen', ['id_perusahaan' => '1']);
+    $tsubdept = getOrInsertMaster($koneksi, 'tsubdept', 'ms_sub_department', 'nama_sub_department', ['id_perusahaan' => '1']);
+    $tjabatan = getOrInsertMaster($koneksi, 'tjabatan', 'ms_jabatan', 'jabatan', ['id_perusahaan' => '1']);
+    $tjadwal = getOrInsertMaster($koneksi, 'tjadwal', 'tb_jadwal', 'keterangan', ['jam_masuk' => '08:00:00', 'jam_keluar' => '17:00:00', 'istirahat_masuk' => '12:00:00', 'istirahat_keluar' => '13:00:00']);
 
     $sql = $koneksi->query("UPDATE ms_karyawan SET 
         id_departmen = '$tdepartmen',
@@ -95,7 +126,7 @@ if (isset($_POST['update'])) {
             <p class="text-sm text-gray-500 mt-1">Perbarui informasi karyawan di bawah ini.</p>
         </div>
 
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" id="formUbahKaryawan" enctype="multipart/form-data">
             <div class="card-body p-6 bg-gray-50/30">
                 
                 <!-- Section 1: Personal & Position -->
@@ -344,3 +375,42 @@ if (isset($_POST['update'])) {
         -moz-appearance: textfield;
     }
 </style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('.select2-manage').on('change', function() {
+        var $select = $(this);
+        var selectName = $select.attr('name');
+        var selectedVal = $select.val();
+
+        if (selectedVal === 'add_new') {
+            // Mengambil label text (Misal: "Sub Departemen")
+            var label = $select.closest('.form-group').find('label').text().replace('*', '').trim();
+            
+            // Tampilkan prompt
+            var newData = prompt("Masukkan " + label + " Baru:");
+
+            if (newData && newData.trim() !== "") {
+                // Hapus input hidden lama jika user mencoba input berkali-kali
+                $('input[name="new_' + selectName + '"]').remove();
+                
+                // Tambahkan input hidden baru ke form
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'new_' + selectName,
+                    value: newData.trim()
+                }).appendTo('#formUbahKaryawan'); // ID Form
+
+                // Tambahkan opsi secara visual agar tidak "disabled" atau blank
+                var newOption = new Option(newData.trim(), newData.trim(), true, true);
+                $select.append(newOption).trigger('change');
+            } else {
+                // Jika batal, reset pilihan
+                $select.val('').trigger('change');
+            }
+        }
+    });
+});
+</script>

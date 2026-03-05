@@ -48,13 +48,13 @@ WHERE A.id_rkk = '$idrkk'
 if ($datastatusrkk == 3) {
   $status = "Hidden";
 } elseif ($datastatusrkk == 2) {
-  if ($_SESSION['level'] != "OWNER") {
+  if ($_SESSION['role'] != "owner") {
     $status = "Hidden";
   } else {
     $status = "";
   }
 } elseif ($datastatusrkk == 1) {
-  if ($_SESSION['level'] != "OWNER") {
+  if ($_SESSION['role'] != "owner") {
     $status = "Hidden";
   } else {
     $status = "";
