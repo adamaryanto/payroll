@@ -263,14 +263,33 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <li class="nav-item"><a href="?page=bagian" class="nav-link"><i class="far fa-building nav-icon"></i>
                       <p>Bagian</p>
                     </a></li>
-                  <li class="nav-item"><a href="?page=jasa" class="nav-link"><i class="fas fa-university nav-icon"></i>
-                      <p>Jasa</p>
-                    </a></li>
+
                   <li class="nav-item"><a href="?page=user" class="nav-link"><i class="fas fa-user-shield nav-icon"></i>
                       <p>User</p>
                     </a></li>
                 </ul>
               </li>
+
+              <li class="nav-item"><a href="?page=rkk" class="nav-link"><i class="nav-icon far fa-calendar-plus"></i>
+                  <p>Rencana Upah</p>
+                </a></li>
+              <li class="nav-item"><a href="?page=realisasi" class="nav-link"><i class="nav-icon fas fa-check-double"></i>
+                  <p>Realisasi Upah</p>
+                </a></li>
+              <li class="nav-item"><a href="?page=realisasi&aksi=karyawan" class="nav-link"><i class="nav-icon fas fa-file-invoice-dollar"></i>
+                  <p>Cetak Slip</p>
+                </a></li>
+
+              <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="nav-icon far fa-clock"></i>
+                  <p>Jadwal</p>
+                </a></li>
+
+              <li class="nav-item"><a href="?page=generate&aksi=tarik" class="nav-link"><i class="nav-icon fas fa-download"></i>
+                  <p>Tarik Data</p>
+                </a></li>
+              <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="nav-icon fas fa-exclamation-triangle"></i>
+                  <p>Denda</p>
+                </a></li>
 
               <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
@@ -295,43 +314,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     </a></li>
                   <li class="nav-item"><a href="?page=alfa" class="nav-link"><i class="fas fa-times-circle nav-icon"></i>
                       <p>Alfa</p>
-                    </a></li>
-                </ul>
-              </li>
-
-              <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="nav-icon far fa-clock"></i>
-                  <p>Jadwal</p>
-                </a></li>
-              <li class="nav-item"><a href="?page=absen" class="nav-link"><i class="nav-icon fas fa-user-check"></i>
-                  <p>Absensi Karyawan</p>
-                </a></li>
-              <li class="nav-item"><a href="?page=payroll" class="nav-link"><i class="nav-icon fas fa-money-bill-wave"></i>
-                  <p>Payroll</p>
-                </a></li>
-              <li class="nav-item"><a href="?page=generate&aksi=tarik" class="nav-link"><i class="nav-icon fas fa-download"></i>
-                  <p>Tarik Data</p>
-                </a></li>
-              <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="nav-icon fas fa-exclamation-triangle"></i>
-                  <p>Denda</p>
-                </a></li>
-
-              <li class="nav-item has-treeview">
-                <a href="#" class="nav-link">
-                  <i class="nav-icon fas fa-chart-line"></i>
-                  <p>
-                    Productivity
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item"><a href="?page=rkk" class="nav-link"><i class="far fa-calendar-plus nav-icon"></i>
-                      <p>Rencana Upah</p>
-                    </a></li>
-                  <li class="nav-item"><a href="?page=realisasi" class="nav-link"><i class="fas fa-check-double nav-icon"></i>
-                      <p>Realisasi Upah</p>
-                    </a></li>
-                  <li class="nav-item"><a href="?page=realisasi&aksi=karyawan" class="nav-link"><i class="fas fa-file-invoice-dollar nav-icon"></i>
-                      <p>Cetak Slip</p>
                     </a></li>
                 </ul>
               </li>
@@ -605,16 +587,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     } elseif ($aksi == "cari") {
                       include "page/ijin/karyawan.php";
                     }
-                  } else if ($page == 'payroll') {
-                    if ($aksi == "") {
-                      include "page/payroll/payroll.php";
-                    } elseif ($aksi == "hapus") {
-                      include "page/payroll/hapus.php";
-                    } elseif ($aksi == "tambah") {
-                      include "page/payroll/tambah.php";
-                    } elseif ($aksi == "cari") {
-                      include "page/payroll/karyawan.php";
-                    }
+
                   } else if ($page == 'denda') {
                     if ($aksi == "") {
                       include "page/denda/denda.php";
@@ -671,16 +644,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     }
                   } elseif ($page == "") {
                     include "home.php";
-                  } else if ($page == 'jasa') {
-                    if ($aksi == "") {
-                      include "page/jasa/jasa.php";
-                    } elseif ($aksi == "hapus") {
-                      include "page/jasa/hapus.php";
-                    } elseif ($aksi == "tambah") {
-                      include "page/jasa/tambah.php";
-                    } elseif ($aksi == "ubah") {
-                      include "page/jasa/ubah.php";
-                    }
+
                   } else if ($page == 'dailyactivity') {
                     if ($aksi == "") {
                       include "page/dailyactivity/karyawan.php";
@@ -701,12 +665,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     } elseif ($aksi == "daily") {
                       include "page/report/Daily.php";
                     }
-                  } else if ($page == 'absen') {
-                    if ($aksi == "") {
-                      include "page/absen/absen.php";
-                    } elseif ($aksi == "cari") {
-                      include "page/absen/karyawan.php";
-                    }
+
                   } else if ($page == 'realisasi') {
                     if ($aksi == "") {
                       include "page/realisasi/realisasi.php";

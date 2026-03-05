@@ -62,88 +62,97 @@ $bulanan = "";
 
 
 ?>
-<div class="row">
-                <div class="col-md-12">
-                    <!-- Advanced Tables -->
-                    <div class="panel panel-primary"  >
-                    <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
-              <h3 class="box-title">Pengaturan Upah</h3>
-            </div>
-             <form method="POST"  enctype="multipart/form-data">
-                        <div class="panel-body">
-                           <div class="panel-body">
-                           
-                            <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                            <div hidden="hidden"  class="form-group col-md-4">
-                    <label class="font-weight-bold">Id Karyawan</label>
-                    
-                    <input  autocomplete="off" type="text" name="tid" value="<?php echo $idkaryawan; ?>"  class="form-control"/>
-                </div>
+<div class="container-fluid px-4 mt-5 mb-5">
+    <div class="card border-0 shadow-lg rounded-xl overflow-hidden">
+        
+        <div class="card-header bg-white border-b border-gray-100 py-5 px-6">
+            <h3 class="text-2xl font-extrabold text-gray-800 tracking-tight m-0">Pengaturan Upah Karyawan</h3>
+            <p class="text-sm text-gray-500 mt-1">Kelola dan perbarui rincian upah untuk karyawan.</p>
+        </div>
 
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Nama </label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $namakaryawan; ?>"  required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. Absen</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnoabsen" value="<?php echo $noabsen; ?>" required class="form-control"/>
-                    
-                </div>
-          
-
+        <form method="POST" enctype="multipart/form-data">
+            <div class="card-body p-6 bg-gray-50/30">
                 
-                 
-               <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Upah Harian</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tharian" value="<?php echo $harian; ?>" required class="form-control"/>
-                    
+                <div class="mb-8">
+                    <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
+                        <i class="fas fa-user mr-2 text-lg"></i> Info Karyawan
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                        
+                        <input type="hidden" name="tid" value="<?php echo $idkaryawan; ?>">
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. Absen</label>
+                            <input type="text" name="tnoabsen" value="<?php echo $noabsen; ?>" readonly class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-500 font-bold cursor-not-allowed">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Karyawan</label>
+                            <input autocomplete="off" type="text" name="tnama" value="<?php echo $namakaryawan; ?>" readonly class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-700 font-bold cursor-not-allowed">
+                        </div>
+                    </div>
                 </div>
 
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Upah Mingguan</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tmingguan" value="<?php echo $mingguan; ?>" required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Upah Bulanan</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tbulanan" value="<?php echo $bulanan; ?>" required class="form-control"/>
-                    
-                </div>
-                
-                  
-                </div>
-
-
-
-
-
-
-
-                  <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                    <div class="form-group col-md-4">
-                 <div>
-                                            
-                                              <div class="col"> <h3><label style="color:red ;" >* </label><label>HArus Diisi</label> </h3> </div>
-                                        </div>
-                                            <div >
-                                            <input type="submit" name="update"  value="Update" class="btn btn-primary">
-                                          
-                                            <a href="?page=karyawan"  class="btn btn-warning">Cancel </a> 
-                                            <div class="col"> <h3><label style="color:red ;" >* </label><label>HArus Diisi</label> </h3> </div>
-                                        </div>
-                                        </div></div>
-                                    </form>
-             
-                                    </form>
-                                  
+                <div class="mb-8">
+                    <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2 text-lg"></i> Detail Upah Dasar
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                        
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Harian <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
+                                <input type="number" name="tharian" value="<?php echo $harian; ?>" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="0">
                             </div>
-                          
-                           
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Mingguan <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
+                                <input type="number" name="tmingguan" value="<?php echo $mingguan; ?>" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Bulanan <span class="text-red-500">*</span></label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
+                                <input type="number" name="tbulanan" value="<?php echo $bulanan; ?>" required class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 transition-all outline-none" placeholder="0">
+                            </div>
+                        </div>
 
                     </div>
                 </div>
-        </div>
+
+            </div>
+
+            <div class="card-footer bg-gray-50 px-8 py-5 flex items-center justify-between border-t border-gray-200">
+                <p class="text-xs text-gray-400 italic">Tanda <span class="text-red-500 font-bold">*</span> wajib diisi.</p>
+                <div class="flex gap-3">
+                    <a href="?page=karyawan" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all no-underline">
+                        Batal
+                    </a>
+                    <button type="submit" name="update" value="Update" class="px-8 py-2.5 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5">
+                        <i class="fas fa-save mr-2"></i> Simpan Upah
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
 
 <?php
 
@@ -169,7 +178,7 @@ $simpan = @$_POST ['simpan'];
 $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('0','0','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">
