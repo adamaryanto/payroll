@@ -73,7 +73,10 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
       }
     </script>
 
-    <link rel="stylesheet" href="css/modern.css">
+    <!-- Select2 -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+  <link rel="stylesheet" href="css/modern.css">
     <style>
       /* Override AdminLTE styles using Tailwind-like clean styles */
       body {
@@ -535,6 +538,54 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     } elseif ($aksi == "ubah") {
                       include "page/jadwal/ubah.php";
                     }
+                  } else if ($page == 'subbagian') {
+                    if ($aksi == "hapus") {
+                      include "page/subbagian/hapus.php";
+                    } elseif ($aksi == "tambah") {
+                      include "page/subbagian/tambah.php";
+                    } elseif ($aksi == "ubah") {
+                      include "page/subbagian/ubah.php";
+                    }
+                  } else if ($page == 'jabatan') {
+                    if ($aksi == "hapus") {
+                      include "page/jabatan/hapus.php";
+                    } elseif ($aksi == "tambah") {
+                      include "page/jabatan/tambah.php";
+                    } elseif ($aksi == "ubah") {
+                      include "page/jabatan/ubah.php";
+                    }
+                  } else if ($page == 'agama') {
+                    if ($aksi == "hapus") {
+                      include "page/agama/hapus.php";
+                    } elseif ($aksi == "tambah") {
+                      include "page/agama/tambah.php";
+                    } elseif ($aksi == "ubah") {
+                      include "page/agama/ubah.php";
+                    }
+                  } else if ($page == 'golongan') {
+                    if ($aksi == "hapus") {
+                      include "page/golongan/hapus.php";
+                    } elseif ($aksi == "tambah") {
+                      include "page/golongan/tambah.php";
+                    } elseif ($aksi == "ubah") {
+                      include "page/golongan/ubah.php";
+                    }
+                  } else if ($page == 'statuskawin') {
+                    if ($aksi == "hapus") {
+                      include "page/statuskawin/hapus.php";
+                    } elseif ($aksi == "tambah") {
+                      include "page/statuskawin/tambah.php";
+                    } elseif ($aksi == "ubah") {
+                      include "page/statuskawin/ubah.php";
+                    }
+                  } else if ($page == 'os_dhk') {
+                    if ($aksi == "hapus") {
+                      include "page/os_dhk/hapus.php";
+                    } elseif ($aksi == "tambah") {
+                      include "page/os_dhk/tambah.php";
+                    } elseif ($aksi == "ubah") {
+                      include "page/os_dhk/ubah.php";
+                    }
                   } else if ($page == 'user') {
                     if ($aksi == "") {
                       include "page/user/user.php";
@@ -720,11 +771,77 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
 
         <script src="assets/dataTables/jquery.dataTables.js"></script>
         <script src="assets/dataTables/dataTables.bootstrap.js"></script>
-        <script>
-          $(document).ready(function() {
-            $('#dataTables-example').dataTable();
+        <!-- Select2 -->
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('#dataTables-example').dataTable();
+
+      // Global Select2 Initialization with Quick Delete
+      $('.select2-manage').each(function() {
+        const $select = $(this);
+        const placeholder = $select.data('placeholder') || '- Pilih -';
+        const deleteUrl = $select.data('delete-route');
+
+        $select.select2({
+          theme: 'bootstrap4',
+          placeholder: placeholder,
+          allowClear: true,
+          templateResult: formatState,
+          templateSelection: formatSelection
+        });
+
+        function formatState(state) {
+          if (!state.id || state.id === 'add_new' || !deleteUrl) return state.text;
+          
+          const $state = $(
+            '<div class="flex justify-between items-center w-full group">' +
+            '<span class="text-gray-700">' + state.text + '</span>' +
+            '<button type="button" class="btn-delete-item ml-2 h-6 w-6 flex items-center justify-center rounded-full text-gray-400 hover:text-rose-600 hover:bg-rose-50 transition-all duration-200 opacity-0 group-hover:opacity-100" data-id="' + state.id + '">' +
+            '<i class="fas fa-times text-[10px]"></i>' +
+            '</button>' +
+            '</div>'
+          );
+
+          $state.find('.btn-delete-item').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (confirm('Hapus "' + state.text + '" dari master data?')) {
+              $.post('page/ajax/hapus_master.php', {
+                id: $(this).data('id'),
+                route: deleteUrl
+              }, function(res) {
+                if (res.success) {
+                  $select.find('option[value="' + state.id + '"]').remove();
+                  $select.trigger('change');
+                  $select.select2('close');
+                } else {
+                  alert('Gagal menghapus: ' + (res.message || 'Data mungkin sedang digunakan.'));
+                }
+              }, 'json');
+            }
           });
-        </script>
+
+          return $state;
+        }
+
+        function formatSelection(state) {
+          return state.text;
+        }
+      });
+
+      // Handle Quick Add in Dropdowns
+      $(document).on('change', 'select', function() {
+        if ($(this).val() === 'add_new') {
+          const url = $(this).find('option:selected').data('url');
+          if (url) {
+            window.location.href = url;
+          }
+        }
+      });
+    });
+  </script>
 
   </body>
 

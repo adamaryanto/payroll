@@ -1,3 +1,47 @@
+<?php
+if (isset($_POST['simpan'])) {
+    $nama = $_POST['tnama'];
+    $noabsen = $_POST['tnoabsen'];
+    $os = $_POST['tos'];
+    $golongan = $_POST['tgolongan'];
+    $jeniskelamin = $_POST['tjeniskelamin'];
+    $agama = $_POST['tagama'];
+    $tempatlahir = $_POST['ttempatlahir'];
+    $tanggallahir = $_POST['ttanggallahir'];
+    $statuskawin = $_POST['tstatuskawin'];
+    $noktp = $_POST['tnoktp'];
+    $bpjs = $_POST['tbpjs'];
+    $alamatktp = $_POST['talamatktp'];
+    $tanggalbergabung = $_POST['ttanggalbergabung'];
+    $harian = $_POST['tharian'] ?: 0;
+    $mingguan = $_POST['tmingguan'] ?: 0;
+    $bulanan = $_POST['tbulanan'] ?: 0;
+    
+    $departmen = isset($_POST['tdepartmen']) ? $_POST['tdepartmen'] : 0;
+    $jabatan = isset($_POST['tjabatan']) ? $_POST['tjabatan'] : 0;
+    $subdept = isset($_POST['tsubdept']) ? $_POST['tsubdept'] : 0;
+    $jadwal = isset($_POST['tjadwal']) ? $_POST['tjadwal'] : 0;
+
+    $sql = $koneksi->query("INSERT INTO ms_karyawan (
+        id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
+        status_kawin, jenis_kelamin, no_ktp, alamat_ktp, alamat_tinggal, 
+        status_karyawan, tgl_aktif, foto, no_bpjs, upah_harian, upah_mingguan, 
+        upah_bulanan, id_jadwal, id_sub_department, OS_DHK, golongan
+    ) VALUES (
+        '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
+        '$statuskawin', '$jeniskelamin', '$noktp', '$alamatktp', '',
+        'Aktif', '$tanggalbergabung', '', '$bpjs', '$harian', '$mingguan',
+        '$bulanan', '$jadwal', '$subdept', '$os', '$golongan'
+    )");
+
+    if ($sql) {
+        echo "<script>alert('Data Berhasil Disimpan'); window.location='?page=karyawan';</script>";
+    } else {
+        echo "<script>alert('Gagal Simpan Data');</script>";
+    }
+}
+?>
+
 <div class="container-fluid px-4 mt-5 mb-5">
     <div class="card border-0 shadow-lg rounded-xl overflow-hidden">
         
@@ -33,20 +77,87 @@
                         </div>
 
                         <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Departemen</label>
+                            <select name="tdepartmen" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Departemen -" data-delete-route="bagian">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=bagian&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Departemen Baru...</option>
+                                <?php
+                                $q_dept = $koneksi->query("SELECT * FROM ms_departmen");
+                                while($d = $q_dept->fetch_assoc()) {
+                                    echo "<option value='".$d['id_departmen']."'>".$d['nama_departmen']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Sub Departemen</label>
+                            <select name="tsubdept" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Sub Bagian -" data-delete-route="subbagian">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=subbagian&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Sub Bagian Baru...</option>
+                                <?php
+                                $q_sub = $koneksi->query("SELECT * FROM ms_sub_department");
+                                while($d = $q_sub->fetch_assoc()) {
+                                    echo "<option value='".$d['id_sub_department']."'>".$d['nama_sub_department']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Jabatan</label>
+                            <select name="tjabatan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Jabatan -" data-delete-route="jabatan">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=jabatan&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Jabatan Baru...</option>
+                                <?php
+                                $q_jab = $koneksi->query("SELECT * FROM ms_jabatan");
+                                while($d = $q_jab->fetch_assoc()) {
+                                    echo "<option value='".$d['id_jabatan']."'>".$d['jabatan']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Jadwal</label>
+                            <select name="tjadwal" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Jadwal -" data-delete-route="jadwal">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=jadwal&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Jadwal Baru...</option>
+                                <?php
+                                $q_jadwal = $koneksi->query("SELECT * FROM tb_jadwal");
+                                while($d = $q_jadwal->fetch_assoc()) {
+                                    echo "<option value='".$d['id_jadwal']."'>".$d['nama_jadwal']."</option>";
+                                }
+                                ?>
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">OS / DHK <span class="text-red-500">*</span></label>
-                            <select name="tos" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                                <option value="OS">OS</option>
-                                <option value="DHK">DHK</option>
-                                <option value="-">-</option>
+                            <select name="tos" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="os_dhk" required>
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=os_dhk&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Data Baru...</option>
+                                <?php
+                                $q_os = $koneksi->query("SELECT * FROM ms_os_dhk");
+                                while($d = $q_os->fetch_assoc()) {
+                                    echo "<option value='".$d['nama_os_dhk']."'>".$d['nama_os_dhk']."</option>";
+                                }
+                                ?>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Golongan</label>
-                            <select name="tgolongan" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="Harian">Harian</option>
-                                <option value="Mingguan">Mingguan</option>
-                                <option value="Bulanan">Bulanan</option>
+                            <select name="tgolongan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="golongan">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=golongan&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Golongan Baru...</option>
+                                <?php
+                                $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
+                                while($d = $q_gol->fetch_assoc()) {
+                                    echo "<option value='".$d['golongan']."'>".$d['golongan']."</option>";
+                                }
+                                ?>
                             </select>
                         </div>
 
@@ -60,12 +171,15 @@
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Agama</label>
-                            <select name="tagama" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="Islam">Islam</option>
-                                <option value="Kristen Katolik">Kristen Katolik</option>
-                                <option value="Kristen Protestan">Kristen Protestan</option>
-                                <option value="Hindu">Hindu</option>
-                                <option value="Budha">Budha</option>
+                            <select name="tagama" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Agama -" data-delete-route="agama">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=agama&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Agama Baru...</option>
+                                <?php
+                                $q_agama = $koneksi->query("SELECT * FROM ms_agama");
+                                while($d = $q_agama->fetch_assoc()) {
+                                    echo "<option value='".$d['agama']."'>".$d['agama']."</option>";
+                                }
+                                ?>
                             </select>
                         </div>
 
@@ -81,11 +195,15 @@
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Status Kawin</label>
-                            <select name="tstatuskawin" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                <option value="Belum Kawin">Belum Kawin</option>
-                                <option value="Kawin">Kawin</option>
-                                <option value="Janda">Janda</option>
-                                <option value="Duda">Duda</option>
+                            <select name="tstatuskawin" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Status -" data-delete-route="statuskawin">
+                                <option value=""></option>
+                                <option value="add_new" data-url="?page=statuskawin&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Status Baru...</option>
+                                <?php
+                                $q_status = $koneksi->query("SELECT * FROM ms_status_kawin");
+                                while($d = $q_status->fetch_assoc()) {
+                                    echo "<option value='".$d['status_kawin']."'>".$d['status_kawin']."</option>";
+                                }
+                                ?>
                             </select>
                         </div>
                     </div>
@@ -155,11 +273,6 @@
                     <button type="submit" name="simpan" value="Simpan" class="px-8 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5">
                         <i class="fas fa-save mr-2"></i> Simpan Data
                     </button>
-                    <?php if(isset($_GET['id'])): ?>
-                    <button type="submit" name="update" value="Update" class="px-8 py-2.5 bg-emerald-600 text-white rounded-lg font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-0.5">
-                        <i class="fas fa-edit mr-2"></i> Update Data
-                    </button>
-                    <?php endif; ?>
                 </div>
             </div>
         </form>
