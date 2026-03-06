@@ -351,14 +351,7 @@ INSERT INTO `ms_lampiran` (`id_lampiran`, `id_karyawan`, `tgl_lampiran`, `lampir
 
 CREATE TABLE `ms_login` (
   `id_login` int(10) NOT NULL,
-  `id_perusahaan` int(10) NOT NULL,<div class="form-group col-md-2">
-                        <label>Pot. Telat</label>
-                        <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" required>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Pot. Istirahat</label>
-                        <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" required>
-                    </div>
+  `id_perusahaan` int(10) NOT NULL,
   `user_login` varchar(225) NOT NULL,
   `lg_password` varchar(255) NOT NULL,
   `role` enum('kepala gudang','admin','admin master','OWNER') DEFAULT NULL
