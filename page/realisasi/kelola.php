@@ -129,9 +129,18 @@ if($simpan) {
     .table-clean tbody td {
         vertical-align: middle;
         font-size: 12px;
-        color: #4D5656;
+        color: #000;
+        font-weight: bold;
         border-top: 1px solid #E0E4E8;
         padding: 6px; 
+    }
+    .bg-red-custom {
+        background-color: #e74c3c !important;
+        color: #fff !important;
+    }
+    .bg-yellow-custom {
+        background-color: #f1c40f !important;
+        color: #000 !important;
     }
 
     /* Form Filter & Length Menu DataTables */
@@ -201,6 +210,7 @@ if($simpan) {
         }
         
         /* Flexbox agar data & label proporsional */
+        #dataTables-example thead { display: none !important; }
         #dataTables-example tbody td {
             display: flex;
             align-items: flex-start;
@@ -301,6 +311,27 @@ if($simpan) {
                         <div class="section-title">List Karyawan</div>
                         <div class="table-responsive">
                             <table class="table table-hover table-clean align-middle mb-0" id="dataTables-example">
+                                <thead class="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">No</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">NIK</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Nama Karyawan</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Departemen</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Sub Bagian</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">OS/DHK</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Gol</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Masuk</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Pulang</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Keluar</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Masuk</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Hasil</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-center">Aksi</th>
+                                    </tr>
+                                </thead>
                                 <tbody>
                                     <?php
                                     $no = 1;
@@ -309,26 +340,32 @@ if($simpan) {
                                     while ($data = $tampil->fetch_assoc()) {
                                         $upah = $data['upahkaryawan'];
                                         $total += $upah;
+                                        
+                                        // Check if both check-in and check-out are missing
+                                        $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') && 
+                                                         (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
+                                        
+                                        $rowClass = $isFullMissing ? 'bg-red-custom' : '';
                                     ?>
-                                    <tr>
+                                    <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
-                                        <td data-label="NIK" class="font-weight-bold"><?php echo $data['no_absen']; ?></td>
-                                        <td data-label="Nama Karyawan"><strong><?php echo $data['nama_karyawan']; ?></strong></td>
+                                        <td data-label="NIK"><?php echo $data['no_absen']; ?></td>
+                                        <td data-label="Nama Karyawan"><?php echo $data['nama_karyawan']; ?></td>
                                         <td data-label="Departemen"><?php echo $data['nama_departmen']; ?></td>
                                         <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                         <td data-label="OS/DHK"><?php echo $data['OS_DHK']; ?></td>
-                                        <td data-label="Golongan"><?php echo $data['golongan']; ?></td>
-                                        <td data-label="Jam Masuk"><?php echo $data['r_jam_masuk']; ?></td>
-                                        <td data-label="Jam Pulang"><?php echo $data['r_jam_keluar']; ?></td>
-                                        <td data-label="Istirahat (Kel)"><?php echo $data['r_istirahat_keluar']; ?></td>
-                                        <td data-label="Istirahat (Msk)"><?php echo $data['r_istirahat_masuk']; ?></td>
-                                        <td data-label="Upah (Rp)" style="color:#27AE60; font-weight:bold;">
+                                        <td data-label="Gol"><?php echo $data['golongan']; ?></td>
+                                        <td data-label="Masuk" class="<?php echo ($isFullMissing || empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
+                                        <td data-label="Pulang" class="<?php echo ($isFullMissing || empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['r_jam_keluar']; ?></td>
+                                        <td data-label="Istirahat Keluar" class="<?php echo ($isFullMissing || empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
+                                        <td data-label="Istirahat Masuk" class="<?php echo ($isFullMissing || empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+                                        <td data-label="Upah" class="text-right">
                                             <?php echo number_format($upah, 0, ',', '.'); ?>
                                         </td>
-                                        <td data-label="Pot. Telat" class="text-danger"><?php echo number_format($data['r_potongan_telat'], 0, ',', '.'); ?></td>
-                                        <td data-label="Pot. Istirahat" class="text-danger"><?php echo number_format($data['r_potongan_istirahat'], 0, ',', '.'); ?></td>
-                                        <td data-label="Pot. Lainnya" class="text-danger"><?php echo number_format($data['r_potongan_lainnya'], 0, ',', '.'); ?></td>
-                                        <td data-label="Hasil Kerja"><?php echo $data['hasil_kerja']; ?></td>
+                                        <td data-label="Pot. Telat" class="text-right <?php echo ($isFullMissing || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_telat'], 0, ',', '.'); ?></td>
+                                        <td data-label="Pot. Istirahat" class="text-right <?php echo ($isFullMissing || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_istirahat'], 0, ',', '.'); ?></td>
+                                        <td data-label="Pot. Lain" class="text-right <?php echo ($isFullMissing || $data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?php echo number_format($data['r_potongan_lainnya'], 0, ',', '.'); ?></td>
+                                        <td data-label="Hasil"><?php echo $data['hasil_kerja']; ?></td>
                                         <td data-label="Aksi">
                                             <div class="flex-action">
                                                 <a href="?page=realisasi&aksi=detail&id=<?php echo $data['id_realisasi_detail'];?>" 

@@ -196,9 +196,9 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 </ul>
               </li>
 
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i><p>Setting Device</p></a>
-              </li>
+              </li> -->
               <?php } ?>
 
             </ul>

@@ -135,8 +135,10 @@
     /* Info text (Showing 1 to 10 of X entries) */
     .dataTables_wrapper .dataTables_info {
         padding-top: 1.7rem !important;
+        margin-bottom: 1.5rem !important;
         font-size: 1rem;
         color: #6b7280;
+        float: left;
     }
 
     /* RESPONSIVE TABLE "STACKED" VIEW */
