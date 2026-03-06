@@ -39,7 +39,6 @@ if (isset($_GET['id'])) {
         FROM tb_realisasi_detail A 
         LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
         LEFT JOIN tb_realisasi C ON A.id_realisasi = C.id_realisasi
-        /* JOIN Departemen dan Sub Dept melalui tabel Karyawan (B) */
         LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
         LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department
         WHERE A.id_realisasi = '$idrealisasi'
@@ -368,6 +367,15 @@ if ($simpan) {
 
                         <div class="section-title">List Karyawan</div>
                         <div class="table-responsive">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="custom-toolbar" class="pull-right" style="margin-bottom: 10px;">
+                                        <a href="page/realisasi/excelrkk.php?id=<?= $idrealisasi ?>" class="btn btn-success btn-sm">
+                                            <i class="fa fa-file-excel-o"></i> Export Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
                             <table class="table table-hover table-clean align-middle mb-0" id="dataTables-example">
                                 <thead class="bg-gray-50 border-b border-gray-200">
                                     <tr>
@@ -481,6 +489,16 @@ if ($simpan) {
             }
         });
 
+        $("#custom-toolbar").appendTo(".dataTables_filter");
+        
+        // CSS tambahan agar tampilannya sejajar
+        $(".dataTables_filter").css({
+            "display": "flex",
+            "justify-content": "flex-end",
+            "align-items": "center",
+            "gap": "10px"
+        });
+        
         $('.dataTables_filter').addClass('mb-2');
     });
 </script>
