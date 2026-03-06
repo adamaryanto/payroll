@@ -8,8 +8,9 @@ $tampil = $koneksi->query("SELECT A.*,
     (select sum(r_potongan_lainnya) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potlainnya
     from tb_realisasi A");
 
-// Logika Akses Owner
-$level_status = ($_SESSION['role'] != "owner") ? "hidden" : "";
+// Logika Akses: Owner dan Admin bisa Approve/Unapprove
+$role_akses = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin" || $_SESSION['role'] == "admin master");
+$level_status = (!$role_akses) ? "hidden" : "";
 ?>
 
 <div class="container-fluid px-2 mt-4 mb-4">
@@ -49,7 +50,7 @@ $level_status = ($_SESSION['role'] != "owner") ? "hidden" : "";
                         <?php
                         $no = 1;
                         while ($data = $tampil->fetch_assoc()) :
-                            if ($data['status_realisasi'] == "1") {
+                            if ($data['status_realisasi'] == 'approve') {
                                 $app = "hidden";
                                 $print = "";
                                 $row_class = "bg-slate-50/40"; 
@@ -62,54 +63,64 @@ $level_status = ($_SESSION['role'] != "owner") ? "hidden" : "";
                             }
                         ?>
                         <tr class="<?= $row_class ?>">
-                            <td class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $no ?></td>
-                            <td class="py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= $data['tgl_realisasi'] ?></td>
-                            <td class="py-2.5 px-2 text-[15px] text-gray-700 align-middle whitespace-nowrap"><?= $data['detail_realisasi'] ?></td>
-                            <td class="py-2.5 px-2 text-center text-[15px] font-bold text-indigo-600 align-middle"><?= $data['jam_kerja'] ?></td>
-                            <td class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $data['jml'] ?></td>
+                            <td data-label="No" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $no ?></td>
+                            <td data-label="Tanggal" class="py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= $data['tgl_realisasi'] ?></td>
+                            <td data-label="Tgl Input" class="py-2.5 px-2 text-[15px] text-gray-700 align-middle whitespace-nowrap"><?= $data['detail_realisasi'] ?></td>
+                            <td data-label="Jam" class="py-2.5 px-2 text-center text-[15px] font-bold text-indigo-600 align-middle"><?= $data['jam_kerja'] ?></td>
+                            <td data-label="Jml" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $data['jml'] ?></td>
                             
-                            <td class="py-2.5 px-2 text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
+                            <td data-label="Total Upah" class="py-2.5 px-2 text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
                                 <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
                             </td>
-                            <td class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                            <td data-label="Pot. Tlt" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                 <?= number_format($data['pottelat'] ?? 0, 0, ',', '.') ?>
                             </td>
-                            <td class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                            <td data-label="Pot. Ist" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                 <?= number_format($data['potistirahat'] ?? 0, 0, ',', '.') ?>
                             </td>
-                            <td class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                            <td data-label="Pot. Lain" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                 <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
                             </td>
                             
-                            <td class="py-2.5 px-2 align-middle">
-                                <div class="text-[14px] text-gray-700 max-w-[150px] truncate" title="<?= htmlspecialchars($data['keterangan']) ?>">
+                            <td data-label="Ket" class="py-2.5 px-2 align-middle">
+                                <div class="text-[14px] text-gray-700 md:max-w-[150px] md:truncate" title="<?= htmlspecialchars($data['keterangan']) ?>">
                                     <?= htmlspecialchars($data['keterangan']) ?>
                                 </div>
                             </td>
                             
-                            <td class="py-2.5 px-2 align-middle text-center">
+                            <td data-label="Status" class="py-2.5 px-2 align-middle text-center">
                                 <?= $status_badge ?>
                             </td>
 
-                            <td class="py-2.5 px-2 align-middle text-center">
-                                <div class="flex items-center justify-center gap-1.5">
+                            <td data-label="Aksi" class="py-2.5 px-2 align-middle text-center">
+                                <div class="flex items-center justify-center gap-1.5 flex-wrap">
                                     <a href="?page=realisasi&aksi=kelola&id=<?= $data['id_realisasi'];?>" 
-                                       class="px-2.5 py-1.5 text-[14px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors" title="Detail">
-                                       <i class="fas fa-eye"></i>
+                                       class="px-2 py-1 text-[13px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors" title="Detail">
+                                       <i class="fas fa-eye"></i> Detail
                                     </a>
 
                                     <div class="<?= $level_status ?> <?= $app ?>">
                                         <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi'];?>"
-                                           class="px-2.5 py-1.5 text-[14px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors"
+                                           class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors"
                                            onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
-                                            <i class="fas fa-check"></i>
+                                            <i class="fas fa-check"></i> Approve
                                         </a>
                                     </div>  
 
+                                    <?php if ($data['status_realisasi'] == 'approve') : ?>
+                                    <div class="<?= $level_status ?>">
+                                        <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi'];?>"
+                                           class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors"
+                                           onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
+                                            <i class="fas fa-undo"></i> Unapprove
+                                        </a>
+                                    </div>
+                                    <?php endif; ?>
+
                                     <div class="<?= $print ?>">
                                         <a href="excelrealisasi.php?id=<?= $data['id_realisasi'];?>"
-                                           class="px-2.5 py-1.5 text-[14px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors" title="Download Payroll">
-                                            <i class="fas fa-file-excel"></i>
+                                           class="px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors" title="Download Payroll">
+                                            <i class="fas fa-file-excel"></i> Excel
                                         </a>
                                     </div>
                                 </div>
@@ -136,6 +147,59 @@ $level_status = ($_SESSION['role'] != "owner") ? "hidden" : "";
     .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { opacity: 0.5; cursor: not-allowed; }
     .dataTables_wrapper .dataTables_info { padding-top: 1.1rem !important; font-size: 14px; color: #4b5563; }
     .dataTables_wrapper::after { content: ""; clear: both; display: table; }
+
+    /* RESPONSIVE TABLE "STACKED" VIEW (Mobile View) */
+    @media screen and (max-width: 768px) {
+        .table-responsive { 
+            border: none !important; 
+            overflow-x: visible !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        #dataTables-example {
+            width: 100% !important;
+            margin: 0 !important;
+        }
+        #dataTables-example thead { display: none !important; }
+        #dataTables-example tbody tr {
+            display: block;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px;
+            background: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        #dataTables-example tbody td {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right !important;
+            padding: 12px 4px !important;
+            border: none !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+            width: 100% !important;
+            font-size: 14px;
+        }
+        #dataTables-example tbody td:last-child { 
+            border-bottom: none !important; 
+            margin-top: 10px; 
+            justify-content: center !important; 
+            display: flex !important; 
+        }
+        #dataTables-example tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.05em;
+            text-align: left;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .flex-wrap { justify-content: center !important; display: flex !important; width: 100%; gap: 8px; }
+    }
 </style>
 
 <script>
