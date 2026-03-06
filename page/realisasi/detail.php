@@ -2,17 +2,25 @@
 if (isset($_GET['id'])) {
     $id = mysqli_real_escape_string($koneksi, $_GET['id']);
 
-    // Query Detail Realisasi
-    $queryDetail = "SELECT A.*, B.keterangan as keterangan_realisasi, B.tgl_realisasi, B.detail_realisasi, B.jam_kerja, 
-                           C.keterangan as shift, BB.no_absen, BC.nama_sub_department, BB.nama_karyawan, 
-                           BD.nama_departmen, BB.jenis_kelamin
+// Query Detail Realisasi
+    $queryDetail = "SELECT A.*, 
+                           B.keterangan as keterangan_realisasi, 
+                           B.tgl_realisasi, 
+                           B.detail_realisasi, 
+                           B.jam_kerja, 
+                           C.keterangan as shift, 
+                           BB.no_absen, 
+                           BB.nama_karyawan, 
+                           BB.jenis_kelamin,
+                           D.nama_departmen, 
+                           SD.nama_sub_department
                     FROM tb_realisasi_detail A 
                     LEFT JOIN tb_realisasi B ON A.id_realisasi = B.id_realisasi
                     LEFT JOIN tb_jadwal C ON A.id_jadwal = C.id_jadwal
                     LEFT JOIN ms_karyawan BB ON A.id_karyawan = BB.id_karyawan
-                    LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
-                    LEFT JOIN ms_departmen BD ON RD.id_departmen = BD.id_departmen
-                    LEFT JOIN ms_sub_department BC ON RD.id_sub_department = BC.id_sub_department
+                    /* Mengambil data Departemen & Sub-Dept langsung dari master karyawan */
+                    LEFT JOIN ms_departmen D ON BB.id_departmen = D.id_departmen
+                    LEFT JOIN ms_sub_department SD ON BB.id_sub_department = SD.id_sub_department
                     WHERE A.id_realisasi_detail = '$id'";
     
     $tampildetail = $koneksi->query($queryDetail);
