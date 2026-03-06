@@ -10,7 +10,7 @@ if (isset($_GET['id'])) {
   $datajamkerja   = $datadetail['jam_kerja'];
   $datastatusrkk   = $datadetail['status_rkk'];
 
- $tampil = $koneksi->query("SELECT 
+  $tampil = $koneksi->query("SELECT 
     A.id_rkk_detail, 
     B.no_absen, 
     BB.nama_sub_department, 
@@ -280,11 +280,11 @@ if ($datastatusrkk == 3) {
                   </td>
                   <td class="text-center"><?php echo $data['OS_DHK'] ?></td>
                   <td class="text-center"><?php echo $data['golongan'] ?></td>
-                 <td class="text-center">
-    <span class="label label-primary">
-        <?php echo ($data['nama_shift'] != "") ? $data['nama_shift'] : "Shift Tidak Set"; ?>
-    </span>
-</td>
+                  <td class="text-center">
+                    <span class="label label-primary">
+                      <?php echo ($data['nama_shift'] != "") ? $data['nama_shift'] : "Shift Tidak Set"; ?>
+                    </span>
+                  </td>
                   <td class="text-center">
                     <span class="label label-success"><?php echo $data['jam_masuk'] ?></span> -
                     <span class="label label-danger"><?php echo $data['jam_keluar'] ?></span>
