@@ -1,60 +1,90 @@
-<div class="row px-3 mt-4">
-    <div class="col-md-8 mx-auto">
-        <div class="card rounded-2xl shadow-sm border-0">
-            
-            <div class="card-header bg-white border-b border-gray-100 py-4 rounded-t-2xl">
-                <h3 class="card-title text-xl font-bold text-gray-800 m-0">Tambah Data User</h3>
-            </div>
-            
-            <form method="POST" enctype="multipart/form-data">
-                <div class="card-body p-6">
-                    
-                    <div class="mb-4">
-                        <label class="form-label font-semibold text-gray-700">Username <span class="text-rose-500">*</span></label>
-                        <input type="text" name="tnama" placeholder="Masukkan username" autocomplete="off" required 
-                               class="form-control rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-100 transition-all px-4 py-2.5"/>
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
+    <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
+        
+        <div class="bg-gradient-to-r from-slate-700 to-slate-800 px-8 py-6">
+            <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
+                <i class="fas fa-user-plus mr-3"></i>
+                Tambah Data User
+            </h3>
+            <p class="text-slate-300 text-sm mt-1">Buat akun pengguna baru dengan hak akses spesifik</p>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <div class="p-8">
+                <!-- Username Input -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Username <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                        <input placeholder="Masukkan username..." autocomplete="off" type="text" name="tnama" required 
+                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm transition duration-150 ease-in-out font-medium"/>
                     </div>
+                </div>
 
-                    <div class="mb-4">
-                        <label class="form-label font-semibold text-gray-700">Password <span class="text-rose-500">*</span></label>
-                        <input type="password" name="tpassword" placeholder="Masukkan password" autocomplete="off" required 
-                               class="form-control rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-100 transition-all px-4 py-2.5"/>
+                <!-- Password Input -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Password <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input placeholder="Masukkan password..." autocomplete="off" type="password" name="tpassword" required 
+                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm transition duration-150 ease-in-out font-medium"/>
                     </div>
+                </div>
 
-                    <div class="mb-5">
-                        <label class="form-label font-semibold text-gray-700">Role <span class="text-rose-500">*</span></label>
-                        <select name="trole" class="form-control select2 rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-100 transition-all px-4 py-2.5" required>
+                <!-- Role Selection -->
+                <div class="mb-8">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Role / Hak Akses <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user-tag text-gray-400"></i>
+                        </div>
+                        <select name="trole" class="block w-full pl-10 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl appearance-none bg-gray-50 font-medium cursor-pointer" required>
                             <option value="" disabled selected>-- Pilih Role --</option>
                             <option value="owner">Owner</option>
                             <option value="Admin HRD">Admin HRD</option>
                             <option value="Kepala Gudang">Kepala Gudang</option>
                             <option value="Admin Master">Admin Master</option>
                         </select>
-                    </div>
-
-                    <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-                        <div class="text-sm text-gray-500">
-                            <span class="text-rose-500 font-bold text-lg leading-none">*</span> Wajib diisi
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                            <i class="fas fa-chevron-down text-xs"></i>
                         </div>
-                        <button type="submit" name="simpan" value="Simpan" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-sm transition-colors border-0 flex items-center">
-                            <i class="fas fa-save mr-2"></i> Simpan
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                    <div class="text-xs text-gray-500 italic">
+                        <span class="text-rose-500">*</span> Wajib diisi
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="?page=user" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition duration-150 ease-in-out">
+                            Batal
+                        </a>
+                        <button type="submit" name="simpan" value="Simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-slate-700 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
+                            <i class="fas fa-save mr-2"></i> Simpan User
                         </button>
                     </div>
-
                 </div>
-            </form>
-        </div></div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?php
-// Cek apakah tombol simpan ditekan
 if (isset($_POST['simpan'])) {
-    // Mengambil data dari form, menggunakan null coalescing (??) agar tidak error jika kosong
     $tnama     = $_POST['tnama'] ?? '';
     $trole     = $_POST['trole'] ?? '';
     $tpassword = $_POST['tpassword'] ?? '';
     
-    // Proses Insert ke Database
     $sql = $koneksi->query("INSERT INTO ms_login (id_perusahaan, user_login, lg_password, role) VALUES ('1', '$tnama', '$tpassword', '$trole')");
     
     if ($sql) {

@@ -364,7 +364,7 @@ INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`
 (1, 1, 'admin', '123', 'admin'),
 (2, 1, 'kepala gudang', '123', 'kepala gudang'),
 (3, 1, 'owner', '123', 'OWNER'),
-(4, 1, 'admin master', '123', 'admin master');
+(4, 1, 'admin master', '123', 'admin master'),
 
 
 -- --------------------------------------------------------
