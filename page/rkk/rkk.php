@@ -2,12 +2,12 @@
 
 
 $tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
-if ($_SESSION['level'] != "OWNER") {
-    $level =  "Hidden";
+if ($_SESSION['role'] != "owner") {
+    $level_status =  "Hidden";
 } else {
-    $level = "";
+    $level_status = "";
 }
-if ($_SESSION['level'] == "OWNER") {
+if ($_SESSION['role'] == "owner") {
     $hr =  "Hidden";
 } else {
     $hr = "";
@@ -273,7 +273,7 @@ if ($_SESSION['level'] == "OWNER") {
                                     </div>
                                 </div>
 
-                                <div <?php echo $level ?>>
+                                <div <?php echo $level_status ?>>
                                     <div <?php echo $app ?>>
                                         <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=app"
                                             class="btn btn-success btn-xs" onclick="return confirm('Approve data ini?');">Approve</a>

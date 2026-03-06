@@ -1,137 +1,132 @@
 <?php
-include "koneksi.php";  // sesuaikan koneksi
+include "koneksi.php";
 
-$id = $_GET['id']; // parameter ?tgl=2025-10-30
+$id = $_GET['id'];
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=export_realisasi_$id.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
+
 function rupiah($angka){
     return "Rp " . number_format($angka, 0, ',', '.');
 }
 
-// Query join lengkap
+// Query join lengkap untuk mendapatkan semua metadata yang diminta
 $sql = "
 SELECT 
-    K.nama_karyawan, K.OS_DHK,K.golongan,
-    J.jabatan,
+    K.no_absen,
+    K.nama_karyawan, 
+    K.OS_DHK,
+    K.golongan,
     D.nama_departmen,
+    R.tgl_realisasi,
     R.jam_kerja,
     RD.ra_masuk,
-    RD.ra_istirahat_masuk,
     RD.ra_keluar,
+    RD.ra_istirahat_keluar,
+    RD.ra_istirahat_masuk,
+    RD.r_jam_masuk,
+    RD.r_istirahat_keluar,
+    RD.r_istirahat_masuk,
+    RD.r_jam_keluar,
     RD.hasil_kerja,
     RD.r_upah,
     RD.r_potongan_telat,
     RD.r_potongan_istirahat,
     RD.r_potongan_lainnya,
-    R.tgl_realisasi,
     RD.lembur
 FROM tb_realisasi_detail RD
 LEFT JOIN tb_realisasi R ON RD.id_realisasi = R.id_realisasi
 LEFT JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
-LEFT JOIN ms_departmen D ON K.id_departmen = D.id_departmen
-LEFT JOIN ms_jabatan J ON K.id_jabatan = J.id_jabatan
+LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
+LEFT JOIN ms_departmen D ON RKD.id_departmen = D.id_departmen
 WHERE R.id_realisasi = '$id'
 ORDER BY D.nama_departmen, K.nama_karyawan ASC
 ";
 
 $result = $koneksi->query($sql);
 
-// MULAI OUTPUT EXCEL (format tabel HTML)
-$row1 = $result->fetch_assoc();
-$tglRealisasi = $row1 ? $row1['tgl_realisasi'] : '-';
-echo "
-<table>
-<tr>
- <td colspan= '16'  style='text-align:center;'>Realisasi Absensi Karyawan Tanggal ". $tglRealisasi ."</td>   
-</tr>
-";
-
-echo "
-<tr>
- <td colspan= '16'  style='text-align:center;'>JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td>   
-</tr>
-";
-
-echo "
-
-<tr>
- <td colspan= '16'  style='text-align:center;'>JIKALAU ISITIRAHAT KURANG DARI JAM 12:00 DAN MASUK SETELAH ISTIRAHAT LEBIH DARI JAM 13:00 MAKA KENA POTONG SEBESAR RP.50,000!!!                          
-</td>   
-</tr>
-
-";
-
-echo "
-
-<tr>
- <td colspan= '16'  style='text-align:center;'>MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td>   
-</tr>
-
-";
-
-echo "
-
-<tr>
- <td colspan= '16' style='text-align:center;'>MASUK JAM 09:00-10:00 ISTIRAHAT JAM 13:00 MASUK JAM ISTIRAHAT JAM 14:00</td>   
-</tr>
-</table>
-";
-if($result->num_rows > 0) {
+// Header Informasi Tambahan (Opsional, tapi bagus untuk konteks)
+$tglRealisasi = '-';
+if ($result->num_rows > 0) {
+    $row_temp = $result->fetch_assoc();
+    $tglRealisasi = $row_temp['tgl_realisasi'];
     $result->data_seek(0);
 }
-echo "<table border='1'>";
+
 echo "
-<tr>
- <th>No.</th>
-    <th>Nama Karyawan</th>
-    <th>Jabatan</th>
-    <th>Bagian</th>
-    <th>OS/DHK</th>
-    <th>Golongan</th>
-    <th>Jam Kerja</th>
-    <th>Masuk</th>
-    <th>Istirahat Masuk</th>
-    <th>Keluar</th>
-    <th>Hasil Kerja</th>
-    <th>Upah</th>
-    <th>Potongan</th>
-    <th>Potongan Istirahat</th>
-    <th>Potongan lainnya</th>
-       <th>Lembur</th>
-    <th>Upah Dibayar</th>
-   
-</tr>
+<table border='1'>
+    <tr>
+        <th colspan='20' style='text-align:center; background-color:#f8f9fa; font-size:16px;'>LAPORAN REALISASI ABSENSI & UPAH TANGGAL: $tglRealisasi</th>
+    </tr>
+    <tr style='background-color:#5F9EA0; color:white;'>
+        <th>No.</th>
+        <th>NIK</th>
+        <th>Nama Karyawan</th>
+        <th>Bagian</th>
+        <th>Golongan</th>
+        <th>OS/DHK</th>
+        <th>Tgl</th>
+        <th>Jam Masuk (R)</th>
+        <th>Pulang (R)</th>
+        <th>Absen Masuk</th>
+        <th>Istirahat Keluar</th>
+        <th>Istirahat Masuk</th>
+        <th>Absen Pulang</th>
+        <th>Lembur</th>
+        <th>Upah</th>
+        <th>Pot. Telat</th>
+        <th>Pot. Istirahat</th>
+        <th>Pot. Lainnya</th>
+        <th>Upah Dibayar</th>
+        <th>Hasil Kerja/Ket</th>
+    </tr>
 ";
-$no=1;
+
+$no = 1;
+$grand_total_dibayar = 0;
+
 while($row = $result->fetch_assoc()){
+    // Hitung Upah Dibayar
+    $upah_bersih = ($row['r_upah'] + $row['lembur']) - ($row['r_potongan_telat'] + $row['r_potongan_istirahat'] + $row['r_potongan_lainnya']);
+    $grand_total_dibayar += $upah_bersih;
 
     echo "
     <tr>
-     <td>".$no."</td>
+        <td style='text-align:center;'>".$no."</td>
+        <td>'".$row['no_absen']."</td>
         <td>".$row['nama_karyawan']."</td>
-        <td>".$row['jabatan']."</td>
         <td>".$row['nama_departmen']."</td>
-         <td>".$row['OS_DHK']."</td>
-         <td>".$row['golongan']."</td>
-        <td>".$row['jam_kerja']."</td>
-        <td>".$row['ra_masuk']."</td>
-        <td>".$row['ra_istirahat_masuk']."</td>
-        <td>".$row['ra_keluar']."</td>
+        <td style='text-align:center;'>".$row['golongan']."</td>
+        <td style='text-align:center;'>".$row['OS_DHK']."</td>
+        <td style='text-align:center;'>".$row['tgl_realisasi']."</td>
+        <td style='text-align:center;'>".$row['ra_masuk']."</td>
+        <td style='text-align:center;'>".$row['ra_keluar']."</td>
+        <td style='text-align:center;'>".$row['r_jam_masuk']."</td>
+        <td style='text-align:center;'>".$row['r_istirahat_keluar']."</td>
+        <td style='text-align:center;'>".$row['r_istirahat_masuk']."</td>
+        <td style='text-align:center;'>".$row['r_jam_keluar']."</td>
+        <td style='text-align:right;'>".number_format($row['lembur'], 0, ',', '.')."</td>
+        <td style='text-align:right;'>".number_format($row['r_upah'], 0, ',', '.')."</td>
+        <td style='text-align:right; color:red;'>".number_format($row['r_potongan_telat'], 0, ',', '.')."</td>
+        <td style='text-align:right; color:red;'>".number_format($row['r_potongan_istirahat'], 0, ',', '.')."</td>
+        <td style='text-align:right; color:red;'>".number_format($row['r_potongan_lainnya'], 0, ',', '.')."</td>
+        <td style='text-align:right; font-weight:bold;'>".number_format($upah_bersih, 0, ',', '.')."</td>
         <td>".$row['hasil_kerja']."</td>
-         <td>".rupiah($row['r_upah'])."</td>
-        <td>".rupiah($row['r_potongan_telat'])."</td>
-        <td>".rupiah($row['r_potongan_istirahat'])."</td>
-        <td>".rupiah($row['r_potongan_lainnya'])."</td>
-         <td>".rupiah($row['lembur'])."</td>
-<td>".rupiah($row['r_upah'] + $row['lembur']-$row['r_potongan_telat'] - $row['r_potongan_istirahat'] - $row['r_potongan_lainnya'])."</td>
     </tr>
     ";
 
     $no++;
 }
 
-echo "</table>";
+// Baris Total di Bawah
+echo "
+    <tr style='background-color:#f1f5f9; font-weight:bold;'>
+        <td colspan='18' style='text-align:right; padding:10px;'>TOTAL UPAH DIBAYAR:</td>
+        <td style='text-align:right;'>".rupiah($grand_total_dibayar)."</td>
+        <td></td>
+    </tr>
+</table>
+";
 ?>

@@ -2,7 +2,7 @@
 
     $id = $_GET ['id'];
 $ttgl2 = date("Y-m-d H:i:s");
-    $sql =   $koneksi->query("update tb_realisasi set status_realisasi = 1 , tgl_status= '$ttgl2' where id_realisasi = '$id' ");
+    $sql =   $koneksi->query("update tb_realisasi set status_realisasi = 'approve' , tgl_status= '$ttgl2' where id_realisasi = '$id' ");
     if($sql) {
         ?>
                 <script type="text/javascript">

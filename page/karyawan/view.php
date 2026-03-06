@@ -16,9 +16,7 @@ $golongan = $data['golongan'];
 $statuskawin = $data['status_kawin'];
 $jeniskelamin = $data['jenis_kelamin'];
 $noktp = $data['no_ktp'];
-$nonpwp = $data['no_npwp'];
 $nobpjs = $data['no_bpjs'];
-$nosim = $data['no_sim'];
 $alamatktp = $data['alamat_ktp'];
 $alamattinggal = $data['alamat_tinggal'];
 $statuskaryawan = $data['status_karyawan'];
@@ -39,7 +37,6 @@ $golongan= "";
 $statuskawin = "";
 $jeniskelamin = "";
 $noktp = "";
-$nosim = "";
 $alamatktp = "";
 $alamattinggal = "";
 $statuskaryawan = "";
@@ -52,138 +49,174 @@ $contupdate="hidden";
 
 
 ?>
-<div class="row">
-                <div class="col-md-12">
-                    <!-- Advanced Tables -->
-                    <div class="panel panel-primary"  >
-                    <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
-              <h3 class="box-title">View Data Karyawan</h3>
+<div class="container-fluid px-4 mt-5 mb-5">
+    <div class="card border-0 shadow-lg rounded-xl overflow-hidden">
+        
+        <div class="card-header bg-white border-b border-gray-100 py-5 px-6 flex justify-between items-center">
+            <div>
+                <h3 class="text-2xl font-extrabold text-gray-800 tracking-tight m-0">Detail Data Karyawan</h3>
+                <p class="text-sm text-gray-500 mt-1">Informasi lengkap profil karyawan (Hanya Baca).</p>
             </div>
-                        <div class="panel-body">
-                           <div class="panel-body">
-                           
-                            <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                            <div hidden="hidden"  class="form-group col-md-4">
-                    <label class="font-weight-bold">Id Karyawan</label>
-                    
-                    <input  autocomplete="off" type="text" name="tid" value="<?php echo $idkaryawan; ?>"  class="form-control"/>
-                </div>
+            <a href="?page=karyawan" class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-semibold transition-all shadow-sm border border-gray-200 no-underline inline-flex items-center">
+                <i class="fas fa-arrow-left mr-2"></i> Kembali
+            </a>
+        </div>
 
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Nama </label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $namakaryawan; ?>"  required class="form-control"/>
+        <div class="card-body p-6 bg-gray-50/30">
+            
+            <div class="mb-8">
+                <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
+                    <i class="fas fa-id-badge mr-2 text-lg"></i> Informasi Dasar
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                     
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">OS/DHK </label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $tos; ?>"  required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Golongan</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnama" value="<?php echo $golongan; ?>"  required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. Absen</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnoabsen" value="<?php echo $noabsen; ?>" required class="form-control"/>
-                    
-                </div>
-          
-             
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Tempat Lahir</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="ttempatlahir" value="<?php echo $tempatlahir; ?>" required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Tanggal Lahir</label>
-                    <input placeholder="*" autocomplete="off" type="date" name="ttanggallahir" value="<?php echo $tgllahir; ?>" required class="form-control"/>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Agama</label>
-                    <select name="tagama" class="form-control" required>
-                      <option value="<?php echo $agama; ?>"><?php echo $agama; ?></option>
-                        <option value="Islam">Islam</option>
-                         <option value="Kristen Katolik">Kristen Katolik</option>
-                         <option value="Kristen Protestan">Kristen Protestan</option>
-                          <option value="Hindu">Hindu</option>
-                           <option value="Budha">Budha</option>
-                        </select>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Status Kawin</label>
-                   <select name="tstatuskawin" class="form-control" required>
-                  <option value="<?php echo $statuskawin; ?>"><?php echo $statuskawin; ?></option>
-                        <option value="Belum Kawin">Belum Kawin</option>
-                         <option value="Kawin">Kawin</option>
-                          <option value="Janda">Janda</option>
-                           <option value="Duda">Duda</option>
-                        </select>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Jenis Kelamin</label>
-                  <select name="tjeniskelamin" class="form-control" required>
-                     <option value="<?php echo $jeniskelamin; ?>"><?php echo $jeniskelamin; ?></option>
-                        <option value="Laki-laki">Laki-laki</option>
-                         <option value="Perempuan">Perempuan</option>
-                        </select>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No.KTP</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnoktp" value="<?php echo $noktp; ?>"  required class="form-control"/>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. SIM</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnosim" value="<?php echo $nosim; ?>" required class="form-control"/>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Alamat KTP</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="talamatktp" value="<?php echo $alamatktp; ?>" required class="form-control"/>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Alamat Tinggal</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="talamattinggal" value="<?php echo $alamattinggal; ?>" required class="form-control"/>
-                    
-                </div>
-                  <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Tanggal Bergabung</label>
-                    <input placeholder="*" autocomplete="off" type="date" name="ttanggalbergabung" value="<?php echo $tglaktif; ?>" required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. NPWP</label>
-                    <input  autocomplete="off" type="number" name="tnpwp" value="<?php echo $nonpwp; ?>" class="form-control"/>
-                    
-                </div>
-                <div class="form-group col-md-4">
-                    <label class="font-weight-bold">No. BPJS</label>
-                    <input  autocomplete="off" type="number" name="tbpjs" value="<?php echo $nobpjs; ?>" class="form-control"/>
-                    
-                </div>
-                  
-                </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Nama Lengkap</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $namakaryawan ? $namakaryawan : '-'; ?>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">No. Absen</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $noabsen ? $noabsen : '-'; ?>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Status Karyawan</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php 
+                            if ($statuskaryawan == 'Aktif') {
+                                echo '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold"><i class="fas fa-check-circle mr-1"></i> Aktif</span>';
+                            } else {
+                                echo '<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold"><i class="fas fa-times-circle mr-1"></i> Non-Aktif</span>';
+                            }
+                            ?>
+                        </div>
+                    </div>
 
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">OS / DHK</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $tos ? $tos : '-'; ?>
+                        </div>
+                    </div>
 
-
-
-
-                            </div>
-                          
-                           
-
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Golongan</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $golongan ? $golongan : '-'; ?>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="mb-8">
+                <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
+                    <i class="fas fa-user mr-2 text-lg"></i> Profil Pribadi
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Tempat Lahir</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $tempatlahir ? $tempatlahir : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Tanggal Lahir</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $tgllahir ? date('d F Y', strtotime($tgllahir)) : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Jenis Kelamin</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $jeniskelamin ? $jeniskelamin : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Agama</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $agama ? $agama : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Status Pernikahan</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $statuskawin ? $statuskawin : '-'; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
+                    <i class="fas fa-address-card mr-2 text-lg"></i> Identitas & Administrasi
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">No. KTP</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium font-mono text-lg tracking-wider">
+                            <?php echo $noktp ? $noktp : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">No. BPJS</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium font-mono">
+                            <?php echo $nobpjs ? $nobpjs : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Alamat (Sesuai KTP)</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium min-h-[60px]">
+                            <?php echo $alamatktp ? $alamatktp : '-'; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group md:col-span-2">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Alamat (Domisili / Tinggal)</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium min-h-[60px]">
+                            <?php echo $alamattinggal ? $alamattinggal : '-'; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
+                    <i class="fas fa-calendar-alt mr-2 text-lg"></i> Riwayat Kepegawaian
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Tanggal Bergabung</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $tglaktif ? date('d F Y', strtotime($tglaktif)) : '-'; ?>
+                        </div>
+                    </div>
+                    <?php if ($tglnonaktif && $tglnonaktif != '0000-00-00') { ?>
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Tanggal Berhenti (Resign)</label>
+                        <div class="px-4 py-3 bg-red-50 rounded-lg border border-red-200 text-red-800 font-bold">
+                            <?php echo date('d F Y', strtotime($tglnonaktif)); ?>
+                        </div>
+                    </div>
+                    <?php } ?>
+                </div>
+            </div>
+
         </div>
+    </div>
+</div>
 
 <?php
 
@@ -197,17 +230,15 @@ $tagama = @$_POST ['tagama'];
 $tstatuskawin = @$_POST ['tstatuskawin'];
 $tjeniskelamin = @$_POST ['tjeniskelamin'];
 $tnoktp = @$_POST ['tnoktp'];
-$tnosim = @$_POST ['tnosim'];
 $talamatktp = @$_POST ['talamatktp'];
 $talamattinggal = @$_POST ['talamattinggal'];
 $ttanggalbergabung = @$_POST ['ttanggalbergabung'];
 $tbpjs = @$_POST ['tbpjs'];
-$tnpwp = @$_POST ['tnpwp'];
 $simpan = @$_POST ['simpan'];
 $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,no_sim,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_npwp,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$tnosim','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tnpwp','$tbpjs')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tbpjs')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">
@@ -219,7 +250,7 @@ if($sql) {
     }
 }//simpan if
 elseif($update) {
-$sql = $koneksi->query("update ms_karyawan set no_absen ='$tnoabsen' ,nama_karyawan = '$tnama',tempat_lahir = '$ttempatlahir' ,tgl_lahir = '$ttanggallahir',agama ='$tagama' ,status_kawin = '$tstatuskawin',jenis_kelamin = '$tjeniskelamin',no_ktp = '$tnoktp' ,no_sim = '$tnosim',alamat_ktp = '$talamatktp',alamat_tinggal = '$talamattinggal' , tgl_aktif = '$ttanggalbergabung' where id_karyawan = '$idu'  ");
+$sql = $koneksi->query("update ms_karyawan set no_absen ='$tnoabsen' ,nama_karyawan = '$tnama',tempat_lahir = '$ttempatlahir' ,tgl_lahir = '$ttanggallahir',agama ='$tagama' ,status_kawin = '$tstatuskawin',jenis_kelamin = '$tjeniskelamin',no_ktp = '$tnoktp' ,alamat_ktp = '$talamatktp',alamat_tinggal = '$talamattinggal' , tgl_aktif = '$ttanggalbergabung' where id_karyawan = '$idu'  ");
 if($sql) {
         ?>
                 <script type="text/javascript">

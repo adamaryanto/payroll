@@ -351,20 +351,29 @@ INSERT INTO `ms_lampiran` (`id_lampiran`, `id_karyawan`, `tgl_lampiran`, `lampir
 
 CREATE TABLE `ms_login` (
   `id_login` int(10) NOT NULL,
-  `id_perusahaan` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,<div class="form-group col-md-2">
+                        <label>Pot. Telat</label>
+                        <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" required>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>Pot. Istirahat</label>
+                        <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" required>
+                    </div>
   `user_login` varchar(225) NOT NULL,
   `lg_password` varchar(255) NOT NULL,
-  `level` enum('sa','admin','user','OWNER') DEFAULT NULL
+  `role` enum('kepala gudang','admin','admin master','OWNER') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data untuk tabel `ms_login`
 --
 
-INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `level`) VALUES
-(1, 1, 'admin', '123', 'sa'),
-(2, 1, 'mahmudin', '123', 'sa'),
-(3, 1, 'owner', '123', 'OWNER');
+INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `role`) VALUES
+(1, 1, 'admin', '123', 'admin'),
+(2, 1, 'kepala gudang', '123', 'kepala gudang'),
+(3, 1, 'owner', '123', 'OWNER'),
+(4, 1, 'admin master', '123', 'admin master'),
+
 
 -- --------------------------------------------------------
 
@@ -681,7 +690,7 @@ CREATE TABLE `tb_realisasi` (
   `tgl_realisasi` date NOT NULL,
   `detail_realisasi` varchar(20) NOT NULL,
   `jam_kerja` int(10) NOT NULL,
-  `status_realisasi` int(10) NOT NULL,
+  `status_realisasi` enum('pending','approve') NOT NULL DEFAULT 'pending',
   `tgl_status` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -690,9 +699,9 @@ CREATE TABLE `tb_realisasi` (
 --
 
 INSERT INTO `tb_realisasi` (`id_realisasi`, `id_rkk`, `keterangan`, `tgl_realisasi`, `detail_realisasi`, `jam_kerja`, `status_realisasi`, `tgl_status`) VALUES
-(9, 1, 'realisasi1', '2025-11-25', '2025-11-25 06:45:16', 8, 1, '2025-11-29'),
-(10, 5, '', '2025-11-12', '2025-11-29 05:56:48', 8, 0, '0000-00-00'),
-(11, 6, '', '2025-11-01', '2025-12-01 06:57:44', 8, 0, '0000-00-00');
+(9, 1, 'realisasi1', '2025-11-25', '2025-11-25 06:45:16', 8, 'approve', '2025-11-29'),
+(10, 5, '', '2025-11-12', '2025-11-29 05:56:48', 8, 'pending', '0000-00-00'),
+(11, 6, '', '2025-11-01', '2025-12-01 06:57:44', 8, 'pending', '0000-00-00');
 
 -- --------------------------------------------------------
 
