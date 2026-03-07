@@ -146,6 +146,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <li class="nav-item"><a href="?page=karyawan" class="nav-link"><i class="fas fa-users nav-icon"></i><p>Karyawan</p></a></li>
                   <li class="nav-item"><a href="?page=bagian" class="nav-link"><i class="far fa-building nav-icon"></i><p>Bagian</p></a></li>
                   <li class="nav-item"><a href="?page=user" class="nav-link"><i class="fas fa-user-shield nav-icon"></i><p>User</p></a></li>
+                  <li class="nav-item"><a href="?page=upah" class="nav-link"><i class="fas fa-money-bill-wave nav-icon"></i><p>Master Upah</p></a></li>
                 </ul>
               </li>
               <?php } ?>
@@ -267,6 +268,11 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "tambah") { include "page/user/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/user/ubah.php"; } 
                     elseif ($aksi == "ubahpass") { include "page/user/ubahpass.php"; }
+                  } else if ($page == 'upah') {
+                    if ($aksi == "") { include "page/upah/upah.php"; } 
+                    elseif ($aksi == "hapus") { include "page/upah/hapus.php"; } 
+                    elseif ($aksi == "tambah") { include "page/upah/tambah.php"; } 
+                    elseif ($aksi == "ubah") { include "page/upah/ubah.php"; }
                   } else if ($page == 'sakit') {
                     if ($aksi == "") { include "page/sakit/sakit.php"; } 
                     elseif ($aksi == "hapus") { include "page/sakit/hapus.php"; } 

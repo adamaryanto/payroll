@@ -23,7 +23,6 @@ $idrkk = $_GET['id'] ?? '';
                                 <th class="py-2.5 px-3 text-[13px] font-bold text-gray-700 uppercase">Jenis Kelamin</th>
                                 <th class="py-2.5 px-3 text-[13px] font-bold text-gray-700 uppercase">Tanggal Aktif</th>
                                 <th class="py-2.5 px-3 text-[13px] font-bold text-gray-700 uppercase text-center w-24">Aksi</th>
-                                <th hidden="hidden">Upah Harian</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -44,7 +43,6 @@ $idrkk = $_GET['id'] ?? '';
                                         <i class="fas fa-print mr-1.5"></i> Slip
                                     </a>
                                 </td>
-                                <td hidden="hidden"><input type="text" name="tupah[]" value="<?= $datakaryawan['upah_harian'] ?>"/></td>
                             </tr>
                             <?php endwhile; ?>
                         </tbody>

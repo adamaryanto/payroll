@@ -56,6 +56,13 @@ if (isset($_POST['simpan_karyawan'])) {
 $list_dept   = $koneksi->query("SELECT * FROM ms_departmen ORDER BY nama_departmen ASC");
 $list_sub    = $koneksi->query("SELECT * FROM ms_sub_department ORDER BY nama_sub_department ASC");
 $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC");
+
+// Ambil upah global terbaru
+$q_upah = $koneksi->query("SELECT * FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
+$global_upah = $q_upah->fetch_assoc();
+$g_harian   = $global_upah['upah_harian'] ?? 0;
+$g_mingguan = $global_upah['upah_mingguan'] ?? 0;
+$g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
 ?>
 
 <style>
@@ -76,18 +83,24 @@ $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC")
                 <div class="panel-body form-section">
                     <div class="row">
                         <div class="form-group col-md-12">
-                            <label class="label-text">Cari No. Absen / Nama Karyawan</label>
-                            <input list="karyawan_list" id="search_karyawan" class="form-control" placeholder="Ketik NIK atau Nama..." autocomplete="off">
-                            <datalist id="karyawan_list">
+                            <label class="label-text">Pilih No. Absen / Nama Karyawan</label>
+                            <select name="id_karyawan" id="search_karyawan" class="form-control" required>
+                                <option value="">- Pilih Karyawan -</option>
                                 <?php
-                                $master = $koneksi->query("SELECT * FROM ms_karyawan WHERE status_karyawan = 'Aktif'");
+                                $master = $koneksi->query("SELECT * FROM ms_karyawan WHERE status_karyawan = 'Aktif' ORDER BY nama_karyawan ASC");
                                 while ($row = $master->fetch_assoc()) {
-                                    // Simpan upah di attribute data-upah
-                                    echo "<option value='" . $row['no_absen'] . " | " . $row['nama_karyawan'] . "' data-id='" . $row['id_karyawan'] . "' data-jk='" . $row['jenis_kelamin'] . "' data-tgl='" . $row['tgl_aktif'] . "' data-upah='" . $row['upah_harian'] . "'>";
+                                    $dept_karyawan = isset($row['id_departmen']) ? $row['id_departmen'] : '';
+                                    $sub_karyawan = isset($row['id_sub_department']) ? $row['id_sub_department'] : '';
+                                    
+                                    echo "<option value='" . $row['id_karyawan'] . "' 
+                                            data-jk='" . $row['jenis_kelamin'] . "' 
+                                            data-tgl='" . $row['tgl_aktif'] . "'
+                                            data-golongan='" . $row['golongan'] . "'
+                                            data-dept='" . $dept_karyawan . "'
+                                            data-sub='" . $sub_karyawan . "'>" . $row['no_absen'] . " | " . $row['nama_karyawan'] . "</option>";
                                 }
                                 ?>
-                            </datalist>
-                            <input type="hidden" name="id_karyawan" id="id_karyawan">
+                            </select>
                         </div>
 
                         <div class="form-group col-md-4">
@@ -99,7 +112,7 @@ $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC")
                             <input type="text" id="tgl_aktif" class="form-control" style="background:#f9f9f9" readonly>
                         </div>
                         <div class="form-group col-md-4">
-                            <label class="label-text">Upah Harian (Manual)</label>
+                            <label class="label-text">Upah </label>
                             <input type="number" name="upah_manual" id="upah_manual" class="form-control" placeholder="Input Upah..." required>
                         </div>
 
@@ -119,7 +132,7 @@ $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC")
 
                         <div class="form-group col-md-4">
                             <label class="label-text">Bagian (Departemen)</label>
-                            <select name="id_departmen" class="form-control" required>
+                            <select name="id_departmen" id="id_departmen" class="form-control" required>
                                 <option value="">- Pilih Departemen -</option>
                                 <?php $list_dept->data_seek(0); while ($d = $list_dept->fetch_assoc()) { ?>
                                     <option value="<?= $d['id_departmen']; ?>"><?= $d['nama_departmen']; ?></option>
@@ -128,7 +141,7 @@ $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC")
                         </div>
                         <div class="form-group col-md-4">
                             <label class="label-text">Sub Bagian</label>
-                            <select name="id_sub_department" class="form-control" required>
+                            <select name="id_sub_department" id="id_sub_department" class="form-control" required>
                                 <option value="">- Pilih Sub Bagian -</option>
                                 <?php $list_sub->data_seek(0); while ($s = $list_sub->fetch_assoc()) { ?>
                                     <option value="<?= $s['id_sub_department']; ?>"><?= $s['nama_sub_department']; ?></option>
@@ -152,19 +165,42 @@ $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC")
 </div>
 
 <script>
-    document.getElementById('search_karyawan').addEventListener('input', function() {
-        var val = this.value;
-        var opts = document.getElementById('karyawan_list').childNodes;
-        for (var i = 0; i < opts.length; i++) {
-            if (opts[i].value === val) {
-                document.getElementById('id_karyawan').value = opts[i].getAttribute('data-id');
-                document.getElementById('jk').value = opts[i].getAttribute('data-jk');
-                document.getElementById('tgl_aktif').value = opts[i].getAttribute('data-tgl');
-                
-                // Mengisi value awal upah dari data master, tapi masih bisa kamu ganti manual
-                document.getElementById('upah_manual').value = opts[i].getAttribute('data-upah');
-                break;
-            }
+    // Variabel upah global dari PHP
+    const globalRates = {
+        harian: <?= $g_harian ?>,
+        mingguan: <?= $g_mingguan ?>,
+        bulanan: <?= $g_bulanan ?>
+    };
+
+    document.getElementById('search_karyawan').addEventListener('change', function() {
+        var selectedOption = this.options[this.selectedIndex];
+        
+        if(this.value === "") {
+            document.getElementById('jk').value = "";
+            document.getElementById('tgl_aktif').value = "";
+            document.getElementById('upah_manual').value = "";
+            document.getElementById('id_departmen').value = "";
+            document.getElementById('id_sub_department').value = "";
+            return;
         }
+
+        // Ambil data-golongan dari option
+        var gol = selectedOption.getAttribute('data-golongan') || "";
+        var finalWage = 0;
+
+        // Tentukan upah berdasarkan golongan karyawan
+        if (gol.toLowerCase().includes("harian") || gol === "1") {
+            finalWage = globalRates.harian;
+        } else if (gol.toLowerCase().includes("mingguan")) {
+            finalWage = globalRates.mingguan;
+        } else if (gol.toLowerCase().includes("bulanan") || gol === "3") {
+            finalWage = globalRates.bulanan;
+        }
+
+        document.getElementById('jk').value = selectedOption.getAttribute('data-jk');
+        document.getElementById('tgl_aktif').value = selectedOption.getAttribute('data-tgl');
+        document.getElementById('upah_manual').value = finalWage;
+        document.getElementById('id_departmen').value = selectedOption.getAttribute('data-dept');
+        document.getElementById('id_sub_department').value = selectedOption.getAttribute('data-sub');
     });
 </script>

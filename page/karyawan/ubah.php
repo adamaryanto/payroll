@@ -25,9 +25,6 @@ if(isset($_GET['id'])){
     $statuskaryawan = $data['status_karyawan'];
     $tglaktif = $data['tgl_aktif'];
     $tglnonaktif = $data['tgl_nonaktif'];
-    $harian = $data['upah_harian'];
-    $mingguan = $data['upah_mingguan'];
-    $bulanan = $data['upah_bulanan'];
 }
 
 if (isset($_POST['update'])) {
@@ -46,9 +43,6 @@ if (isset($_POST['update'])) {
     $talamatktp = $_POST['talamatktp'];
     $talamattinggal = $_POST['talamattinggal'];
     $ttanggalbergabung = $_POST['ttanggalbergabung'];
-    $tharian = $_POST['tharian'] ?: 0;
-    $tmingguan = $_POST['tmingguan'] ?: 0;
-    $tbulanan = $_POST['tbulanan'] ?: 0;
     // Function to handle inline insert and return new ID
     if (!function_exists('getOrInsertMaster')) {
         function getOrInsertMaster($koneksi, $postKey, $table, $column, $extraData = []) {
@@ -103,10 +97,7 @@ if (isset($_POST['update'])) {
         alamat_tinggal = '$talamattinggal',
         tgl_aktif = '$ttanggalbergabung',
         OS_DHK = '$tos',
-        golongan = '$tgolongan',
-        upah_harian = '$tharian',
-        upah_mingguan = '$tmingguan',
-        upah_bulanan = '$tbulanan'
+        golongan = '$tgolongan'
         WHERE id_karyawan = '$tid'
     ");
 
@@ -193,20 +184,7 @@ if (isset($_POST['update'])) {
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Jadwal / Shift</label>
-                            <select name="tjadwal" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Jadwal -" data-delete-route="jadwal">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=jadwal&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Jadwal Baru...</option>
-                                <?php
-                                $q_jad = $koneksi->query("SELECT * FROM tb_jadwal");
-                                while($d = $q_jad->fetch_assoc()) {
-                                    $sel = ($d['id_jadwal'] == $idjadwal) ? 'selected' : '';
-                                    echo "<option value='".$d['id_jadwal']."' $sel>".$d['nama_jadwal']."</option>";
-                                }
-                                ?>
-                            </select>
-                        </div>
+                       
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">OS / DHK <span class="text-red-500">*</span></label>
@@ -318,31 +296,10 @@ if (isset($_POST['update'])) {
                     <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
                         <i class="fas fa-money-bill-wave mr-2 text-lg"></i> Informasi Penggajian
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Bergabung</label>
                             <input type="date" name="ttanggalbergabung" value="<?= $tglaktif; ?>" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Harian</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                <input type="number" name="tharian" value="<?= $harian; ?>" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Mingguan</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                <input type="number" name="tmingguan" value="<?= $mingguan; ?>" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Bulanan</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                <input type="number" name="tbulanan" value="<?= $bulanan; ?>" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0">
-                            </div>
                         </div>
                     </div>
                 </div>

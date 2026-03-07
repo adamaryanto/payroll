@@ -35,14 +35,12 @@ $level_status = (!$role_akses) ? "hidden" : "";
                         <tr>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-8">No</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tgl Input</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jam</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jml</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Pot. Tlt</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Pot. Ist</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Pot. Lain</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Ket</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Potongan Telat</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Potongan Istirahat</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
                         </tr>
@@ -66,27 +64,24 @@ $level_status = (!$role_akses) ? "hidden" : "";
                         <tr class="<?= $row_class ?>">
                             <td data-label="No" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $no ?></td>
                             <td data-label="Tanggal" class="py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= $data['tgl_realisasi'] ?></td>
-                            <td data-label="Tgl Input" class="py-2.5 px-2 text-[15px] text-gray-700 align-middle whitespace-nowrap"><?= $data['detail_realisasi'] ?></td>
-                            <td data-label="Jam" class="py-2.5 px-2 text-center text-[15px] font-bold text-indigo-600 align-middle"><?= $data['jam_kerja'] ?></td>
-                            <td data-label="Jml" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $data['jml'] ?></td>
+                            <td data-label="Keterangan" class="py-2.5 px-2 align-middle">
+                                <div class="text-[14px] text-gray-700 md:max-w-[150px] md:truncate" title="<?= htmlspecialchars($data['keterangan']) ?>">
+                                    <?= htmlspecialchars($data['keterangan']) ?>
+                                </div>
+                            </td>
+                            <td data-label="Jumlah Karyawan" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $data['jml'] ?></td>
                             
                             <td data-label="Total Upah" class="py-2.5 px-2 text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
                                 <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
                             </td>
-                            <td data-label="Pot. Tlt" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                            <td data-label="Potongan Telat" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                 <?= number_format($data['pottelat'] ?? 0, 0, ',', '.') ?>
                             </td>
-                            <td data-label="Pot. Ist" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                            <td data-label="Potongan Istirahat" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                 <?= number_format($data['potistirahat'] ?? 0, 0, ',', '.') ?>
                             </td>
-                            <td data-label="Pot. Lain" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                            <td data-label="Potongan Lainnya" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                 <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
-                            </td>
-                            
-                            <td data-label="Ket" class="py-2.5 px-2 align-middle">
-                                <div class="text-[14px] text-gray-700 md:max-w-[150px] md:truncate" title="<?= htmlspecialchars($data['keterangan']) ?>">
-                                    <?= htmlspecialchars($data['keterangan']) ?>
-                                </div>
                             </td>
                             
                             <td data-label="Status" class="py-2.5 px-2 align-middle text-center">

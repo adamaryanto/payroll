@@ -87,7 +87,7 @@ $tampil = $koneksi->query("
  CASE WHEN (SELECT TIMEDIFF(istirahatkonvert,istirahatmasuk)) > '0'
  THEN (SELECT denda_istirahat FROM tb_denda) ELSE '0' END AS 'dendaistirahat' ,
   
-  B.nama_karyawan , B.upah_harian,BB.nama_sub_department,
+  B.nama_karyawan , C.upah,BB.nama_sub_department,
 (select nama_departmen from ms_departmen WHERE id_departmen = B.id_departmen) as namadepartmen
    FROM tb_record A LEFT JOIN ms_karyawan B ON A.userid = B.no_absen
       left join ms_sub_department BB on B.id_sub_department = BB.id_sub_department
@@ -135,7 +135,7 @@ $tampil = $koneksi->query("
  CASE WHEN (SELECT TIMEDIFF(istirahatkonvert,istirahatmasuk)) > '0'
  THEN (SELECT denda_istirahat FROM tb_denda) ELSE '0' END AS 'dendaistirahat' ,
   
-  B.nama_karyawan , B.upah_harian,BB.nama_sub_department,
+  B.nama_karyawan , C.upah,BB.nama_sub_department,
 (select nama_departmen from ms_departmen WHERE id_departmen = B.id_departmen) as namadepartmen
    FROM tb_record A LEFT JOIN ms_karyawan B ON A.userid = B.no_absen
       left join ms_sub_department BB on B.id_sub_department = BB.id_sub_department
@@ -187,7 +187,7 @@ $tampil = $koneksi->query("SELECT DISTINCT A.tgl , A.userid ,
  THEN (SELECT denda_istirahat FROM tb_denda) ELSE '0' END AS 'dendaistirahat' ,
  
   
-  B.nama_karyawan , B.upah_harian,BB.nama_sub_department,
+  B.nama_karyawan , C.upah,BB.nama_sub_department,
   (select nama_departmen from ms_departmen WHERE id_departmen = B.id_departmen) as namadepartmen
 
 
@@ -334,10 +334,10 @@ if ($data['pulanglebihawal'] != ''){echo "#FFEBCD";}
 ><?php echo $data['pulangkonvert'] ?></td>
 <td style='text-align:center;'><?php echo $data['lembur'] ?></td>
 
-<td style='text-align:right;'><?php echo number_format( $data['upah_harian'],0,',',',') ?></td>
+<td style='text-align:right;'><?php echo number_format( $data['upah'],0,',',',') ?></td>
 <td style='text-align:right;'><?php echo number_format( $data['dendamasuk'] +  $data['dendaistirahat'],0,',',',') ?></td>
-<td style='text-align:right;'><?php echo number_format( $data['upah_harian']-$data['dendaistirahat'] - $data['dendaistirahat'],0,',',',') ;
-$tot2 = $data['upah_harian']-$data['dendamasuk'] - $data['dendaistirahat'];
+<td style='text-align:right;'><?php echo number_format( $data['upah']-$data['dendaistirahat'] - $data['dendaistirahat'],0,',',',') ;
+$tot2 = $data['upah']-$data['dendamasuk'] - $data['dendaistirahat'];
 $tot1 += $tot2;
 
 ?></td>
