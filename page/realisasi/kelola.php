@@ -387,8 +387,15 @@ if ($simpan) {
 
                                     while ($data = $tampil->fetch_assoc()) {
                                         $upah = $data['upahkaryawan'];
-                                        $total += $upah;
 
+                                        $potongan =
+                                            $data['r_potongan_telat'] +
+                                            $data['r_potongan_istirahat'] +
+                                            $data['r_potongan_lainnya'];
+
+                                        $upah_bersih = $upah - $potongan;
+
+                                        $total += $upah_bersih;
                                         // Check if both check-in and check-out are missing
                                         $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                             (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');

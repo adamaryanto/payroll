@@ -46,7 +46,7 @@
     }
 
     .form-modern .form-control:focus {
-        border-color: #5F9EA0;
+        border-color: #2563eb;
         background-color: #ffffff;
         box-shadow: 0 0 0 3px rgba(95, 158, 160, 0.15); /* Glow effect saat aktif */
         outline: none;
@@ -54,7 +54,7 @@
 
     /* Styling Tombol Modern */
     .btn-modern {
-        background-color: #5F9EA0; /* Warna cadillac cadet blue */
+        background-color: #2563eb; /* Warna cadillac cadet blue */
         color: white;
         border: none;
         border-radius: 8px;
@@ -69,7 +69,7 @@
     }
 
     .btn-modern:hover {
-        background-color: #4a8082;
+        background-color: #1e3a8a;
         color: white;
         box-shadow: 0 4px 8px rgba(95, 158, 160, 0.2);
     }
@@ -97,7 +97,7 @@
             
             <div class="card-modern-header">
                 <h3 class="card-modern-title">
-                    <i class="fa fa-calendar-alt" style="color:#5F9EA0;"></i> Ubah Jadwal Karyawan
+                    <i class="fa fa-calendar-alt" style="color:#2563eb;"></i> Tambah Jadwal Karyawan
                 </h3>
             </div>
             
