@@ -485,6 +485,27 @@ INSERT INTO `ms_sub_department` (`id_sub_department`, `id_perusahaan`, `nama_sub
 -- --------------------------------------------------------
 
 --
+-- Struktur dari tabel `ms_upah`
+--
+
+CREATE TABLE `ms_upah` (
+  `id_upah` int(11) NOT NULL,
+  `id_golongan` int(11) NOT NULL DEFAULT '0',
+  `upah_harian` int(11) NOT NULL DEFAULT '0',
+  `upah_mingguan` int(11) NOT NULL DEFAULT '0',
+  `upah_bulanan` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_upah`
+--
+
+INSERT INTO `ms_upah` (`id_upah`, `id_golongan`, `upah_harian`, `upah_mingguan`, `upah_bulanan`) VALUES
+(1, 0, 123, 23, 123);
+
+-- --------------------------------------------------------
+
+--
 -- Struktur dari tabel `tb_alfa`
 --
 
@@ -5520,6 +5541,12 @@ ALTER TABLE `ms_sub_department`
   ADD PRIMARY KEY (`id_sub_department`);
 
 --
+-- Indexes for table `ms_upah`
+--
+ALTER TABLE `ms_upah`
+  ADD PRIMARY KEY (`id_upah`);
+
+--
 -- Indexes for table `tb_alfa`
 --
 ALTER TABLE `tb_alfa`
@@ -5768,6 +5795,12 @@ ALTER TABLE `ms_status`
 --
 ALTER TABLE `ms_sub_department`
   MODIFY `id_sub_department` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `ms_upah`
+--
+ALTER TABLE `ms_upah`
+  MODIFY `id_upah` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_alfa`

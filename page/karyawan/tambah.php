@@ -52,24 +52,27 @@ if (isset($_POST['simpan'])) {
     $tempatlahir = $koneksi->real_escape_string($_POST['ttempatlahir']);
     $tanggallahir = $koneksi->real_escape_string($_POST['ttanggallahir']);
     $noktp = $koneksi->real_escape_string($_POST['tnoktp']);
-    $bpjs = $koneksi->real_escape_string($_POST['tbpjs']);
-    $alamatktp = $koneksi->real_escape_string($_POST['talamatktp']);
-    $tanggalbergabung = $koneksi->real_escape_string($_POST['ttanggalbergabung']);
-    $harian = $_POST['tharian'] ?: 0;
-    $mingguan = $_POST['tmingguan'] ?: 0;
-    $bulanan = $_POST['tbulanan'] ?: 0;
-
+    $bpjs = isset($_POST['tbpjs']) ? $koneksi->real_escape_string($_POST['tbpjs']) : '';
+    $alamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
+    $tanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
         status_kawin, jenis_kelamin, no_ktp, alamat_ktp, alamat_tinggal, 
-        status_karyawan, tgl_aktif, foto, no_bpjs, upah_harian, upah_mingguan, 
-        upah_bulanan, id_sub_department, OS_DHK, golongan
+        status_karyawan, tgl_aktif, foto, no_bpjs, id_sub_department, OS_DHK, golongan, id_jadwal
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
         '$statuskawin', '$jeniskelamin', '$noktp', '$alamatktp', '',
-        'Aktif', '$tanggalbergabung', '', '$bpjs', '$harian', '$mingguan',
-        '$bulanan', '$subdept', '$os', '$golongan'
+        'Aktif', '$tanggalbergabung', '', '$bpjs', '$subdept', '$os', '$golongan', '0'
     )");
+
+    // Simpan upah ke ms_karyawan jika ada
+    $upah_h = isset($_POST['tupah_harian']) ? (int)$_POST['tupah_harian'] : 0;
+    $upah_m = isset($_POST['tupah_mingguan']) ? (int)$_POST['tupah_mingguan'] : 0;
+    $upah_b = isset($_POST['tupah_bulanan']) ? (int)$_POST['tupah_bulanan'] : 0;
+    $new_id = $koneksi->insert_id;
+    if ($new_id && ($upah_h > 0 || $upah_m > 0 || $upah_b > 0)) {
+        $koneksi->query("UPDATE ms_karyawan SET upah_harian='$upah_h', upah_mingguan='$upah_m', upah_bulanan='$upah_b' WHERE id_karyawan='$new_id'");
+    }
 
     if ($sql) {
         echo "<script>alert('Data Berhasil Disimpan'); window.location='?page=karyawan';</script>";
@@ -175,18 +178,19 @@ if (isset($_POST['simpan'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Golongan</label>
-                            <select name="tgolongan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="golongan">
+                            <select name="tgolongan" id="selectGolongan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="golongan">
                                 <option value=""></option>
                                 <option value="add_new" data-url="?page=golongan&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Golongan Baru...</option>
                                 <?php
-                                $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
+                                $q_gol = $koneksi->query("SELECT g.*, COALESCE(u.upah_harian, 0) as upah_harian, COALESCE(u.upah_mingguan, 0) as upah_mingguan, COALESCE(u.upah_bulanan, 0) as upah_bulanan FROM ms_golongan g LEFT JOIN ms_upah u ON g.id_golongan = u.id_golongan");
                                 while($d = $q_gol->fetch_assoc()) {
-                                    // Sudah diperbaiki: menggunakan id_golongan
-                                    echo "<option value='".$d['id_golongan']."' data-id='".$d['id_golongan']."'>".$d['golongan']."</option>";
+                                    echo "<option value='".$d['id_golongan']."' data-harian='".$d['upah_harian']."' data-mingguan='".$d['upah_mingguan']."' data-bulanan='".$d['upah_bulanan']."'>".$d['golongan']."</option>";
                                 }
                                 ?>
                             </select>
                         </div>
+
+                        
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Jenis Kelamin</label>
@@ -235,6 +239,11 @@ if (isset($_POST['simpan'])) {
                                 ?>
                             </select>
                         </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Bergabung <span class="text-red-500">*</span></label>
+                            <input type="date" name="ttanggalbergabung" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
                     </div>
                 </div>
 
@@ -258,38 +267,7 @@ if (isset($_POST['simpan'])) {
                     </div>
                 </div>
 
-                <div class="mb-8">
-                    <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
-                        <i class="fas fa-money-bill-wave mr-2 text-lg"></i> Informasi Penggajian
-                    </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Bergabung</label>
-                            <input type="date" name="ttanggalbergabung" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Harian</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                <input type="number" name="tharian" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Mingguan</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                <input type="number" name="tmingguan" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Bulanan</label>
-                            <div class="relative">
-                                <span class="absolute left-3 top-2.5 text-gray-400 text-sm">Rp</span>
-                                <input type="number" name="tbulanan" class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="0">
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
 
             </div>
 
@@ -324,34 +302,41 @@ if (isset($_POST['simpan'])) {
 
 <script>
 $(document).ready(function() {
+    // Auto-fill upah saat golongan berubah
+    $('#selectGolongan').on('change', function() {
+        var selected = $(this).find('option:selected');
+        var val = $(this).val();
+        
+        if (val && val !== 'add_new' && val !== '') {
+            $('#upahHarian').val(selected.data('harian') || 0);
+            $('#upahMingguan').val(selected.data('mingguan') || 0);
+            $('#upahBulanan').val(selected.data('bulanan') || 0);
+        } else if (val !== 'add_new') {
+            $('#upahHarian').val('');
+            $('#upahMingguan').val('');
+            $('#upahBulanan').val('');
+        }
+    });
+
     $('.select2-manage').on('change', function() {
         var $select = $(this);
         var selectName = $select.attr('name');
         var selectedVal = $select.val();
 
         if (selectedVal === 'add_new') {
-            // Mengambil label text (Misal: "Sub Departemen")
             var label = $select.closest('.form-group').find('label').text().replace('*', '').trim();
-            
-            // Tampilkan prompt
             var newData = prompt("Masukkan " + label + " Baru:");
 
             if (newData && newData.trim() !== "") {
-                // Hapus input hidden lama jika user mencoba input berkali-kali
                 $('input[name="new_' + selectName + '"]').remove();
-                
-                // Tambahkan input hidden baru ke form
                 $('<input>').attr({
                     type: 'hidden',
                     name: 'new_' + selectName,
                     value: newData.trim()
-                }).appendTo('#formTambahKaryawan'); // ID Form
-
-                // Tambahkan opsi secara visual agar tidak "disabled" atau blank
+                }).appendTo('#formTambahKaryawan');
                 var newOption = new Option(newData.trim(), newData.trim(), true, true);
                 $select.append(newOption).trigger('change');
             } else {
-                // Jika batal, reset pilihan
                 $select.val('').trigger('change');
             }
         }

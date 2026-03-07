@@ -47,8 +47,6 @@ $idrkkkaryawan = $datadetail['id_karyawan'];
                                           
                                          
                                            <th >Tanggal Aktif </th>
-                                             <th >Upah Harian</th>
-                                             <th hidden="hidden">Upah Harian</th>
                                               <th >Status</th>
                                            
                          
@@ -91,8 +89,7 @@ $datahasil2 = $datadetail2['status_rkk'];
 
 <td><?php echo $datakaryawan['tgl_aktif'] ?></td>
 
-<td><?php echo number_format( $datakaryawan['upah_harian'],0,',','.')  ?></td>
-<td hidden="hidden"><input type="text" name="tupah[]" value="<?php echo $datakaryawan['upah_harian'] ; ?>"/></td>
+<td><?php echo $datahasil2 ?></td>
 <td><?php echo $datahasil2 ?></td>
 
 <!--

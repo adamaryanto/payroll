@@ -55,7 +55,7 @@ $tampil = $koneksi->query("
  CASE WHEN (SELECT TIMEDIFF(istirahatkonvert,istirahatmasuk)) > '0'
  THEN (SELECT denda_istirahat FROM tb_denda) ELSE '0' END AS 'dendaistirahat' ,
   
-  B.nama_karyawan , B.upah_harian, C.status_rkk, C.id_rkk_detail, 
+  B.nama_karyawan , C.upah, C.status_rkk, C.id_rkk_detail, 
 (SELECT nama_departmen FROM ms_departmen WHERE id_departmen = B.id_departmen) AS namadepartmen,
 BB.nama_sub_department , C.status_rkk
 
@@ -217,12 +217,12 @@ if ($data['pulanglebihawal'] != ''){echo "#FFEBCD";}
 <td style='text-align:center;'><?php echo $data['lembur'] ?></td>
 
 
-<td style='text-align:right;'><?php echo number_format( $data['upah_harian'],0,',',',') ?></td>
+<td style='text-align:right;'><?php echo number_format( $data['upah'],0,',',',') ?></td>
 <td style='text-align:right;'><?php echo number_format( $data['dendamasuk'] + $data['dendaistirahat'],0,',',',') ?></td>
-<td style='text-align:right;'><?php echo number_format( $data['upah_harian']-$data['dendamasuk'] - $data['dendaistirahat'],0,',',',') ;
-$tot2 = $data['upah_harian']-$data['dendamasuk'] - $data['dendaistirahat'];
+<td style='text-align:right;'><?php echo number_format( $data['upah']-$data['dendamasuk'] - $data['dendaistirahat'],0,',',',') ;
+$tot2 = $data['upah']-$data['dendamasuk'] - $data['dendaistirahat'];
 $tot1 += $tot2;
-$subtotal += $data['upah_harian'];
+$subtotal += $data['upah'];
 $totpotongan +=$data['dendamasuk'] + $data['dendaistirahat'];
 ?></td>
 

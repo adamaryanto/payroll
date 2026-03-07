@@ -1,4 +1,4 @@
-   <?php
+<?php
   $tampildetail=$koneksi->query("select COUNT(id_karyawan) as jmlkaryawan from ms_karyawan ");
   $datadetail=$tampildetail->fetch_assoc();
   $jmlkaryawan = $datadetail['jmlkaryawan'];
@@ -32,33 +32,24 @@
   }
  ?>
 
-<!-- Content Header (Page header) -->
 <div class="content-header pt-6 pb-4 px-4">
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-sm-6">
         <h1 class="m-0 text-2xl font-bold text-slate-800 tracking-tight">Dashboard Overview</h1>
         <p class="text-sm text-slate-500 mt-1">Payroll & HR System Analytics</p>
-      </div><!-- /.col -->
-      <div class="col-sm-6">
+      </div><div class="col-sm-6">
         <ol class="breadcrumb float-sm-right bg-transparent text-sm">
           <li class="breadcrumb-item"><a href="#" class="text-brand-600 hover:text-brand-800 transition-colors">Home</a></li>
           <li class="breadcrumb-item active text-slate-500">Dashboard</li>
         </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
-</div>
-<!-- /.content-header -->
-
-<!-- Main content -->
+      </div></div></div></div>
 <section class="content px-4 pb-6">
   <div class="container-fluid">
-    <!-- Updated the grid from lg:grid-cols-4 to lg:grid-cols-3 so three cards fit evenly -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-   
-      <!-- Widget 1: Total Karyawan -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md md:col-span-2 lg:col-span-1 relative text-center">
+    
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md relative text-center">
           
           <div class="flex flex-col items-center justify-center mb-4">
               <div class="p-3 bg-brand-50 rounded-full text-brand-500 mb-3 inline-flex items-center justify-center">
@@ -71,22 +62,21 @@
           </div>
           
           <a href="?page=karyawan" class="mt-auto px-4 py-2 bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-800 rounded-lg text-sm font-medium transition-colors text-center">
-              Lihat Anggota
+              Lihat Karyawan
           </a>
       </div>
       
-      <!-- Widget 2: Rencana Upah Terbaru -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md md:col-span-1 lg:col-span-1 relative text-center">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md relative text-center">
           
-          <div class="flex flex-col items-center justify-center mb-4">
-              <div class="p-3 bg-orange-50 rounded-full text-orange-500 mb-3 inline-flex items-center justify-center">
-                  <i class="far fa-calendar-plus text-xl"></i>
-              </div>
-              <div>
-                  <h3 class="text-sm font-medium text-slate-500 mb-1">Rencana Upah (<?php echo $rkk_tgl; ?>)</h3>
-                  <div class="text-3xl font-bold text-slate-800 tracking-tight">Rp <?php echo number_format($rkk_terbaru, 0, ',', '.'); ?></div>
-              </div>
-          </div>
+         <div class="flex flex-col items-center justify-center mb-4">
+    <div class="p-3 bg-orange-50 rounded-full text-orange-500 mb-3 inline-flex items-center justify-center">
+        <i class="far fa-calendar-plus text-xl"></i>
+    </div>
+    <div>
+        <h3 class="text-sm font-medium text-slate-500 mb-1">Rencana Upah (<?php echo date('d-m-Y', strtotime($rkk_tgl)); ?>)</h3>
+        <div class="text-3xl font-bold text-slate-800 tracking-tight">Rp <?php echo number_format($rkk_terbaru, 0, ',', '.'); ?></div>
+    </div>
+</div>
           
           <div class="flex flex-row space-x-6 mb-5 justify-center border-t border-b border-slate-100 py-3">
               <div class="flex-1">
@@ -101,13 +91,11 @@
           </div>
           
           <div class="flex flex-row gap-2 mt-auto justify-center">
-              <!-- Outline styles for secondary actions -->
               <a href="excelrkk.php?id=<?php echo $rkk_id; ?>" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 hover:text-slate-800 transition-colors flex items-center justify-center flex-1">
                   <i class="fas fa-print mr-2"></i> Cetak
               </a>
               
               <?php if($rkk_status != "1") { ?>
-              <!-- Subtle primary style for primary action -->
               <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5]">
                   <i class="fas fa-check-circle mr-2 opacity-80"></i> Approve
               </a>
@@ -117,22 +105,23 @@
               </div>
               <?php } ?>
               
+              <div class="flex flex-row gap-2 mt-auto justify-center">
               <a href="?page=rkk&aksi=kelola&id=<?php echo $rkk_id; ?>" class="px-4 py-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg text-sm font-medium transition-colors flex items-center justify-center flex-1">
                   Detail <i class="fas fa-chevron-right ml-1 text-[10px]"></i>
               </a>
+              </div>
           </div>
       </div>
 
-      <!-- Widget 3: Realisasi Upah Terbaru -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md md:col-span-1 lg:col-span-1 relative text-center">
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md relative text-center">
           
           <div class="flex flex-col items-center justify-center mb-4">
               <div class="p-3 bg-emerald-50 rounded-full text-emerald-500 mb-3 inline-flex items-center justify-center">
                   <i class="fas fa-check-double text-xl"></i>
               </div>
               <div>
-                  <h3 class="text-sm font-medium text-slate-500 mb-1">Realisasi Upah (<?php echo $real_tgl; ?>)</h3>
-                  <div class="text-3xl font-bold text-slate-800 tracking-tight">Rp <?php echo number_format($real_terbaru, 0, ',', '.'); ?></div>
+                  <h3 class="text-sm font-medium text-slate-500 mb-1">Realisasi Upah (<?php echo date('d-m-Y', strtotime($real_tgl)); ?>)</h3>
+            <div class="text-3xl font-bold text-slate-800 tracking-tight">Rp <?php echo number_format($real_terbaru, 0, ',', '.'); ?></div>
               </div>
           </div>
           
@@ -163,13 +152,13 @@
               </a>
               <?php } ?>
               
+              <div class="flex flex-row gap-2 mt-auto justify-center">
               <a href="?page=realisasi&aksi=kelola&id=<?php echo $real_id; ?>" class="px-4 py-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg text-sm font-medium transition-colors flex items-center justify-center flex-1">
                   Detail <i class="fas fa-chevron-right ml-1 text-[10px]"></i>
               </a>
+              </div>
           </div>
       </div>
 
     </div>
-  </div><!-- /.container-fluid -->
-</section>
-<!-- /.content -->
+  </div></section>

@@ -10,7 +10,6 @@ $datanamakaryawan = $datadetail['nama_karyawan'];
 $datanoabsen   = $datadetail['no_absen'];
 $datashift   = $datadetail['keterangan'];
 $dataidshift   = $datadetail['id_jadwal'];
-$upah_harian   = $datadetail['upah_harian'];
 
 }
 
@@ -87,7 +86,7 @@ $upah_harian   = $datadetail['upah_harian'];
                  <div class="row" style=" background-color:white; border:1px ; color:black; "> 
                    <div class="form-group col-md-4">
                     <label class="font-weight-bold">Upah</label>
-                    <input placeholder="*" autocomplete="off" type="number" name="tupah" value="<?php echo $upah_harian ?>" required class="form-control"/>
+                    <input placeholder="*" autocomplete="off" type="number" name="tupah" value="" required class="form-control"/>
                     
                 </div>
                  <div class="form-group col-md-4">

@@ -25,7 +25,6 @@
                             <th class="px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Jenis Kelamin</th>
                             <th class="px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Kontak & Dokumen</th>
                             <th class="px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Status</th>
-                            <th class="px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Informasi Upah (IDR)</th>
                             <th class="px-4 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center" style="min-width: 180px;">Aksi</th>
                         </tr>
                     </thead>
@@ -52,10 +51,6 @@
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?= $status_class ?>">
                                     <?= $datakaryawan['status_karyawan'] ?>
                                 </span>
-                            </td>
-                            <td class="text-xs">
-                                <div class="flex justify-between border-b border-gray-50 pb-1"><span>Harian:</span> <span class="font-bold">Rp <?= number_format($datakaryawan['upah_harian'],0,',','.') ?></span></div>
-                                <div class="flex justify-between pt-1"><span>Bulanan:</span> <span class="font-bold text-blue-600">Rp <?= number_format($datakaryawan['upah_bulanan'],0,',','.') ?></span></div>
                             </td>
                             <td class="text-center">
                                 <div class="flex items-center justify-center gap-2">
