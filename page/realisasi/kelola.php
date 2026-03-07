@@ -1,6 +1,4 @@
 <?php
-// Catatan: Pastikan session_start(); sudah dipanggil di file utama Anda
-
 if (isset($_GET['id'])) {
     $idrealisasi = $_GET['id'];
 
@@ -54,7 +52,6 @@ if (isset($_GET['id'])) {
     $dataketerangan      = "";
     $datadetailrealisasi = "";
     $datajamkerja        = "";
-    $datajamkerja        = "";
     $datastatusrealisasi = 'pending';
 }
 
@@ -82,7 +79,6 @@ if ($simpan) {
 ?>
 
 <style>
-    /* Styling Card & Header (Formal Clean) */
     .card-clean {
         background: #fff;
         border: 1px solid #E0E4E8;
@@ -271,16 +267,11 @@ if ($simpan) {
             letter-spacing: 0.05em;
             text-align: left;
             flex-basis: 35%;
-            /* Label otomatis mengambil 35% lebar layar */
             min-width: 120px;
-            /* Batas minimal agar teks label tidak hancur */
             margin-right: 15px;
-            /* Jarak pas agar label & data tidak terlalu dekat */
             flex-shrink: 0;
-            /* Mencegah label menyusut */
         }
 
-        /* Penyesuaian khusus form & detail di atas table */
         .flex-action {
             display: flex;
             justify-content: flex-start;
@@ -367,15 +358,6 @@ if ($simpan) {
 
                         <div class="section-title">List Karyawan</div>
                         <div class="table-responsive">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div id="custom-toolbar" class="pull-right" style="margin-bottom: 10px;">
-                                        <a href="page/realisasi/excelrkk.php?id=<?= $idrealisasi ?>" class="btn btn-success btn-sm">
-                                            <i class="fa fa-file-excel-o"></i> Export Excel
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
                             <table class="table table-hover table-clean align-middle mb-0" id="dataTables-example">
                                 <thead class="bg-gray-50 border-b border-gray-200">
                                     <tr>
@@ -489,16 +471,6 @@ if ($simpan) {
             }
         });
 
-        $("#custom-toolbar").appendTo(".dataTables_filter");
-        
-        // CSS tambahan agar tampilannya sejajar
-        $(".dataTables_filter").css({
-            "display": "flex",
-            "justify-content": "flex-end",
-            "align-items": "center",
-            "gap": "10px"
-        });
-        
         $('.dataTables_filter').addClass('mb-2');
     });
 </script>

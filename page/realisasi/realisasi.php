@@ -11,6 +11,7 @@ $tampil = $koneksi->query("SELECT A.*,
 // Logika Akses: Owner dan Admin bisa Approve/Unapprove
 $role_akses = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin" || $_SESSION['role'] == "admin master");
 $level_status = (!$role_akses) ? "hidden" : "";
+
 ?>
 
 <div class="container-fluid px-2 mt-4 mb-4">
@@ -118,7 +119,7 @@ $level_status = (!$role_akses) ? "hidden" : "";
                                     <?php endif; ?>
 
                                     <div class="<?= $print ?>">
-                                        <a href="excelrealisasi.php?id=<?= $data['id_realisasi'];?>"
+                                        <a href="page/realisasi/excelrealisasi.php?id=<?= $data['id_realisasi'];?>"
                                            class="px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors" title="Download Payroll">
                                             <i class="fas fa-file-excel"></i> Excel
                                         </a>
