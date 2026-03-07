@@ -1,5 +1,10 @@
 <?php
 
+// 1. hak Approve/Un-Approve
+$is_authorized = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin master");
+
+// 2.hak Propose/Un-Propose (HRD & Admin Master)
+$can_propose = ($_SESSION['role'] == "admin" || $_SESSION['role'] == "admin master");
 
 $tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
 if ($_SESSION['role'] != "owner") {
@@ -173,126 +178,86 @@ if ($_SESSION['role'] == "owner") {
         color: #ccc !important;
         background: #fafafa !important;
     }
-
 </style>
 
-<div class="row">
-    <div class="col-md-12">
-        <!-- Advanced Tables -->
-        <div class="panel panel-primary custom-card">
-            <div class="box-header with-border d-flex justify-content-between align-items-center"
-                style="background-color:#5F9EA0; color:white; padding: 10px 15px; border-radius: 12px 12px 0 0;">
+<div class="container-fluid px-2 mt-4 mb-4">
+    <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
 
-                <h3 class="box-title" style="margin: 0; font-size: 18px; font-weight: 600;">
-                    <i class="fa fa-list-alt"></i> List Rencana Upah
-                </h3>
-
-                <a href="?page=rkk&aksi=tambah" class="btn btn-info"
-                    style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: none;">
-                    <i class="fa fa-plus-circle"></i> &nbsp;
-                    <span class="d-none d-md-inline">&nbsp;Tambah Data Rencana Upah</span>
-                    <span class="d-inline d-md-none">&nbsp;Tambah</span>
+        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+            <div>
+                <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
+            </div>
+            <div>
+                <a href="?page=rkk&aksi=tambah" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                    <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
         </div>
 
-        <div class="table-responsive">
-
-            <table class="table table-bordered table-striped" id="dataTables-example">
-                <thead>
-                    <tr class="text-center">
-                        <th width="5%">No</th>
-                        <th>Tanggal</th>
-                        <th>Tanggal Input</th>
-                        <th>Jam Kerja</th>
-                        <th>Karyawan</th>
-                        <th>Total Upah</th>
-                        <th>Keterangan</th>
-                        <th width="15%">Aksi Data</th>
-                        <th width="15%">Otorisasi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    while ($data = $tampil->fetch_assoc()) {
-                        // Logika Warna & Tombol
-                        if ($data['status_rkk'] == "1") {
-                            $bg = "#FFEBCD";
-                            $pro = "hidden";
-                            $app = "";
-                            $unpro = "";
-                            $unapp = "hidden";
-                        } elseif ($data['status_rkk'] == "2") {
-                            $bg = "#F0FFFF";
-                            $pro = "hidden";
-                            $app = "hidden";
-                            $unpro = "hidden";
-                            $unapp = "";
-                        } elseif ($data['status_rkk'] == "3") {
-                            $bg = "#98FB98";
-                            $pro = "hidden";
-                            $app = "hidden";
-                            $unpro = "hidden";
-                            $unapp = "hidden";
-                        } else {
-                            $bg = "transparent";
-                            $pro = "";
-                            $app = "hidden";
-                            $unpro = "hidden";
-                            $unapp = "hidden";
-                        }
-                    ?>
-                        <tr style="background-color:<?php echo $bg ?>; color:black;">
-                            <td class="text-center"><?php echo $no++; ?></td>
-                            <td class="text-center"><strong><?php echo $data['tgl_rkk'] ?></strong></td>
-                            <td class="text-center"><?php echo $data['detail_rkk'] ?></td>
-                            <td class="text-center"><?php echo $data['jam_kerja'] ?> Jam</td>
-                            <td class="text-center"><?php echo $data['jml'] ?> Org</td>
-                            <td>Rp <?php echo number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
-                            <td><?php echo $data['keterangan'] ?></td>
-
-                            <td class="text-center">
-                                <a href="?page=rkk&aksi=kelola&id=<?php echo $data['id_rkk']; ?>" class="btn btn-warning btn-xs">
-                                    <i class="fa fa-search"></i> <span class="d-none d-lg-inline"> Detail </span>
-                                </a>
-                                <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>" class="btn btn-info btn-xs">
-                                    <i class="fa fa-print"></i> <span class="d-none d-lg-inline">Cetak </span>
-                                </a>
-                            </td>
-
-                            <td class="text-center">
-                                <div <?php echo $hr ?>>
-                                    <div <?php echo $pro ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=pro"
-                                            class="btn btn-danger btn-xs" onclick="return confirm('Propose data ini?');">Approve</a>
-                                    </div>
-                                    <div <?php echo $unpro ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unpro"
-                                            class="btn btn-default btn-xs" onclick="return confirm('Batalkan Propose?');">Unapprove</a>
-                                    </div>
-                                </div>
-
-                                <div <?php echo $level_status ?>>
-                                    <div <?php echo $app ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=app"
-                                            class="btn btn-success btn-xs" onclick="return confirm('Approve data ini?');">Approve</a>
-                                    </div>
-                                    <div <?php echo $unapp ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unapp"
-                                            class="btn btn-default btn-xs" onclick="return confirm('Batalkan Approve?');">Un-Approve</a>
-                                    </div>
-                                </div>
-                            </td>
+        <div class="p-0">
+            <div class="table-responsive px-3 py-3">
+                <table class="w-full text-left border-collapse" id="dataTables-example">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">No</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Tanggal</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Jam</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Karyawan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-right">Total Upah</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Keterangan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Aksi</th>
                         </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php
+                        $no = 1;
+                        while ($data = $tampil->fetch_assoc()) :
+                            // Logika Status (Gunakan CSS kelas untuk warna)
+                            $status_color = ($data['status_rkk'] == "3") ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800";
+                        ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="py-2.5 px-2 text-center text-[15px]"><?= $no++ ?></td>
+                                <td class="py-2.5 px-2 text-[15px] font-medium"><?= $data['tgl_rkk'] ?></td>
+                                <td class="py-2.5 px-2 text-[15px]"><?= $data['jam_kerja'] ?> Jam</td>
+                                <td class="py-2.5 px-2 text-center text-[15px]"><?= $data['jml'] ?></td>
+                                <td class="py-2.5 px-2 text-right text-[15px] font-bold">Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
+                                <td class="py-2.5 px-2 text-[14px] text-gray-600"><?= $data['keterangan'] ?></td>
+                                <td class="py-2.5 px-2 align-middle text-center">
+                                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
 
+                                        <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
+                                                class="px-2 py-1 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200"
+                                                onclick="return confirm('Propose data ini?');"><i class="fas fa-paper-plane"></i> Propose</a>
+                                        <?php endif; ?>
+
+                                        <?php if ($data['status_rkk'] == '1' && $can_propose) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unpro"
+                                                class="px-2 py-1 text-[12px] font-bold text-gray-600 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-200"
+                                                onclick="return confirm('Tarik kembali data (Un-propose)?');"><i class="fas fa-undo"></i> Un-Propose</a>
+                                        <?php endif; ?>
+
+                                        <?php if ($data['status_rkk'] == '1' && $is_authorized) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=app"
+                                                class="px-2 py-1 text-[12px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200"
+                                                onclick="return confirm('Approve data ini?');"><i class="fas fa-check"></i> Approve</a>
+                                        <?php endif; ?>
+
+                                        <?php if ($data['status_rkk'] == '2' && $is_authorized) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unapp"
+                                                class="px-2 py-1 text-[12px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200"
+                                                onclick="return confirm('Batalkan Approve data ini?');"><i class="fas fa-times"></i> Un-Approve</a>
+                                        <?php endif; ?>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-</div>
 </div>
 
 <script>
