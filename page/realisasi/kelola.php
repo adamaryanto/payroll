@@ -26,14 +26,16 @@ if (isset($_GET['id'])) {
         A.ra_masuk, 
         A.ra_keluar, 
         A.ra_istirahat_keluar,
+        A.ra_istirahat_masuk, 
         B.OS_DHK,
         B.golongan,
-        A.ra_istirahat_masuk, 
         A.r_upah as upahkaryawan, 
         A.r_potongan_telat, 
         A.r_potongan_istirahat, 
         A.r_potongan_lainnya, 
-        A.hasil_kerja
+        A.hasil_kerja,
+        A.lembur,
+        A.status_realisasi_detail
         FROM tb_realisasi_detail A 
         LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
         LEFT JOIN tb_realisasi C ON A.id_realisasi = C.id_realisasi
@@ -65,17 +67,28 @@ if ($datastatusrealisasi == 'approve') {
     $status = "";
 }
 
-$simpan = @$_POST['simpan'];
-if ($simpan) {
-    $tketerangan = @$_POST['tketerangan'];
-    $sql = $koneksi->query("UPDATE tb_realisasi SET keterangan = '$tketerangan' WHERE id_realisasi = '$idrealisasi'");
-    if ($sql) {
+    $simpan = @$_POST['simpan'];
+    if ($simpan) {
+        $tketerangan = @$_POST['tketerangan'];
+        $sql = $koneksi->query("UPDATE tb_realisasi SET keterangan = '$tketerangan' WHERE id_realisasi = '$idrealisasi'");
+        if ($sql) {
+            echo '<script type="text/javascript">
+                    alert("Data Tersimpan");
+                    window.location.href="?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
+                  </script>';
+        }
+    }
+
+    $cleanup = @$_POST['cleanup'];
+    if ($cleanup) {
+        // Run synchronization logic
+        include 'fix_realisasi.php';
+        $count = syncRealisasiData($koneksi, $idrealisasi);
         echo '<script type="text/javascript">
-                alert("Data Tersimpan");
+                alert("Berhasil menarik ' . $count . ' data dari record mesin.");
                 window.location.href="?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
               </script>';
     }
-}
 ?>
 
 <style>
@@ -351,6 +364,9 @@ if ($simpan) {
                             <button type="submit" name="simpan" value="Simpan" class="btn btn-primary btn-sm" style="background-color: #2C3E50; border-color: #2C3E50;">
                                 <i class="fa fa-save"></i> Simpan Ket.
                             </button>
+                            <button type="submit" name="cleanup" value="Cleanup" class="btn btn-warning btn-sm" onclick="return confirm('Tarik data dari record mesin? Data realisasi manual akan tertimpa.')">
+                                <i class="fa fa-refresh"></i> Tarik Data Realisasi
+                            </button>
                             <a href="?page=realisasi" class="btn btn-default btn-sm" style="border: 1px solid #ccc;">
                                 <i class="fa fa-arrow-left"></i> Kembali
                             </a>
@@ -368,11 +384,16 @@ if ($simpan) {
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Sub Bagian</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">OS/DHK</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Gol</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Masuk</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Pulang</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Jam Masuk</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Jam Pulang</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Keluar</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Masuk</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Masuk</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Pulang</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Istirahat Keluar</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Istirahat Masuk</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
@@ -389,13 +410,9 @@ if ($simpan) {
                                         $upah = $data['upahkaryawan'];
                                         $total += $upah;
 
-                                        // Check if both check-in and check-out are missing
-                                        $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
-                                            (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
-
-                                        $rowClass = $isFullMissing ? 'bg-red-custom' : '';
+                                        // row highlight removed as per user request
                                     ?>
-                                        <tr class="<?php echo $rowClass; ?>">
+                                        <tr>
                                             <td data-label="No"><?php echo $no; ?></td>
                                             <td data-label="NIK"><?php echo $data['no_absen']; ?></td>
                                             <td data-label="Nama Karyawan"><?php echo $data['nama_karyawan']; ?></td>
@@ -403,16 +420,25 @@ if ($simpan) {
                                             <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                             <td data-label="OS/DHK"><?php echo $data['OS_DHK']; ?></td>
                                             <td data-label="Gol"><?php echo $data['golongan']; ?></td>
-                                            <td data-label="Masuk" class="<?php echo ($isFullMissing || empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
-                                            <td data-label="Pulang" class="<?php echo ($isFullMissing || empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['r_jam_keluar']; ?></td>
-                                            <td data-label="Istirahat Keluar" class="<?php echo ($isFullMissing || empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
-                                            <td data-label="Istirahat Masuk" class="<?php echo ($isFullMissing || empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+                                            <td data-label="Rec. Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
+                                            <td data-label="Rec. Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
+                                            <td data-label="Rec. Ist. K" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
+                                            <td data-label="Rec. Ist. M" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+                                            
+                                            <td data-label="Real. Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
+                                            <td data-label="Real. Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
+                                            <td data-label="Real. Ist. K" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
+                                            <td data-label="Real. Ist. M" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
+
                                             <td data-label="Upah" class="text-right">
                                                 <?php echo number_format($upah, 0, ',', '.'); ?>
                                             </td>
-                                            <td data-label="Pot. Telat" class="text-right <?php echo ($isFullMissing || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_telat'], 0, ',', '.'); ?></td>
-                                            <td data-label="Pot. Istirahat" class="text-right <?php echo ($isFullMissing || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_istirahat'], 0, ',', '.'); ?></td>
-                                            <td data-label="Pot. Lain" class="text-right <?php echo ($isFullMissing || $data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?php echo number_format($data['r_potongan_lainnya'], 0, ',', '.'); ?></td>
+                                            <td data-label="Lembur" class="text-right">
+                                                <?php echo number_format($data['lembur'], 0, ',', '.'); ?>
+                                            </td>
+                                            <td data-label="Pot. Telat" class="text-right <?php echo ($data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_telat'], 0, ',', '.'); ?></td>
+                                            <td data-label="Pot. Istirahat" class="text-right <?php echo ($data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_istirahat'], 0, ',', '.'); ?></td>
+                                            <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?php echo number_format($data['r_potongan_lainnya'], 0, ',', '.'); ?></td>
                                             <td data-label="Hasil"><?php echo $data['hasil_kerja']; ?></td>
                                             <td data-label="Aksi">
                                                 <div class="flex-action">

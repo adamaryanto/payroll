@@ -269,18 +269,12 @@ CREATE TABLE `ms_karyawan` (
   `status_kawin` enum('Kawin','Belum Kawin','Janda','Duda') DEFAULT NULL,
   `jenis_kelamin` enum('Laki-laki','Perempuan') DEFAULT NULL,
   `no_ktp` varchar(20) NOT NULL,
-  `no_sim` varchar(20) NOT NULL,
   `alamat_ktp` varchar(255) NOT NULL,
   `alamat_tinggal` varchar(255) NOT NULL,
   `status_karyawan` enum('Aktif','Non Aktif') DEFAULT NULL,
   `tgl_aktif` date DEFAULT NULL,
   `tgl_nonaktif` date DEFAULT NULL,
   `foto` varchar(255) NOT NULL,
-  `no_npwp` varchar(20) NOT NULL,
-  `no_bpjs` varchar(20) NOT NULL,
-  `upah_harian` int(10) NOT NULL,
-  `upah_mingguan` int(10) NOT NULL,
-  `upah_bulanan` int(10) NOT NULL,
   `id_jadwal` int(10) NOT NULL,
   `id_sub_department` int(10) NOT NULL,
   `OS_DHK` varchar(50) NOT NULL,
@@ -291,17 +285,17 @@ CREATE TABLE `ms_karyawan` (
 -- Dumping data untuk tabel `ms_karyawan`
 --
 
-INSERT INTO `ms_karyawan` (`id_karyawan`, `id_departmen`, `id_jabatan`, `no_absen`, `nama_karyawan`, `tempat_lahir`, `tgl_lahir`, `agama`, `status_kawin`, `jenis_kelamin`, `no_ktp`, `no_sim`, `alamat_ktp`, `alamat_tinggal`, `status_karyawan`, `tgl_aktif`, `tgl_nonaktif`, `foto`, `no_npwp`, `no_bpjs`, `upah_harian`, `upah_mingguan`, `upah_bulanan`, `id_jadwal`, `id_sub_department`, `OS_DHK`, `golongan`) VALUES
-(2, 3, 2, 19, 'Nofiardi', 'Jkfd', '2024-04-20', 'Islam', 'Belum Kawin', 'Laki-laki', '21313', '234242', 'kewtw', 'asda', 'Aktif', '2024-04-30', NULL, '', '2', '1', 100000, 0, 0, 2, 1, 'WJS', 'Harian'),
-(3, 3, 1, 62, 'Mikha', 'Kotabumi', '2024-04-29', 'Islam', 'Belum Kawin', 'Laki-laki', '123123132312', '12312131', 'Jakarta', 'Tangerang', 'Aktif', '2024-04-30', NULL, '', '09871', '12341', 0, 0, 0, 1, 0, '', ''),
-(4, 4, 0, 22, 'Riki Maulana', 'Jakarta palembang', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', '09871', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2024-10-10', NULL, '', '12121', '3333', 0, 0, 0, 1, 0, '', ''),
-(5, 3, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', '09871', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', '1212111', '33331', 0, 0, 0, 1, 0, '', ''),
-(6, 0, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', '09871', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', '1212', '33331', 0, 0, 0, 1, 0, '', ''),
-(7, 2, 1, 49, 'Mahmudin', 'Jakarta', '1992-09-03', 'Islam', 'Belum Kawin', 'Laki-laki', '222222222', '3333333', 'dd', 'fdf', 'Aktif', '2023-10-01', NULL, '', '333', '33', 500000, 0, 0, 1, 1, '', ''),
-(8, 2, 1, 55, 'Bekti', 'Kebumen', '1988-10-03', 'Islam', 'Belum Kawin', 'Laki-laki', '13', '1241241', 'Rancabango', 'Rejeg', 'Aktif', '2024-10-06', NULL, '', '213132', '123121', 0, 0, 0, 0, 0, '', ''),
-(9, 2, 0, 16, 'Ammar', 'Tangerang', '2024-09-15', 'Islam', 'Belum Kawin', 'Laki-laki', '3173', '1231', 'Rancabango', 'Kapuk', 'Aktif', '2024-12-12', NULL, '', '1234', '1234', 100000, 1000000, 10000000, 1, 0, '', ''),
-(10, 2, 0, 33, 'Arhan', 'Jakarta', '1989-02-01', 'Islam', 'Belum Kawin', 'Laki-laki', '1211', '32', 'Rancabango', 'Rajeg', 'Aktif', '2024-01-01', NULL, '', '123', '1231', 100000, 2000000, 3000000, 1, 1, '', ''),
-(11, 2, 0, 123, 'xxx', '', '0000-00-00', 'Islam', 'Belum Kawin', 'Laki-laki', '', '', '', '', 'Aktif', '0000-00-00', NULL, '', '', '', 0, 0, 0, 1, 1, '', '');
+INSERT INTO `ms_karyawan` (`id_karyawan`, `id_departmen`, `id_jabatan`, `no_absen`, `nama_karyawan`, `tempat_lahir`, `tgl_lahir`, `agama`, `status_kawin`, `jenis_kelamin`, `no_ktp`, `alamat_ktp`, `alamat_tinggal`, `status_karyawan`, `tgl_aktif`, `tgl_nonaktif`, `foto`, `id_jadwal`, `id_sub_department`, `OS_DHK`, `golongan`) VALUES
+  (2, 3, 2, 19, 'Nofiardi', 'Jkfd', '2024-04-20', 'Islam', 'Belum Kawin', 'Laki-laki', '21313', 'kewtw', 'asda', 'Aktif', '2024-04-30', NULL, '', 2, 1, 'WJS', 'Harian'),
+  (3, 3, 1, 62, 'Mikha', 'Kotabumi', '2024-04-29', 'Islam', 'Belum Kawin', 'Laki-laki', '123123132312', 'Jakarta', 'Tangerang', 'Aktif', '2024-04-30', NULL, '', 1, 0, '', ''),
+  (4, 4, 0, 22, 'Riki Maulana', 'Jakarta palembang', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2024-10-10', NULL, '', 1, 0, '', ''),
+  (5, 3, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', 1, 0, '', ''),
+  (6, 0, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', 1, 0, '', ''),
+  (7, 2, 1, 49, 'Mahmudin', 'Jakarta', '1992-09-03', 'Islam', 'Belum Kawin', 'Laki-laki', '222222222', 'dd', 'fdf', 'Aktif', '2023-10-01', NULL, '', 1, 1, '', ''),
+  (8, 2, 1, 55, 'Bekti', 'Kebumen', '1988-10-03', 'Islam', 'Belum Kawin', 'Laki-laki', '13', 'Rancabango', 'Rejeg', 'Aktif', '2024-10-06', NULL, '', 0, 0, '', ''),
+  (9, 2, 0, 16, 'Ammar', 'Tangerang', '2024-09-15', 'Islam', 'Belum Kawin', 'Laki-laki', '3173', 'Rancabango', 'Kapuk', 'Aktif', '2024-12-12', NULL, '', 1, 0, '', ''),
+  (10, 2, 0, 33, 'Arhan', 'Jakarta', '1989-02-01', 'Islam', 'Belum Kawin', 'Laki-laki', '1211', 'Rancabango', 'Rajeg', 'Aktif', '2024-01-01', NULL, '', 1, 1, '', ''),
+  (11, 2, 0, 123, 'xxx', '', '0000-00-00', 'Islam', 'Belum Kawin', 'Laki-laki', '', '', '', 'Aktif', '0000-00-00', NULL, '', 1, 1, '', '');
 
 -- --------------------------------------------------------
 
@@ -354,7 +348,7 @@ CREATE TABLE `ms_login` (
   `id_perusahaan` int(10) NOT NULL,
   `user_login` varchar(225) NOT NULL,
   `lg_password` varchar(255) NOT NULL,
-  `role` enum('kepala gudang','admin','admin master','OWNER') DEFAULT NULL
+  `role` enum('kepala gudang','admin','admin master','owner') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -363,7 +357,7 @@ CREATE TABLE `ms_login` (
 INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `role`) VALUES
 (1, 1, 'admin', '123', 'admin'),
 (2, 1, 'kepala gudang', '123', 'kepala gudang'),
-(3, 1, 'owner', '123', 'OWNER'),
+(3, 1, 'owner', '123', 'owner'),
 (4, 1, 'admin master', '123', 'admin master'),
 
 
@@ -697,14 +691,15 @@ INSERT INTO `tb_mesin` (`id_mesin`, `no_mesin`, `nama_mesin`, `ip_mesin`, `comm_
 --
 
 CREATE TABLE `tb_realisasi` (
-  `id_realisasi` int(10) NOT NULL,
+  `id_realisasi` int(10) NOT NULL AUTO_INCREMENT,
   `id_rkk` int(10) NOT NULL,
-  `keterangan` text NOT NULL,
+  `keterangan` text DEFAULT NULL,
   `tgl_realisasi` date NOT NULL,
   `detail_realisasi` varchar(20) NOT NULL,
   `jam_kerja` int(10) NOT NULL,
   `status_realisasi` enum('pending','approve') NOT NULL DEFAULT 'pending',
-  `tgl_status` date NOT NULL
+  `tgl_status` date DEFAULT NULL,
+  PRIMARY KEY (`id_realisasi`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -723,29 +718,30 @@ INSERT INTO `tb_realisasi` (`id_realisasi`, `id_rkk`, `keterangan`, `tgl_realisa
 --
 
 CREATE TABLE `tb_realisasi_detail` (
-  `id_realisasi_detail` int(10) NOT NULL,
+  `id_realisasi_detail` int(10) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id_realisasi_detail`),
   `id_realisasi` int(10) NOT NULL,
   `id_rkk_detail` int(10) NOT NULL,
   `id_rkk` int(10) NOT NULL,
   `id_karyawan` int(10) NOT NULL,
   `r_upah` int(10) NOT NULL,
-  `r_potongan_telat` int(10) NOT NULL,
-  `r_potongan_istirahat` int(10) NOT NULL,
-  `r_potongan_lainnya` int(10) NOT NULL,
+  `r_potongan_telat` int(10) NOT NULL DEFAULT 0,
+  `r_potongan_istirahat` int(10) NOT NULL DEFAULT 0,
+  `r_potongan_lainnya` int(10) NOT NULL DEFAULT 0,
   `r_jam_masuk` varchar(20) NOT NULL,
   `r_jam_keluar` varchar(20) NOT NULL,
   `r_istirahat_masuk` varchar(20) NOT NULL,
   `r_istirahat_keluar` varchar(20) NOT NULL,
-  `r_status` int(10) NOT NULL,
-  `r_update` varchar(20) NOT NULL,
-  `ra_masuk` varchar(20) NOT NULL,
-  `ra_keluar` varchar(20) NOT NULL,
-  `ra_istirahat_masuk` varchar(20) NOT NULL,
-  `ra_istirahat_keluar` varchar(20) NOT NULL,
+  `r_status` int(10) NOT NULL DEFAULT 0,
+  `r_update` varchar(20) NOT NULL DEFAULT '',
+  `ra_masuk` varchar(20) NOT NULL DEFAULT '',
+  `ra_keluar` varchar(20) NOT NULL DEFAULT '',
+  `ra_istirahat_masuk` varchar(20) NOT NULL DEFAULT '',
+  `ra_istirahat_keluar` varchar(20) NOT NULL DEFAULT '',
   `id_jadwal` int(10) NOT NULL,
-  `status_realisasi_detail` int(10) NOT NULL,
-  `hasil_kerja` varchar(255) NOT NULL,
-  `lembur` int(10) NOT NULL,
+  `status_realisasi_detail` int(10) NOT NULL DEFAULT 0,
+  `hasil_kerja` varchar(255) NOT NULL DEFAULT '',
+  `lembur` int(10) NOT NULL DEFAULT 0,
   `tgl_realisasi_detail` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
@@ -5134,7 +5130,7 @@ INSERT INTO `tb_record` (`id_record`, `data`, `userid`, `tgl`, `verifikasi`, `st
 --
 
 CREATE TABLE `tb_rkk` (
-  `id_rkk` int(10) NOT NULL,
+  `id_rkk` int(10) NOT NULL AUTO_INCREMENT,
   `keterangan` text NOT NULL,
   `tgl_rkk` date NOT NULL,
   `detail_rkk` varchar(20) NOT NULL,
@@ -5162,10 +5158,13 @@ INSERT INTO `tb_rkk` (`id_rkk`, `keterangan`, `tgl_rkk`, `detail_rkk`, `jam_kerj
 --
 
 CREATE TABLE `tb_rkk_detail` (
-  `id_rkk_detail` int(10) NOT NULL,
+  `id_rkk_detail` int(10) NOT NULL AUTO_INCREMENT,
   `id_rkk` int(10) NOT NULL,
   `id_karyawan` int(10) NOT NULL,
   `upah` int(10) NOT NULL,
+  `id_departmen` int(10) DEFAULT NULL,
+  `id_sub_department` int(10) DEFAULT NULL,
+  `shift` varchar(50) DEFAULT NULL,
   `status_rkk` enum('Hadir','Tidak Hadir','Digantikan','Pengganti') NOT NULL,
   `id_jadwal` int(10) NOT NULL,
   `potongan_telat` int(10) NOT NULL,

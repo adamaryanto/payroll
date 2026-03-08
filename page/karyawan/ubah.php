@@ -17,7 +17,6 @@ if(isset($_GET['id'])){
     $statuskawin = $data['status_kawin'];
     $jeniskelamin = $data['jenis_kelamin'];
     $noktp = $data['no_ktp'];
-    $nobpjs = $data['no_bpjs'];
     $os = $data['OS_DHK'];
     $golongan = $data['golongan'];
     $alamatktp = $data['alamat_ktp'];
@@ -39,7 +38,6 @@ if (isset($_POST['update'])) {
     $ttanggallahir = $_POST['ttanggallahir'];
     $tstatuskawin = $_POST['tstatuskawin'];
     $tnoktp = $_POST['tnoktp'];
-    $tbpjs = $_POST['tbpjs'];
     $talamatktp = $_POST['talamatktp'];
     $talamattinggal = $_POST['talamattinggal'];
     $ttanggalbergabung = $_POST['ttanggalbergabung'];
@@ -79,6 +77,11 @@ if (isset($_POST['update'])) {
     $tsubdept = getOrInsertMaster($koneksi, 'tsubdept', 'ms_sub_department', 'nama_sub_department', ['id_perusahaan' => '1']);
     $tjabatan = getOrInsertMaster($koneksi, 'tjabatan', 'ms_jabatan', 'jabatan', ['id_perusahaan' => '1']);
     $tjadwal = getOrInsertMaster($koneksi, 'tjadwal', 'tb_jadwal', 'keterangan', ['jam_masuk' => '08:00:00', 'jam_keluar' => '17:00:00', 'istirahat_masuk' => '12:00:00', 'istirahat_keluar' => '13:00:00']);
+    $tagama = getOrInsertMaster($koneksi, 'tagama', 'ms_agama', 'agama');
+    $tstatuskawin = isset($_POST['tstatuskawin']) ? $koneksi->real_escape_string($_POST['tstatuskawin']) : '';
+
+    $tgolongan = getOrInsertMaster($koneksi, 'tgolongan', 'ms_golongan', 'golongan');
+    $tos = getOrInsertMaster($koneksi, 'tos', 'ms_os_dhk', 'nama_os_dhk');
 
     $sql = $koneksi->query("UPDATE ms_karyawan SET 
         id_departmen = '$tdepartmen',
@@ -92,7 +95,6 @@ if (isset($_POST['update'])) {
         status_kawin = '$tstatuskawin',
         jenis_kelamin = '$tjeniskelamin',
         no_ktp = '$tnoktp',
-        no_bpjs = '$tbpjs',
         alamat_ktp = '$talamatktp',
         alamat_tinggal = '$talamattinggal',
         tgl_aktif = '$ttanggalbergabung',
@@ -251,16 +253,12 @@ if (isset($_POST['update'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Status Kawin</label>
-                            <select name="tstatuskawin" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Status -" data-delete-route="statuskawin">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=statuskawin&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Status Baru...</option>
-                                <?php
-                                $q_status = $koneksi->query("SELECT * FROM ms_status_kawin");
-                                while($d = $q_status->fetch_assoc()) {
-                                    $sel = ($d['status_kawin'] == $statuskawin) ? 'selected' : '';
-                                    echo "<option value='".$d['status_kawin']."' $sel>".$d['status_kawin']."</option>";
-                                }
-                                ?>
+                            <select name="tstatuskawin" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="" <?= ($statuskawin == '') ? 'selected' : ''; ?>>- Pilih Status -</option>
+                                <option value="Kawin" <?= ($statuskawin == 'Kawin') ? 'selected' : ''; ?>>Kawin</option>
+                                <option value="Belum Kawin" <?= ($statuskawin == 'Belum Kawin') ? 'selected' : ''; ?>>Belum Kawin</option>
+                                <option value="Janda" <?= ($statuskawin == 'Janda') ? 'selected' : ''; ?>>Janda</option>
+                                <option value="Duda" <?= ($statuskawin == 'Duda') ? 'selected' : ''; ?>>Duda</option>
                             </select>
                         </div>
                     </div>
@@ -275,10 +273,6 @@ if (isset($_POST['update'])) {
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. KTP</label>
                             <input type="text" name="tnoktp" value="<?= $noktp; ?>" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
-                        </div>
-                        <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. BPJS</label>
-                            <input type="number" name="tbpjs" value="<?= $nobpjs; ?>" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan No. BPJS">
                         </div>
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap (KTP)</label>

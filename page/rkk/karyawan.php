@@ -15,7 +15,7 @@ if (isset($_POST['simpan_karyawan'])) {
         $ambil_jadwal = $koneksi->query("SELECT * FROM tb_jadwal WHERE id_jadwal = '$id_jadwal'");
         $dj = $ambil_jadwal->fetch_assoc();
         
-        $nama_shift = $dj['shift']; // Inilah variabel 'shift' yang akan disimpan ke tb_rkk_detail
+        $nama_shift = $dj['keterangan']; // Inilah variabel 'shift' yang akan disimpan ke tb_rkk_detail
         $j_masuk    = $dj['jam_masuk'];
         $j_keluar   = $dj['jam_keluar'];
         $i_masuk    = $dj['istirahat_masuk'];

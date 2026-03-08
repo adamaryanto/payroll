@@ -39,10 +39,10 @@ if (isset($_POST['simpan'])) {
     $departmen = getOrInsertMaster($koneksi, 'tdepartmen', 'ms_departmen', 'nama_departmen', ['id_perusahaan' => '1']);
     $subdept = getOrInsertMaster($koneksi, 'tsubdept', 'ms_sub_department', 'nama_sub_department', ['id_perusahaan' => '1']);
     $jabatan = getOrInsertMaster($koneksi, 'tjabatan', 'ms_jabatan', 'jabatan', ['id_perusahaan' => '1']);
-    $os = getOrInsertMaster($koneksi, 'tos', 'ms_os_dhk', 'OS_DHK');
+    $os = getOrInsertMaster($koneksi, 'tos', 'ms_os_dhk', 'nama_os_dhk');
     $golongan = getOrInsertMaster($koneksi, 'tgolongan', 'ms_golongan', 'golongan');
     $agama = getOrInsertMaster($koneksi, 'tagama', 'ms_agama', 'agama');
-    $statuskawin = getOrInsertMaster($koneksi, 'tstatuskawin', 'ms_status_kawin', 'status_kawin');
+    $statuskawin = isset($_POST['tstatuskawin']) ? $koneksi->real_escape_string($_POST['tstatuskawin']) : '';
     
     // ---------------------------------------------------------
 
@@ -52,27 +52,20 @@ if (isset($_POST['simpan'])) {
     $tempatlahir = $koneksi->real_escape_string($_POST['ttempatlahir']);
     $tanggallahir = $koneksi->real_escape_string($_POST['ttanggallahir']);
     $noktp = $koneksi->real_escape_string($_POST['tnoktp']);
-    $bpjs = isset($_POST['tbpjs']) ? $koneksi->real_escape_string($_POST['tbpjs']) : '';
     $alamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
+    $alamattinggal = isset($_POST['talamattinggal']) ? $koneksi->real_escape_string($_POST['talamattinggal']) : '';
     $tanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
         status_kawin, jenis_kelamin, no_ktp, alamat_ktp, alamat_tinggal, 
-        status_karyawan, tgl_aktif, foto, no_bpjs, id_sub_department, OS_DHK, golongan, id_jadwal
+        status_karyawan, tgl_aktif, foto, id_sub_department, OS_DHK, golongan, id_jadwal
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
-        '$statuskawin', '$jeniskelamin', '$noktp', '$alamatktp', '',
-        'Aktif', '$tanggalbergabung', '', '$bpjs', '$subdept', '$os', '$golongan', '0'
+        '$statuskawin', '$jeniskelamin', '$noktp', '$alamatktp', '$alamattinggal',
+        'Aktif', '$tanggalbergabung', '', '$subdept', '$os', '$golongan', '0'
     )");
 
-    // Simpan upah ke ms_karyawan jika ada
-    $upah_h = isset($_POST['tupah_harian']) ? (int)$_POST['tupah_harian'] : 0;
-    $upah_m = isset($_POST['tupah_mingguan']) ? (int)$_POST['tupah_mingguan'] : 0;
-    $upah_b = isset($_POST['tupah_bulanan']) ? (int)$_POST['tupah_bulanan'] : 0;
     $new_id = $koneksi->insert_id;
-    if ($new_id && ($upah_h > 0 || $upah_m > 0 || $upah_b > 0)) {
-        $koneksi->query("UPDATE ms_karyawan SET upah_harian='$upah_h', upah_mingguan='$upah_m', upah_bulanan='$upah_b' WHERE id_karyawan='$new_id'");
-    }
 
     if ($sql) {
         echo "<script>alert('Data Berhasil Disimpan'); window.location='?page=karyawan';</script>";
@@ -227,16 +220,12 @@ if (isset($_POST['simpan'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Status Kawin</label>
-                            <select name="tstatuskawin" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Status -" data-delete-route="statuskawin">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=statuskawin&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Status Baru...</option>
-                                <?php
-                                $q_status = $koneksi->query("SELECT * FROM ms_status_kawin");
-                                while($d = $q_status->fetch_assoc()) {
-                                    // Sudah diperbaiki: menggunakan id_status_kawin
-                                    echo "<option value='".$d['id_status_kawin']."' data-id='".$d['id_status_kawin']."'>".$d['status_kawin']."</option>";
-                                }
-                                ?>
+                            <select name="tstatuskawin" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">- Pilih Status -</option>
+                                <option value="Kawin">Kawin</option>
+                                <option value="Belum Kawin">Belum Kawin</option>
+                                <option value="Janda">Janda</option>
+                                <option value="Duda">Duda</option>
                             </select>
                         </div>
 
@@ -257,12 +246,12 @@ if (isset($_POST['simpan'])) {
                             <input type="text" name="tnoktp" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
                         </div>
                         <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. BPJS</label>
-                            <input type="number" name="tbpjs" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan No. BPJS">
-                        </div>
-                        <div class="form-group md:col-span-2">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap (KTP)</label>
                             <textarea name="talamatktp" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap (Tinggal)</label>
+                            <textarea name="talamattinggal" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."></textarea>
                         </div>
                     </div>
                 </div>

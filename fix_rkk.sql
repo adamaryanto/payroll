@@ -1,0 +1,2 @@
+ALTER TABLE `tb_rkk` ADD PRIMARY KEY (`id_rkk`);
+ALTER TABLE `tb_rkk` MODIFY `id_rkk` INT(10) NOT NULL AUTO_INCREMENT;

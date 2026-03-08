@@ -265,11 +265,11 @@ if ($_SESSION['role'] == "owner") {
                                 <div <?php echo $hr ?>>
                                     <div <?php echo $pro ?>>
                                         <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=pro"
-                                            class="btn btn-danger btn-xs" onclick="return confirm('Propose data ini?');">Approve</a>
+                                            class="btn btn-danger btn-xs" onclick="return confirm('Propose data ini?');">Propose</a>
                                     </div>
                                     <div <?php echo $unpro ?>>
                                         <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unpro"
-                                            class="btn btn-default btn-xs" onclick="return confirm('Batalkan Propose?');">Unapprove</a>
+                                            class="btn btn-default btn-xs" onclick="return confirm('Batalkan Propose?');">UnPropose</a>
                                     </div>
                                 </div>
 

@@ -7,7 +7,9 @@ $ttgl2 = date("Y-m-d H:i:s");
 
 
 
-   $koneksi->query("insert into tb_realisasi (id_rkk, tgl_realisasi,jam_kerja,detail_realisasi) select id_rkk,tgl_rkk,jam_kerja,'$ttgl2' from tb_rkk where id_rkk = '$id' ");
+   $koneksi->query("insert into tb_realisasi (id_rkk, tgl_realisasi, jam_kerja, detail_realisasi, keterangan, tgl_status, status_realisasi) 
+                    select id_rkk, tgl_rkk, jam_kerja, '$ttgl2', '', CURDATE(), 'pending' 
+                    from tb_rkk where id_rkk = '$id' ");
 
 $tampil=$koneksi->query("sELECT * from tb_realisasi WHERE id_rkk = '$id' ");
 $data=$tampil->fetch_assoc();

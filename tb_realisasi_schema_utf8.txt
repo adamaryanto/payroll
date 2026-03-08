@@ -1,0 +1,2 @@
+﻿Table	Create Table
+tb_realisasi	CREATE TABLE `tb_realisasi` (\n  `id_realisasi` int NOT NULL AUTO_INCREMENT,\n  `id_rkk` int NOT NULL,\n  `keterangan` text NOT NULL,\n  `tgl_realisasi` date NOT NULL,\n  `detail_realisasi` varchar(20) NOT NULL,\n  `jam_kerja` int NOT NULL,\n  `status_realisasi` enum('pending','approve') NOT NULL DEFAULT 'pending',\n  `tgl_status` date NOT NULL,\n  PRIMARY KEY (`id_realisasi`)\n) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=latin1

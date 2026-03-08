@@ -29,8 +29,7 @@
                                         <tr>
                                         <th width="5%">No</th>
                                            <th >No. Absen</th>
-                                            <th >No. KTP</th>
-                                             <th >No. BPJS</th>
+                                             <th >No. KTP</th>
 
                                         <th >Nama </th>
                                         <th >Jenis Kelamin</th> 
@@ -63,7 +62,6 @@ $tampil = $koneksi->query("SELECT ms_karyawan.* FROM ms_karyawan   ");
 <td><?php echo $no ?></td>
 <td><?php echo $datakaryawan['no_absen'] ?></td>
 <td><?php echo $datakaryawan['no_ktp'] ?></td>
-<td><?php echo $datakaryawan['no_bpjs'] ?></td>
 <td><?php echo $datakaryawan['nama_karyawan'] ?></td>
 <td><?php echo $datakaryawan['jenis_kelamin'] ?></td>
 <td><?php echo $datakaryawan['alamat_tinggal'] ?></td>

@@ -16,7 +16,6 @@ $golongan = $data['golongan'];
 $statuskawin = $data['status_kawin'];
 $jeniskelamin = $data['jenis_kelamin'];
 $noktp = $data['no_ktp'];
-$nobpjs = $data['no_bpjs'];
 $alamatktp = $data['alamat_ktp'];
 $alamattinggal = $data['alamat_tinggal'];
 $statuskaryawan = $data['status_karyawan'];
@@ -169,13 +168,6 @@ $contupdate="hidden";
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="block text-sm font-semibold text-gray-500 mb-2">No. BPJS</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium font-mono">
-                            <?php echo $nobpjs ? $nobpjs : '-'; ?>
-                        </div>
-                    </div>
-
                     <div class="form-group md:col-span-2">
                         <label class="block text-sm font-semibold text-gray-500 mb-2">Alamat (Sesuai KTP)</label>
                         <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium min-h-[60px]">
@@ -233,12 +225,11 @@ $tnoktp = @$_POST ['tnoktp'];
 $talamatktp = @$_POST ['talamatktp'];
 $talamattinggal = @$_POST ['talamattinggal'];
 $ttanggalbergabung = @$_POST ['ttanggalbergabung'];
-$tbpjs = @$_POST ['tbpjs'];
 $simpan = @$_POST ['simpan'];
 $update = @$_POST ['update'];
 $iduser = $_SESSION['iduser'];
 if($simpan) {
-$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif,no_bpjs) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung','$tbpjs')  ");
+$sql = $koneksi->query("insert into ms_karyawan(id_departmen,id_jabatan,no_absen,nama_karyawan,tempat_lahir,tgl_lahir,agama,status_kawin,jenis_kelamin,no_ktp,alamat_ktp,alamat_tinggal,status_karyawan,tgl_aktif) values('0','$tjabatan','$tnoabsen','$tnama','$ttempatlahir','$ttanggallahir','$tagama','$tstatuskawin','$tjeniskelamin','$tnoktp','$talamatktp','$talamattinggal','Aktif','$ttanggalbergabung')  ");
 if($sql) {
         ?>
                 <script type="text/javascript">
