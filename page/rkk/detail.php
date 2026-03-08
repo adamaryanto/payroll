@@ -4,16 +4,18 @@
 if (isset($_GET['id'])) {
    $id = $_GET['id'];
 
-   $tampildetail = $koneksi->query("SELECT A.*, B.keterangan as keterangan_rkk, B.tgl_rkk, B.detail_rkk, B.jam_kerja, C.keterangan as shift, 
-                                        BB.no_absen, BC.nama_sub_department, BB.nama_karyawan, BD.nama_departmen, BB.jenis_kelamin,
-                                        BB.id_departmen, BB.id_sub_department
-                                 FROM tb_rkk_detail A 
-                                 LEFT JOIN tb_rkk B ON A.id_rkk = B.id_rkk
-                                 LEFT JOIN tb_jadwal C ON A.id_jadwal = C.id_jadwal
-                                 LEFT JOIN ms_karyawan BB ON A.id_karyawan = BB.id_karyawan
-                                 LEFT JOIN ms_departmen BD ON BB.id_departmen = BD.id_departmen
-                                 LEFT JOIN ms_sub_department BC ON BB.id_sub_department = BC.id_sub_department
-                                 WHERE A.id_rkk_detail = '$id' ");
+   $tampildetail = $koneksi->query("
+   SELECT A.*, B.keterangan as keterangan_rkk, B.tgl_rkk, B.detail_rkk, B.jam_kerja, C.keterangan as shift, 
+   BB.no_absen, BC.nama_sub_department, BB.nama_karyawan, BD.nama_departmen, BB.jenis_kelamin,
+   BB.id_departmen, BB.id_sub_department
+   FROM tb_rkk_detail A 
+   LEFT JOIN tb_rkk B ON A.id_rkk = B.id_rkk
+   LEFT JOIN tb_jadwal C ON A.id_jadwal = C.id_jadwal
+   LEFT JOIN ms_karyawan BB ON A.id_karyawan = BB.id_karyawan
+   LEFT JOIN ms_departmen BD ON BB.id_departmen = BD.id_departmen
+   LEFT JOIN ms_sub_department BC ON BB.id_sub_department = BC.id_sub_department
+   WHERE A.id_rkk_detail = '$id' ");
+
    $datadetail = $tampildetail->fetch_assoc();
    $dataidrkk = $datadetail['id_rkk'];
    $datatglrkk = $datadetail['tgl_rkk'];
@@ -67,13 +69,9 @@ if (isset($_GET['id'])) {
    $datapotonganlainnya = "";
 }
 
-
-
-
 ?>
 <div class="row">
    <div class="col-md-12">
-      <!-- Advanced Tables -->
       <div class="panel panel-primary">
          <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
             <h3 class="box-title">Detail Rencana Upah</h3>
@@ -81,8 +79,6 @@ if (isset($_GET['id'])) {
          <form method="POST" enctype="multipart/form-data">
             <div class="panel-body">
                <div class="panel-body">
-
-
                   <div class="box-header with-border">
                      <h3 class="box-title">Rencana Kerja</h3>
                   </div>
@@ -110,9 +106,6 @@ if (isset($_GET['id'])) {
 
                         </div>
                      </div>
-
-
-
                   </div>
 
                   <div class="box-header with-border">
@@ -165,15 +158,6 @@ if (isset($_GET['id'])) {
                      </div>
 
                   </div>
-
-
-
-
-
-
-
-
-
 
                   <div class="box-header with-border">
                      <h3 class="box-title">Detail</h3>
@@ -255,19 +239,8 @@ if (isset($_GET['id'])) {
                      </div>
 
                   </div>
-
-
-
-
-
          </form>
-
-         </form>
-
       </div>
-
-
-
    </div>
 </div>
 </div>
@@ -296,7 +269,7 @@ if ($simpan) {
    $tistirahatmasuk = $data['istirahat_masuk'];
    $tistirahatkeluar = $data['istirahat_keluar'];
 
-  $sql = $koneksi->query("UPDATE tb_rkk_detail SET 
+   $sql = $koneksi->query("UPDATE tb_rkk_detail SET 
                             upah = '$tupah',
                             id_jadwal = '$tshift',
                             potongan_telat = '$tpottelat',
@@ -309,7 +282,7 @@ if ($simpan) {
                             tgl_updt = '$ttgl2' 
                             WHERE id_rkk_detail = '$id' ");
    if ($sql) {
-        echo "<script>alert('Data Tersimpan'); window.location.href='?page=rkk&aksi=kelola&id=$dataidrkk';</script>";
-    }
+      echo "<script>alert('Data Tersimpan'); window.location.href='?page=rkk&aksi=kelola&id=$dataidrkk';</script>";
    }
+}
 ?>
