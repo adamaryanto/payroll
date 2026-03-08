@@ -1,0 +1,22 @@
+﻿Field	Type	Null	Key	Default	Extra
+id_karyawan	int	NO	PRI	NULL	auto_increment
+id_departmen	varchar(100)	YES		NULL	
+id_jabatan	varchar(100)	YES		NULL	
+no_absen	int	NO		NULL	
+nama_karyawan	varchar(255)	NO		NULL	
+tempat_lahir	varchar(255)	NO		NULL	
+tgl_lahir	date	YES		NULL	
+agama	varchar(50)	NO		NULL	
+status_kawin	enum('Kawin','Belum Kawin','Janda','Duda')	YES		NULL	
+jenis_kelamin	enum('Laki-laki','Perempuan')	YES		NULL	
+no_ktp	varchar(20)	NO		NULL	
+alamat_ktp	varchar(255)	NO		NULL	
+alamat_tinggal	varchar(255)	NO		NULL	
+status_karyawan	enum('Aktif','Non Aktif')	YES		NULL	
+tgl_aktif	date	YES		NULL	
+tgl_nonaktif	date	YES		NULL	
+foto	varchar(255)	NO		NULL	
+id_jadwal	int	NO		NULL	
+id_sub_department	varchar(100)	YES		NULL	
+OS_DHK	varchar(50)	NO		NULL	
+golongan	varchar(50)	NO		NULL	

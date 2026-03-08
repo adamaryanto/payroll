@@ -21,7 +21,10 @@ $level_status = (!$role_akses) ? "hidden" : "";
             <div>
                 <h3 class="text-xl font-bold m-0"><i class="fas fa-file-invoice-dollar mr-2"></i>List Realisasi Upah</h3>
             </div>
-            <div>
+            <div class="flex gap-2">
+                <a href="?page=boneless" class="inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                    <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
+                </a>
                 <a href="?page=realisasi&aksi=rkk" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>

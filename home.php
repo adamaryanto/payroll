@@ -95,14 +95,36 @@
                   <i class="fas fa-print mr-2"></i> Cetak
               </a>
               
-              <?php if($rkk_status != "1") { ?>
-              <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5]">
-                  <i class="fas fa-check-circle mr-2 opacity-80"></i> Approve
-              </a>
-              <?php } else { ?>
-               <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-medium flex items-center justify-center flex-[1.5] cursor-default border border-emerald-100">
-                  <i class="fas fa-check-circle mr-2"></i> Approved
-              </div>
+              <?php if($rkk_status == "0") { ?>
+                  <?php if ($role != 'Owner') { ?>
+                  <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Rencana Upah ini?');" class="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase">
+                      <i class="fas fa-paper-plane mr-2"></i> Propose
+                  </a>
+                  <?php } else { ?>
+                  <div class="px-4 py-2 bg-slate-100 text-slate-400 rounded-lg text-sm font-medium flex items-center justify-center flex-[1.5] border border-slate-200 cursor-not-allowed">
+                      <i class="fas fa-clock mr-2 text-xs"></i> New Record
+                  </div>
+                  <?php } ?>
+              <?php } elseif($rkk_status == "1") { ?>
+                  <?php if ($role == 'Owner') { ?>
+                  <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase">
+                      <i class="fas fa-check-circle mr-2"></i> Approve
+                  </a>
+                  <?php } else { ?>
+                   <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro" onclick="return confirm('Apakah Anda yakin ingin Unpropose Rencana Upah ini?');" class="px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-bold hover:bg-rose-600 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase">
+                      <i class="fas fa-undo mr-2"></i> Unpropose
+                  </a>
+                  <?php } ?>
+              <?php } else { 
+                  if ($role == 'Owner') { ?>
+                   <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unapp" onclick="return confirm('Apakah Anda yakin ingin Unapprove Rencana Upah ini?');" class="px-4 py-2 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.5] uppercase tracking-tighter shadow-sm">
+                      <i class="fas fa-undo mr-2"></i> Unapprove
+                  </a>
+                  <?php } else { ?>
+                  <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold flex items-center justify-center flex-[1.5] cursor-default border border-emerald-100 uppercase tracking-tighter">
+                      <i class="fas fa-check-double mr-2"></i> Approved Owner
+                  </div>
+                  <?php } ?>
               <?php } ?>
               
               <div class="flex flex-row gap-2 mt-auto justify-center">
@@ -142,14 +164,36 @@
                   <i class="fas fa-file-invoice-dollar mr-2"></i> Payroll
               </a>
               
-              <?php if($real_status != 'approve') { ?>
-              <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>" onclick="return confirm('Apakah Anda yakin ingin Approve Realisasi Upah ini?');" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.2]">
-                  <i class="fas fa-check-circle mr-2 opacity-80"></i> Approve
-              </a>
-              <?php } else { ?>
-               <a href="?page=realisasi&aksi=unapprove&id=<?php echo $real_id; ?>" onclick="return confirm('Apakah Anda yakin ingin Unapprove Realisasi Upah ini?');" class="px-4 py-2 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-medium hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.2]">
-                  <i class="fas fa-undo mr-2"></i> Unapprove
-              </a>
+              <?php if($real_status == 'pending') { 
+                  if ($role != 'Owner') { ?>
+                  <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Realisasi Upah ini?');" class="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase">
+                      <i class="fas fa-paper-plane mr-2"></i> Propose
+                  </a>
+                  <?php } else { ?>
+                  <div class="px-4 py-2 bg-slate-100 text-slate-400 rounded-lg text-sm font-medium flex items-center justify-center flex-[1.2] border border-slate-200 cursor-not-allowed">
+                      <i class="fas fa-clock mr-2 text-xs"></i> New Record
+                  </div>
+                  <?php } ?>
+              <?php } elseif($real_status == 'propose') { 
+                  if ($role == 'Owner') { ?>
+                  <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Realisasi Upah ini?');" class="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase">
+                      <i class="fas fa-check-circle mr-2 opacity-80"></i> Approve
+                  </a>
+                  <?php } else { ?>
+                  <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=unpro" onclick="return confirm('Apakah Anda yakin ingin Unpropose Realisasi Upah ini?');" class="px-4 py-2 bg-rose-500 text-white rounded-lg text-sm font-bold hover:bg-rose-600 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase">
+                      <i class="fas fa-undo mr-2"></i> Unpropose
+                  </a>
+                  <?php } ?>
+              <?php } else { 
+                  if ($role == 'Owner') { ?>
+                   <a href="?page=realisasi&aksi=unapprove&id=<?php echo $real_id; ?>" onclick="return confirm('Apakah Anda yakin ingin Unapprove Realisasi Upah ini?');" class="px-4 py-2 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.2] uppercase tracking-tighter shadow-sm">
+                      <i class="fas fa-undo mr-2"></i> Unapprove
+                  </a>
+                  <?php } else { ?>
+                  <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold flex items-center justify-center flex-[1.2] cursor-default border border-emerald-100 uppercase tracking-tighter">
+                      <i class="fas fa-check-double mr-2 text-xs"></i> Approved Owner
+                  </div>
+                  <?php } ?>
               <?php } ?>
               
               <div class="flex flex-row gap-2 mt-auto justify-center">

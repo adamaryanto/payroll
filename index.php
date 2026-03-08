@@ -338,6 +338,11 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "detail") { include "page/realisasi/detail.php"; } 
                     elseif ($aksi == "karyawan") { include "page/realisasi/karyawan.php"; } 
                     elseif ($aksi == "slip") { include "page/realisasi/slip.php"; }
+                  } else if ($page == 'boneless') {
+                    if ($aksi == "") { include "page/boneless/boneless.php"; } 
+                    elseif ($aksi == "hapus") { include "page/boneless/hapus.php"; } 
+                    elseif ($aksi == "tambah") { include "page/boneless/tambah.php"; } 
+                    elseif ($aksi == "ubah") { include "page/boneless/ubah.php"; }
                   }
                   ?>
                 </div>
