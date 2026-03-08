@@ -20,6 +20,8 @@ if (isset($_GET['id'])) {
     B.OS_DHK,
     B.golongan,
     J.keterangan as nama_shift,
+    J.jam_masuk,
+    J.jam_keluar,
     A.upah as upahkaryawan, 
     A.potongan_telat, 
     A.potongan_istirahat, 

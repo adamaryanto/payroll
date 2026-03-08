@@ -5,15 +5,15 @@ if (isset($_GET['id'])) {
    $id = $_GET['id'];
 
    $tampildetail = $koneksi->query("
-   SELECT A.*, B.keterangan as keterangan_rkk, B.tgl_rkk, B.detail_rkk, B.jam_kerja, C.keterangan as shift, 
-   BB.no_absen, BC.nama_sub_department, BB.nama_karyawan, BD.nama_departmen, BB.jenis_kelamin,
-   BB.id_departmen, BB.id_sub_department
-   FROM tb_rkk_detail A 
-   LEFT JOIN tb_rkk B ON A.id_rkk = B.id_rkk
-   LEFT JOIN tb_jadwal C ON A.id_jadwal = C.id_jadwal
-   LEFT JOIN ms_karyawan BB ON A.id_karyawan = BB.id_karyawan
-   LEFT JOIN ms_departmen BD ON BB.id_departmen = BD.id_departmen
-   LEFT JOIN ms_sub_department BC ON BB.id_sub_department = BC.id_sub_department
+   SELECT A.*, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar, J.keterangan as nama_shift, B.nama_karyawan, B.no_absen,
+   B.id_departmen, B.id_sub_department, BD.nama_departmen, BC.nama_sub_department, B.jenis_kelamin,
+   R.keterangan as keterangan_rkk, R.tgl_rkk, R.detail_rkk, R.jam_kerja
+   FROM tb_rkk_detail A
+   LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
+   LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
+   LEFT JOIN ms_departmen BD ON B.id_departmen = BD.id_departmen
+   LEFT JOIN ms_sub_department BC ON B.id_sub_department = BC.id_sub_department
+   LEFT JOIN tb_rkk R ON A.id_rkk = R.id_rkk
    WHERE A.id_rkk_detail = '$id' ");
 
    $datadetail = $tampildetail->fetch_assoc();
@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
    $dataistirahatmasuk = $datadetail['istirahat_masuk'];
    $datajamistirahatkeluar = $datadetail['istirahat_keluar'];
    $dataidjadwal = $datadetail['id_jadwal'];
-   $dataketerangan = $datadetail['shift'];
+   $dataketerangan = $datadetail['nama_shift']; // Changed from 'shift' to 'nama_shift'
 
    $datanoabsen = $datadetail['no_absen'];
    $datanamakaryawan = $datadetail['nama_karyawan'];
@@ -115,7 +115,7 @@ if (isset($_GET['id'])) {
       margin: 0 0 20px 0;
       font-weight: 800;
     }
-    
+
     /* Tombol Modern */
     .btn-custom {
         padding: 10px 20px;
@@ -134,7 +134,7 @@ if (isset($_GET['id'])) {
         <form method="POST" enctype="multipart/form-data">
             <div class="card-modern">
                <h3><i class="fas fa-file-invoice-dollar mr-2"></i> Detail Rencana Upah</h3>
-                
+
                 <div class="section-divider">Rencana Kerja</div>
                 <div class="row">
                     <div class="form-group col-md-3">
@@ -240,18 +240,20 @@ if ($simpan) {
    $tistirahatmasuk = $data['istirahat_masuk'];
    $tistirahatkeluar = $data['istirahat_keluar'];
 
-   $sql = $koneksi->query("UPDATE tb_rkk_detail SET 
-                            upah = '$tupah',
-                            id_jadwal = '$tshift',
-                            potongan_telat = '$tpottelat',
-                            potongan_istirahat = '$tpotistirahat',
-                            potongan_lainnya = '$tpotlainnya', 
-                            jam_masuk = '$tjammasuk', 
-                            jam_keluar = '$tjamkeluar', 
-                            istirahat_masuk = '$tistirahatmasuk', 
-                            istirahat_keluar = '$tistirahatkeluar', 
-                            tgl_updt = '$ttgl2' 
-                            WHERE id_rkk_detail = '$id' ");
+   $sql = $koneksi->query("UPDATE tb_rkk_detail SET
+      upah = '$tupah',
+      id_departmen = '$tdepartmen',
+      id_sub_department = '$tsubdepartment',
+      id_jadwal = '$tshift',
+      potongan_telat = '$tpottelat',
+      potongan_istirahat = '$tpotistirahat',
+      potongan_lainnya = '$tpotlainnya',
+      jam_masuk = '$tjammasuk',
+      jam_keluar = '$tjamkeluar',
+      istirahat_masuk = '$tistirahatmasuk',
+      istirahat_keluar = '$tistirahatkeluar',
+      tgl_updt = '$ttgl2'
+      WHERE id_rkk_detail = '$id'");
    if ($sql) {
       echo "<script>alert('Data Tersimpan'); window.location.href='?page=rkk&aksi=kelola&id=$dataidrkk';</script>";
    }

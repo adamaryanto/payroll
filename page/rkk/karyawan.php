@@ -11,16 +11,6 @@ if (isset($_POST['simpan_karyawan'])) {
     $upah       = $_POST['upah_manual'];
 
     if (!empty($idkaryawan) && !empty($id_jadwal) && $idrkk > 0) {
-        // Ambil data detail jam dari tabel jadwal
-        $ambil_jadwal = $koneksi->query("SELECT * FROM tb_jadwal WHERE id_jadwal = '$id_jadwal'");
-        $dj = $ambil_jadwal->fetch_assoc();
-        
-        $nama_shift = $dj['keterangan']; // Inilah variabel 'shift' yang akan disimpan ke tb_rkk_detail
-        $j_masuk    = $dj['jam_masuk'];
-        $j_keluar   = $dj['jam_keluar'];
-        $i_masuk    = $dj['istirahat_masuk'];
-        $i_keluar   = $dj['istirahat_keluar'];
-
         // Cek duplikat
         $cek = $koneksi->query("SELECT id_karyawan FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$idkaryawan'");
 
@@ -28,14 +18,12 @@ if (isset($_POST['simpan_karyawan'])) {
             // Force int
             $idrkk_fix = intval($idrkk);
             
-            // INSERT dengan menyertakan tgl_updt menggunakan NOW() agar tidak error
+            // INSERT simplified: remove jam_masuk, jam_keluar, etc.
             $insert = $koneksi->query("INSERT INTO tb_rkk_detail 
-                (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, shift, status_rkk, 
-                 jam_masuk, jam_keluar, istirahat_masuk, istirahat_keluar, 
+                (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, status_rkk, 
                  potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
                 VALUES 
-                ($idrkk_fix, '$idkaryawan', '$upah', '$id_dept', '$id_sub', '$id_jadwal', '$nama_shift', 'Hadir', 
-                 '$j_masuk', '$j_keluar', '$i_masuk', '$i_keluar', 
+                ($idrkk_fix, '$idkaryawan', '$upah', '$id_dept', '$id_sub', '$id_jadwal', 'Hadir', 
                  '0', '0', '0', NOW())");
 
             if ($insert) {

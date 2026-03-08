@@ -7,11 +7,6 @@ if(isset($_GET['id'])){
    $idrkkkaryawan = $datadetail['id_karyawan'];
    $orig_upah = $datadetail['upah'];
    $orig_jadwal = $datadetail['id_jadwal'];
-   $orig_shift = $datadetail['shift'];
-   $orig_jam_masuk = $datadetail['jam_masuk'];
-   $orig_jam_keluar = $datadetail['jam_keluar'];
-   $orig_ist_masuk = $datadetail['istirahat_masuk'];
-   $orig_ist_keluar = $datadetail['istirahat_keluar'];
 } else {
     $idrkkdetail = ""; $idrkk = ""; $idrkkkaryawan="";
 }
@@ -127,13 +122,13 @@ if(isset($_POST['simpan'])) {
         $iddept_pengganti = $tdept[$cek];
         $idsub_pengganti = $tsub[$cek];
 
-        // 1. Masukkan karyawan pengganti ke tb_rkk_detail (copy upah/shift dari yang diganti)
+        // 1. Masukkan karyawan pengganti ke tb_rkk_detail (copy upah/jadwal dari yang diganti)
         $q_insert = "INSERT INTO tb_rkk_detail 
-            (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, shift, status_rkk, 
-             jam_masuk, jam_keluar, istirahat_masuk, istirahat_keluar, tgl_updt) 
+            (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, status_rkk, 
+             potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
             VALUES 
-            ('$idrkk', '$idkaryawan_pengganti', '$orig_upah', '$iddept_pengganti', '$idsub_pengganti', '$orig_jadwal', '$orig_shift', 'Pengganti', 
-             '$orig_jam_masuk', '$orig_jam_keluar', '$orig_ist_masuk', '$orig_ist_keluar', NOW())";
+            ('$idrkk', '$idkaryawan_pengganti', '$orig_upah', '$iddept_pengganti', '$idsub_pengganti', '$orig_jadwal', 'Pengganti', 
+             '0', '0', '0', NOW())";
         
         if($koneksi->query($q_insert)) {
             // 2. Update status karyawan lama

@@ -62,7 +62,7 @@ BB.nama_sub_department , C.status_rkk
    FROM tb_record A   
    LEFT JOIN ms_karyawan B ON A.userid = B.no_absen
    LEFT JOIN tb_rkk_detail C ON B.id_karyawan = C.id_karyawan
-   LEFT JOIN tb_rkk D ON C.id_rkk = D.id_rkk
+   LEFT JOIN tb_jadwal D ON C.id_jadwal = D.id_jadwal
    
    left join ms_sub_department BB on B.id_sub_department = BB.id_sub_department
  WHERE A.tgl = '$tglrkk'  AND B.nama_karyawan <> ''

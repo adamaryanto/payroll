@@ -5164,17 +5164,13 @@ CREATE TABLE `tb_rkk_detail` (
   `upah` int(10) NOT NULL,
   `id_departmen` int(10) DEFAULT NULL,
   `id_sub_department` int(10) DEFAULT NULL,
-  `shift` varchar(50) DEFAULT NULL,
   `status_rkk` enum('Hadir','Tidak Hadir','Digantikan','Pengganti') NOT NULL,
   `id_jadwal` int(10) NOT NULL,
   `potongan_telat` int(10) NOT NULL,
   `potongan_istirahat` int(10) NOT NULL,
   `potongan_lainnya` int(10) NOT NULL,
-  `jam_masuk` varchar(20) NOT NULL,
-  `jam_keluar` varchar(20) NOT NULL,
-  `istirahat_masuk` varchar(20) NOT NULL,
-  `istirahat_keluar` varchar(20) NOT NULL,
-  `tgl_updt` varchar(20) NOT NULL
+  `tgl_updt` varchar(20) NOT NULL,
+  PRIMARY KEY (`id_rkk_detail`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

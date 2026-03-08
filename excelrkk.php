@@ -28,6 +28,7 @@ SELECT
     R.tgl_rkk
 FROM tb_rkk_detail RD
 LEFT JOIN tb_rkk R ON RD.id_rkk = R.id_rkk
+LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
 LEFT JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
 LEFT JOIN ms_departmen D ON K.id_departmen = D.id_departmen
 LEFT JOIN ms_jabatan J ON K.id_jabatan = J.id_jabatan

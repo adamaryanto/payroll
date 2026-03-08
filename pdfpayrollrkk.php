@@ -13,20 +13,18 @@ $istirahatmasuk = $datarkk ? substr($datarkk['istirahat_masuk'],0,3) : '';
 $istirahatkeluar = $datarkk ? substr($datarkk['istirahat_keluar'],0,3) : '';
 
 
-$tampil = $koneksi->query("SELECT B.no_absen , B.nama_karyawan , D.nama_departmen , C.tgl_rkk ,C.jam_masuk , C.jam_keluar , C.istirahat_keluar,
-C.istirahat_masuk , A.status_rkk , BB.nama_sub_department ,
+$tampil = $koneksi->query("SELECT B.no_absen, B.nama_karyawan, D.nama_departmen, C.tgl_rkk, J.jam_masuk, J.jam_keluar, J.istirahat_keluar,
+J.istirahat_masuk, A.status_rkk, BB.nama_sub_department,
 case when A.status_rkk = 'Digantikan' then '0'
  when A.status_rkk = 'Tidak Hadir' then '0'
  else A.upah
-
 end as upahkaryawan
 FROM tb_rkk_detail A 
 LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
 LEFT JOIN ms_departmen D on B.id_departmen = D.id_departmen
-
-   left join ms_sub_department BB on B.id_sub_department = BB.id_sub_department
-
+LEFT JOIN ms_sub_department BB on B.id_sub_department = BB.id_sub_department
+LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
 WHERE A.id_rkk = '$idrkk'
 ");
   }
