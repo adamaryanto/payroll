@@ -314,7 +314,7 @@ if ($datastatusrkk == 3) {
 <div class="container-fluid px-2 mt-4 mb-4">
   <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
     <div class="border-b border-gray-100 py-4 px-5 bg-white flex justify-between items-center">
-      <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Detail Rencana Upah</h3>
+      <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
       <div>
         <a href="?page=rkk&aksi=karyawan" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
           <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan

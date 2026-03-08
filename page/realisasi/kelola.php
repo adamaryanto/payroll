@@ -307,7 +307,7 @@ if ($simpan) {
         <div class="col-md-12">
             <div class="card-clean">
                 <div class="card-header-clean">
-                    <i class="fa fa-list-alt"></i> Detail Realisasi Upah
+                    <i class="fa fa-list-alt mr-2"></i> Daftar Realisasi Upah
                 </div>
 
                 <form method="POST" enctype="multipart/form-data">

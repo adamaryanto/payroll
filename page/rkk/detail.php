@@ -70,179 +70,150 @@ if (isset($_GET['id'])) {
 }
 
 ?>
+<style>
+    /* Styling Dasar Modern */
+    .card-modern {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 25px;
+        margin-bottom: 25px;
+        border: none;
+    }
+    .section-divider {
+        display: flex;
+        align-items: center;
+        color: #2563eb;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 30px 0 15px 0;
+        font-size: 0.9rem;
+    }
+    .section-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+        margin-left: 15px;
+    }
+    /* Input Styling */
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        padding: 10px 15px;
+        height: auto;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(95, 158, 160, 0.2);
+    }
+    label { font-size: 0.75rem; color: #6b7280; margin-bottom: 8px; }
+    h3{
+      color: #2563eb;
+      margin: 0 0 20px 0;
+      font-weight: 800;
+    }
+    
+    /* Tombol Modern */
+    .btn-custom {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+    .btn-primary-custom { background-color: #2563eb; color: white; border: none; }
+    .btn-primary-custom:hover { background-color: #4a7d7f; color: white; transform: translateY(-1px); }
+    .btn-warning-custom { background-color: #f39c12; color: white; border: none; }
+    .btn-warning-custom:hover { background-color: #d68910; color: white; }
+</style>
+
 <div class="row">
-   <div class="col-md-12">
-      <div class="panel panel-primary">
-         <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
-            <h3 class="box-title">Detail Rencana Upah</h3>
-         </div>
-         <form method="POST" enctype="multipart/form-data">
-            <div class="panel-body">
-               <div class="panel-body">
-                  <div class="box-header with-border">
-                     <h3 class="box-title">Rencana Kerja</h3>
-                  </div>
-                  <div class="panel-body">
-                     <div class="row" style=" background-color:white; border:1px ; color:black; ">
-                        <div hidden="hidden" class="form-group col-md-4">
-                           <label class="font-weight-bold">Id Karyawan</label>
+    <div class="col-md-12">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="card-modern">
+               <h3><i class="fas fa-file-invoice-dollar mr-2"></i> Detail Rencana Upah</h3>
+                
+                <div class="section-divider">Rencana Kerja</div>
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        <label>TANGGAL</label>
+                        <input type="date" name="ttgl1" value="<?= $datatglrkk ?>" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>KETERANGAN</label>
+                        <input type="text" name="tketerangan" value="<?= $dataketeranganrkk ?>" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>JAM KERJA</label>
+                        <input type="number" name="tjamkerja" value="<?= $datajamkerja ?>" class="form-control" />
+                    </div>
+                </div>
 
-                           <input autocomplete="off" type="text" name="tid" class="form-control" />
-                        </div>
-                        <div class="form-group col-md-3">
-                           <label class="font-weight-bold">Tanggal</label>
-                           <input placeholder="*" autocomplete="off" type="date" name="ttgl1" value="<?php echo $datatglrkk; ?>" class="form-control" />
+                <div class="section-divider">Informasi Karyawan</div>
+                <div class="row">
+                    <div class="form-group col-md-4">
+                        <label>NO. ABSEN</label>
+                        <input type="text" value="<?= $datanoabsen ?>" class="form-control" readonly style="background: #f9fafb;" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>NAMA</label>
+                        <input type="text" value="<?= $datanamakaryawan ?>" class="form-control" readonly style="background: #f9fafb;" />
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label>BAGIAN</label>
+                        <select class="form-control" name="tdepartmen">
+                             <option value="<?= $dataiddepartmen ?>"><?= $databagian ?></option>
+                             <?php
+                             $sqldept = $koneksi->query("select * from ms_departmen");
+                             while ($d = $sqldept->fetch_array()) { echo "<option value='$d[id_departmen]'>$d[nama_departmen]</option>"; }
+                             ?>
+                        </select>
+                    </div>
+                </div>
 
-                        </div>
-
-                        <div class="form-group col-md-4">
-                           <label class="font-weight-bold">Keterangan </label>
-                           <input placeholder="*" autocomplete="off" type="text" name="tketerangan" value="<?php echo $dataketeranganrkk; ?>" class="form-control" />
-
-                        </div>
-                        <div class="form-group col-md-2">
-                           <label class="font-weight-bold">Jam Kerja</label>
-                           <input placeholder="*" autocomplete="off" type="number" name="tjamkerja" value="<?php echo $datajamkerja; ?>" class="form-control" />
-
-                        </div>
-                     </div>
-                  </div>
-
-                  <div class="box-header with-border">
-                     <h3 class="box-title">Data Karyawan</h3>
-                  </div>
-                  <div class="panel-body">
-                     <div class="row" style=" background-color:white; border:1px ; color:black; ">
-
-                        <div class="form-group col-md-4">
-                           <label class="font-weight-bold">No. Absen </label>
-                           <input placeholder="*" autocomplete="off" type="text" name="tketerangan" value="<?php echo $datanoabsen; ?>" class="form-control" />
-                        </div>
-
-                        <div class="form-group col-md-4">
-                           <label class="font-weight-bold">Nama</label>
-                           <input placeholder="*" autocomplete="off" type="text" name="tketerangan" value="<?php echo $datanamakaryawan; ?>" class="form-control" />
-                        </div>
-
-                        <div class="form-group col-md-4">
-                           <label class="font-weight-bold">Bagian </label>
-                           <select class="form-control" name="tdepartmen">
-                              <option value="<?php echo $dataiddepartmen ?>"><?php echo $databagian ?></option>
-                              <?php
-                              $sqldept = $koneksi->query("select * from ms_departmen ");
-                              while ($datadeptRow =  $sqldept->fetch_array()) {
-                                 echo "<option value='$datadeptRow[id_departmen]'>$datadeptRow[nama_departmen]</option>";
-                              }
-                              ?>
-                           </select>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                           <label class="font-weight-bold">Sub Bagian</label>
-                           <select class="form-control" name="tsubdepartment">
-                              <option value="<?php echo $dataidsubdepartment ?>"><?php echo $datasubbagian ?></option>
-                              <?php
-                              $sqlsubdept = $koneksi->query("select * from ms_sub_department ");
-                              while ($datasubdeptRow =  $sqlsubdept->fetch_array()) {
-                                 echo "<option value='$datasubdeptRow[id_sub_department]'>$datasubdeptRow[nama_sub_department]</option>";
-                              }
-                              ?>
-                           </select>
-                        </div>
-
-                        <div class="form-group col-md-4">
-                           <label class="font-weight-bold">Jenis Kelamin </label>
-                           <input placeholder="*" autocomplete="off" type="text" name="tketerangan" value="<?php echo $datajenkel; ?>" class="form-control" />
-                        </div>
-
-                     </div>
-
-                  </div>
-
-                  <div class="box-header with-border">
-                     <h3 class="box-title">Detail</h3>
-                  </div>
-
-                  <div class="panel-body">
-
-
-                     <div class="form-group col-md-4">
-                        <label class="font-weight-bold">Shift </label>
+                <div class="section-divider text-danger">Detail Upah & Shift</div>
+                <div class="row">
+                    <div class="form-group col-md-3">
+                        <label>SHIFT</label>
                         <select class="form-control" name="tshift" required>
-                           <option value="<?php echo $dataidjadwal ?>"><?php echo $dataketerangan ?></option>
+                           <option value="<?= $dataidjadwal ?>"><?= $dataketerangan ?></option>
                            <?php
-                           $sql = $koneksi->query("select * from tb_jadwal ");
-
-                           while ($datashiftRow =  $sql->fetch_array()) {
-                              if ($datashiftBagian == $datashiftRow['keterangan']) {
-                                 $cek1 = " selected";
-                              } else {
-                                 $cek1 = "";
-                              }
-                              echo "<option value='$datashiftRow[id_jadwal]' $cek>$datashiftRow[keterangan]</option>";
-                           }
+                           $sql = $koneksi->query("select * from tb_jadwal");
+                           while ($j = $sql->fetch_array()) { echo "<option value='$j[id_jadwal]'>$j[keterangan]</option>"; }
                            ?>
                         </select>
-                     </div>
-                     <div hidden class="form-group col-md-2">
-                        <label class="font-weight-bold">Jam Masuk</label>
-                        <input placeholder="*" autocomplete="off" type="time" name="tjammasuk" value="<?php echo $datajammasuk ?>" class="form-control" />
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>UPAH</label>
+                        <input type="number" name="tupah" value="<?= $dataupah ?>" class="form-control" required />
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>POT. TELAT</label>
+                        <input type="number" name="tpottelat" value="<?= $datapotongantelat ?>" class="form-control" required />
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>POT. ISTIRAHAT</label>
+                        <input type="number" name="tpotistirahat" value="<?= $datapotonganistirahat ?>" class="form-control" required />
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label>POT. LAINNYA</label>
+                        <input type="number" name="tpotlainnya" value="<?= $datapotonganlainnya ?>" class="form-control" required />
+                    </div>
+                </div>
 
-                     </div>
-                     <div hidden class="form-group col-md-2">
-                        <label class="font-weight-bold">Jam Keluar</label>
-                        <input placeholder="*" autocomplete="off" type="time" name="tjamkeluar" value="<?php echo $datajamkeluar ?>" class="form-control" />
-
-                     </div>
-                     <div hidden class="form-group col-md-2">
-                        <label class="font-weight-bold">Istirahat Masuk</label>
-                        <input placeholder="*" autocomplete="off" type="time" name="tistirahatmasuk" value="<?php echo $dataistirahatmasuk ?>" class="form-control" />
-
-                     </div>
-                     <div hidden class="form-group col-md-2">
-                        <label class="font-weight-bold">Istirahat Keluar</label>
-                        <input placeholder="*" autocomplete="off" type="time" name="tistirahatkeluar" value="<?php echo $datajamistirahatkeluar ?>" class="form-control" />
-
-                     </div>
-                     <div class="form-group col-md-2">
-                        <label class="font-weight-bold">Upah</label>
-                        <input placeholder="*" autocomplete="off" type="number" name="tupah" value="<?php echo $dataupah ?>" required class="form-control" />
-
-                     </div>
-                     <div class="form-group col-md-2">
-                        <label class="font-weight-bold">Potongan Telat</label>
-                        <input placeholder="*" autocomplete="off" type="number" name="tpottelat" value="<?php echo $datapotongantelat ?>" required class="form-control" />
-
-                     </div>
-                     <div class="form-group col-md-2">
-                        <label class="font-weight-bold">Potongan Istirahat</label>
-                        <input placeholder="*" autocomplete="off" type="number" name="tpotistirahat" value="<?php echo $datapotonganistirahat ?>" required class="form-control" />
-
-                     </div>
-                     <div class="form-group col-md-2">
-                        <label class="font-weight-bold">Potongan Lainnya</label>
-                        <input placeholder="*" autocomplete="off" type="number" name="tpotlainnya" value="<?php echo $datapotonganlainnya ?>" required class="form-control" />
-
-                     </div>
-
-
-                  </div>
-
-                  <div class="row" style=" background-color:white; border:1px ; color:black; ">
-                     <div class="form-group">
-
-                        <input type="submit" name="simpan" value="Simpan" class="btn btn-primary">
-                        <a href="?page=rkk&aksi=kelola&id=<?php echo $dataidrkk ?>"
-                           class="btn btn-warning">
-                           << Kembali
-                              </a>
-                     </div>
-
-                  </div>
-         </form>
-      </div>
-   </div>
-</div>
+                <div style="margin-top: 25px; border-top: 1px solid #f3f4f6;">
+                    <a href="?page=rkk&aksi=kelola&id=<?= $dataidrkk ?>" class="btn btn-warning-custom btn-custom">
+                        <i class="fa fa-arrow-left"></i> Kembali
+                    </a>
+                    <button type="submit" name="simpan" class="btn btn-primary-custom btn-custom">
+                        <i class="fa fa-save"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
 <?php
