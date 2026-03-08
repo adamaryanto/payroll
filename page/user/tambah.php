@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
     <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
         
-        <div class="bg-gradient-to-r from-slate-700 to-slate-800 px-8 py-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
             <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
                 <i class="fas fa-user-plus mr-3"></i>
                 Tambah Data User
@@ -70,7 +70,7 @@
                             Batal
                         </a>
                         <button type="submit" name="simpan" value="Simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-slate-700 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
-                            <i class="fas fa-save mr-2"></i> Simpan User
+                            <i class="fas fa-save mr-2"></i> Simpan
                         </button>
                     </div>
                 </div>

@@ -20,9 +20,9 @@ if (isset($_POST['simpan'])) {
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
             <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
                 <i class="fas fa-plus-circle mr-3"></i>
-                Tambah Template Upah
+                Tambah Data Upah
             </h3>
-            <p class="text-blue-200 text-sm mt-1">Buat template upah baru</p>
+            <p class="text-blue-200 text-sm mt-1">Buat Data Upah baru</p>
         </div>
         
         <form method="POST" enctype="multipart/form-data">

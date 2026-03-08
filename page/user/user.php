@@ -1,150 +1,325 @@
 <style>
-    /* Membersihkan layout setelah elemen mengambang (float) */
-    .dataTables_wrapper::after {
-        content: "";
-        clear: both;
-        display: table;
-    }
-    
-    /* --- Area Atas: Show Entries (Kiri) & Search (Kanan) --- */
-    .dataTables_wrapper .dataTables_length {
-        float: left;
-        margin-bottom: 1rem;
-        color: #4b5563; /* text-gray-600 */
-    }
-    .dataTables_wrapper .dataTables_filter {
-        float: right;
-        margin-bottom: 1rem;
-        color: #4b5563;
-    }
-    /* Styling input search & dropdown length */
-    .dataTables_wrapper .dataTables_filter input, 
-    .dataTables_wrapper .dataTables_length select {
-        border: 1px solid #d1d5db; /* border-gray-300 */
-        border-radius: 0.375rem;   /* rounded-md */
-        padding: 0.25rem 0.5rem;
-        margin-left: 0.5rem;
-        outline: none;
-        background-color: #fff;
-    }
-    .dataTables_wrapper .dataTables_filter input:focus, 
-    .dataTables_wrapper .dataTables_length select:focus {
-        border-color: #3b82f6; /* blue-500 */
-        box-shadow: 0 0 0 1px #3b82f6;
+    .card-modern {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        border: 1px solid #f0f0f0;
+        margin-bottom: 24px;
+        overflow: hidden;
     }
 
-    /* --- Area Bawah: Info (Kiri) & Pagination (Kanan) --- */
-    .dataTables_wrapper .dataTables_info {
-        float: left;
-        margin-top: 1rem;
-        color: #6b7280; /* text-gray-500 */
-        font-size: 0.875rem; /* text-sm */
-    }
-    .dataTables_wrapper .dataTables_paginate {
-        float: right;
-        margin-top: 1rem;
-    }
-    
-    /* Styling Tombol Pagination (Previous, 1, 2, Next) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-        padding: 0.375rem 0.75rem;
-        margin-left: 0.25rem;
-        border-radius: 0.375rem;
-        border: 1px solid #d1d5db;
+    .card-modern-header {
         background-color: #ffffff;
-        color: #374151 !important; /* text-gray-700 */
-        font-size: 0.875rem;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
+        padding: 20px 24px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
-        background-color: #f3f4f6; /* bg-gray-100 */
-        color: #111827 !important;
+
+    .card-modern-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
-    
-    /* Tombol Aktif (Current Page) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-        background-color: #2563eb !important; /* bg-blue-600 */
-        color: #ffffff !important;
-        border-color: #2563eb;
+
+    .btn-modern {
+        background-color: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        font-size: 13px;
+        transition: all 0.2s;
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-    
-    /* Tombol Non-aktif (Disabled - spt Previous di halaman 1) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        background-color: #f9fafb !important;
+
+    .btn-modern:hover {
+        background-color: #1e3a8a;
+        color: white;
+    }
+
+    .table-responsive {
+        padding: 24px;
+    }
+
+    .table-modern thead th {
+        background-color: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        padding: 12px 16px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .table-modern tbody td {
+        padding: 14px 16px;
+        vertical-align: middle;
+        font-size: 14px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    .action-links {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s;
+        text-decoration: none !important;
+    }
+
+    .btn-edit {
+        background-color: #fef3c7;
+        color: #d97706;
+    }
+
+    .btn-delete {
+        background-color: #fee2e2;
+        color: #dc2626;
+    }
+
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
+    .dataTables_wrapper {
+        display: block !important;
+    }
+
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
+    .dataTables_wrapper::before,
+    .dataTables_wrapper::after {
+        display: none !important;
+    }
+
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
+    #dataTables-example_wrapper .row:first-child {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+    }
+
+    /* 4. Styling Tampil _MENU_ (Kiri) */
+    .dataTables_length {
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+
+    /* 5. Styling Cari: (Kanan) */
+    .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_filter input {
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
+    }
+
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
+    .dataTables_wrapper .dataTables_paginate {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding-top: 15px !important;
+    }
+
+    .dataTables_paginate .paginate_button {
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        border-radius: 6px !important;
+        padding: 5px 12px !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
+        color: white !important;
+    }
+
+    .dataTables_paginate .paginate_button.disabled {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed !important;
+    }
+
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
+    @media screen and (max-width: 768px) {
+        .table-responsive {
+            padding: 12px !important;
+        }
+
+        .table-modern thead {
+            display: none !important;
+        }
+
+        .table-modern tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .table-modern tbody td {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px 10px !important;
+            border: none !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+        }
+
+        .table-modern tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 11px;
+            min-width: 120px;
+            margin-right: 15px;
+        }
     }
 </style>
 
-<div class="row px-3 mt-4">
-    <div class="col-md-12">
-        <div class="card rounded-2xl shadow-sm border-0">
-            <div class="card-header bg-white border-b border-gray-100 py-4 flex justify-between items-center rounded-t-2xl">
-                <h3 class="card-title text-xl font-bold text-gray-800 m-0">Data Akun User</h3>
-                <div class="card-tools">
-                    <a href="?page=user&aksi=tambah" class="btn btn-primary bg-brand-600 hover:bg-brand-700 border-0 rounded-lg shadow-sm px-4 py-2 font-medium transition-colors">
-                        <i class="fas fa-user-plus mr-2"></i> Tambah User
-                    </a>
-                </div>
-            </div>
-            
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped border-b border-gray-100" id="dataTables-example">
-                        <thead class="bg-gray-50 text-gray-600 text-sm">
-                                        <tr>
-                                        <th width="5%">No</th>
-                                         <th >Username</th>
-                                         <th class="text-center" width="10%">Role</th>
-                                         <th class="text-center" width="10%">Aksi</th>
+<div class="container-fluid py-4">
+    <div class="card-modern">
+        <div class="card-modern-header">
+            <h3 class="card-modern-title">
+                <i class="fas fa-building" style="color:#2563eb;"></i> Data Pengguna
+            </h3>
+            <a href="?page=user&aksi=tambah" class="btn-modern">
+                <i class="fas fa-plus"></i> Tambah Pengguna
+            </a>
+        </div>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php
+        <div class="table-responsive">
+            <table class="table table-modern w-full" id="dataTables-example">
+                <thead class="bg-gray-50 text-gray-600 text-sm">
+                    <tr>
+                        <th width="5%">No</th>
+                        <th>Username</th>
+                        <th class="text-center" width="10%">Role</th>
+                        <th class="text-center" width="10%">Aksi</th>
 
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
 
-$no = 1;
+                    $no = 1;
 
+                    $tampil = $koneksi->query("SELECT * FROM ms_login");
+                    while ($data = $tampil->fetch_assoc()) {
+                    ?>
+                        <tr>
+                            <td><?php echo $no ?></td>
+                            <td><?php echo $data['user_login'] ?></td>
+                            <td><?php echo $data['role'] ?></td>
+                            <td class="text-center align-middle">
+                                <div class="flex flex-wrap gap-2 justify-center">
+                                    <a href="?page=user&aksi=ubah&id=<?php echo $data['id_login']; ?>" class="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Ubah User"><i class="fas fa-edit"></i></a>
+                                    <a href="?page=user&aksi=hapus&id=<?php echo $data['id_login']; ?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Hapus User"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </td>
+                        </tr>
 
-$tampil = $koneksi->query("SELECT * FROM ms_login");
-    while ($data=$tampil->fetch_assoc())
-    {
+                    <?php $no++;
+                    } ?>
 
-?>
-
-
-                                        <tr>
-<td><?php echo $no ?></td>
-<td><?php echo $data['user_login'] ?></td>
-<td><?php echo $data['role'] ?></td>
-<td class="text-center align-middle">
-    <div class="flex flex-wrap gap-2 justify-center">
-        <a href="?page=user&aksi=ubah&id=<?php echo $data['id_login'];?>" class="btn btn-sm bg-amber-500 hover:bg-amber-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Ubah User"><i class="fas fa-edit"></i></a>
-        <a href="?page=user&aksi=hapus&id=<?php echo $data['id_login'];?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Hapus User"><i class="fas fa-trash"></i></a>
-    </div>
-</td>
-</tr>
-
-                                       <?php  $no++; } ?>
-
-                                    </tbody>   
-                                    </table>
-                            </div>
-                        </div></div></div>
+                </tbody>
+            </table>
         </div>
     </div>
-  
-    <script>
- $(document).ready( function () {
-$('#dataTables-example').DataTable({
-    pageLength: 100,
-    "searching": true
-}
-);
+</div>
 
-} );
+<script>
+    $(document).ready(function() {
+        var table = $('#dataTables-example').DataTable({
+            pageLength: 25,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            language: {
+                search: "Cari:",
+                searchPlaceholder: "Cari...",
+                lengthMenu: "Tampilkan _MENU_ pengguna",
+                info: "Menampilkan _START_ sd _END_ dari _TOTAL_ pengguna"
+            },
+            initComplete: function() {
+                // Memindahkan posisi secara paksa setelah tabel ter-render
+                var $wrapper = $('#dataTables-example_wrapper');
+                var $length = $wrapper.find('.dataTables_length');
+                var $filter = $wrapper.find('.dataTables_filter');
+
+                // Membuat wadah flex baru di atas tabel
+                $('<div class="d-flex justify-content-between align-items-center mb-3"></div>')
+                    .insertBefore('#dataTables-example_wrapper .row:first-child')
+                    .append($length)
+                    .append($filter);
+            }
+        });
+    });
 </script>

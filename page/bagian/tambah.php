@@ -1,77 +1,64 @@
-
-<div class="row px-3 mt-4">
-    <div class="col-md-6 col-md-offset-3">
-        <div class="card rounded-2xl shadow-sm border-0">
-            <div class="card-header bg-white border-b border-gray-100 py-4 rounded-t-2xl">
-                <h3 class="card-title text-xl font-bold text-gray-800 m-0">Tambah Data Bagian</h3>
-            </div>
-            
-            <form method="POST" enctype="multipart/form-data">
-                <div class="card-body p-4">
-                    <div class="form-group mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Bagian <span class="text-red-500">*</span></label>
-                        <input placeholder="Masukkan nama bagian..." autocomplete="off" type="text" name="tnama" required class="form-control custom-input" />
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
+    <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
+        
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+            <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
+                <i class="fas fa-plus-circle mr-3"></i>
+                Tambah Data Bagian
+            </h3>
+            <p class="text-slate-300 text-sm mt-1">Tambahkan departemen baru ke dalam sistem</p>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <div class="p-8">
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Nama Bagian <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-building text-gray-400"></i>
+                        </div>
+                        <input placeholder="Masukkan nama bagian..." autocomplete="off" type="text" name="tnama" required 
+                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
                     </div>
                 </div>
-                
-                <div class="card-footer bg-gray-50 p-4 flex gap-3 justify-end rounded-b-2xl">
-                    <button type="submit" name="simpan" class="btn btn-primary bg-brand-600 hover:bg-brand-700 border-0 rounded-lg px-6 py-2 font-semibold shadow-sm transition-all focus:ring-2 focus:ring-brand-500">
-                        <i class="fas fa-save mr-2"></i> Simpan
-                    </button>
-                    <a onclick="history.back();" href="#" class="btn btn-danger bg-gray-200 hover:bg-gray-300 text-gray-700 border-0 rounded-lg px-6 py-2 font-semibold transition-all">
-                        Batal
-                    </a>
+
+                <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                    <div class="text-xs text-gray-500 italic">
+                        <span class="text-rose-500">*</span> Wajib diisi
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="?page=bagian" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out">
+                            Batal
+                        </a>
+                        <button type="submit" name="simpan" value="Simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-slate-700 hover:bg-slate-800 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
+                            <i class="fas fa-save mr-2"></i> Simpan
+                        </button>
+                    </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
 
-<style>
-    .custom-input {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 12px;
-        transition: all 0.2s;
-    }
-    .custom-input:focus {
-        border-color: #5F9EA0;
-        box-shadow: 0 0 0 3px rgba(95, 158, 160, 0.1);
-        outline: none;
-    }
-    .bg-brand-600 {
-        background-color: #5F9EA0 !important;
-    }
-    .hover\:bg-brand-700:hover {
-        background-color: #4d8284 !important;
-    }
-    /* Simple grid helpers if Tailwind is missing */
-    .flex { display: flex; }
-    .gap-3 { gap: 0.75rem; }
-    .justify-end { justify-content: flex-end; }
-    .block { display: block; }
-    .mb-2 { margin-bottom: 0.5rem; }
-    .mb-4 { margin-bottom: 1rem; }
-    .p-4 { padding: 1rem; }
-    .text-sm { font-size: 0.875rem; }
-    .font-semibold { font-weight: 600; }
-    .text-gray-700 { color: #374151; }
-    .text-gray-800 { color: #1f2937; }
-    .text-red-500 { color: #ef4444; }
-</style>
-
 <?php
-$tnama = @$_POST['tnama'];
-$simpan = @$_POST['simpan'];
-if ($simpan) {
-    $sql = $koneksi->query("INSERT INTO ms_departmen (nama_departmen) VALUES ('$tnama')");
-    if ($sql) {
-        ?>
-        <script type="text/javascript">
-            alert("Data Tersimpan");
-            window.location.href = "?page=bagian";
-        </script>
-        <?php
+if (isset($_POST['simpan'])) {
+    $tnama = $_POST['tnama'] ?? '';
+    
+    // Gunakan prepared statement untuk keamanan lebih baik
+    $stmt = $koneksi->prepare("INSERT INTO ms_departmen (nama_departmen) VALUES (?)");
+    $stmt->bind_param("s", $tnama);
+    
+    if ($stmt->execute()) {
+        echo '<script type="text/javascript">
+                alert("Data Berhasil Tersimpan");
+                window.location.href="?page=bagian";
+              </script>';
+    } else {
+        echo '<script type="text/javascript">
+                alert("Gagal menyimpan data!");
+              </script>';
     }
 }
 ?>
