@@ -296,7 +296,7 @@ $level_status = (!$role_akses) ? "hidden" : "";
             language: {
                 search: "Cari:",
                 searchPlaceholder: "Cari data...",
-                lengthMenu: "Tampil _MENU_ data",
+                lengthMenu: "Tampilkan _MENU_ data",
                 info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
                 paginate: {
                     previous: "Prev",

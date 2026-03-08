@@ -24,7 +24,7 @@ if (isset($_GET['id'])) {
     A.status_rkk,
     B.OS_DHK,
     B.golongan,
-    J.keterangan as nama_shift, /* Mengambil Nama Shift dari tb_jadwal */
+    J.keterangan as nama_shift,
     A.upah as upahkaryawan, 
     A.potongan_telat, 
     A.potongan_istirahat, 
@@ -32,9 +32,10 @@ if (isset($_GET['id'])) {
 FROM tb_rkk_detail A 
 LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
-LEFT JOIN ms_departmen D ON A.id_departmen = D.id_departmen
-LEFT JOIN ms_sub_department BB ON A.id_sub_department = BB.id_sub_department
-LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal /* Relasi lewat id_jadwal */
+/* Mengambil data dari tabel karyawan (B) bukan tabel detail (A) */
+LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
+LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department 
+LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal 
 WHERE A.id_rkk = '$idrkk'
 ");
 } else {
@@ -66,271 +67,313 @@ if ($datastatusrkk == 3) {
 
 ?>
 <style>
-  /* Container Utama */
-  .custom-card {
-    border-radius: 12px !important;
-    border: none !important;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05) !important;
+  /* Card Styling */
+  .panel-primary {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     overflow: hidden;
-    margin-bottom: 25px;
-    background: #fff;
   }
 
-  /* Header Berwarna Toska */
-  .custom-header {
-    background: linear-gradient(45deg, #5F9EA0, #4d8284) !important;
-    color: white !important;
-    padding: 12px 20px !important;
-    border: none !important;
+  .box-header {
+    padding: 15px 20px !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
   }
 
-  /* Label Styling */
-  .label-text {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: #666;
-    font-weight: bold;
-    margin-bottom: 5px;
-    display: block;
-  }
-
-  /* Input Readonly Styling */
-  .form-control[readonly] {
-    background-color: #f8f9fa !important;
-    border: 1px solid #ddd;
-  }
-
-  /* Tabel Header */
-  #dataTables-example thead th {
-    background-color: #f1f4f4 !important;
+  /* Table Styling */
+  .table thead th {
+    background-color: #f8f9fa;
     color: #333;
-    font-size: 13px;
-    text-align: center;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #dee2e6 !important;
     vertical-align: middle;
-    border-bottom: 2px solid #5F9EA0 !important;
   }
 
-  /* Badge Total di Bawah */
-  .total-box {
-    background-color: #fff9c4 !important;
-    /* Kuning lembut */
-    color: #5d4037 !important;
-    height: 70px !important;
-    font-size: 22px !important;
-    border-radius: 10px !important;
+  .table tbody td {
+    vertical-align: middle !important;
+    font-size: 13px;
   }
 
-  /* Container Utama */
+  .table-hover tbody tr:hover {
+    background-color: rgba(95, 158, 160, 0.1) !important;
+    transition: 0.3s;
+  }
+
+  /* Custom Badges untuk Status */
+  .status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    display: inline-block;
+  }
+
+  .bg-propose {
+    background-color: #FFEBCD;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
+
+  .bg-accept {
+    background-color: #98FB98;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+
+  .bg-reject {
+    background-color: #F0FFFF;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+
+  /* Button Styling */
+  .btn {
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    transition: 0.2s;
+  }
+
+  .btn-info {
+    background-color: #5bc0de;
+    border: none;
+  }
+
+  .btn-info:hover {
+    background-color: #31b0d5;
+    transform: translateY(-1px);
+  }
+
+  .btn-warning {
+    color: #fff !important;
+  }
+
+  /* Utility */
+  .m-b-10 {
+    margin-bottom: 10px;
+  }
+
+  .p-20 {
+    padding: 20px;
+  }
+
+  /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
   .dataTables_wrapper {
-    width: 100%;
-    margin-top: 10px;
+    display: block !important;
   }
 
-  /* Memperbaiki baris bawah (Info & Paginate) */
-  .dataTables_wrapper .row:last-child {
+  /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
+  .dataTables_wrapper::before,
+  .dataTables_wrapper::after {
+    display: none !important;
+    /* Hapus clearfix bawaan yang mengganggu */
+  }
+
+  /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
+  #dataTables-example_wrapper .row:first-child {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    padding: 10px 0;
+    margin-bottom: 20px !important;
+    width: 100% !important;
   }
 
-  /* Info: Menampilkan halaman x dari y */
-  .dataTables_wrapper .dataTables_info {
-    padding-top: 0 !important;
-    font-size: 13px;
-    color: #666;
+  /* 4. Styling Tampil _MENU_ (Kiri) */
+  .dataTables_length {
+    display: flex !important;
+    align-items: center !important;
   }
 
-  /* Paginate Wrapper: Paksa ke Kanan */
+  .dataTables_length label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  .dataTables_length select {
+    padding: 5px 10px !important;
+    border: 1px solid #e0e6ed !important;
+    border-radius: 8px !important;
+  }
+
+  /* 5. Styling Cari: (Kanan) */
+  .dataTables_filter {
+    text-align: right !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+  }
+
+  .dataTables_filter label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  .dataTables_filter input {
+    padding: 6px 12px !important;
+    border: 1px solid #e0e6ed !important;
+    border-radius: 8px !important;
+    width: 200px !important;
+  }
+
+  /* --- STYLING PAGINATE (PREV/NEXT) --- */
   .dataTables_wrapper .dataTables_paginate {
     display: flex !important;
     justify-content: flex-end !important;
-    margin: 0 !important;
-    padding: 0 !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding-top: 15px !important;
   }
 
-  /* Styling Tombol Paginate (Kotak) */
-  .dataTables_wrapper .dataTables_paginate .paginate_button {
+  .dataTables_paginate .paginate_button {
+    border: 1px solid #e2e8f0 !important;
+    background: white !important;
+    border-radius: 6px !important;
     padding: 5px 12px !important;
-    margin: 0 2px !important;
-    border: 1px solid #ddd !important;
-    border-radius: 4px !important;
-    background: #fff !important;
-    color: #337ab7 !important;
+    color: #475569 !important;
+    font-weight: 500 !important;
     cursor: pointer !important;
-    text-decoration: none !important;
-    display: inline-block !important;
-    min-width: 35px;
-    text-align: center;
+    transition: all 0.2s !important;
   }
 
-  /* Tombol Aktif (Halaman Sekarang) */
-  .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background-color: #5F9EA0 !important;
+  .dataTables_paginate .paginate_button:hover {
+    background: #f8fafc !important;
+    color: #2563eb !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  h3 {
+    color: #2563eb !important;
+  }
+
+  .dataTables_paginate .paginate_button.current {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
     color: white !important;
-    border-color: #5F9EA0 !important;
-    font-weight: bold;
   }
 
-  /* Efek Hover */
-  .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background-color: #eee !important;
-    border-color: #ccc !important;
-    color: #23527c !important;
-  }
-
-  /* Sembunyikan garis/border default DataTables jika ada */
-  .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+  .dataTables_paginate .paginate_button.disabled {
+    background: #f1f5f9 !important;
+    color: #94a3b8 !important;
     cursor: not-allowed !important;
-    color: #ccc !important;
-    background: #fafafa !important;
   }
 
-  .btn-outline-secondary:hover {
-    background-color: #5F9EA0 !important;
-    color: #fff !important;
-    transform: translateX(-3px);
-    /* Efek geser sedikit ke kiri */
+  /* --- STYLING INFO --- */
+  .dataTables_wrapper .dataTables_info {
+    padding-top: 20px !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+  }
+
+  @media screen and (max-width: 768px) {
+    .table-responsive {
+      padding: 12px !important;
+    }
+
+    .table-modern thead {
+      display: none !important;
+    }
+
+    .table-modern tbody tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .table-modern tbody td {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 10px !important;
+      border: none !important;
+      border-bottom: 1px solid #f3f4f6 !important;
+    }
+
+    .table-modern tbody td:before {
+      content: attr(data-label);
+      font-weight: 700;
+      color: #4b5563;
+      text-transform: uppercase;
+      font-size: 11px;
+      min-width: 120px;
+      margin-right: 15px;
+    }
+
+    h3 {
+      color: #2563eb !important;
+    }
   }
 </style>
 
-<div class="row">
-  <div class="col-md-12">
-    <div class="panel custom-card">
-      <div class="panel-heading custom-header">
-        <h3 class="panel-title"><i class="fa fa-info-circle"></i> Detail Rencana Upah</h3>
-      </div>
-
-      <div class="panel-body" style="padding: 20px;">
-        <div class="row">
-          <div class="form-group col-md-3">
-            <label class="label-text">Tanggal Pelaksanaan</label>
-            <input type="date" value="<?php echo $datatglrkk; ?>" readonly class="form-control" />
-          </div>
-          <div class="form-group col-md-4">
-            <label class="label-text">Keterangan Rencana Kerja</label>
-            <input type="text" value="<?php echo $dataketerangan; ?>" readonly class="form-control" />
-          </div>
-          <div class="form-group col-md-2">
-            <label class="label-text">Standar Jam Kerja</label>
-            <div class="input-group align-items-center">
-              <input type="text" value="<?php echo $datajamkerja; ?>" readonly class="form-control" />
-              <span class="input-group-addon">Jam</span>
-            </div>
-          </div>
-        </div>
+<div class="container-fluid px-2 mt-4 mb-4">
+  <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
+    <div class="border-b border-gray-100 py-4 px-5 bg-white flex justify-between items-center">
+      <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Detail Rencana Upah</h3>
+      <div>
+        <a href="?page=rkk&aksi=karyawan" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+          <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
+        </a>
       </div>
     </div>
 
-    <div class="panel custom-card">
-      <div class="panel-heading" style="background: #fcfcfc; border-bottom: 1px solid #eee;">
-        <div class="row">
-          <div class="col-md-6">
-            <h3 style="font-size: 16px; font-weight: bold; color: #5F9EA0;" class="mt-3 ms-2">
-              <i class="fa fa-users"></i> List Karyawan Terdaftar
-            </h3>
-          </div>
-          <div class="col-md-6 text-right">
-            <div <?php echo $status; ?> style="display: inline-block;">
-              <a href="?page=rkk&aksi=karyawan&id=<?php echo $idrkk; ?>" class="btn btn-info btn-sm">
-                <i class="fa fa-plus"></i> Tambah Karyawan
-              </a>
-            </div>
-            <a href="?page=rkk" class="btn btn-outline-secondary font-weight-bold mt-2"
-              style="border-radius: 8px; padding: 10px 20px; border: 2px solid #5F9EA0; transition: 0.3s; color:#5F9EA0">
-              <i class="fa fa-arrow-left"></i> &nbsp; Kembali
-            </a>
-          </div>
-        </div>
+    <div class="p-5">
+      <div class="row">
+        <div class="col-md-3"><label>Tanggal:</label><input type="date" value="<?= $datatglrkk; ?>" readonly class="form-control" /></div>
+        <div class="col-md-4"><label>Keterangan:</label><input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control" /></div>
+        <div class="col-md-2"><label>Jam Kerja:</label><input type="text" value="<?= $datajamkerja; ?> Jam" readonly class="form-control" /></div>
       </div>
+    </div>
 
-      <div class="panel-body">
-        <div class="table-responsive">
-          <table class="table table-hover table-bordered" id="dataTables-example">
-            <thead>
+    <div class="p-0">
+      <div class="table-responsive px-3 py-3">
+        <table class="w-full text-left border-collapse" id="dataTables-example">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">No</th>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Karyawan</th>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Penempatan</th>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Shift</th>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Jam</th>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Upah</th>
+              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Potongan</th>
+              <th class="text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $no = 1;
+            while ($data = $tampil->fetch_assoc()) : ?>
               <tr>
-                <th>No</th>
-                <th>Biodata Karyawan</th>
-                <th>Penempatan</th>
-                <th>OS/DHK</th>
-                <th>Gol</th>
-                <th>Shift</th>
-                <th>Jam Masuk/Pulang</th>
-                <th>Istirahat Keluar/Masuk</th>
-                <th>Upah (Rp)</th>
-                <th>Potongan</th>
-                <th <?php echo $status; ?>>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              <?php
-              $no = 1;
-              $total = 0;
-              while ($data = $tampil->fetch_assoc()) {
-              ?>
-                <tr>
-                  <td class="text-center"><?php echo $no ?></td>
-                  <td>
-                    <b><?php echo $data['nama_karyawan'] ?></b><br>
-                    <small class="text-muted">NIK: <?php echo $data['no_absen'] ?></small>
-                  </td>
-                  <td>
-                    <?php echo $data['nama_departmen'] ?><br>
-                    <small><?php echo $data['nama_sub_department'] ?></small>
-                  </td>
-                  <td class="text-center"><?php echo $data['OS_DHK'] ?></td>
-                  <td class="text-center"><?php echo $data['golongan'] ?></td>
-                  <td class="text-center">
-                    <span class="label label-primary">
-                      <?php echo ($data['nama_shift'] != "") ? $data['nama_shift'] : "Shift Tidak Set"; ?>
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    <span class="label label-success"><?php echo $data['jam_masuk'] ?></span> -
-                    <span class="label label-danger"><?php echo $data['jam_keluar'] ?></span>
-                  </td>
-                  <td class="text-center">
-                    <span class="label label-success"><?php echo $data['istirahat_keluar'] ?></span> -
-                    <span class="label label-danger"><?php echo $data['istirahat_masuk'] ?></span>
-                  </td>
-                  <td class="text-right">
-                    <?php
-                    echo number_format($data['upahkaryawan'], 0, ',', '.');
-                    $total += $data['upahkaryawan'];
-                    ?>
-                  </td>
-                  <td>
-                    <small>Telat: <?php echo number_format($data['potongan_telat'], 0, ',', '.') ?></small><br>
-                    <small>Istirahat: <?php echo number_format($data['potongan_istirahat'], 0, ',', '.') ?></small><br>
-                    <small>Lain: <?php echo number_format($data['potongan_lainnya'], 0, ',', '.') ?></small>
-                  </td>
-                  <td <?php echo $status; ?> class="text-center">
-                    <a href="?page=rkk&aksi=detail&id=<?php echo $data['id_rkk_detail']; ?>" class="btn btn-warning btn-xs" title="Detail">
-                      <i class="fa fa-search"></i>
-                    </a>
-                    <a href="?page=rkk&aksi=hapusdetail&id=<?php echo $idrkk; ?>&iddetail=<?php echo $data['id_rkk_detail']; ?>"
-                      class="btn btn-danger btn-xs" onclick="return confirm('Hapus data ini?');">
-                      <i class="fa fa-trash"></i>
-                    </a>
-                  </td>
-                </tr>
-              <?php $no++;
-              } ?>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+                <td><?= $no++ ?></td>
+                <td><b><?= $data['nama_karyawan'] ?></b><br><small><?= $data['no_absen'] ?></small></td>
+                <td><?= $data['nama_departmen'] ?><br><small><?= $data['nama_sub_department'] ?></small></td>
+                <td><span class="badge"><?= $data['nama_shift'] ?></span></td>
+                <td><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></td>
+                <td>Rp <?= number_format($data['upahkaryawan'], 0, ',', '.') ?></td>
+                <td class="text-[12px] leading-tight">
+                  <div class="text-amber-700">Telat: <?= number_format($data['potongan_telat'], 0, ',', '.') ?></div>
+                  <div class="text-amber-700">Istirahat: <?= number_format($data['potongan_istirahat'], 0, ',', '.') ?></div>
+                  <div class="text-amber-700">Lain: <?= number_format($data['potongan_lainnya'], 0, ',', '.') ?></div>
+                </td>
+                <td class="text-center">
+                  <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
+                    class="btn btn-info btn-xs"><i class="fas fa-eye"></i> Detail</a>
 
-    <div class="row">
-      <div class="col-md-6 col-md-offset-6">
-        <div class="panel custom-card" style="border-left: 5px solid #5F9EA0 !important;">
-          <div class="panel-body text-center">
-            <label class="label-text">Total Estimasi Pengeluaran Upah</label>
-            <input readonly class="form-control total-box font-weight-bold"
-              value="<?php echo "Rp. " . number_format($total, 0, ',', '.') . " / " . ($no - 1) . " Org"; ?>" />
-          </div>
-        </div>
+                  <a href="?page=rkk&aksi=hapusdetail&id=<?= $idrkk; ?>&iddetail=<?= $data['id_rkk_detail']; ?>"
+                    class="btn btn-danger btn-xs" onclick="return confirm('Hapus?');">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -339,22 +382,25 @@ if ($datastatusrkk == 3) {
 <script>
   $(document).ready(function() {
     $('#dataTables-example').DataTable({
-      "pageLength": 10, // Ubah ke 10 agar pagination terlihat bekerja
-      "searching": true,
-      "ordering": true,
-      "dom": '<"row"<"col-sm-6"l><"col-sm-6"f>>rt<"row"<"col-sm-6"i><"col-sm-6 text-right"p>>',
-      "language": {
-        "search": "Cari Data:",
-        "lengthMenu": "Tampilkan _MENU_ data per halaman",
-        "zeroRecords": "Data tidak ditemukan",
-        "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-        "infoEmpty": "Tidak ada data tersedia",
-        "infoFiltered": "(disaring dari _MAX_ total data)",
-        "paginate": {
-          "next": ">",
-          "previous": "<"
+      pageLength: 25,
+      autoWidth: false,
+      responsive: false,
+      lengthMenu: [
+        [10, 25, 50, -1],
+        [10, 25, 50, "Semua"]
+      ],
+      language: {
+        search: "Cari:",
+        searchPlaceholder: "Cari data...",
+        lengthMenu: "Tampilkan _MENU_ data",
+        info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+        paginate: {
+          previous: "Prev",
+          next: "Next"
         }
       }
     });
+    $('.dataTables_filter').css('float', 'right').addClass('mb-3');
+    $('.dataTables_length').css('float', 'left').addClass('mb-3');
   });
 </script>

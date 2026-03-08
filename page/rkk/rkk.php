@@ -4,8 +4,7 @@
 $is_authorized = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin master");
 
 // 2.hak Propose/Un-Propose (HRD & Admin Master)
-$can_propose = ($_SESSION['role'] == "admin" || $_SESSION['role'] == "admin master");
-
+$can_propose = ($_SESSION['role'] == "admin" || $_SESSION['role'] == "kepala gudang");
 $tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
 if ($_SESSION['role'] != "owner") {
     $level_status =  "Hidden";
@@ -113,70 +112,154 @@ if ($_SESSION['role'] == "owner") {
         padding: 20px;
     }
 
-    /* Container Utama */
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
-        width: 100%;
-        margin-top: 10px;
+        display: block !important;
     }
 
-    /* Memperbaiki baris bawah (Info & Paginate) */
-    .dataTables_wrapper .row:last-child {
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
+    .dataTables_wrapper::before,
+    .dataTables_wrapper::after {
+        display: none !important;
+        /* Hapus clearfix bawaan yang mengganggu */
+    }
+
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
+    #dataTables-example_wrapper .row:first-child {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 10px 0;
+        margin-bottom: 20px !important;
+        width: 100% !important;
     }
 
-    /* Info: Menampilkan halaman x dari y */
-    .dataTables_wrapper .dataTables_info {
-        padding-top: 0 !important;
-        font-size: 13px;
-        color: #666;
+    /* 4. Styling Tampil _MENU_ (Kiri) */
+    .dataTables_length {
+        display: flex !important;
+        align-items: center !important;
     }
 
-    /* Paginate Wrapper: Paksa ke Kanan */
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+
+    /* 5. Styling Cari: (Kanan) */
+    .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_filter input {
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
+    }
+
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
     .dataTables_wrapper .dataTables_paginate {
         display: flex !important;
         justify-content: flex-end !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding-top: 15px !important;
     }
 
-    /* Styling Tombol Paginate (Kotak) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
+    .dataTables_paginate .paginate_button {
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        border-radius: 6px !important;
         padding: 5px 12px !important;
-        margin: 0 2px !important;
-        border: 1px solid #ddd !important;
-        border-radius: 4px !important;
-        background: #fff !important;
-        color: #337ab7 !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
         cursor: pointer !important;
-        text-decoration: none !important;
-        display: inline-block !important;
-        min-width: 35px;
-        text-align: center;
+        transition: all 0.2s !important;
     }
 
-    /* Tombol Aktif (Halaman Sekarang) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #5F9EA0 !important;
+    .dataTables_paginate .paginate_button:hover {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    h3 {
+        color: #2563eb !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
         color: white !important;
-        border-color: #5F9EA0 !important;
-        font-weight: bold;
     }
 
-    /* Efek Hover */
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #eee !important;
-        border-color: #ccc !important;
-        color: #23527c !important;
-    }
-
-    /* Sembunyikan garis/border default DataTables jika ada */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    .dataTables_paginate .paginate_button.disabled {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
         cursor: not-allowed !important;
-        color: #ccc !important;
-        background: #fafafa !important;
+    }
+
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
+    @media screen and (max-width: 768px) {
+        .table-responsive {
+            padding: 12px !important;
+        }
+
+        .table-modern thead {
+            display: none !important;
+        }
+
+        .table-modern tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .table-modern tbody td {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px 10px !important;
+            border: none !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+        }
+
+        .table-modern tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 11px;
+            min-width: 120px;
+            margin-right: 15px;
+        }
+
+        h3 {
+            color: #2563eb !important;
+        }
     }
 </style>
 
@@ -212,7 +295,6 @@ if ($_SESSION['role'] == "owner") {
                         <?php
                         $no = 1;
                         while ($data = $tampil->fetch_assoc()) :
-                            // Logika Status (Gunakan CSS kelas untuk warna)
                             $status_color = ($data['status_rkk'] == "3") ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800";
                         ?>
                             <tr class="hover:bg-gray-50 transition-colors">
@@ -224,7 +306,10 @@ if ($_SESSION['role'] == "owner") {
                                 <td class="py-2.5 px-2 text-[14px] text-gray-600"><?= $data['keterangan'] ?></td>
                                 <td class="py-2.5 px-2 align-middle text-center">
                                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
-
+                                        <a href="?page=rkk&aksi=kelola&id=<?= $data['id_rkk']; ?>"
+                                            class="px-2 py-1 text-[12px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200">
+                                            <i class="fas fa-eye"></i> Detail
+                                        </a>
                                         <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
                                                 class="px-2 py-1 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200"
@@ -263,23 +348,26 @@ if ($_SESSION['role'] == "owner") {
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-            "pageLength": 10,
-            "searching": true,
-            "ordering": true,
-            "dom": '<"row"<"col-sm-6"l><"col-sm-6 text-right pull-right"f>>rt<"row"<"col-sm-6"i><"col-sm-6 text-right"p>>',
-            "language": {
-                "search": "Cari Data:",
-                "lengthMenu": "Tampilkan _MENU_ data per halaman",
-                "zeroRecords": "Data tidak ditemukan",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-                "infoEmpty": "Tidak ada data tersedia",
-                "infoFiltered": "(disaring dari _MAX_ total data)",
-                "paginate": {
-                    "next": ">",
-                    "previous": "<"
+            pageLength: 25,
+            autoWidth: false,
+            responsive: false,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            language: {
+                search: "Cari:",
+                searchPlaceholder: "Cari data...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Prev",
+                    next: "Next"
                 }
             }
         });
+        $('.dataTables_filter').css('float', 'right').addClass('mb-3');
+        $('.dataTables_length').css('float', 'left').addClass('mb-3');
     });
 </script>
 
@@ -291,6 +379,7 @@ $ttgl2 = @$_POST['ttgl2'];
 $simpan = @$_POST['simpan'];
 $print = @$_POST['print'];
 $excel = @$_POST['excel'];
+
 if ($simpan) {
 ?><script type="text/javascript">
         window.location.href = "?page=cuti&ttgl1=<?php echo $ttgl1; ?>&ttgl2=<?php echo $ttgl2; ?>";
@@ -309,7 +398,4 @@ if ($excel) {
     </script>
 <?php
 }
-
-
-
 ?>
