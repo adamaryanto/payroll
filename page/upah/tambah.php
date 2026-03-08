@@ -4,7 +4,7 @@ if (isset($_POST['simpan'])) {
     $tmingguan = $_POST['tmingguan'] ?? 0;
     $tbulanan = $_POST['tbulanan'] ?? 0;
 
-    $sql = $koneksi->query("INSERT INTO ms_upah (id_golongan, upah_harian, upah_mingguan, upah_bulanan) VALUES ('0', '$tharian', '$tmingguan', '$tbulanan')");
+    $sql = $koneksi->query("INSERT INTO ms_upah (upah_harian, upah_mingguan, upah_bulanan) VALUES ('$tharian', '$tmingguan', '$tbulanan')");
     if ($sql) {
         echo '<script>alert("Data Tersimpan"); window.location.href="?page=upah";</script>';
         exit;
