@@ -1,198 +1,154 @@
 <?php
-
 if(isset($_GET['id'])){
    $idrkkdetail = $_GET['id'];
-
-  $tampildetail=$koneksi->query("select * from tb_rkk_detail where id_rkk_detail = '$idrkkdetail' ");
-$datadetail=$tampildetail->fetch_assoc();
-$idrkk = $datadetail['id_rkk'];
-$idrkkkaryawan = $datadetail['id_karyawan'];
-
- }else{$idrkkdetail = "";$idrkk = "";$idrkkkaryawan="";}
-
-   ?>
-
-<div class="row">
-                <div class="col-md-12">
-                    <!-- Advanced Tables -->
-                    <div class="panel panel-primary"  >
-                    <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
-              <h3 class="box-title">Kelola Data Karyawan Update </h3>
-            </div>
-             <form method="POST"  enctype="multipart/form-data">
-                        <div class="panel-body">
-                           
-                      
-              
-            <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                  
-                </div>
-<input type="submit" name="simpan"  value="Simpan" class="btn btn-primary">
-                
-                                    </form>
-                                    <div class="form-group "></div>
-
-                            <div class="table-responsive">
-                                
-                                <table class="table table-bordered table-striped" id="dataTables-example">
-                                    <thead >
-                                        <tr>
-                                          <th width="5%">Pilih</th>
-                                           <th hidden="hidden" >ID Karyawan</th>
-                                            <th >No. Absen</th>
-                                           <th >Nama </th>
-                                           <th >Bagian</th>
-
-                                        
-                                        <th >Jenis Kelamin</th> 
-                                          
-                                         
-                                           <th >Tanggal Aktif </th>
-                                             <th >Status</th>
-                                              <th >Status</th>
-                                           
-                         
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                                                <?php
-
-
-$no = 0;
-
-
-$tampil = $koneksi->query("SELECT ms_karyawan.* , ms_departmen.nama_departmen FROM ms_karyawan LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen 
-where ms_karyawan.status_karyawan = 'Aktif' ");
-    while ($datakaryawan=$tampil->fetch_assoc())
-    {
-
-        $id = $datakaryawan['id_karyawan'] ;
-
-
-
-  $tampildetail2=$koneksi->query("select * from tb_rkk_detail where id_rkk = '$idrkk' and id_karyawan = '$id' ");
-$datadetail2=$tampildetail2->fetch_assoc();
-$datahasil2 = $datadetail2['status_rkk'];
-
-?>
-
-
-                                        <tr>
-
-<td><input type="radio"
-<?php
-if($datahasil2 == "Hadir"){echo "hidden";}elseif($datahasil2 == "Digantikan"){echo "hidden";}elseif($datahasil2 == "Pengganti"){echo "hidden";}
-?>
-
-  name="ck[]" value="<?php echo $no ; ?>" /></td>
-
-<td hidden="hidden"><input type="text" name="tidkaryawan[]" value="<?php echo $datakaryawan['id_karyawan'] ; ?>"/></td>
-<td><?php echo $datakaryawan['no_absen'] ?></td>
-
-<td><?php echo $datakaryawan['nama_karyawan'] ?></td>
-<td><?php echo $datakaryawan['nama_departmen'] ?></td>
-
-<td><?php echo $datakaryawan['jenis_kelamin'] ?></td>
-
-<td><?php echo $datakaryawan['tgl_aktif'] ?></td>
-
-<td><?php echo $datahasil2 ?></td>
-<td><?php echo $datahasil2 ?></td>
-
-<!--
-<td>
-    
-<a  href="?page=order&id=<?php echo $data['id_transaksi'];?>"  class="btn btn-success"> Update</a>
-
-
-</td>
--->
-                                      
-                                            
-                                        </tr>
-
-                                       <?php  $no++; } ?>
-
-                                    </tbody>   
-                                    </table>
-                            </div>
-
-                       
-
-                    </div>
-                </div>
-        </div>
-    </div>
-  
-    <script>
- $(document).ready( function () {
-$('#dataTables-example').DataTable({
-    scrollY: true,
-    
-    scrollY: 400,
-    pageLength: 1000,
-    "searching": true
+   $tampildetail=$koneksi->query("select * from tb_rkk_detail where id_rkk_detail = '$idrkkdetail' ");
+   $datadetail=$tampildetail->fetch_assoc();
+   $idrkk = $datadetail['id_rkk'];
+   $idrkkkaryawan = $datadetail['id_karyawan'];
+   $orig_upah = $datadetail['upah'];
+   $orig_jadwal = $datadetail['id_jadwal'];
+   $orig_shift = $datadetail['shift'];
+   $orig_jam_masuk = $datadetail['jam_masuk'];
+   $orig_jam_keluar = $datadetail['jam_keluar'];
+   $orig_ist_masuk = $datadetail['istirahat_masuk'];
+   $orig_ist_keluar = $datadetail['istirahat_keluar'];
+} else {
+    $idrkkdetail = ""; $idrkk = ""; $idrkkkaryawan="";
 }
-);
+?>
 
-} );
-   
+<div class="container-fluid px-2 mt-4 mb-4">
+    <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
+        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+            <div>
+                <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-sync-alt mr-2"></i>Pilih Karyawan Pengganti</h3>
+                <small class="text-gray-500">Menggantikan karyawan pada RKK ID: <?= $idrkk; ?></small>
+            </div>
+            <div>
+                <a href="?page=rkk&aksi=kelola&id=<?= $idrkk; ?>" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded transition-colors">
+                    Kembali
+                </a>
+            </div>
+        </div>
 
+        <form method="POST">
+            <div class="p-0">
+                <div class="table-responsive px-4 py-4">
+                    <table class="w-full text-left border-collapse" id="dataTables-example">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Pilih</th>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">NIK</th>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Nama Karyawan</th>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Departemen</th>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Bagian</th>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Status Saat Ini</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php
+                            $no = 0;
+                            $tampil = $koneksi->query("SELECT ms_karyawan.*, ms_departmen.nama_departmen, ms_sub_department.nama_sub_department 
+                                FROM ms_karyawan 
+                                LEFT JOIN ms_departmen ON ms_karyawan.id_departmen = ms_departmen.id_departmen 
+                                LEFT JOIN ms_sub_department ON ms_karyawan.id_sub_department = ms_sub_department.id_sub_department
+                                WHERE ms_karyawan.status_karyawan = 'Aktif' 
+                                ORDER BY ms_karyawan.nama_karyawan ASC");
+                            
+                            while ($datakaryawan = $tampil->fetch_assoc()) {
+                                $id_k = $datakaryawan['id_karyawan'];
+                                // Cek apakah sudah ada di RKK ini
+                                $cek_rkk = $koneksi->query("SELECT status_rkk FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$id_k' LIMIT 1");
+                                $rkk_status = $cek_rkk->num_rows > 0 ? $cek_rkk->fetch_assoc()['status_rkk'] : 'Tersedia';
+                                
+                                $is_disabled = ($rkk_status != 'Tersedia');
+                            ?>
+                                <tr class="<?= $is_disabled ? 'bg-gray-50 opacity-60' : 'hover:bg-gray-50' ?> transition-colors text-[14px]">
+                                    <td class="py-2 px-2 text-center">
+                                        <?php if(!$is_disabled): ?>
+                                            <input type="radio" name="ck" value="<?= $no; ?>" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
+                                            <input type="hidden" name="tidkaryawan[]" value="<?= $id_k; ?>">
+                                            <input type="hidden" name="tdept[]" value="<?= $datakaryawan['id_departmen']; ?>">
+                                            <input type="hidden" name="tsub[]" value="<?= $datakaryawan['id_sub_department']; ?>">
+                                        <?php else: ?>
+                                            <i class="fas fa-lock text-gray-400"></i>
+                                            <input type="hidden" name="tidkaryawan[]" value="<?= $id_k; ?>">
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="py-2 px-2"><?= $datakaryawan['no_absen'] ?></td>
+                                    <td class="py-2 px-2 font-medium text-gray-900"><?= $datakaryawan['nama_karyawan'] ?></td>
+                                    <td class="py-2 px-2"><?= $datakaryawan['nama_departmen'] ?></td>
+                                    <td class="py-2 px-2"><?= $datakaryawan['nama_sub_department'] ?></td>
+                                    <td class="py-2 px-2">
+                                        <?php if($rkk_status == 'Tersedia'): ?>
+                                            <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full">Tersedia</span>
+                                        <?php else: ?>
+                                            <span class="bg-gray-200 text-gray-600 text-[11px] font-bold px-2 py-0.5 rounded-full"><?= $rkk_status ?></span>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php $no++; } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
+            <div class="px-5 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                <input type="submit" name="simpan" value="Konfirmasi Penggantian" class="inline-flex items-center px-6 py-2 border border-transparent text-sm font-bold rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#dataTables-example').DataTable({
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+            language: {
+                search: "Cari Karyawan:",
+                lengthMenu: "Tampilkan _MENU_",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: { previous: "Prev", next: "Next" }
+            }
+        });
+    });
 </script>
 
 <?php
-  
-$simpan = @$_POST ['simpan'];
-if($simpan) {
+if(isset($_POST['simpan'])) {
+    if(isset($_POST['ck'])){
+        $cek = $_POST['ck'];
+        $tidkaryawan = $_POST['tidkaryawan'];
+        $tdept = $_POST['tdept'];
+        $tsub = $_POST['tsub'];
+        
+        $idkaryawan_pengganti = $tidkaryawan[$cek];
+        $iddept_pengganti = $tdept[$cek];
+        $idsub_pengganti = $tsub[$cek];
 
+        // 1. Masukkan karyawan pengganti ke tb_rkk_detail (copy upah/shift dari yang diganti)
+        $q_insert = "INSERT INTO tb_rkk_detail 
+            (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, shift, status_rkk, 
+             jam_masuk, jam_keluar, istirahat_masuk, istirahat_keluar, tgl_updt) 
+            VALUES 
+            ('$idrkk', '$idkaryawan_pengganti', '$orig_upah', '$iddept_pengganti', '$idsub_pengganti', '$orig_jadwal', '$orig_shift', 'Pengganti', 
+             '$orig_jam_masuk', '$orig_jam_keluar', '$orig_ist_masuk', '$orig_ist_keluar', NOW())";
+        
+        if($koneksi->query($q_insert)) {
+            // 2. Update status karyawan lama
+            $koneksi->query("UPDATE tb_rkk_detail SET status_rkk = 'Digantikan' WHERE id_rkk_detail = '$idrkkdetail'");
 
-$tidkaryawan =$_POST['tidkaryawan'];
-$tupah = $_POST['tupah'];
+            // 3. Catat di tabel histori update
+            $koneksi->query("INSERT INTO tb_rkk_update (id_rkk_detail, id_karyawan, status) VALUES ('$idrkkdetail', '$idkaryawan_pengganti', 'Pengganti')");
+            $koneksi->query("INSERT INTO tb_rkk_update (id_rkk_detail, id_karyawan, status) VALUES ('$idrkkdetail', '$idrkkkaryawan', 'Digantikan')");
 
-
-if(!empty($_POST['ck'])){
-foreach ($_POST['ck'] as $cek) {
- 
-
-$idkaryawan = $tidkaryawan[$cek];
-$upah = $tupah[$cek];
-
-
-
-
-  $koneksi->query("insert into tb_rkk_detail (id_rkk,id_karyawan,upah,status_rkk) values('$idrkk','$idkaryawan','$upah','Pengganti') ");
-  $koneksi->query("update tb_rkk_detail set status_rkk = 'Digantikan' where id_rkk_detail = '$idrkkdetail' ");
-
-    $koneksi->query("insert into tb_rkk_update (id_rkk_detail,id_karyawan,status) values('$idrkkdetail','$idkaryawan','Pengganti') ");
-    $koneksi->query("insert into tb_rkk_update (id_rkk_detail,id_karyawan,status) values('$idrkkdetail','$idrkkkaryawan','Digantikan') ");
-
-   
+            echo "<script>alert('Berhasil mengganti karyawan.'); window.location.href='?page=rkk&aksi=kelola&id=$idrkk';</script>";
+        } else {
+            echo "<script>alert('Gagal menyimpan: " . $koneksi->error . "');</script>";
+        }
+    } else {
+        echo "<script>alert('Pilih satu karyawan pengganti!');</script>";
+    }
 }
- ?>
-                <script type="text/javascript">
-                alert("Data Tersimpan");
-                window.location.href="?page=rkk";
-
-            </script>
-            <?php
-
-
- 
-}else{
- ?>
-                <script type="text/javascript">
-                alert("Tidak Ada Data Yang Dipilih");
-
-            </script>
-            <?php
-
-}
-
- 
-
-
-}//simpan if
-
-
 ?>

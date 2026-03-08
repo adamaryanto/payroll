@@ -147,6 +147,8 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <li class="nav-item"><a href="?page=bagian" class="nav-link"><i class="far fa-building nav-icon"></i><p>Bagian</p></a></li>
                   <li class="nav-item"><a href="?page=user" class="nav-link"><i class="fas fa-user-shield nav-icon"></i><p>User</p></a></li>
                   <li class="nav-item"><a href="?page=upah" class="nav-link"><i class="fas fa-money-bill-wave nav-icon"></i><p>Master Upah</p></a></li>
+                  <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="far fa-clock nav-icon"></i><p>Jadwal</p></a></li>
+                  <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><p>Denda</p></a></li>
                 </ul>
               </li>
               <?php } ?>
@@ -174,13 +176,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
 
               <?php if ($role != 'owner') { ?>
               <li class="nav-item">
-                <a href="?page=jadwal" class="nav-link"><i class="nav-icon far fa-clock"></i><p>Jadwal</p></a>
-              </li>
-              <li class="nav-item">
                 <a href="?page=generate&aksi=tarik" class="nav-link"><i class="nav-icon fas fa-download"></i><p>Tarik Data</p></a>
-              </li>
-              <li class="nav-item">
-                <a href="?page=denda" class="nav-link"><i class="nav-icon fas fa-exclamation-triangle"></i><p>Denda</p></a>
               </li>
 
               <li class="nav-item has-treeview">
@@ -306,7 +302,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "tambah") { include "page/rkk/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/rkk/ubah.php"; } 
                     elseif ($aksi == "karyawan") { include "page/rkk/karyawan.php"; } 
-                    elseif ($aksi == "update") { include "page/rkk/karyawanupdate.php"; } 
+                    elseif ($aksi == "update" || $aksi == "karyawanupdate") { include "page/rkk/karyawanupdate.php"; } 
                     elseif ($aksi == "history") { include "page/rkk/history.php"; } 
                     elseif ($aksi == "payroll") { include "page/rkk/payroll.php"; } 
                     elseif ($aksi == "payrollrkk") { include "page/rkk/payrollrkk.php"; } 

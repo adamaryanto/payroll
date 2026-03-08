@@ -13,34 +13,40 @@ if (isset($_GET['id'])) {
     $idrkk               = $datadetail['id_rkk'];
 
     $tampil = $koneksi->query("SELECT 
-        A.id_realisasi_detail, 
+        A.*, 
+        A.r_upah as upahkaryawan, 
         B.no_absen, 
         BB.nama_sub_department, 
         B.nama_karyawan, 
         D.nama_departmen, 
         C.tgl_realisasi, 
-        A.r_jam_masuk, 
-        A.r_jam_keluar, 
-        A.r_istirahat_keluar,
-        A.r_istirahat_masuk, 
-        A.ra_masuk, 
-        A.ra_keluar, 
-        A.ra_istirahat_keluar,
-        A.ra_istirahat_masuk, 
         B.OS_DHK,
         B.golongan,
-        A.r_upah as upahkaryawan, 
-        A.r_potongan_telat, 
-        A.r_potongan_istirahat, 
-        A.r_potongan_lainnya, 
-        A.hasil_kerja,
-        A.lembur,
-        A.status_realisasi_detail
+        RD.status_rkk,
+        (SELECT K3.nama_karyawan 
+         FROM tb_rkk_update U1 
+         JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
+         JOIN ms_karyawan K3 ON U2.id_karyawan = K3.id_karyawan 
+         JOIN tb_rkk_detail RD2 ON U1.id_rkk_detail = RD2.id_rkk_detail
+         WHERE U1.id_karyawan = A.id_karyawan 
+         AND U1.status = 'Pengganti' 
+         AND U2.status = 'Digantikan' 
+         AND RD2.id_rkk = A.id_rkk
+         LIMIT 1) as menggantikan,
+        (SELECT K4.nama_karyawan 
+         FROM tb_rkk_update U3 
+         JOIN tb_rkk_update U4 ON U3.id_rkk_detail = U4.id_rkk_detail 
+         JOIN ms_karyawan K4 ON U4.id_karyawan = K4.id_karyawan 
+         WHERE U3.id_rkk_detail = A.id_rkk_detail 
+         AND U3.status = 'Digantikan' 
+         AND U4.status = 'Pengganti' 
+         LIMIT 1) as digantikan_oleh
         FROM tb_realisasi_detail A 
         LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
         LEFT JOIN tb_realisasi C ON A.id_realisasi = C.id_realisasi
         LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
         LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department
+        LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
         WHERE A.id_realisasi = '$idrealisasi'
     ");
 
@@ -419,7 +425,31 @@ if ($datastatusrealisasi == 'approve') {
                                         <tr>
                                             <td data-label="No"><?php echo $no; ?></td>
                                             <td data-label="NIK"><?php echo $data['no_absen']; ?></td>
-                                            <td data-label="Nama Karyawan"><?php echo $data['nama_karyawan']; ?></td>
+                                            <td data-label="Nama Karyawan">
+                                                <strong><?php echo $data['nama_karyawan']; ?></strong>
+                                                <?php if (!empty($data['menggantikan'])) : ?>
+                                                    <div class="text-xs text-blue-600 font-bold italic">
+                                                        <i class="fas fa-exchange-alt mr-1"></i> (Menggantikan <?php echo $data['menggantikan']; ?>)
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if (!empty($data['digantikan_oleh'])) : ?>
+                                                    <div class="text-xs text-red-600 font-bold italic line-through">
+                                                        <i class="fas fa-user-times mr-1"></i> (Digantikan oleh <?php echo $data['digantikan_oleh']; ?>)
+                                                    </div>
+                                                <?php endif; ?>
+
+                                                <div class="mt-1">
+                                                    <?php if ($data['status_rkk'] == 'Hadir') : ?>
+                                                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
+                                                    <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
+                                                        <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir</span>
+                                                    <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
+                                                        <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Digantikan</span>
+                                                    <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
+                                                        <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Pengganti</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
                                             <td data-label="Departemen"><?php echo $data['nama_departmen']; ?></td>
                                             <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                             <td data-label="OS/DHK"><?php echo $data['OS_DHK']; ?></td>

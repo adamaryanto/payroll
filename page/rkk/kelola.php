@@ -11,28 +11,40 @@ if (isset($_GET['id'])) {
   $datastatusrkk   = $datadetail['status_rkk'];
 
   $tampil = $koneksi->query("SELECT 
-    A.id_rkk_detail, 
+    A.*, 
     B.no_absen, 
     BB.nama_sub_department, 
     B.nama_karyawan, 
     D.nama_departmen, 
     C.tgl_rkk, 
-    A.jam_masuk, 
-    A.jam_keluar, 
-    A.istirahat_keluar,
-    A.istirahat_masuk, 
-    A.status_rkk,
     B.OS_DHK,
     B.golongan,
     J.keterangan as nama_shift,
     A.upah as upahkaryawan, 
     A.potongan_telat, 
     A.potongan_istirahat, 
-    A.potongan_lainnya
+    A.potongan_lainnya,
+    (SELECT K3.nama_karyawan 
+     FROM tb_rkk_update U1 
+     JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
+     JOIN ms_karyawan K3 ON U2.id_karyawan = K3.id_karyawan 
+     JOIN tb_rkk_detail RD2 ON U1.id_rkk_detail = RD2.id_rkk_detail
+     WHERE U1.id_karyawan = A.id_karyawan 
+     AND U1.status = 'Pengganti' 
+     AND U2.status = 'Digantikan' 
+     AND RD2.id_rkk = A.id_rkk
+     LIMIT 1) as menggantikan,
+    (SELECT K4.nama_karyawan 
+     FROM tb_rkk_update U3 
+     JOIN tb_rkk_update U4 ON U3.id_rkk_detail = U4.id_rkk_detail 
+     JOIN ms_karyawan K4 ON U4.id_karyawan = K4.id_karyawan 
+     WHERE U3.id_rkk_detail = A.id_rkk_detail 
+     AND U3.status = 'Digantikan' 
+     AND U4.status = 'Pengganti' 
+     LIMIT 1) as digantikan_oleh
 FROM tb_rkk_detail A 
 LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
-/* Mengambil data dari tabel karyawan (B) bukan tabel detail (A) */
 LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
 LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department 
 LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal 
@@ -363,7 +375,32 @@ if ($datastatusrkk == 3) {
             while ($data = $tampil->fetch_assoc()) : ?>
               <tr>
                 <td><?= $no++ ?></td>
-                <td><b><?= $data['nama_karyawan'] ?></b><br><small><?= $data['no_absen'] ?></small></td>
+                <td>
+                  <strong><?= $data['nama_karyawan'] ?></strong><br>
+                  <small><?= $data['no_absen'] ?></small>
+                  <?php if (!empty($data['menggantikan'])) : ?>
+                    <div class="text-[10px] text-blue-600 font-bold italic">
+                      <i class="fas fa-exchange-alt mr-1"></i> (Menggantikan <?= $data['menggantikan'] ?>)
+                    </div>
+                  <?php endif; ?>
+                  <?php if (!empty($data['digantikan_oleh'])) : ?>
+                    <div class="text-[10px] text-red-600 font-bold italic line-through">
+                      <i class="fas fa-user-times mr-1"></i> (Digantikan oleh <?= $data['digantikan_oleh'] ?>)
+                    </div>
+                  <?php endif; ?>
+
+                  <div class="mt-1">
+                    <?php if ($data['status_rkk'] == 'Hadir') : ?>
+                      <span class="bg-emerald-100 text-emerald-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full">Hadir</span>
+                    <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
+                      <span class="bg-rose-100 text-rose-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full">Tidak Hadir</span>
+                    <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
+                      <span class="bg-amber-100 text-amber-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full">Digantikan</span>
+                    <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
+                      <span class="bg-indigo-100 text-indigo-800 text-[9px] font-bold px-1.5 py-0.5 rounded-full">Pengganti</span>
+                    <?php endif; ?>
+                  </div>
+                </td>
                 <td><?= $data['nama_departmen'] ?><br><small><?= $data['nama_sub_department'] ?></small></td>
                 <td><span class="badge"><?= $data['nama_shift'] ?></span></td>
                 <td><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></td>
@@ -374,13 +411,19 @@ if ($datastatusrkk == 3) {
                   <div class="text-amber-700">Lain: <?= number_format($data['potongan_lainnya'], 0, ',', '.') ?></div>
                 </td>
                 <td class="text-center">
-                  <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
-                    class="btn btn-info btn-xs"><i class="fas fa-eye"></i> Detail</a>
+                  <div class="flex flex-col gap-1">
+                    <a href="?page=rkk&aksi=karyawanupdate&id=<?= $data['id_rkk_detail']; ?>"
+                      class="btn btn-warning btn-xs" title="Ganti Karyawan">
+                      <i class="fas fa-sync-alt"></i> Ganti
+                    </a>
+                    <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
+                      class="btn btn-info btn-xs"><i class="fas fa-eye"></i> Detail</a>
 
-                  <a href="?page=rkk&aksi=hapusdetail&id=<?= $idrkk; ?>&iddetail=<?= $data['id_rkk_detail']; ?>"
-                    class="btn btn-danger btn-xs" onclick="return confirm('Hapus?');">
-                    <i class="fas fa-trash"></i>
-                  </a>
+                    <a href="?page=rkk&aksi=hapusdetail&id=<?= $idrkk; ?>&iddetail=<?= $data['id_rkk_detail']; ?>"
+                      class="btn btn-danger btn-xs" onclick="return confirm('Hapus?');">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
                 </td>
               </tr>
             <?php endwhile; ?>
