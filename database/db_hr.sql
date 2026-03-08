@@ -5159,7 +5159,7 @@ INSERT INTO `tb_rkk` (`id_rkk`, `keterangan`, `tgl_rkk`, `detail_rkk`, `jam_kerj
 
 CREATE TABLE `tb_rkk_detail` (
   `id_rkk_detail` int(10) NOT NULL AUTO_INCREMENT,
-  `id_rkk` int(10) NOT NULL,
+  `id_rkk` int(10) NOT NULL DEFAULT 0,
   `id_karyawan` int(10) NOT NULL,
   `upah` int(10) NOT NULL,
   `id_departmen` int(10) DEFAULT NULL,

@@ -1,6 +1,6 @@
 <?php
-// 1. Ambil ID RKK dari URL
-$idrkk = isset($_GET['id']) ? $_GET['id'] : "";
+// 1. Ambil ID RKK dari URL (GET) atau dari hidden field (POST)
+$idrkk = !empty($_REQUEST['id']) ? intval($_REQUEST['id']) : (!empty($_POST['id_rkk_hidden']) ? intval($_POST['id_rkk_hidden']) : 0);
 
 // 2. Logika Simpan
 if (isset($_POST['simpan_karyawan'])) {
@@ -10,7 +10,7 @@ if (isset($_POST['simpan_karyawan'])) {
     $id_jadwal  = $_POST['id_jadwal']; // Ini adalah ID dari tabel jadwal
     $upah       = $_POST['upah_manual'];
 
-    if (!empty($idkaryawan) && !empty($id_jadwal)) {
+    if (!empty($idkaryawan) && !empty($id_jadwal) && $idrkk > 0) {
         // Ambil data detail jam dari tabel jadwal
         $ambil_jadwal = $koneksi->query("SELECT * FROM tb_jadwal WHERE id_jadwal = '$id_jadwal'");
         $dj = $ambil_jadwal->fetch_assoc();
@@ -25,13 +25,16 @@ if (isset($_POST['simpan_karyawan'])) {
         $cek = $koneksi->query("SELECT id_karyawan FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$idkaryawan'");
 
         if ($cek->num_rows == 0) {
+            // Force int
+            $idrkk_fix = intval($idrkk);
+            
             // INSERT dengan menyertakan tgl_updt menggunakan NOW() agar tidak error
             $insert = $koneksi->query("INSERT INTO tb_rkk_detail 
                 (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, shift, status_rkk, 
                  jam_masuk, jam_keluar, istirahat_masuk, istirahat_keluar, 
                  potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
                 VALUES 
-                ('$idrkk', '$idkaryawan', '$upah', '$id_dept', '$id_sub', '$id_jadwal', '$nama_shift', 'Hadir', 
+                ($idrkk_fix, '$idkaryawan', '$upah', '$id_dept', '$id_sub', '$id_jadwal', '$nama_shift', 'Hadir', 
                  '$j_masuk', '$j_keluar', '$i_masuk', '$i_keluar', 
                  '0', '0', '0', NOW())");
 
@@ -80,6 +83,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 <h3 style="margin:0; font-size: 18px;"><i class="fa fa-user-plus"></i> Tambah Karyawan ke RKK</h3>
             </div>
             <form method="POST">
+                <input type="hidden" name="id_rkk_hidden" value="<?= $idrkk; ?>">
                 <div class="panel-body form-section">
                     <div class="row">
                         <div class="form-group col-md-12">

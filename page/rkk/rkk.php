@@ -311,6 +311,12 @@ if ($_SESSION['role'] == "owner") {
                                             class="px-2 py-1 text-[12px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200">
                                             <i class="fas fa-eye"></i> Detail
                                         </a>
+                                        <?php if ($_SESSION['role'] == "owner") : ?>
+                                            <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
+                                                class="px-2 py-1 text-[12px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded border border-indigo-200">
+                                                <i class="fas fa-user-plus"></i> Tetapkan</a>
+                                        <?php endif; ?>
+
                                         <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
                                                 class="px-2 py-1 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200"
@@ -323,7 +329,7 @@ if ($_SESSION['role'] == "owner") {
                                                 onclick="return confirm('Tarik kembali data (Un-propose)?');"><i class="fas fa-undo"></i> Un-Propose</a>
                                         <?php endif; ?>
 
-                                        <?php if ($data['status_rkk'] == '1' && $is_authorized) : ?>
+                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && $_SESSION['role'] == "owner")) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=app"
                                                 class="px-2 py-1 text-[12px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200"
                                                 onclick="return confirm('Approve data ini?');"><i class="fas fa-check"></i> Approve</a>

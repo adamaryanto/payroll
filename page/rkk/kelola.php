@@ -315,8 +315,20 @@ if ($datastatusrkk == 3) {
   <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
     <div class="border-b border-gray-100 py-4 px-5 bg-white flex justify-between items-center">
       <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
-      <div>
-        <a href="?page=rkk&aksi=karyawan" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+      <div class="flex items-center gap-2">
+        <?php if ($_SESSION['role'] == "owner") : ?>
+          <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
+            <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=app" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] font-medium py-2 px-3 rounded shadow-sm transition-colors" onclick="return confirm('Approve Rencana Kerja ini?');">
+              <i class="fas fa-check-circle mr-1.5"></i> Approve
+            </a>
+          <?php elseif ($datastatusrkk == 2) : ?>
+            <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=unapp" class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] font-medium py-2 px-3 rounded shadow-sm transition-colors" onclick="return confirm('Batalkan Approve Rencana Kerja ini?');">
+              <i class="fas fa-times-circle mr-1.5"></i> Un-Approve
+            </a>
+          <?php endif; ?>
+        <?php endif; ?>
+
+        <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[14px] font-medium py-2 px-3 rounded shadow-sm transition-colors">
           <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
         </a>
       </div>
