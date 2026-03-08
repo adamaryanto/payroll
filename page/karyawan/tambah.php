@@ -13,17 +13,18 @@ if (isset($_POST['simpan'])) {
     $tanggallahir = $koneksi->real_escape_string($_POST['ttanggallahir']);
     $statuskawin = $koneksi->real_escape_string($_POST['tstatuskawin']);
     $noktp = $koneksi->real_escape_string($_POST['tnoktp']);
+    $nobpjs = $koneksi->real_escape_string($_POST['tnobpjs']);
     $alamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
     $alamattinggal = isset($_POST['talamattinggal']) ? $koneksi->real_escape_string($_POST['talamattinggal']) : '';
     $tanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
 
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
-        status_kawin, jenis_kelamin, no_ktp, alamat_ktp, alamat_tinggal, 
+        status_kawin, jenis_kelamin, no_ktp, no_bpjs, alamat_ktp, alamat_tinggal, 
         status_karyawan, tgl_aktif, foto, id_sub_department, OS_DHK, golongan, id_jadwal
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
-        '$statuskawin', '$jeniskelamin', '$noktp', '$alamatktp', '$alamattinggal',
+        '$statuskawin', '$jeniskelamin', '$noktp', '$nobpjs', '$alamatktp', '$alamattinggal',
         'Aktif', '$tanggalbergabung', '', '$subdept', '$os', '$golongan', '0'
     )");
 
@@ -197,7 +198,10 @@ if (isset($_POST['simpan'])) {
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. KTP</label>
                             <input type="text" name="tnoktp" class="max-w-md w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
                         </div>
-                        <div class="form-group hidden md:block"></div> <!-- Spacer to align addresses -->
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. BPJS</label>
+                            <input type="text" name="tnobpjs" class="max-w-md w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="No. BPJS Ketenagakerjaan/Kesehatan">
+                        </div>
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap (KTP)</label>
                             <textarea name="talamatktp" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."></textarea>

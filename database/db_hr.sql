@@ -156,7 +156,8 @@ CREATE TABLE `ms_karyawan` (
   `id_jadwal` int NOT NULL,
   `id_sub_department` int NOT NULL,
   `OS_DHK` varchar(50) NOT NULL,
-  `golongan` varchar(50) NOT NULL
+  `golongan` varchar(50) NOT NULL,
+  `no_bpjs` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
