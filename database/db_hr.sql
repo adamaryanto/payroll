@@ -156,7 +156,8 @@ CREATE TABLE `ms_karyawan` (
   `id_jadwal` int NOT NULL,
   `id_sub_department` int NOT NULL,
   `OS_DHK` varchar(50) NOT NULL,
-  `golongan` varchar(50) NOT NULL
+  `golongan` varchar(50) NOT NULL,
+  `no_bpjs` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
@@ -5442,6 +5443,35 @@ ALTER TABLE `tb_transaksi`
 ALTER TABLE `users`
   MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 COMMIT;
+
+--
+-- Table structure for table `tb_boneless`
+--
+
+CREATE TABLE `tb_boneless` (
+  `id_boneless` int NOT NULL AUTO_INCREMENT,
+  `tgl` date NOT NULL,
+  `jumlah_mobil` int NOT NULL,
+  `keterangan` text,
+  `tgl_updt` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_boneless`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `tb_boneless_detail`
+--
+
+CREATE TABLE `tb_boneless_detail` (
+  `id_boneless_detail` int NOT NULL AUTO_INCREMENT,
+  `id_boneless` int NOT NULL,
+  `nama_item` varchar(255) NOT NULL,
+  `qty` decimal(10,2) NOT NULL,
+  `harga` int NOT NULL,
+  `total` int NOT NULL,
+  PRIMARY KEY (`id_boneless_detail`),
+  KEY `id_boneless` (`id_boneless`),
+  CONSTRAINT `tb_boneless_detail_ibfk_1` FOREIGN KEY (`id_boneless`) REFERENCES `tb_boneless` (`id_boneless`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

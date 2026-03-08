@@ -11,6 +11,7 @@ if(isset($_GET['id'])){
     $idjadwal = $data['id_jadwal'];
     $noabsen = $data['no_absen'];
     $nama = $data['nama_karyawan'];
+    $nobpjs = $data['no_bpjs'];
     $tempatlahir = $data['tempat_lahir'];
     $tgllahir = $data['tgl_lahir'];
     $agama = $data['agama'];
@@ -30,6 +31,7 @@ if (isset($_POST['update'])) {
     $tid = $_POST['tid'];
     $tnama = $koneksi->real_escape_string($_POST['tnama']);
     $tnoabsen = $koneksi->real_escape_string($_POST['tnoabsen']);
+    $tnobpjs = $koneksi->real_escape_string($_POST['tnobpjs']);
     $tos = $koneksi->real_escape_string($_POST['tos']);
     $tgolongan = $koneksi->real_escape_string($_POST['tgolongan']);
     $tjeniskelamin = $koneksi->real_escape_string($_POST['tjeniskelamin']);
@@ -60,6 +62,7 @@ if (isset($_POST['update'])) {
         alamat_ktp = '$talamatktp',
         alamat_tinggal = '$talamattinggal',
         tgl_aktif = '$ttanggalbergabung',
+        no_bpjs = '$tnobpjs',
         OS_DHK = '$tos',
         golongan = '$tgolongan'
         WHERE id_karyawan = '$tid'
@@ -237,7 +240,10 @@ if (isset($_POST['update'])) {
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. KTP</label>
                             <input type="text" name="tnoktp" value="<?= $noktp; ?>" class="max-w-md w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
                         </div>
-                        <div class="form-group hidden md:block"></div> <!-- Spacer -->
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. BPJS</label>
+                            <input type="text" name="tnobpjs" value="<?= $nobpjs; ?>" class="max-w-md w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Masukkan No. BPJS">
+                        </div>
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap (KTP)</label>
                             <textarea name="talamatktp" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."><?= $alamatktp; ?></textarea>
