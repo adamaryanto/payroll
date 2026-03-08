@@ -87,59 +87,101 @@ if (isset($_GET['id'])) {
 ?>
 
 <style>
-    .section-divider { border-left: 4px solid #5F9EA0; padding-left: 15px; margin: 20px 0; color: #5F9EA0; font-weight: bold; }
-    .card-custom { border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; background: #fff; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    label { font-size: 0.85rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; }
-    @media (max-width: 768px) { .col-md-2, .col-md-3, .col-md-4 { margin-bottom: 15px; } }
+    /* Styling Dasar Modern */
+    .card-modern {
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        padding: 25px;
+        margin-bottom: 25px;
+        border: none;
+    }
+    .section-divider {
+        display: flex;
+        align-items: center;
+        color: #2563eb;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 30px 0 15px 0;
+        font-size: 0.9rem;
+    }
+    .section-divider::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: #e5e7eb;
+        margin-left: 15px;
+    }
+    /* Input Styling */
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        padding: 10px 15px;
+        height: auto;
+        transition: all 0.3s ease;
+    }
+    .form-control:focus {
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+    label { font-size: 0.75rem; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
+    h3 { color: #2563eb; margin: 0 0 20px 0; font-weight: 800; }
+    
+    /* Tombol Modern */
+    .btn-custom { padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
+    .btn-primary-custom { background-color: #2563eb; color: white; border: none; }
+    .btn-primary-custom:hover { background-color: #1d4ed8; color: white; transform: translateY(-1px); }
+    .btn-warning-custom { background-color: #f39c12; color: white; border: none; }
+    .btn-warning-custom:hover { background-color: #d68910; color: white; }
 </style>
 
 <div class="row">
     <div class="col-md-12">
         <form method="POST" enctype="multipart/form-data">
-            <div class="card-custom" style="border-top: 5px solid #5F9EA0;">
-                <h3 style="margin-top:0;">Detail Realisasi Upah</h3>
-                <hr>
+            <div class="card-modern">
+                <h3><i class="fas fa-clipboard-check mr-2"></i> Detail Realisasi Upah</h3>
 
-                <div class="section-divider">RENCANA KERJA (RKK)</div>
+                <div class="section-divider">Rencana Kerja (RKK)</div>
                 <div class="row">
                     <div class="form-group col-md-3">
-                        <label>Tanggal RKK</label>
-                        <input type="text" readonly value="<?= $datadetailrkk['tgl_rkk'] ?>" class="form-control">
+                        <label>TANGGAL RKK</label>
+                        <input type="text" readonly value="<?= $datadetailrkk['tgl_rkk'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Keterangan RKK</label>
-                        <input type="text" readonly value="<?= $datadetailrkk['keterangan_rkk'] ?>" class="form-control">
+                        <label>KETERANGAN RKK</label>
+                        <input type="text" readonly value="<?= $datadetailrkk['keterangan_rkk'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                     <div class="form-group col-md-3">
-                        <label>Shift RKK</label>
-                        <input type="text" readonly value="<?= $datadetailrkk['shift_rkk'] ?>" class="form-control">
+                        <label>SHIFT RKK</label>
+                        <input type="text" readonly value="<?= $datadetailrkk['shift_rkk'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                 </div>
 
-                <div class="section-divider">DATA KARYAWAN</div>
+                <div class="section-divider">Data Karyawan</div>
                 <div class="row">
                     <div class="form-group col-md-2">
-                        <label>No. Absen</label>
-                        <input type="text" readonly value="<?= $datadetail['no_absen'] ?>" class="form-control">
+                        <label>NO. ABSEN</label>
+                        <input type="text" readonly value="<?= $datadetail['no_absen'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                     <div class="form-group col-md-4">
-                        <label>Nama Karyawan</label>
-                        <input type="text" readonly value="<?= $datadetail['nama_karyawan'] ?>" class="form-control">
+                        <label>NAMA KARYAWAN</label>
+                        <input type="text" readonly value="<?= $datadetail['nama_karyawan'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                     <div class="form-group col-md-3">
-                        <label>Bagian</label>
-                        <input type="text" readonly value="<?= $datadetail['nama_departmen'] ?>" class="form-control">
+                        <label>BAGIAN</label>
+                        <input type="text" readonly value="<?= $datadetail['nama_departmen'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                     <div class="form-group col-md-3">
-                        <label>Sub Bagian</label>
-                        <input type="text" readonly value="<?= $datadetail['nama_sub_department'] ?>" class="form-control">
+                        <label>SUB BAGIAN</label>
+                        <input type="text" readonly value="<?= $datadetail['nama_sub_department'] ?>" class="form-control" style="background: #f9fafb;">
                     </div>
                 </div>
 
-                <div class="section-divider text-danger">INPUT REALISASI ABSENSI & UPAH</div>
+                <div class="section-divider text-danger">Input Realisasi Absensi & Upah</div>
                 <div class="row">
                     <div class="form-group col-md-3">
-                        <label>Shift Realisasi</label>
+                        <label>SHIFT REALISASI</label>
                         <select class="form-control" name="tshift" required>
                             <option value="<?= $datadetail['id_jadwal'] ?>"><?= $datadetail['shift'] ?></option>
                             <?php 
@@ -150,64 +192,34 @@ if (isset($_GET['id'])) {
                             ?>
                         </select>
                     </div>
-                    <div class="form-group col-md-2">
-                        <label>Absen Masuk</label>
-                        <input type="time" name="tjammasuk" value="<?= $hasilabsenmasuk ?>" class="form-control" readonly>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Absen Keluar</label>
-                        <input type="time" name="tjamkeluar" value="<?= $hasilabsenkeluar ?>" class="form-control" readonly>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Istirahat Masuk</label>
-                        <input type="time" name="tistirahatmasuk" value="<?= $hasilabsenistirahatmasuk ?>" class="form-control" readonly>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Istirahat Keluar</label>
-                        <input type="time" name="tistirahatkeluar" value="<?= $hasilabsenistirahatkeluar ?>" class="form-control" readonly>
-                    </div>
+                    <div class="form-group col-md-2"> <label>ABSEN MASUK</label> <input type="time" name="tjammasuk" value="<?= $hasilabsenmasuk ?>" class="form-control" readonly> </div>
+                    <div class="form-group col-md-2"> <label>ABSEN KELUAR</label> <input type="time" name="tjamkeluar" value="<?= $hasilabsenkeluar ?>" class="form-control" readonly> </div>
+                    <div class="form-group col-md-2"> <label>ISTIRAHAT MASUK</label> <input type="time" name="tistirahatmasuk" value="<?= $hasilabsenistirahatmasuk ?>" class="form-control" readonly> </div>
+                    <div class="form-group col-md-2"> <label>ISTIRAHAT KELUAR</label> <input type="time" name="tistirahatkeluar" value="<?= $hasilabsenistirahatkeluar ?>" class="form-control" readonly> </div>
                 </div>
 
-                <div class="row mt-3">
-                    <div class="form-group col-md-3">
-                        <label>Upah (Pokok)</label>
-                        <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" required>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Pot. Telat</label>
-                        <input type="number" name="tpottelat" value="<?= $globalDendaMasuk ?>" class="form-control" readonly>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Pot. Istirahat</label>
-                        <input type="number" name="tpotistirahat" value="<?= $globalDendaIstirahat ?>" class="form-control" readonly>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Pot. Lainnya</label>
-                        <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required>
-                    </div>
-                    <div class="form-group col-md-2">
-                        <label>Lembur</label>
-                        <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required>
-                    </div>
+                <div class="row">
+                    <div class="form-group col-md-3"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" required> </div>
+                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $globalDendaMasuk ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $globalDendaIstirahat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. LAINNYA</label> <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required> </div>
+                    <div class="form-group col-md-3"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
                 </div>
 
                 <div class="row">
                     <div class="form-group col-md-12">
-                        <label>Hasil Kerja / Keterangan Detail</label>
+                        <label>HASIL KERJA / KETERANGAN DETAIL</label>
                         <textarea name="thasilkerja" class="form-control" rows="3"><?= $datadetail['hasil_kerja'] ?></textarea>
                     </div>
                 </div>
 
-                <hr>
-                <div class="row">
-                    <div class="col-md-12">
-                        <a href="?page=realisasi&aksi=kelola&id=<?= $dataidrealisasi ?>" class="btn btn-warning">
-                            <i class="fa fa-arrow-left"></i> Kembali
-                        </a>
-                        <button type="submit" name="simpan" class="btn btn-primary">
-                            <i class="fa fa-save"></i> Simpan Data Realisasi
-                        </button>
-                    </div>
+                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f3f4f6;">
+                    <a href="?page=realisasi&aksi=kelola&id=<?= $dataidrealisasi ?>" class="btn btn-warning-custom btn-custom">
+                        <i class="fa fa-arrow-left"></i> Kembali
+                    </a>
+                    <button type="submit" name="simpan" class="btn btn-primary-custom btn-custom">
+                        <i class="fa fa-save"></i> Simpan Data Realisasi
+                    </button>
                 </div>
             </div>
         </form>

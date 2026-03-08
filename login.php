@@ -108,42 +108,24 @@ include "koneksi.php";
 </html>
 
 <?php
-  if (isset($_POST['login'])){
+ if (isset($_POST['login'])) {
+    $username = trim($_POST['tusername']); 
+    $pass = $_POST['tpass'];
 
-    $username = @$_POST['tusername'];
-    $pass = @$_POST['tpass'];
-  $uname=str_replace(' ','',$username) ;
-$tgl1 = date("Y-m-d-H-i-s");
-// if($cek =='user'){
- $sql = $koneksi -> query("SELECT * FROM ms_login WHERE user_login ='$uname' AND lg_password = '$pass' ");
-$tampil = $sql->fetch_assoc();
-$ketemu = $sql -> num_rows;
+    $sql = $koneksi->query("SELECT * FROM ms_login WHERE user_login = '$username' AND lg_password = '$pass'");
+    
+    $ketemu = $sql->num_rows;
+    $tampil = $sql->fetch_assoc();
 
+    if ($ketemu > 0) {
+        $_SESSION['iduser'] = $tampil['id_login'];
+        $_SESSION['nama'] = $tampil['user_login'];
+        $_SESSION['passuser'] = $tampil['lg_password'];
+        $_SESSION['role'] = $tampil['role'];
 
-  
-  if($ketemu > 0){
-     $_SESSION['iduser'] = $tampil['id_login'];
-     $_SESSION['nama'] = $tampil['user_login'];
-     $_SESSION['passuser'] = $tampil['lg_password'];
-     $_SESSION['role'] = $tampil['role'];
-
-     header("location:index.php"); 
-}else
-{
-  ?>
-
-  <script type="text/javascript">
-  alert("Data Not Found")
-  </script> 
-<?php 
+        header("location:index.php"); 
+    } else {
+        echo "<script>alert('Data Not Found! Pastikan Username & Password benar.');</script>";
+    }
 }
-
-
-      
- 
-
-
-  }
-
-
 ?>

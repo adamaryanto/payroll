@@ -1,7 +1,8 @@
 <?php
 include "koneksi.php";
 
-$id = $_GET['id'];
+$id = isset($_GET['id']) ? $_GET['id'] : '';
+
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=export_realisasi_$id.xls");

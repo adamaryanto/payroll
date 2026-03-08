@@ -320,7 +320,7 @@ if ($datastatusrealisasi == 'approve') {
         <div class="col-md-12">
             <div class="card-clean">
                 <div class="card-header-clean">
-                    <i class="fa fa-list-alt"></i> Detail Realisasi Upah
+                    <i class="fa fa-list-alt mr-2"></i> Daftar Realisasi Upah
                 </div>
 
                 <form method="POST" enctype="multipart/form-data">
@@ -410,7 +410,11 @@ if ($datastatusrealisasi == 'approve') {
                                         $upah = $data['upahkaryawan'];
                                         $total += $upah;
 
-                                        // row highlight removed as per user request
+                                        // Check if both check-in and check-out are missing
+                                        $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
+                                            (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
+
+                                        $rowClass = $isFullMissing ? 'bg-red-custom' : '';
                                     ?>
                                         <tr>
                                             <td data-label="No"><?php echo $no; ?></td>

@@ -1,6 +1,10 @@
 <?php
 
+// 1. hak Approve/Un-Approve
+$is_authorized = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin master");
 
+// 2.hak Propose/Un-Propose (HRD & Admin Master)
+$can_propose = ($_SESSION['role'] == "admin" || $_SESSION['role'] == "kepala gudang");
 $tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
 if ($_SESSION['role'] != "owner") {
     $level_status =  "Hidden";
@@ -108,213 +112,263 @@ if ($_SESSION['role'] == "owner") {
         padding: 20px;
     }
 
-    /* Container Utama */
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
-        width: 100%;
-        margin-top: 10px;
+        display: block !important;
     }
 
-    /* Memperbaiki baris bawah (Info & Paginate) */
-    .dataTables_wrapper .row:last-child {
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
+    .dataTables_wrapper::before,
+    .dataTables_wrapper::after {
+        display: none !important;
+        /* Hapus clearfix bawaan yang mengganggu */
+    }
+
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
+    #dataTables-example_wrapper .row:first-child {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 10px 0;
+        margin-bottom: 20px !important;
+        width: 100% !important;
     }
 
-    /* Info: Menampilkan halaman x dari y */
-    .dataTables_wrapper .dataTables_info {
-        padding-top: 0 !important;
-        font-size: 13px;
-        color: #666;
+    /* 4. Styling Tampil _MENU_ (Kiri) */
+    .dataTables_length {
+        display: flex !important;
+        align-items: center !important;
     }
 
-    /* Paginate Wrapper: Paksa ke Kanan */
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+
+    /* 5. Styling Cari: (Kanan) */
+    .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_filter input {
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
+    }
+
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
     .dataTables_wrapper .dataTables_paginate {
         display: flex !important;
         justify-content: flex-end !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding-top: 15px !important;
     }
 
-    /* Styling Tombol Paginate (Kotak) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
+    .dataTables_paginate .paginate_button {
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        border-radius: 6px !important;
         padding: 5px 12px !important;
-        margin: 0 2px !important;
-        border: 1px solid #ddd !important;
-        border-radius: 4px !important;
-        background: #fff !important;
-        color: #337ab7 !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
         cursor: pointer !important;
-        text-decoration: none !important;
-        display: inline-block !important;
-        min-width: 35px;
-        text-align: center;
+        transition: all 0.2s !important;
     }
 
-    /* Tombol Aktif (Halaman Sekarang) */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background-color: #5F9EA0 !important;
+    .dataTables_paginate .paginate_button:hover {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    h3 {
+        color: #2563eb !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
         color: white !important;
-        border-color: #5F9EA0 !important;
-        font-weight: bold;
     }
 
-    /* Efek Hover */
-    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-        background-color: #eee !important;
-        border-color: #ccc !important;
-        color: #23527c !important;
-    }
-
-    /* Sembunyikan garis/border default DataTables jika ada */
-    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    .dataTables_paginate .paginate_button.disabled {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
         cursor: not-allowed !important;
-        color: #ccc !important;
-        background: #fafafa !important;
     }
 
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
+    @media screen and (max-width: 768px) {
+        .table-responsive {
+            padding: 12px !important;
+        }
+
+        .table-modern thead {
+            display: none !important;
+        }
+
+        .table-modern tbody tr {
+            display: block;
+            margin-bottom: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 10px;
+        }
+
+        .table-modern tbody td {
+            display: flex;
+            align-items: flex-start;
+            padding: 8px 10px !important;
+            border: none !important;
+            border-bottom: 1px solid #f3f4f6 !important;
+        }
+
+        .table-modern tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: uppercase;
+            font-size: 11px;
+            min-width: 120px;
+            margin-right: 15px;
+        }
+
+        h3 {
+            color: #2563eb !important;
+        }
+    }
 </style>
 
-<div class="row">
-    <div class="col-md-12">
-        <!-- Advanced Tables -->
-        <div class="panel panel-primary custom-card">
-            <div class="box-header with-border d-flex justify-content-between align-items-center"
-                style="background-color:#5F9EA0; color:white; padding: 10px 15px; border-radius: 12px 12px 0 0;">
+<div class="container-fluid px-2 mt-4 mb-4">
+    <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
 
-                <h3 class="box-title" style="margin: 0; font-size: 18px; font-weight: 600;">
-                    <i class="fa fa-list-alt"></i> List Rencana Upah
-                </h3>
-
-                <a href="?page=rkk&aksi=tambah" class="btn btn-info"
-                    style="border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: none;">
-                    <i class="fa fa-plus-circle"></i> &nbsp;
-                    <span class="d-none d-md-inline">&nbsp;Tambah Data Rencana Upah</span>
-                    <span class="d-inline d-md-none">&nbsp;Tambah</span>
+        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+            <div>
+                <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
+            </div>
+            <div>
+                <a href="?page=rkk&aksi=tambah" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                    <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
         </div>
 
-        <div class="table-responsive">
+        <div class="p-0">
+            <div class="table-responsive px-3 py-3">
+                <table class="w-full text-left border-collapse" id="dataTables-example">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">No</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Tanggal</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Jam</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Karyawan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-right">Total Upah</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Keterangan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Aksi</th>
 
-            <table class="table table-bordered table-striped" id="dataTables-example">
-                <thead>
-                    <tr class="text-center">
-                        <th width="5%">No</th>
-                        <th>Tanggal</th>
-                        <th>Tanggal Input</th>
-                        <th>Jam Kerja</th>
-                        <th>Karyawan</th>
-                        <th>Total Upah</th>
-                        <th>Keterangan</th>
-                        <th width="15%">Aksi Data</th>
-                        <th width="15%">Otorisasi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    while ($data = $tampil->fetch_assoc()) {
-                        // Logika Warna & Tombol
-                        if ($data['status_rkk'] == "1") {
-                            $bg = "#FFEBCD";
-                            $pro = "hidden";
-                            $app = "";
-                            $unpro = "";
-                            $unapp = "hidden";
-                        } elseif ($data['status_rkk'] == "2") {
-                            $bg = "#F0FFFF";
-                            $pro = "hidden";
-                            $app = "hidden";
-                            $unpro = "hidden";
-                            $unapp = "";
-                        } elseif ($data['status_rkk'] == "3") {
-                            $bg = "#98FB98";
-                            $pro = "hidden";
-                            $app = "hidden";
-                            $unpro = "hidden";
-                            $unapp = "hidden";
-                        } else {
-                            $bg = "transparent";
-                            $pro = "";
-                            $app = "hidden";
-                            $unpro = "hidden";
-                            $unapp = "hidden";
-                        }
-                    ?>
-                        <tr style="background-color:<?php echo $bg ?>; color:black;">
-                            <td class="text-center"><?php echo $no++; ?></td>
-                            <td class="text-center"><strong><?php echo $data['tgl_rkk'] ?></strong></td>
-                            <td class="text-center"><?php echo $data['detail_rkk'] ?></td>
-                            <td class="text-center"><?php echo $data['jam_kerja'] ?> Jam</td>
-                            <td class="text-center"><?php echo $data['jml'] ?> Org</td>
-                            <td>Rp <?php echo number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
-                            <td><?php echo $data['keterangan'] ?></td>
-
-                            <td class="text-center">
-                                <a href="?page=rkk&aksi=kelola&id=<?php echo $data['id_rkk']; ?>" class="btn btn-warning btn-xs">
-                                    <i class="fa fa-search"></i> <span class="d-none d-lg-inline"> Detail </span>
-                                </a>
-                                <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>" class="btn btn-info btn-xs">
-                                    <i class="fa fa-print"></i> <span class="d-none d-lg-inline">Cetak </span>
-                                </a>
-                            </td>
-
-                            <td class="text-center">
-                                <div <?php echo $hr ?>>
-                                    <div <?php echo $pro ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=pro"
-                                            class="btn btn-danger btn-xs" onclick="return confirm('Propose data ini?');">Propose</a>
-                                    </div>
-                                    <div <?php echo $unpro ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unpro"
-                                            class="btn btn-default btn-xs" onclick="return confirm('Batalkan Propose?');">UnPropose</a>
-                                    </div>
-                                </div>
-
-                                <div <?php echo $level_status ?>>
-                                    <div <?php echo $app ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=app"
-                                            class="btn btn-success btn-xs" onclick="return confirm('Approve data ini?');">Approve</a>
-                                    </div>
-                                    <div <?php echo $unapp ?>>
-                                        <a href="?page=rkk&aksi=accept&id=<?php echo $data['id_rkk']; ?>&iddetail=unapp"
-                                            class="btn btn-default btn-xs" onclick="return confirm('Batalkan Approve?');">Un-Approve</a>
-                                    </div>
-                                </div>
-                            </td>
                         </tr>
-                    <?php } ?>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php
+                        $no = 1;
+                        while ($data = $tampil->fetch_assoc()) :
+                            $status_color = ($data['status_rkk'] == "3") ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800";
+                        ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="py-2.5 px-2 text-center text-[15px]"><?= $no++ ?></td>
+                                <td class="py-2.5 px-2 text-[15px] font-medium"><?= $data['tgl_rkk'] ?></td>
+                                <td class="py-2.5 px-2 text-[15px]"><?= $data['jam_kerja'] ?> Jam</td>
+                                <td class="py-2.5 px-2 text-center text-[15px]"><?= $data['jml'] ?></td>
+                                <td class="py-2.5 px-2 text-right text-[15px] font-bold">Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
+                                <td class="py-2.5 px-2 text-[14px] text-gray-600"><?= $data['keterangan'] ?></td>
+                                <td class="py-2.5 px-2 align-middle text-center">
+                                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                        <a href="?page=rkk&aksi=kelola&id=<?= $data['id_rkk']; ?>"
+                                            class="px-2 py-1 text-[12px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200">
+                                            <i class="fas fa-eye"></i> Detail
+                                        </a>
+                                        <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
+                                                class="px-2 py-1 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200"
+                                                onclick="return confirm('Propose data ini?');"><i class="fas fa-paper-plane"></i> Propose</a>
+                                        <?php endif; ?>
 
+                                        <?php if ($data['status_rkk'] == '1' && $can_propose) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unpro"
+                                                class="px-2 py-1 text-[12px] font-bold text-gray-600 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-200"
+                                                onclick="return confirm('Tarik kembali data (Un-propose)?');"><i class="fas fa-undo"></i> Un-Propose</a>
+                                        <?php endif; ?>
+
+                                        <?php if ($data['status_rkk'] == '1' && $is_authorized) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=app"
+                                                class="px-2 py-1 text-[12px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200"
+                                                onclick="return confirm('Approve data ini?');"><i class="fas fa-check"></i> Approve</a>
+                                        <?php endif; ?>
+
+                                        <?php if ($data['status_rkk'] == '2' && $is_authorized) : ?>
+                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unapp"
+                                                class="px-2 py-1 text-[12px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200"
+                                                onclick="return confirm('Batalkan Approve data ini?');"><i class="fas fa-times"></i> Un-Approve</a>
+                                        <?php endif; ?>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-</div>
 </div>
 
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
-            "pageLength": 10,
-            "searching": true,
-            "ordering": true,
-            "dom": '<"row"<"col-sm-6"l><"col-sm-6 text-right pull-right"f>>rt<"row"<"col-sm-6"i><"col-sm-6 text-right"p>>',
-            "language": {
-                "search": "Cari Data:",
-                "lengthMenu": "Tampilkan _MENU_ data per halaman",
-                "zeroRecords": "Data tidak ditemukan",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_",
-                "infoEmpty": "Tidak ada data tersedia",
-                "infoFiltered": "(disaring dari _MAX_ total data)",
-                "paginate": {
-                    "next": ">",
-                    "previous": "<"
+            pageLength: 25,
+            autoWidth: false,
+            responsive: false,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            language: {
+                search: "Cari:",
+                searchPlaceholder: "Cari data...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Prev",
+                    next: "Next"
                 }
             }
         });
+        $('.dataTables_filter').css('float', 'right').addClass('mb-3');
+        $('.dataTables_length').css('float', 'left').addClass('mb-3');
     });
 </script>
 
@@ -326,6 +380,7 @@ $ttgl2 = @$_POST['ttgl2'];
 $simpan = @$_POST['simpan'];
 $print = @$_POST['print'];
 $excel = @$_POST['excel'];
+
 if ($simpan) {
 ?><script type="text/javascript">
         window.location.href = "?page=cuti&ttgl1=<?php echo $ttgl1; ?>&ttgl2=<?php echo $ttgl2; ?>";
@@ -344,7 +399,4 @@ if ($excel) {
     </script>
 <?php
 }
-
-
-
 ?>
