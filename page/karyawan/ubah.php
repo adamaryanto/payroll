@@ -28,66 +28,28 @@ if(isset($_GET['id'])){
 
 if (isset($_POST['update'])) {
     $tid = $_POST['tid'];
-    $tnama = $_POST['tnama'];
-    $tnoabsen = $_POST['tnoabsen'];
-    $tos = $_POST['tos'];
-    $tgolongan = $_POST['tgolongan'];
-    $tjeniskelamin = $_POST['tjeniskelamin'];
-    $tagama = $_POST['tagama'];
-    $ttempatlahir = $_POST['ttempatlahir'];
-    $ttanggallahir = $_POST['ttanggallahir'];
-    $tstatuskawin = $_POST['tstatuskawin'];
-    $tnoktp = $_POST['tnoktp'];
-    $talamatktp = $_POST['talamatktp'];
-    $talamattinggal = $_POST['talamattinggal'];
-    $ttanggalbergabung = $_POST['ttanggalbergabung'];
-    // Function to handle inline insert and return new ID
-    if (!function_exists('getOrInsertMaster')) {
-        function getOrInsertMaster($koneksi, $postKey, $table, $column, $extraData = []) {
-            $newValue = isset($_POST['new_' . $postKey]) ? trim($koneksi->real_escape_string($_POST['new_' . $postKey])) : '';
-            
-            if ($newValue !== '') {
-                // Check if exists
-                $check = $koneksi->query("SELECT * FROM $table WHERE $column = '$newValue'");
-                if ($check && $check->num_rows > 0) {
-                    $existing = $check->fetch_assoc();
-                    $pkResult = $koneksi->query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
-                    $pk = $pkResult->fetch_assoc()['Column_name'];
-                    return $existing[$pk];
-                }
-                
-                // Insert new
-                $cols = [$column];
-                $vals = ["'$newValue'"];
-                foreach ($extraData as $c => $v) {
-                    $cols[] = $c;
-                    $vals[] = "'$v'";
-                }
-                
-                $koneksi->query("INSERT INTO $table (" . implode(',', $cols) . ") VALUES (" . implode(',', $vals) . ")");
-                return $koneksi->insert_id;
-            }
-            
-            $selectedVal = isset($_POST[$postKey]) ? $koneksi->real_escape_string($_POST[$postKey]) : 0;
-            return ($selectedVal === 'add_new') ? 0 : $selectedVal;
-        }
-    }
-
-    $tdepartmen = getOrInsertMaster($koneksi, 'tdepartmen', 'ms_departmen', 'nama_departmen', ['id_perusahaan' => '1']);
-    $tsubdept = getOrInsertMaster($koneksi, 'tsubdept', 'ms_sub_department', 'nama_sub_department', ['id_perusahaan' => '1']);
-    $tjabatan = getOrInsertMaster($koneksi, 'tjabatan', 'ms_jabatan', 'jabatan', ['id_perusahaan' => '1']);
-    $tjadwal = getOrInsertMaster($koneksi, 'tjadwal', 'tb_jadwal', 'keterangan', ['jam_masuk' => '08:00:00', 'jam_keluar' => '17:00:00', 'istirahat_masuk' => '12:00:00', 'istirahat_keluar' => '13:00:00']);
-    $tagama = getOrInsertMaster($koneksi, 'tagama', 'ms_agama', 'agama');
-    $tstatuskawin = isset($_POST['tstatuskawin']) ? $koneksi->real_escape_string($_POST['tstatuskawin']) : '';
-
-    $tgolongan = getOrInsertMaster($koneksi, 'tgolongan', 'ms_golongan', 'golongan');
-    $tos = getOrInsertMaster($koneksi, 'tos', 'ms_os_dhk', 'nama_os_dhk');
+    $tnama = $koneksi->real_escape_string($_POST['tnama']);
+    $tnoabsen = $koneksi->real_escape_string($_POST['tnoabsen']);
+    $tos = $koneksi->real_escape_string($_POST['tos']);
+    $tgolongan = $koneksi->real_escape_string($_POST['tgolongan']);
+    $tjeniskelamin = $koneksi->real_escape_string($_POST['tjeniskelamin']);
+    $tagama = $koneksi->real_escape_string($_POST['tagama']);
+    $ttempatlahir = $koneksi->real_escape_string($_POST['ttempatlahir']);
+    $ttanggallahir = $koneksi->real_escape_string($_POST['ttanggallahir']);
+    $tstatuskawin = $koneksi->real_escape_string($_POST['tstatuskawin']);
+    $tnoktp = $koneksi->real_escape_string($_POST['tnoktp']);
+    $talamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
+    $talamattinggal = isset($_POST['talamattinggal']) ? $koneksi->real_escape_string($_POST['talamattinggal']) : '';
+    $ttanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
+    
+    $tdepartmen = $koneksi->real_escape_string($_POST['tdepartmen']);
+    $tsubdept = $koneksi->real_escape_string($_POST['tsubdept']);
+    $tjabatan = $koneksi->real_escape_string($_POST['tjabatan']);
 
     $sql = $koneksi->query("UPDATE ms_karyawan SET 
         id_departmen = '$tdepartmen',
         id_jabatan = '$tjabatan',
         id_sub_department = '$tsubdept',
-        id_jadwal = '$tjadwal',
         nama_karyawan = '$tnama',
         tempat_lahir = '$ttempatlahir',
         tgl_lahir = '$ttanggallahir',
@@ -106,10 +68,12 @@ if (isset($_POST['update'])) {
     if ($sql) {
         echo "<script>alert('Data Berhasil Diperbarui'); window.location='?page=karyawan';</script>";
     } else {
-        echo "<script>alert('Gagal Perbarui Data');</script>";
+        echo "<script>alert('Gagal Perbarui Data: " . $koneksi->error . "');</script>";
     }
 }
 ?>
+
+
 
 <div class="container-fluid px-4 mt-5 mb-5">
     <div class="card border-0 shadow-lg rounded-xl overflow-hidden">
@@ -127,29 +91,29 @@ if (isset($_POST['update'])) {
                     <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
                         <i class="fas fa-user-circle mr-2 text-lg"></i> Informasi Pribadi & Jabatan
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                         
                         <input type="hidden" name="tid" value="<?= $idkaryawan; ?>">
 
-                        <div class="form-group">
+                        <div class="form-group md:col-span-2">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                             <input autocomplete="off" type="text" name="tnama" value="<?= $nama; ?>" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" placeholder="Masukkan nama lengkap">
                         </div>
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. Absen</label>
-                            <input type="text" name="tnoabsen" value="<?= $noabsen; ?>" readonly class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 font-bold cursor-not-allowed">
+                            <input type="text" name="tnoabsen" value="<?= $noabsen; ?>" readonly class="max-w-[150px] w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 font-bold cursor-not-allowed">
                         </div>
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Departemen</label>
                             <select name="tdepartmen" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Departemen -" data-delete-route="bagian">
                                 <option value=""></option>
-                                <option value="add_new" data-url="?page=bagian&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Departemen Baru...</option>
+                                <option value="add_new" class="font-bold text-indigo-600">+ Tambah Departemen Baru...</option>
                                 <?php
                                 $q_dept = $koneksi->query("SELECT * FROM ms_departmen");
                                 while($d = $q_dept->fetch_assoc()) {
-                                    $sel = ($d['id_departmen'] == $iddepartmen) ? 'selected' : '';
+                                    $sel = ($d['id_departmen'] == $iddepartmen || $d['nama_departmen'] == $iddepartmen) ? 'selected' : '';
                                     echo "<option value='".$d['id_departmen']."' $sel>".$d['nama_departmen']."</option>";
                                 }
                                 ?>
@@ -160,11 +124,11 @@ if (isset($_POST['update'])) {
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Sub Departemen</label>
                             <select name="tsubdept" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Sub Bagian -" data-delete-route="subbagian">
                                 <option value=""></option>
-                                <option value="add_new" data-url="?page=subbagian&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Sub Bagian Baru...</option>
+                                <option value="add_new" class="font-bold text-indigo-600">+ Tambah Sub Bagian Baru...</option>
                                 <?php
                                 $q_sub = $koneksi->query("SELECT * FROM ms_sub_department");
                                 while($d = $q_sub->fetch_assoc()) {
-                                    $sel = ($d['id_sub_department'] == $idsubdept) ? 'selected' : '';
+                                    $sel = ($d['id_sub_department'] == $idsubdept || $d['nama_sub_department'] == $idsubdept) ? 'selected' : '';
                                     echo "<option value='".$d['id_sub_department']."' $sel>".$d['nama_sub_department']."</option>";
                                 }
                                 ?>
@@ -175,11 +139,11 @@ if (isset($_POST['update'])) {
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Jabatan</label>
                             <select name="tjabatan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Jabatan -" data-delete-route="jabatan">
                                 <option value=""></option>
-                                <option value="add_new" data-url="?page=jabatan&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Jabatan Baru...</option>
+                                <option value="add_new" class="font-bold text-indigo-600">+ Tambah Jabatan Baru...</option>
                                 <?php
                                 $q_jab = $koneksi->query("SELECT * FROM ms_jabatan");
                                 while($d = $q_jab->fetch_assoc()) {
-                                    $sel = ($d['id_jabatan'] == $idjabatan) ? 'selected' : '';
+                                    $sel = ($d['id_jabatan'] == $idjabatan || $d['jabatan'] == $idjabatan) ? 'selected' : '';
                                     echo "<option value='".$d['id_jabatan']."' $sel>".$d['jabatan']."</option>";
                                 }
                                 ?>
@@ -190,14 +154,13 @@ if (isset($_POST['update'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">OS / DHK <span class="text-red-500">*</span></label>
-                            <select name="tos" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" required data-placeholder="- Pilih -" data-delete-route="os_dhk">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=os_dhk&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Data Baru...</option>
+                            <select name="tos" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                                <option value="">- Pilih -</option>
                                 <?php
-                                $q_os = $koneksi->query("SELECT * FROM ms_os_dhk");
-                                while($d = $q_os->fetch_assoc()) {
-                                    $sel = ($d['nama_os_dhk'] == $os) ? 'selected' : '';
-                                    echo "<option value='".$d['nama_os_dhk']."' $sel>".$d['nama_os_dhk']."</option>";
+                                $os_list = ['OS', 'DHK', 'WJS'];
+                                foreach($os_list as $o) {
+                                    $sel = ($o == $os) ? 'selected' : '';
+                                    echo "<option value='$o' $sel>$o</option>";
                                 }
                                 ?>
                             </select>
@@ -205,17 +168,18 @@ if (isset($_POST['update'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Golongan</label>
-                            <select name="tgolongan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="golongan">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=golongan&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Golongan Baru...</option>
-                                <?php
-                                $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
-                                while($d = $q_gol->fetch_assoc()) {
-                                    $sel = ($d['golongan'] == $golongan) ? 'selected' : '';
-                                    echo "<option value='".$d['golongan']."' $sel>".$d['golongan']."</option>";
-                                }
-                                ?>
-                            </select>
+                            <div class="max-w-xs">
+                                <select name="tgolongan" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    <option value="">- Pilih -</option>
+                                    <?php
+                                    $gols = ['Harian', 'Bulanan', 'Mingguan'];
+                                    foreach($gols as $g) {
+                                        $sel = ($g == $golongan) ? 'selected' : '';
+                                        echo "<option value='$g' $sel>$g</option>";
+                                    }
+                                    ?>
+                                </select>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -228,14 +192,13 @@ if (isset($_POST['update'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Agama</label>
-                            <select name="tagama" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih Agama -" data-delete-route="agama">
-                                <option value=""></option>
-                                <option value="add_new" data-url="?page=agama&aksi=tambah" class="font-bold text-indigo-600">+ Tambah Agama Baru...</option>
+                            <select name="tagama" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="">- Pilih Agama -</option>
                                 <?php
-                                $q_agama = $koneksi->query("SELECT * FROM ms_agama");
-                                while($d = $q_agama->fetch_assoc()) {
-                                    $sel = ($d['agama'] == $agama) ? 'selected' : '';
-                                    echo "<option value='".$d['agama']."' $sel>".$d['agama']."</option>";
+                                $agamas = ['Islam', 'Kristen Protestan', 'Kristen Katolik', 'Hindu', 'Budha', 'Khonghucu'];
+                                foreach($agamas as $a) {
+                                    $sel = ($a == $agama) ? 'selected' : '';
+                                    echo "<option value='$a' $sel>$a</option>";
                                 }
                                 ?>
                             </select>
@@ -269,18 +232,19 @@ if (isset($_POST['update'])) {
                     <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
                         <i class="fas fa-file-alt mr-2 text-lg"></i> Dokumen & Domisili
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">No. KTP</label>
-                            <input type="text" name="tnoktp" value="<?= $noktp; ?>" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
+                            <input type="text" name="tnoktp" value="<?= $noktp; ?>" class="max-w-md w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="16 Digit No. KTP">
                         </div>
+                        <div class="form-group hidden md:block"></div> <!-- Spacer -->
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Lengkap (KTP)</label>
-                            <textarea name="talamatktp" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."><?= $alamatktp; ?></textarea>
+                            <textarea name="talamatktp" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."><?= $alamatktp; ?></textarea>
                         </div>
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Alamat Tinggal</label>
-                            <textarea name="talamattinggal" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."><?= $alamattinggal; ?></textarea>
+                            <textarea name="talamattinggal" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Jl. Contoh No. 123..."><?= $alamattinggal; ?></textarea>
                         </div>
                     </div>
                 </div>
@@ -335,33 +299,31 @@ $(document).ready(function() {
         var $select = $(this);
         var selectName = $select.attr('name');
         var selectedVal = $select.val();
+        var route = $select.data('delete-route');
 
         if (selectedVal === 'add_new') {
-            // Mengambil label text (Misal: "Sub Departemen")
             var label = $select.closest('.form-group').find('label').text().replace('*', '').trim();
-            
-            // Tampilkan prompt
             var newData = prompt("Masukkan " + label + " Baru:");
 
             if (newData && newData.trim() !== "") {
-                // Hapus input hidden lama jika user mencoba input berkali-kali
-                $('input[name="new_' + selectName + '"]').remove();
-                
-                // Tambahkan input hidden baru ke form
-                $('<input>').attr({
-                    type: 'hidden',
-                    name: 'new_' + selectName,
-                    value: newData.trim()
-                }).appendTo('#formUbahKaryawan'); // ID Form
-
-                // Tambahkan opsi secara visual agar tidak "disabled" atau blank
-                var newOption = new Option(newData.trim(), newData.trim(), true, true);
-                $select.append(newOption).trigger('change');
+                $.post('page/ajax/tambah_master.php', {
+                    value: newData.trim(),
+                    route: route
+                }, function(res) {
+                    if (res.success) {
+                        var newOption = new Option(res.value, res.id, true, true);
+                        $select.append(newOption).trigger('change');
+                    } else {
+                        alert('Gagal menambah data: ' + res.message);
+                        $select.val('').trigger('change');
+                    }
+                }, 'json');
             } else {
-                // Jika batal, reset pilihan
                 $select.val('').trigger('change');
             }
         }
     });
 });
 </script>
+
+
