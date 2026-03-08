@@ -383,7 +383,7 @@ if ($datastatusrealisasi == 'approve') {
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Departemen</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Sub Bagian</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">OS/DHK</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Gol</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Golongan</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Jam Masuk</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Jam Pulang</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Keluar</th>
@@ -394,9 +394,9 @@ if ($datastatusrealisasi == 'approve') {
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Istirahat Masuk</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Potongan Telat</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Potongan Istirahat</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Potongan Lain</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Hasil</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-center">Aksi</th>
                                     </tr>

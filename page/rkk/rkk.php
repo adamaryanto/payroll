@@ -284,11 +284,10 @@ if ($_SESSION['role'] == "owner") {
                         <tr>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">No</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Tanggal</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Jam</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Karyawan</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-right">Total Upah</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Keterangan</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Aksi</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Jumlah Karyawan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Aksi Data</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Otorisasi</th>
 
                         </tr>
                     </thead>
@@ -301,22 +300,26 @@ if ($_SESSION['role'] == "owner") {
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="py-2.5 px-2 text-center text-[15px]"><?= $no++ ?></td>
                                 <td class="py-2.5 px-2 text-[15px] font-medium"><?= $data['tgl_rkk'] ?></td>
-                                <td class="py-2.5 px-2 text-[15px]"><?= $data['jam_kerja'] ?> Jam</td>
-                                <td class="py-2.5 px-2 text-center text-[15px]"><?= $data['jml'] ?></td>
-                                <td class="py-2.5 px-2 text-right text-[15px] font-bold">Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></td>
                                 <td class="py-2.5 px-2 text-[14px] text-gray-600"><?= $data['keterangan'] ?></td>
+                                <td class="py-2.5 px-2 text-center text-[15px]"><b><?= $data['jml'] ?></b><br><small>Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></small></td>
                                 <td class="py-2.5 px-2 align-middle text-center">
                                     <div class="flex items-center justify-center gap-1.5 flex-wrap">
                                         <a href="?page=rkk&aksi=kelola&id=<?= $data['id_rkk']; ?>"
                                             class="px-2 py-1 text-[12px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200">
                                             <i class="fas fa-eye"></i> Detail
                                         </a>
+                                        <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>"
+                                            class="px-2 py-1 text-[12px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200">
+                                            <i class="fa fa-print"></i> Cetak</a>
                                         <?php if ($_SESSION['role'] == "owner") : ?>
                                             <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
                                                 class="px-2 py-1 text-[12px] font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded border border-indigo-200">
                                                 <i class="fas fa-user-plus"></i> Tetapkan</a>
                                         <?php endif; ?>
-
+                                    </div>
+                                </td>
+                                <td class="py-2.5 px-2 align-middle text-center">
+                                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
                                         <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
                                                 class="px-2 py-1 text-[12px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200"
@@ -340,7 +343,6 @@ if ($_SESSION['role'] == "owner") {
                                                 class="px-2 py-1 text-[12px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200"
                                                 onclick="return confirm('Batalkan Approve data ini?');"><i class="fas fa-times"></i> Un-Approve</a>
                                         <?php endif; ?>
-
                                     </div>
                                 </td>
                             </tr>
