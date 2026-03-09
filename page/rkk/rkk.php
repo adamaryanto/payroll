@@ -48,54 +48,72 @@ if ($_SESSION['role'] == "owner") {
         transition: 0.3s;
     }
 
-    /* DataTables Styling Update untuk Mobile */
+     /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
         display: block !important;
     }
 
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
     .dataTables_wrapper::before,
     .dataTables_wrapper::after {
         display: none !important;
     }
 
-    /* Flexbox pembungkus Search & Length */
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
     #dataTables-example_wrapper .row:first-child {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        flex-wrap: wrap !important;
-        gap: 15px;
         margin-bottom: 20px !important;
         width: 100% !important;
     }
 
-    .dataTables_length, .dataTables_filter {
+    /* 4. Styling Tampil _MENU_ (Kiri) */
+    .dataTables_length {
         display: flex !important;
         align-items: center !important;
     }
-    
+
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+
+    /* 5. Styling Cari: (Kanan) */
     .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
         justify-content: flex-end !important;
     }
 
-    .dataTables_length select, .dataTables_filter input {
-        padding: 8px 12px !important;
-        border: 1px solid #e0e6ed !important;
-        border-radius: 8px !important;
-        font-size: 14px !important;
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
     }
 
     .dataTables_filter input {
-        width: 100%;
-        max-width: 250px;
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
     }
 
-    /* Pagination & Info */
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
     .dataTables_wrapper .dataTables_paginate {
         display: flex !important;
-        justify-content: center !important;
-        flex-wrap: wrap !important;
-        gap: 6px !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 4px !important;
         padding-top: 15px !important;
     }
 
@@ -103,11 +121,21 @@ if ($_SESSION['role'] == "owner") {
         border: 1px solid #e2e8f0 !important;
         background: white !important;
         border-radius: 6px !important;
-        padding: 8px 14px !important;
+        padding: 5px 12px !important;
         color: #475569 !important;
         font-weight: 500 !important;
         cursor: pointer !important;
-        font-size: 14px;
+        transition: all 0.2s !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    h3{
+        color: #2563eb !important;
     }
 
     .dataTables_paginate .paginate_button.current {
@@ -116,26 +144,43 @@ if ($_SESSION['role'] == "owner") {
         color: white !important;
     }
 
-    .dataTables_wrapper .dataTables_info {
-        padding-top: 15px !important;
-        color: #64748b !important;
-        font-size: 14px !important;
-        text-align: center;
+    .dataTables_paginate .paginate_button.disabled {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed !important;
     }
 
-    /* Responsive Mobile View Khusus Tabel */
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
+    /* =========================================
+       KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
+       ========================================= */
     @media screen and (max-width: 768px) {
+        .table-responsive {
+            padding: 12px !important;
+        }
+        
         #dataTables-example_wrapper .row:first-child {
             flex-direction: column !important;
             align-items: flex-start !important;
+            gap: 15px;
         }
-        .dataTables_length, .dataTables_filter {
+        .dataTables_filter, .dataTables_length {
             width: 100% !important;
             justify-content: flex-start !important;
         }
         .dataTables_filter input {
             width: 100% !important;
-            max-width: 100%;
+            max-width: 100% !important;
+        }
+        .dataTables_paginate {
+            justify-content: center !important;
+            flex-wrap: wrap;
         }
 
         .table-modern thead {
@@ -144,25 +189,28 @@ if ($_SESSION['role'] == "owner") {
 
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1.5rem;
-            border: 1px solid #cbd5e1;
+            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            background-color: #fff;
         }
 
         .table-modern tbody td {
             display: flex;
-            flex-direction: column;
-            padding: 10px 0 !important;
+            flex-direction: column; /* Label di atas, data di bawah (stacking) */
+            align-items: flex-start;
+            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
-            border-bottom: 1px solid #f1f5f9 !important;
-            font-size: 15px; /* Teks lebih besar untuk orang tua */
-            text-align: left !important;
+            border-bottom: 1px dashed #e2e8f0 !important;
         }
-
+        .table-modern tbody td:first-child {
+            padding-top: 0 !important;
+        }
         .table-modern tbody td:last-child {
             border-bottom: none !important;
+            padding-bottom: 0 !important;
         }
 
         .table-modern tbody td:before {
@@ -170,24 +218,30 @@ if ($_SESSION['role'] == "owner") {
             font-weight: 700;
             color: #64748b;
             text-transform: uppercase;
-            font-size: 12px;
-            margin-bottom: 6px; /* Jarak antara label dan isi */
-        }
-
-        .btn-action-group {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 10px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px; /* Memberi jarak ke datanya */
+            display: block;
             width: 100%;
-            margin-top: 5px;
         }
 
-        .btn-action-group a {
-            flex: 1 1 auto;
-            text-align: center;
-            justify-content: center;
-            padding: 10px !important; /* Area sentuh jari lebih besar */
+        /* Memperbesar Tombol Aksi di Mobile */
+        .action-btn-group {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            padding-top: 5px;
+        }
+        .action-btn-group > a, .action-btn-group > div {
+            flex: 1; /* Lebar tombol menyesuaikan merata */
+        }
+        .action-btn-group a {
+            padding: 10px !important; /* Area klik jadi besar */
+            width: 100%;
+        }
+
+        h3 {
+            color: #2563eb !important;
         }
     }
 </style>
@@ -305,13 +359,12 @@ if ($_SESSION['role'] == "owner") {
                 lengthMenu: "Tampilkan _MENU_ baris",
                 info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
                 paginate: {
-                    previous: "« Prev",
-                    next: "Next »"
+                    previous: "Prev",
+                    next: "Next"
                 }
             }
         });
         
-        // Dihapus style .css('float') yang bisa mengganggu flexbox responsif
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');
     });

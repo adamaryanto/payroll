@@ -93,7 +93,8 @@ if ($datastatusrkk == 3) {
     background-color: #f8f9fa;
     color: #333;
     text-transform: uppercase;
-    font-size: 13px; /* Diperbesar dari 11px */
+    font-size: 13px;
+    /* Diperbesar */
     letter-spacing: 0.5px;
     border-bottom: 2px solid #dee2e6 !important;
     vertical-align: middle;
@@ -101,57 +102,81 @@ if ($datastatusrkk == 3) {
 
   .table tbody td {
     vertical-align: middle !important;
-    font-size: 14px; /* Huruf standar lebih jelas */
+    font-size: 14px;
+    /* Diperbesar */
   }
 
-  /* DataTables Styling Update untuk Mobile */
+  .table-hover tbody tr:hover {
+    background-color: rgba(95, 158, 160, 0.1) !important;
+    transition: 0.3s;
+  }
+
+  /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
   .dataTables_wrapper {
     display: block !important;
   }
 
+  /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
   .dataTables_wrapper::before,
   .dataTables_wrapper::after {
     display: none !important;
   }
 
-  /* Flexbox pembungkus Search & Length */
+  /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
   #dataTables-example_wrapper .row:first-child {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    flex-wrap: wrap !important; /* Agar turun ke bawah di HP */
-    gap: 15px;
     margin-bottom: 20px !important;
     width: 100% !important;
   }
 
-  .dataTables_length, .dataTables_filter {
+  /* 4. Styling Tampil _MENU_ (Kiri) */
+  .dataTables_length {
     display: flex !important;
     align-items: center !important;
   }
-  
+
+  .dataTables_length label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
+  }
+
+  .dataTables_length select {
+    padding: 5px 10px !important;
+    border: 1px solid #e0e6ed !important;
+    border-radius: 8px !important;
+  }
+
+  /* 5. Styling Cari: (Kanan) */
   .dataTables_filter {
+    text-align: right !important;
+    display: flex !important;
     justify-content: flex-end !important;
   }
 
-  .dataTables_length select, .dataTables_filter input {
-    padding: 8px 12px !important;
-    border: 1px solid #e0e6ed !important;
-    border-radius: 8px !important;
-    font-size: 14px !important;
+  .dataTables_filter label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin: 0 !important;
   }
 
   .dataTables_filter input {
-    width: 100%;
-    max-width: 250px;
+    padding: 6px 12px !important;
+    border: 1px solid #e0e6ed !important;
+    border-radius: 8px !important;
+    width: 200px !important;
   }
 
-  /* Pagination & Info */
+  /* --- STYLING PAGINATE (PREV/NEXT) --- */
   .dataTables_wrapper .dataTables_paginate {
     display: flex !important;
-    justify-content: center !important;
-    flex-wrap: wrap !important;
-    gap: 6px !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 4px !important;
     padding-top: 15px !important;
   }
 
@@ -159,11 +184,21 @@ if ($datastatusrkk == 3) {
     border: 1px solid #e2e8f0 !important;
     background: white !important;
     border-radius: 6px !important;
-    padding: 8px 14px !important;
+    padding: 5px 12px !important;
     color: #475569 !important;
     font-weight: 500 !important;
     cursor: pointer !important;
-    font-size: 14px;
+    transition: all 0.2s !important;
+  }
+
+  .dataTables_paginate .paginate_button:hover {
+    background: #f8fafc !important;
+    color: #2563eb !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  h3 {
+    color: #2563eb !important;
   }
 
   .dataTables_paginate .paginate_button.current {
@@ -172,26 +207,35 @@ if ($datastatusrkk == 3) {
     color: white !important;
   }
 
+  .dataTables_paginate .paginate_button.disabled {
+    background: #f1f5f9 !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed !important;
+  }
+
+  /* --- STYLING INFO --- */
   .dataTables_wrapper .dataTables_info {
-    padding-top: 15px !important;
+    padding-top: 20px !important;
     color: #64748b !important;
-    font-size: 14px !important;
-    text-align: center;
+    font-size: 13px !important;
   }
 
   /* Responsive Mobile View Khusus Tabel */
   @media screen and (max-width: 768px) {
     #dataTables-example_wrapper .row:first-child {
-        flex-direction: column !important;
-        align-items: flex-start !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
     }
-    .dataTables_length, .dataTables_filter {
-        width: 100% !important;
-        justify-content: flex-start !important;
+
+    .dataTables_length,
+    .dataTables_filter {
+      width: 100% !important;
+      justify-content: flex-start !important;
     }
+
     .dataTables_filter input {
-        width: 100% !important;
-        max-width: 100%;
+      width: 100% !important;
+      max-width: 100%;
     }
 
     .table-modern thead {
@@ -204,16 +248,18 @@ if ($datastatusrkk == 3) {
       border: 1px solid #cbd5e1;
       border-radius: 12px;
       padding: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
 
     .table-modern tbody td {
       display: flex;
-      flex-direction: column; /* Label di atas, value di bawah pada layar sangat kecil, atau biarkan flex-row dengan jarak */
+      flex-direction: column;
+      /* Label di atas, value di bawah pada layar sangat kecil, atau biarkan flex-row dengan jarak */
       padding: 10px 0 !important;
       border: none !important;
       border-bottom: 1px solid #f1f5f9 !important;
-      font-size: 15px; /* Lebih besar untuk ortu */
+      font-size: 15px;
+      /* Lebih besar untuk ortu */
     }
 
     .table-modern tbody td:last-child {
@@ -228,7 +274,7 @@ if ($datastatusrkk == 3) {
       font-size: 12px;
       margin-bottom: 4px;
     }
-    
+
     .aksi-buttons {
       display: flex;
       flex-direction: row;
@@ -244,7 +290,7 @@ if ($datastatusrkk == 3) {
   <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
     <div class="border-b border-gray-200 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
-      
+
       <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
         <?php if ($_SESSION['role'] == "owner") : ?>
           <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
@@ -267,16 +313,16 @@ if ($datastatusrkk == 3) {
     <div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
       <div class="row">
         <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-            <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
-            <input type="date" value="<?= $datatglrkk; ?>" readonly class="form-control text-base py-2" />
+          <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
+          <input type="date" value="<?= $datatglrkk; ?>" readonly class="form-control text-base py-2" />
         </div>
         <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-            <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
-            <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
+          <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
+          <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
         </div>
         <div class="col-md-4 col-sm-12">
-            <label class="font-bold text-gray-700 text-sm">Jam Kerja:</label>
-            <input type="text" value="<?= $datajamkerja; ?> Jam" readonly class="form-control text-base py-2" />
+          <label class="font-bold text-gray-700 text-sm">Jam Kerja:</label>
+          <input type="text" value="<?= $datajamkerja; ?> Jam" readonly class="form-control text-base py-2" />
         </div>
       </div>
     </div>
@@ -305,13 +351,13 @@ if ($datastatusrkk == 3) {
                 <td data-label="Karyawan">
                   <span class="text-base font-bold text-gray-900"><?= $data['nama_karyawan'] ?></span><br>
                   <span class="text-sm text-gray-500"><?= $data['no_absen'] ?></span>
-                  
+
                   <?php if (!empty($data['menggantikan'])) : ?>
                     <div class="text-xs text-blue-600 font-bold italic mt-1">
                       <i class="fas fa-exchange-alt mr-1"></i> Menggantikan <?= $data['menggantikan'] ?>
                     </div>
                   <?php endif; ?>
-                  
+
                   <?php if (!empty($data['digantikan_oleh'])) : ?>
                     <div class="text-xs text-red-600 font-bold italic mt-1">
                       <i class="fas fa-user-times mr-1"></i> Digantikan oleh <?= $data['digantikan_oleh'] ?>
@@ -331,8 +377,8 @@ if ($datastatusrkk == 3) {
                   </div>
                 </td>
                 <td data-label="Penempatan">
-                    <span class="text-base font-medium"><?= $data['nama_departmen'] ?></span><br>
-                    <span class="text-sm text-gray-600"><?= $data['nama_sub_department'] ?></span>
+                  <span class="text-base font-medium"><?= $data['nama_departmen'] ?></span><br>
+                  <span class="text-sm text-gray-600"><?= $data['nama_sub_department'] ?></span>
                 </td>
                 <td data-label="Shift"><span class="badge bg-gray-200 text-gray-800 px-2 py-1 text-sm rounded"><?= $data['nama_shift'] ?></span></td>
                 <td data-label="Jam"><span class="text-sm font-medium"><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></span></td>
@@ -383,8 +429,8 @@ if ($datastatusrkk == 3) {
         lengthMenu: "Tampilkan _MENU_ baris",
         info: "Menampilkan _START_ s/d _END_ dari total _TOTAL_ data",
         paginate: {
-          previous: "« Prev",
-          next: "Next »"
+          previous: "Prev",
+          next: "Next"
         }
       }
     });
