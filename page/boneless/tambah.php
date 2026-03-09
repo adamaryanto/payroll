@@ -60,8 +60,16 @@ $default_items = [
                     <form method="POST">
                         <div class="row">
                             <div class="col-md-4 form-group">
-                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Tanggal Produksi</label>
-                                <input type="date" name="tgl" class="form-control" required value="<?= date('Y-m-d') ?>">
+                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Realisasi</label>
+                                <select name="tgl" class="form-control" required>
+                                    <option value="">-- Pilih Realisasi --</option>
+                                    <?php
+                                    $sql_realisasi = $koneksi->query("SELECT * FROM tb_realisasi ORDER BY tgl_realisasi DESC");
+                                    while ($row_realisasi = $sql_realisasi->fetch_assoc()) {
+                                        echo '<option value="' . $row_realisasi['tgl_realisasi'] . '">' . date('d-m-Y', strtotime($row_realisasi['tgl_realisasi'])) . ' - ' . $row_realisasi['keterangan'] . '</option>';
+                                    }
+                                    ?>
+                                </select>
                             </div>
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Jumlah Mobil (Potong)</label>
