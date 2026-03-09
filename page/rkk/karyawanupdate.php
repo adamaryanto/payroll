@@ -1,14 +1,16 @@
 <?php
-if(isset($_GET['id'])){
-   $idrkkdetail = $_GET['id'];
-   $tampildetail=$koneksi->query("select * from tb_rkk_detail where id_rkk_detail = '$idrkkdetail' ");
-   $datadetail=$tampildetail->fetch_assoc();
-   $idrkk = $datadetail['id_rkk'];
-   $idrkkkaryawan = $datadetail['id_karyawan'];
-   $orig_upah = $datadetail['upah'];
-   $orig_jadwal = $datadetail['id_jadwal'];
+if (isset($_GET['id'])) {
+    $idrkkdetail = $_GET['id'];
+    $tampildetail = $koneksi->query("select * from tb_rkk_detail where id_rkk_detail = '$idrkkdetail' ");
+    $datadetail = $tampildetail->fetch_assoc();
+    $idrkk = $datadetail['id_rkk'];
+    $idrkkkaryawan = $datadetail['id_karyawan'];
+    $orig_upah = $datadetail['upah'];
+    $orig_jadwal = $datadetail['id_jadwal'];
 } else {
-    $idrkkdetail = ""; $idrkk = ""; $idrkkkaryawan="";
+    $idrkkdetail = "";
+    $idrkk = "";
+    $idrkkkaryawan = "";
 }
 ?>
 
@@ -49,25 +51,21 @@ if(isset($_GET['id'])){
                                 LEFT JOIN ms_sub_department ON ms_karyawan.id_sub_department = ms_sub_department.id_sub_department
                                 WHERE ms_karyawan.status_karyawan = 'Aktif' 
                                 ORDER BY ms_karyawan.nama_karyawan ASC");
-                            
+
                             while ($datakaryawan = $tampil->fetch_assoc()) {
                                 $id_k = $datakaryawan['id_karyawan'];
                                 // Cek apakah sudah ada di RKK ini
                                 $cek_rkk = $koneksi->query("SELECT status_rkk FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$id_k' LIMIT 1");
                                 $rkk_status = $cek_rkk->num_rows > 0 ? $cek_rkk->fetch_assoc()['status_rkk'] : 'Tersedia';
-                                
+
                                 $is_disabled = ($rkk_status != 'Tersedia');
                             ?>
                                 <tr class="<?= $is_disabled ? 'bg-gray-50 opacity-60' : 'hover:bg-gray-50' ?> transition-colors text-[14px]">
                                     <td class="py-2 px-2 text-center">
-                                        <?php if(!$is_disabled): ?>
-                                            <input type="radio" name="ck" value="<?= $no; ?>" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300">
-                                            <input type="hidden" name="tidkaryawan[]" value="<?= $id_k; ?>">
-                                            <input type="hidden" name="tdept[]" value="<?= $datakaryawan['id_departmen']; ?>">
-                                            <input type="hidden" name="tsub[]" value="<?= $datakaryawan['id_sub_department']; ?>">
+                                        <?php if (!$is_disabled): ?>
+                                            <input type="radio" name="id_pengganti" value="<?= $id_k; ?>" class="w-4 h-4 text-indigo-600 focus:ring-indigo-500 border-gray-300" required>
                                         <?php else: ?>
                                             <i class="fas fa-lock text-gray-400"></i>
-                                            <input type="hidden" name="tidkaryawan[]" value="<?= $id_k; ?>">
                                         <?php endif; ?>
                                     </td>
                                     <td class="py-2 px-2"><?= $datakaryawan['no_absen'] ?></td>
@@ -75,14 +73,15 @@ if(isset($_GET['id'])){
                                     <td class="py-2 px-2"><?= $datakaryawan['nama_departmen'] ?></td>
                                     <td class="py-2 px-2"><?= $datakaryawan['nama_sub_department'] ?></td>
                                     <td class="py-2 px-2">
-                                        <?php if($rkk_status == 'Tersedia'): ?>
+                                        <?php if ($rkk_status == 'Tersedia'): ?>
                                             <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2 py-0.5 rounded-full">Tersedia</span>
                                         <?php else: ?>
                                             <span class="bg-gray-200 text-gray-600 text-[11px] font-bold px-2 py-0.5 rounded-full"><?= $rkk_status ?></span>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
-                            <?php $no++; } ?>
+                            <?php $no++;
+                            } ?>
                         </tbody>
                     </table>
                 </div>
@@ -99,38 +98,45 @@ if(isset($_GET['id'])){
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
             pageLength: 25,
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
             language: {
                 search: "Cari Karyawan:",
                 lengthMenu: "Tampilkan _MENU_",
                 info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
-                paginate: { previous: "Prev", next: "Next" }
+                paginate: {
+                    previous: "Prev",
+                    next: "Next"
+                }
             }
         });
     });
 </script>
 
 <?php
-if(isset($_POST['simpan'])) {
-    if(isset($_POST['ck'])){
-        $cek = $_POST['ck'];
-        $tidkaryawan = $_POST['tidkaryawan'];
-        $tdept = $_POST['tdept'];
-        $tsub = $_POST['tsub'];
-        
-        $idkaryawan_pengganti = $tidkaryawan[$cek];
-        $iddept_pengganti = $tdept[$cek];
-        $idsub_pengganti = $tsub[$cek];
+if (isset($_POST['simpan'])) {
+    // Cek apakah radio button 'id_pengganti' sudah dipilih
+    if (isset($_POST['id_pengganti'])) {
+        $idkaryawan_pengganti = $_POST['id_pengganti'];
 
-        // 1. Masukkan karyawan pengganti ke tb_rkk_detail (copy upah/jadwal dari yang diganti)
+        // Ambil data departemen & sub-dept karyawan pengganti langsung dari DB agar aman
+        $q_karyawan = $koneksi->query("SELECT id_departmen, id_sub_department FROM ms_karyawan WHERE id_karyawan = '$idkaryawan_pengganti'");
+        $data_k = $q_karyawan->fetch_assoc();
+
+        $iddept_pengganti = $data_k['id_departmen'];
+        $idsub_pengganti  = $data_k['id_sub_department'];
+
+        // 1. Masukkan karyawan pengganti ke tb_rkk_detail
         $q_insert = "INSERT INTO tb_rkk_detail 
             (id_rkk, id_karyawan, upah, id_departmen, id_sub_department, id_jadwal, status_rkk, 
              potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
             VALUES 
             ('$idrkk', '$idkaryawan_pengganti', '$orig_upah', '$iddept_pengganti', '$idsub_pengganti', '$orig_jadwal', 'Pengganti', 
              '0', '0', '0', NOW())";
-        
-        if($koneksi->query($q_insert)) {
+
+        if ($koneksi->query($q_insert)) {
             // 2. Update status karyawan lama
             $koneksi->query("UPDATE tb_rkk_detail SET status_rkk = 'Digantikan' WHERE id_rkk_detail = '$idrkkdetail'");
 
@@ -143,7 +149,7 @@ if(isset($_POST['simpan'])) {
             echo "<script>alert('Gagal menyimpan: " . $koneksi->error . "');</script>";
         }
     } else {
-        echo "<script>alert('Pilih satu karyawan pengganti!');</script>";
+        echo "<script>alert('Silakan pilih satu karyawan pengganti!');</script>";
     }
 }
 ?>
