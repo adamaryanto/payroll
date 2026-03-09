@@ -45,8 +45,9 @@
                             <td class="text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['golongan'] ?></td>
                             <td class="text-center text-sm text-gray-600"><?= $datakaryawan['jenis_kelamin'] ?></td>
                             <td class="text-xs space-y-1">
-                                <div class="flex items-center"><span class="w-12 text-gray-400 font-medium">KTP:</span> <span class="text-gray-700"><?= $datakaryawan['no_ktp'] ?></span></div>
-                                <div class="flex items-center"><span class="w-12 text-gray-400 font-medium">BPJS:</span> <span class="text-gray-700"><?= $datakaryawan['no_bpjs'] ?></span></div>
+                                <div class="flex items-center"><span class="w-12 text-gray-400 font-medium">KTP:</span> <span class="text-gray-700"><?= $datakaryawan['no_ktp'] ?></span>
+                            <span class="w-12 text-gray-400 font-medium">KTP:</span> <span class="text-gray-700"><?= $datakaryawan['no_bpjs'] ?></span>
+                            </div>
                             </td>
                             <td class="text-center">
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?= $status_class ?>">
