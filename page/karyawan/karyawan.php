@@ -129,24 +129,6 @@
         display: inline-block;
     }
 
-    .bg-propose {
-        background-color: #FFEBCD;
-        color: #856404;
-        border: 1px solid #ffeeba;
-    }
-
-    .bg-accept {
-        background-color: #98FB98;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .bg-reject {
-        background-color: #F0FFFF;
-        color: #0c5460;
-        border: 1px solid #bee5eb;
-    }
-
     /* Button Styling */
     .btn {
         border-radius: 4px;

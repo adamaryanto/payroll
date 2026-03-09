@@ -64,7 +64,7 @@ if (isset($_GET['id'])) {
                     <div class="flex gap-3">
                         <a href="?page=upah" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition">Batal</a>
                         <button type="submit" name="simpan" value="Simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-0.5">
-                            <i class="fas fa-save mr-2"></i> Simpan Perubahan
+                            <i class="fas fa-save mr-2"></i> Simpan
                         </button>
                     </div>
                 </div>
