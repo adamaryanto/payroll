@@ -40,6 +40,7 @@ if (isset($_POST['update'])) {
     $ttanggallahir = $koneksi->real_escape_string($_POST['ttanggallahir']);
     $tstatuskawin = $koneksi->real_escape_string($_POST['tstatuskawin']);
     $tnoktp = $koneksi->real_escape_string($_POST['tnoktp']);
+    $tbpjs = $koneksi->real_escape_string($_POST['tnobpjs']);
     $talamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
     $talamattinggal = isset($_POST['talamattinggal']) ? $koneksi->real_escape_string($_POST['talamattinggal']) : '';
     $ttanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
@@ -59,10 +60,10 @@ if (isset($_POST['update'])) {
         status_kawin = '$tstatuskawin',
         jenis_kelamin = '$tjeniskelamin',
         no_ktp = '$tnoktp',
+        no_bpjs = '$tbpjs',
         alamat_ktp = '$talamatktp',
         alamat_tinggal = '$talamattinggal',
         tgl_aktif = '$ttanggalbergabung',
-        no_bpjs = '$tnobpjs',
         OS_DHK = '$tos',
         golongan = '$tgolongan'
         WHERE id_karyawan = '$tid'
@@ -291,9 +292,6 @@ if (isset($_POST['update'])) {
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
-    }
-    input[type=number] {
-        -moz-appearance: textfield;
     }
 </style>
 
