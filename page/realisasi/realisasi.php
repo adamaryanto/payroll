@@ -17,15 +17,15 @@ $level_status = (!$role_akses) ? "hidden" : "";
 <div class="container-fluid px-2 mt-4 mb-4">
     <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
 
-        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+        <div class="border-b border-gray-100 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white">
             <div>
                 <h3 class="text-xl font-bold m-0"><i class="fas fa-file-invoice-dollar mr-2"></i>List Realisasi Upah</h3>
             </div>
-            <div class="flex gap-2">
-                <a href="?page=boneless" class="inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+            <div class="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
+                <a href="?page=boneless" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
                 </a>
-                <a href="?page=realisasi&aksi=rkk" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                <a href="?page=realisasi&aksi=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
@@ -33,7 +33,7 @@ $level_status = (!$role_akses) ? "hidden" : "";
 
         <div class="p-0">
             <div class="table-responsive px-3 py-3">
-                <table class="w-full text-left border-collapse" id="dataTables-example">
+                <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-8">No</th>
@@ -65,61 +65,63 @@ $level_status = (!$role_akses) ? "hidden" : "";
                             }
                         ?>
                             <tr class="<?= $row_class ?>">
-                                <td data-label="No" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $no ?></td>
-                                <td data-label="Tanggal" class="py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= $data['tgl_realisasi'] ?></td>
-                                <td data-label="Keterangan" class="py-2.5 px-2 align-middle">
+                                <td data-label="No" class="md:text-center text-sm md:text-[15px] text-gray-700 font-medium align-middle"><?= $no ?></td>
+                                <td data-label="Tanggal" class="py-2 md:py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= $data['tgl_realisasi'] ?></td>
+                                <td data-label="Keterangan" class="py-2 md:py-2.5 px-2 align-middle">
                                     <div class="text-[14px] text-gray-700 md:max-w-[150px] md:truncate" title="<?= htmlspecialchars($data['keterangan']) ?>">
                                         <?= htmlspecialchars($data['keterangan']) ?>
                                     </div>
                                 </td>
-                                <td data-label="Jumlah Karyawan" class="py-2.5 px-2 text-center text-[15px] text-gray-700 align-middle"><?= $data['jml'] ?></td>
-
-                                <td data-label="Total Upah" class="py-2.5 px-2 text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
-                                    <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
-                                </td>
-                                <td data-label="Potongan Telat" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
-                                    <?= number_format($data['pottelat'] ?? 0, 0, ',', '.') ?>
-                                </td>
-                                <td data-label="Potongan Istirahat" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
-                                    <?= number_format($data['potistirahat'] ?? 0, 0, ',', '.') ?>
-                                </td>
-                                <td data-label="Potongan Lainnya" class="py-2.5 px-2 text-right text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
-                                    <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
+                                <td data-label="Jumlah Karyawan" class="py-2 md:py-2.5 px-2 md:text-center text-[15px] text-gray-700 align-middle">
+                                    <span class="md:hidden font-bold">Total: </span><?= $data['jml'] ?> <span class="md:hidden">Orang</span>
                                 </td>
 
-                                <td data-label="Status" class="py-2.5 px-2 align-middle text-center">
+                                <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Potongan Telat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['pottelat'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Potongan Istirahat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['potistirahat'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Potongan Lainnya" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
+                                </td>
+
+                                <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
                                     <?= $status_badge ?>
                                 </td>
 
-                                <td data-label="Aksi" class="py-2.5 px-2 align-middle text-center">
-                                    <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                <td data-label="Aksi" class="py-2 md:py-2.5 px-2 align-middle md:text-center mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
+                                    <div class="flex items-center md:justify-center gap-1.5 flex-wrap action-btn-group">
                                         <a href="?page=realisasi&aksi=kelola&id=<?= $data['id_realisasi']; ?>"
-                                            class="px-2 py-1 text-[13px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors" title="Detail">
-                                            <i class="fas fa-eye"></i> Detail
+                                            class="px-2 py-1 text-[13px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors flex justify-center items-center" title="Detail">
+                                            <i class="fas fa-eye md:mr-1"></i> <span class="ml-1 md:inline">Detail</span>
                                         </a>
 
-                                        <div class="<?= $level_status ?> <?= $app ?>">
+                                        <div class="<?= $level_status ?> <?= $app ?> flex-1 md:flex-none">
                                             <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
-                                                class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors"
+                                                class="w-full md:w-auto px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
                                                 onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
-                                                <i class="fas fa-check"></i> Approve
+                                                <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
                                             </a>
                                         </div>
 
                                         <?php if ($data['status_realisasi'] == 'approve') : ?>
-                                            <div class="<?= $level_status ?>">
+                                            <div class="<?= $level_status ?> flex-1 md:flex-none">
                                                 <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi']; ?>"
-                                                    class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors"
+                                                    class="w-full md:w-auto px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
                                                     onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
-                                                    <i class="fas fa-undo"></i> Unapprove
+                                                    <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Unapprove</span>
                                                 </a>
                                             </div>
                                         <?php endif; ?>
 
-                                        <div class="<?= $print ?>">
+                                        <div class="<?= $print ?> flex-1 md:flex-none">
                                             <a href="page/realisasi/excelrealisasi.php?id=<?= $data['id_realisasi']; ?>"
-                                                class="px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors" title="Download Payroll">
-                                                <i class="fas fa-file-excel"></i> Excel
+                                                class="w-full md:w-auto px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors flex justify-center items-center" title="Download Payroll">
+                                                <i class="fas fa-file-excel md:mr-1"></i> <span class="ml-1 md:inline">Excel</span>
                                             </a>
                                         </div>
                                     </div>
@@ -135,7 +137,6 @@ $level_status = (!$role_akses) ? "hidden" : "";
 </div>
 
 <style>
-   
      /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
         display: block !important;
@@ -145,7 +146,6 @@ $level_status = (!$role_akses) ? "hidden" : "";
     .dataTables_wrapper::before,
     .dataTables_wrapper::after {
         display: none !important;
-        /* Hapus clearfix bawaan yang mengganggu */
     }
 
     /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
@@ -246,9 +246,30 @@ $level_status = (!$role_akses) ? "hidden" : "";
         font-size: 13px !important;
     }
 
+    /* =========================================
+       KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
+       ========================================= */
     @media screen and (max-width: 768px) {
         .table-responsive {
             padding: 12px !important;
+        }
+        
+        #dataTables-example_wrapper .row:first-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px;
+        }
+        .dataTables_filter, .dataTables_length {
+            width: 100% !important;
+            justify-content: flex-start !important;
+        }
+        .dataTables_filter input {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .dataTables_paginate {
+            justify-content: center !important;
+            flex-wrap: wrap;
         }
 
         .table-modern thead {
@@ -257,31 +278,59 @@ $level_status = (!$role_akses) ? "hidden" : "";
 
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
+            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            background-color: #fff;
         }
 
         .table-modern tbody td {
             display: flex;
+            flex-direction: column; /* Label di atas, data di bawah (stacking) */
             align-items: flex-start;
-            padding: 8px 10px !important;
+            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
-            border-bottom: 1px solid #f3f4f6 !important;
+            border-bottom: 1px dashed #e2e8f0 !important;
+        }
+        .table-modern tbody td:first-child {
+            padding-top: 0 !important;
+        }
+        .table-modern tbody td:last-child {
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
         }
 
         .table-modern tbody td:before {
             content: attr(data-label);
             font-weight: 700;
-            color: #4b5563;
+            color: #64748b;
             text-transform: uppercase;
             font-size: 11px;
-            min-width: 120px;
-            margin-right: 15px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px; /* Memberi jarak ke datanya */
+            display: block;
+            width: 100%;
         }
-        h3{
-        color: #2563eb !important;
+
+        /* Memperbesar Tombol Aksi di Mobile */
+        .action-btn-group {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            padding-top: 5px;
+        }
+        .action-btn-group > a, .action-btn-group > div {
+            flex: 1; /* Lebar tombol menyesuaikan merata */
+        }
+        .action-btn-group a {
+            padding: 10px !important; /* Area klik jadi besar */
+            width: 100%;
+        }
+
+        h3 {
+            color: #2563eb !important;
         }
     }
 </style>
@@ -307,8 +356,10 @@ $level_status = (!$role_akses) ? "hidden" : "";
                 }
             }
         });
-        $('.dataTables_filter').css('float', 'right').addClass('mb-3');
-        $('.dataTables_length').css('float', 'left').addClass('mb-3');
+        
+        // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile
+        $('.dataTables_filter').addClass('mb-3');
+        $('.dataTables_length').addClass('mb-3');
     });
 </script>
 

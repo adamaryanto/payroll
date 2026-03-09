@@ -164,13 +164,19 @@ if ($datastatusrealisasi == 'approve') {
         width: 100%;
     }
 
+    /* Padding lebar dan larangan bungkus teks (nowrap) untuk PC */
+    #dataTables-example thead th {
+        padding: 8px 4px !important;
+        font-size: 11px !important;
+    }
+
     .table-clean tbody td {
         vertical-align: middle;
-        font-size: 12px;
+        font-size: 11px;
         color: #000;
         font-weight: bold;
         border-top: 1px solid #E0E4E8;
-        padding: 6px;
+        padding: 6px 4px !important;
     }
 
     .bg-red-custom {
@@ -231,8 +237,30 @@ if ($datastatusrealisasi == 'approve') {
         color: white !important;
     }
 
-    /* RESPONSIVE TABLE "STACKED" VIEW (Mobile View) - DIPERBAIKI */
+    /* =========================================
+       RESPONSIVE TABLE FIT SCREEN (Mobile View) 
+       ========================================= */
     @media screen and (max-width: 768px) {
+        /* Fit Screen: Buang semua jarak tepi */
+        .container-fluid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        .col-md-12 {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+        .card-clean {
+            border-radius: 0 !important; 
+            border-left: none !important;
+            border-right: none !important;
+            margin-bottom: 0 !important;
+        }
+        
         .table-responsive {
             border: none !important;
             overflow-x: visible !important;
@@ -240,83 +268,154 @@ if ($datastatusrealisasi == 'approve') {
             margin: 0 !important;
         }
 
+        #dataTables-example_wrapper {
+            padding: 0 10px; 
+        }
+        
+        #dataTables-example_wrapper .row:first-child {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px;
+            margin-bottom: 15px !important;
+            width: 100% !important;
+        }
+        .dataTables_filter, .dataTables_length {
+            display: flex !important;
+            width: 100% !important;
+            justify-content: flex-start !important;
+        }
+        .dataTables_filter input {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .dataTables_paginate {
+            justify-content: center !important;
+            flex-wrap: wrap;
+        }
+
         #dataTables-example {
             width: 100% !important;
             margin: 0 !important;
         }
 
-        #dataTables-example tbody tr {
+        /* Kotak tiap karyawan menempel layar (Fit) */
+        .table-modern tbody tr {
             display: block;
             margin-bottom: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
+            border-top: 3px solid #e2e8f0; 
+            border-bottom: 3px solid #e2e8f0;
+            border-left: none;
+            border-right: none;
+            border-radius: 0; 
+            padding: 15px 20px; /* Jarak kiri kanan ke text agak lega */
             background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            box-shadow: none;
         }
 
-        /* Flexbox agar data & label proporsional */
-        #dataTables-example thead {
+        .table-modern thead {
             display: none !important;
         }
 
-        #dataTables-example tbody td {
+        .table-modern tbody td {
             display: flex;
-            align-items: flex-start;
+            flex-direction: column; 
+            align-items: flex-start !important;
             text-align: left !important;
-            padding: 8px 10px !important;
+            padding: 12px 0 !important;
             border: none !important;
-            border-bottom: 1px solid #f3f4f6 !important;
+            border-bottom: 1px dashed #e2e8f0 !important;
             width: 100% !important;
-            font-size: 13px;
+            font-size: 15px; /* DIBESARKAN: ukuran isi datanya */
+            white-space: normal !important; 
         }
 
-        #dataTables-example tbody td:last-child {
+        .table-modern tbody td:first-child {
+            padding-top: 0 !important;
+        }
+
+        .table-modern tbody td:last-child {
             border-bottom: none !important;
-            padding-top: 12px !important;
-            justify-content: flex-start !important;
+            padding-bottom: 0 !important;
         }
 
-        #dataTables-example tbody td:before {
+        .table-modern tbody td:before {
             content: attr(data-label);
             font-weight: 700;
-            color: #4b5563;
+            color: #64748b;
             text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.05em;
-            text-align: left;
-            flex-basis: 35%;
-            min-width: 120px;
-            margin-right: 15px;
-            flex-shrink: 0;
+            font-size: 13px; /* DIBESARKAN: ukuran judul labelnya */
+            letter-spacing: 0.5px;
+            margin-bottom: 6px; 
+            display: block;
+            width: 100%;
         }
 
         .flex-action {
             display: flex;
             justify-content: flex-start;
             width: 100%;
-            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .flex-action a {
+            width: 100%; 
+            text-align: center;
+            padding: 12px !important;
+            font-size: 15px !important; /* DIBESARKAN: tombol aksi */
+            border-radius: 6px;
         }
 
         .card-header-clean {
-            font-size: 14px;
-            padding: 10px 15px;
+            font-size: 16px; /* DIBESARKAN */
+            padding: 15px;
         }
 
         .section-title {
-            font-size: 13px;
+            font-size: 15px; /* DIBESARKAN */
             margin-top: 15px;
+            padding-left: 15px;
         }
 
         .panel-body {
-            padding: 10px !important;
+            padding: 15px 0 !important;
+        }
+
+        .panel-body .row, .panel-body .form-group {
+            padding: 0 15px;
+        }
+        
+        .panel-body hr {
+            margin: 15px !important;
+        }
+
+        .form-control-clean {
+            font-size: 15px; /* DIBESARKAN: input form */
+            padding: 10px; 
+        }
+        .form-group label {
+            font-size: 14px; /* DIBESARKAN: label form */
         }
 
         .total-box {
-            font-size: 15px;
-            height: 40px;
+            font-size: 16px;
+            height: 45px;
             text-align: left;
             padding-left: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .header-btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+        .header-btn-group button, .header-btn-group a {
+            width: 100%;
+            text-align: center;
+            padding: 12px !important;
+            font-size: 15px; /* DIBESARKAN: tombol form */
         }
     }
 </style>
@@ -366,7 +465,7 @@ if ($datastatusrealisasi == 'approve') {
                             </div>
                         </div>
 
-                        <div class="form-group" <?php echo $status; ?> style="margin-bottom: 20px;">
+                        <div class="form-group header-btn-group" <?php echo $status; ?> style="margin-bottom: 20px;">
                             <button type="submit" name="simpan" value="Simpan" class="btn btn-primary btn-sm" style="background-color: #2C3E50; border-color: #2C3E50;">
                                 <i class="fa fa-save"></i> Simpan Ket.
                             </button>
@@ -380,7 +479,7 @@ if ($datastatusrealisasi == 'approve') {
 
                         <div class="section-title">List Karyawan</div>
                         <div class="table-responsive">
-                            <table class="table table-hover table-clean align-middle mb-0" id="dataTables-example">
+                            <table class="table table-hover table-clean align-middle mb-0 table-modern" id="dataTables-example">
                                 <thead class="bg-gray-50 border-b border-gray-200">
                                     <tr>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">No</th>
@@ -416,7 +515,6 @@ if ($datastatusrealisasi == 'approve') {
                                         $upah = $data['upahkaryawan'];
                                         $total += $upah;
 
-                                        // Check if both check-in and check-out are missing
                                         $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                             (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
 
@@ -433,7 +531,7 @@ if ($datastatusrealisasi == 'approve') {
                                                     </div>
                                                 <?php endif; ?>
                                                 <?php if (!empty($data['digantikan_oleh'])) : ?>
-                                                    <div class="text-xs text-red-600 font-bold italic line-through">
+                                                    <div class="text-xs text-red-600 font-bold italic">
                                                         <i class="fas fa-user-times mr-1"></i> (Digantikan oleh <?php echo $data['digantikan_oleh']; ?>)
                                                     </div>
                                                 <?php endif; ?>
@@ -465,14 +563,14 @@ if ($datastatusrealisasi == 'approve') {
                                             <td data-label="Real. Ist. M" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
                                             <td data-label="Upah" class="text-right">
-                                                <?php echo number_format($upah, 0, ',', '.'); ?>
+                                                Rp <?php echo number_format($upah, 0, ',', '.'); ?>
                                             </td>
                                             <td data-label="Lembur" class="text-right">
-                                                <?php echo number_format($data['lembur'], 0, ',', '.'); ?>
+                                                Rp <?php echo number_format($data['lembur'], 0, ',', '.'); ?>
                                             </td>
-                                            <td data-label="Pot. Telat" class="text-right <?php echo ($data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_telat'], 0, ',', '.'); ?></td>
-                                            <td data-label="Pot. Istirahat" class="text-right <?php echo ($data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo number_format($data['r_potongan_istirahat'], 0, ',', '.'); ?></td>
-                                            <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?php echo number_format($data['r_potongan_lainnya'], 0, ',', '.'); ?></td>
+                                            <td data-label="Pot. Telat" class="text-right <?php echo ($data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>">Rp <?php echo number_format($data['r_potongan_telat'], 0, ',', '.'); ?></td>
+                                            <td data-label="Pot. Istirahat" class="text-right <?php echo ($data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>">Rp <?php echo number_format($data['r_potongan_istirahat'], 0, ',', '.'); ?></td>
+                                            <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>">Rp <?php echo number_format($data['r_potongan_lainnya'], 0, ',', '.'); ?></td>
                                             <td data-label="Hasil"><?php echo $data['hasil_kerja']; ?></td>
                                             <td data-label="Aksi">
                                                 <div class="flex-action">
@@ -511,13 +609,12 @@ if ($datastatusrealisasi == 'approve') {
 
 <script>
     $(document).ready(function() {
-        // Detect mobile: disable scrollX on small screens so stacked cards work
         var isMobile = window.innerWidth <= 768;
 
         $('#dataTables-example').DataTable({
             pageLength: 10,
             responsive: false,
-            scrollX: !isMobile, // Only enable horizontal scroll on desktop
+            scrollX: !isMobile, 
             autoWidth: !isMobile,
             language: {
                 search: "",

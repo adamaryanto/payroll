@@ -1,15 +1,15 @@
 <div class="container-fluid px-2 mt-4 mb-4">
     <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
 
-        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+        <div class="border-b border-gray-100 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white">
             <div>
                 <h3 class="text-xl font-bold text-indigo-600 m-0">
                     <i class="fas fa-users mr-2"></i>Data Karyawan
                 </h3>
                 <p class="text-[12px] text-gray-400 mt-0.5 mb-0">Kelola informasi detail dan upah seluruh karyawan</p>
             </div>
-            <div>
-                <a href="?page=karyawan&aksi=tambah" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+            <div class="w-full md:w-auto mt-2 md:mt-0">
+                <a href="?page=karyawan&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Karyawan
                 </a>
             </div>
@@ -17,7 +17,7 @@
 
         <div class="p-0">
             <div class="table-responsive px-3 py-3">
-                <table class="w-full text-left border-collapse" id="dataTables-example">
+                <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">No</th>
@@ -38,15 +38,15 @@
                             $status_class = ($datakaryawan['status_karyawan'] == 'Aktif') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
                         ?>
                             <tr class="hover:bg-blue-50/50 transition-colors">
-                                <td class="text-center text-sm text-gray-600 font-medium"><?= $no++ ?></td>
-                                <td class="text-sm font-semibold text-gray-700"><?= $datakaryawan['no_absen'] ?></td>
-                                <td>
+                                <td data-label="No" class="md:text-center text-sm text-gray-600 font-medium"><?= $no++ ?></td>
+                                <td data-label="No. Absen" class="text-sm font-semibold text-gray-700"><?= $datakaryawan['no_absen'] ?></td>
+                                <td data-label="Nama Karyawan">
                                     <div class="font-bold text-gray-900"><?= $datakaryawan['nama_karyawan'] ?></div>
                                     <div class="text-xs text-gray-400 italic"><?= $datakaryawan['OS_DHK'] ?></div>
                                 </td>
-                                <td class="text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['golongan'] ?></td>
-                                <td class="text-center text-sm text-gray-600"><?= $datakaryawan['jenis_kelamin'] ?></td>
-                                <td class="text-xs py-2">
+                                <td data-label="Gol" class="md:text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['golongan'] ?></td>
+                                <td data-label="Jenis Kelamin" class="md:text-center text-sm text-gray-600"><?= $datakaryawan['jenis_kelamin'] ?></td>
+                                <td data-label="Kontak & Dokumen" class="text-xs py-2">
                                     <div class="block mb-1">
                                         <span class="inline-block w-12 text-gray-400 font-medium">KTP:</span>
                                         <span class="text-gray-700 font-semibold"><?= $datakaryawan['no_ktp'] ?></span>
@@ -57,20 +57,20 @@
                                         <span class="text-gray-700 font-semibold"><?= $datakaryawan['no_bpjs'] ?></span>
                                     </div>
                                 </td>
-                                <td class="text-center">
+                                <td data-label="Status" class="md:text-center">
                                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full <?= $status_class ?>">
                                         <?= $datakaryawan['status_karyawan'] ?>
                                     </span>
                                 </td>
-                                <td class="text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <a href="?page=karyawan&aksi=view&id=<?= $datakaryawan['id_karyawan'] ?>" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-all" title="Detail">
+                                <td data-label="Aksi" class="md:text-center">
+                                    <div class="flex items-center md:justify-center gap-2 action-btn-group">
+                                        <a href="?page=karyawan&aksi=view&id=<?= $datakaryawan['id_karyawan'] ?>" class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-lg transition-all flex justify-center items-center" title="Detail">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a href="?page=karyawan&aksi=ubah&id=<?= $datakaryawan['id_karyawan'] ?>" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all" title="Edit">
+                                        <a href="?page=karyawan&aksi=ubah&id=<?= $datakaryawan['id_karyawan'] ?>" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all flex justify-center items-center" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="?page=karyawan&aksi=hapus&id=<?= $datakaryawan['id_karyawan'] ?>" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all" onclick="return confirm('Hapus data ini?')" title="Hapus">
+                                        <a href="?page=karyawan&aksi=hapus&id=<?= $datakaryawan['id_karyawan'] ?>" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all flex justify-center items-center" onclick="return confirm('Hapus data ini?')" title="Hapus">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
@@ -169,7 +169,6 @@
     .dataTables_wrapper::before,
     .dataTables_wrapper::after {
         display: none !important;
-        /* Hapus clearfix bawaan yang mengganggu */
     }
 
     /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
@@ -270,9 +269,31 @@
         font-size: 13px !important;
     }
 
+    /* =========================================
+       KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
+       ========================================= */
     @media screen and (max-width: 768px) {
         .table-responsive {
             padding: 12px !important;
+        }
+
+        /* Merapikan form cari dan baris dataTables di HP */
+        #dataTables-example_wrapper .row:first-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px;
+        }
+        .dataTables_filter, .dataTables_length {
+            width: 100% !important;
+            justify-content: flex-start !important;
+        }
+        .dataTables_filter input {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .dataTables_paginate {
+            justify-content: center !important;
+            flex-wrap: wrap;
         }
 
         .table-modern thead {
@@ -281,28 +302,53 @@
 
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 10px;
+            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px; /* Jarak ke dalam kotak dilebarkan */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
         }
 
         .table-modern tbody td {
             display: flex;
+            flex-direction: column; /* Label ada di atas data, BUKAN di samping */
             align-items: flex-start;
-            padding: 8px 10px !important;
+            padding: 12px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
-            border-bottom: 1px solid #f3f4f6 !important;
+            border-bottom: 1px dashed #e2e8f0 !important;
+            font-size: 14px; /* Huruf sedikit diperbesar */
+        }
+        .table-modern tbody td:first-child {
+            padding-top: 0 !important;
+        }
+        .table-modern tbody td:last-child {
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
         }
 
         .table-modern tbody td:before {
             content: attr(data-label);
             font-weight: 700;
-            color: #4b5563;
+            color: #64748b;
             text-transform: uppercase;
             font-size: 11px;
-            min-width: 120px;
-            margin-right: 15px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px; /* Memberi jarak ke datanya */
+            display: block;
+            width: 100%;
+        }
+
+        /* Memperbesar Tombol Aksi di Mobile */
+        .action-btn-group {
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .action-btn-group a {
+            flex: 1; /* Lebar tombol menyesuaikan merata */
+            padding: 12px !important; /* Area klik jadi besar */
+            font-size: 16px; /* Ikon diperbesar sedikit */
         }
 
         h3 {
@@ -332,7 +378,8 @@
                 }
             }
         });
-        $('.dataTables_filter').css('float', 'right').addClass('mb-3');
-        $('.dataTables_length').css('float', 'left').addClass('mb-3');
+        
+        $('.dataTables_filter').addClass('mb-3');
+        $('.dataTables_length').addClass('mb-3');
     });
 </script>

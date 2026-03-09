@@ -4,20 +4,21 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
 
 <div class="container-fluid px-2 mt-4 mb-4">
     <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
-        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+        
+        <div class="border-b border-gray-100 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white">
             <div>
                 <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-truck-loading mr-2"></i>Data Boneless</h3>
             </div>
-            <div>
-                <a href="?page=boneless&aksi=tambah" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+            <div class="w-full md:w-auto mt-2 md:mt-0">
+                <a href="?page=boneless&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
         </div>
 
         <div class="p-4">
-            <div class="table-responsive">
-                <table class="w-full text-left border-collapse" id="dataTables-example">
+            <div class="table-responsive px-0 md:px-2">
+                <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase">No</th>
@@ -34,22 +35,23 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                         while ($data = $tampil->fetch_assoc()) :
                         ?>
                             <tr class="hover:bg-gray-50 transition-colors">
-                                <td class="py-3 px-4 text-sm text-gray-700"><?= $no++ ?></td>
-                                <td class="py-3 px-4 text-sm text-gray-900 font-bold text-center"><?= date('d-m-Y', strtotime($data['tgl'])) ?></td>
-                                <td class="py-3 px-4 text-sm text-gray-900 text-center font-bold">
+                                <td data-label="No" class="py-3 px-4 text-sm text-gray-700 font-medium md:font-normal"><?= $no++ ?></td>
+                                <td data-label="Tanggal" class="py-3 px-4 text-sm text-gray-900 font-bold md:text-center"><?= date('d-m-Y', strtotime($data['tgl'])) ?></td>
+                                <td data-label="Jumlah Mobil" class="py-3 px-4 text-sm text-gray-900 md:text-center font-bold">
                                    <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-100">
                                        <?= $data['jumlah_mobil'] ?> Unit
                                    </span>
                                 </td>
-                                <td class="py-3 px-4 text-sm font-bold text-blue-600 text-right">Rp <?= number_format($data['grand_total'], 0, ',', '.') ?></td>
-                                <td class="py-3 px-4 text-sm text-gray-600 italic"><?= htmlspecialchars($data['keterangan']) ?: '-' ?></td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>" class="p-1 px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold">
-                                            <i class="fas fa-edit mr-1"></i> Lihat / Edit
+                                <td data-label="Total Biaya Boneless" class="py-3 px-4 text-sm font-bold text-blue-600 md:text-right">Rp <?= number_format($data['grand_total'], 0, ',', '.') ?></td>
+                                <td data-label="Keterangan" class="py-3 px-4 text-sm text-gray-600 italic"><?= htmlspecialchars($data['keterangan']) ?: '-' ?></td>
+                                
+                                <td data-label="Aksi" class="py-3 px-4 md:text-center mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
+                                    <div class="flex items-center md:justify-center gap-2 action-btn-group">
+                                        <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center">
+                                            <i class="fas fa-edit md:mr-1"></i> <span class="ml-1 md:inline">Lihat / Edit</span>
                                         </a>
-                                        <a href="?page=boneless&aksi=hapus&id=<?= $data['id_boneless'] ?>" class="p-1 px-3 text-rose-600 bg-rose-50 border border-rose-100 rounded hover:bg-rose-600 hover:text-white transition-all text-xs font-bold" onclick="return confirm('Hapus data ini? Semua rincian item juga akan terhapus.')">
-                                            <i class="fas fa-trash mr-1"></i> Hapus
+                                        <a href="?page=boneless&aksi=hapus&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-rose-600 bg-rose-50 border border-rose-100 rounded hover:bg-rose-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center" onclick="return confirm('Hapus data ini? Semua rincian item juga akan terhapus.')">
+                                            <i class="fas fa-trash md:mr-1"></i> <span class="ml-1 md:inline">Hapus</span>
                                         </a>
                                     </div>
                                 </td>
@@ -62,17 +64,169 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
     </div>
 </div>
 
+<style>
+    /* Reset DataTables Wrapper untuk penyesuaian flexbox */
+    .dataTables_wrapper {
+        display: block !important;
+    }
+    .dataTables_wrapper::before,
+    .dataTables_wrapper::after {
+        display: none !important;
+    }
+    #dataTables-example_wrapper .row:first-child {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+    }
+    .dataTables_length {
+        display: flex !important;
+        align-items: center !important;
+    }
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+    .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+    .dataTables_filter input {
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding-top: 15px !important;
+    }
+
+    /* =========================================
+       KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
+       ========================================= */
+    @media screen and (max-width: 768px) {
+        .table-responsive {
+            padding: 0 !important;
+            overflow-x: visible !important;
+        }
+
+        /* Merapikan form cari dan length di HP */
+        #dataTables-example_wrapper .row:first-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px;
+            margin-bottom: 15px !important;
+        }
+        .dataTables_filter, .dataTables_length {
+            width: 100% !important;
+            justify-content: flex-start !important;
+        }
+        .dataTables_filter input {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .dataTables_paginate {
+            justify-content: center !important;
+            flex-wrap: wrap;
+        }
+
+        .table-modern thead {
+            display: none !important;
+        }
+
+        /* Box Data (Setiap Baris menjadi Kotak Terpisah) */
+        .table-modern tbody tr {
+            display: block;
+            margin-bottom: 1.5rem; /* Jarak antar kotak */
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px; /* Padding dalam kotak dilebarkan */
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+
+        /* Baris Data di dalam Kotak */
+        .table-modern tbody td {
+            display: flex;
+            flex-direction: column; /* Label di atas, data di bawah (stacking) */
+            align-items: flex-start !important;
+            text-align: left !important;
+            padding: 12px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
+            border: none !important;
+            border-bottom: 1px dashed #e2e8f0 !important;
+            width: 100% !important;
+            font-size: 14px;
+        }
+        .table-modern tbody td:first-child {
+            padding-top: 0 !important;
+        }
+        .table-modern tbody td:last-child {
+            border-bottom: none !important;
+            padding-bottom: 0 !important;
+        }
+
+        /* Label Judul Kolom */
+        .table-modern tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px; /* Jarak antara label dan isi data */
+            display: block;
+            width: 100%;
+        }
+
+        /* Memperbesar Tombol Aksi di Mobile */
+        .action-btn-group {
+            width: 100%;
+            display: flex;
+            gap: 8px;
+            padding-top: 5px;
+        }
+        .action-btn-group a {
+            flex: 1; /* Lebar tombol menyesuaikan merata (50:50) */
+            padding: 12px !important; /* Area klik diperbesar */
+        }
+    }
+</style>
+
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
             pageLength: 25,
             autoWidth: false,
-            responsive: true,
+            // Mematikan responsive bawaan datatables agar tidak bentrok dengan CSS kustom kita
+            responsive: false, 
             language: {
                 search: "Cari Data:",
                 lengthMenu: "Tampil _MENU_",
                 info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data"
             }
         });
+        
+        // Membersihkan gaya float bawaan Datatables
+        $('.dataTables_filter').addClass('mb-3');
+        $('.dataTables_length').addClass('mb-3');
     });
 </script>
