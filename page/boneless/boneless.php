@@ -45,9 +45,6 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                                 <td class="py-3 px-4 text-sm text-gray-600 italic"><?= htmlspecialchars($data['keterangan']) ?: '-' ?></td>
                                 <td class="py-3 px-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a href="page/boneless/excel.php?id=<?= $data['id_boneless'] ?>" class="p-1 px-3 text-emerald-600 bg-emerald-50 border border-emerald-100 rounded hover:bg-emerald-600 hover:text-white transition-all text-xs font-bold">
-                                            <i class="fas fa-file-excel mr-1"></i> Excel
-                                        </a>
                                         <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>" class="p-1 px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold">
                                             <i class="fas fa-edit mr-1"></i> Lihat / Edit
                                         </a>
