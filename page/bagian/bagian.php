@@ -222,7 +222,7 @@
         <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
             <div>
                 <h3 class="text-xl font-bold text-indigo-600 m-0">
-                    <i class="fas fa-users mr-2"></i>Data Bagian (Departmen)
+                    <i class="fas fa-users mr-2"></i>Data Bagian (Departemen)
                 </h3>
                 <p class="text-[12px] text-gray-400 mt-0.5 mb-0">Kelola data bagian karyawan</p>
             </div>
@@ -239,24 +239,24 @@
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center" width="5%">No</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center">Nama Bagian</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase">Nama Bagian</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center" width="15%">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-100">
                         <?php
                         $no = 1;
                         $tampil = $koneksi->query("SELECT * FROM ms_departmen ORDER BY nama_departmen ASC");
                         while ($data = $tampil->fetch_assoc()) : ?>
-                            <tr class="hover:bg-blue-50 transition-colors duration-200">
-                                <td class="text-center text-sm text-gray-600 font-medium" data-label="No"><?php echo $no++; ?></td>
-                                <td class="text-center text-sm text-gray-600 font-medium" data-label="Nama Bagian"><strong><?php echo htmlspecialchars($data['nama_departmen']); ?></strong></td>
-                                <td class="text-center">
+                            <tr class="hover:bg-blue-50/50 transition-colors duration-200">
+                                <td class="py-2 px-2 text-center text-sm text-gray-600 font-medium" data-label="No"><?php echo $no++; ?></td>
+                                <td class="py-2 px-2 text-sm text-gray-700 font-semibold" data-label="Nama Bagian"><?php echo htmlspecialchars($data['nama_departmen']); ?></td>
+                                <td class="py-2 px-2 text-center" data-label="Aksi">
                                     <div class="flex items-center justify-center gap-2">
                                         <a href="?page=bagian&aksi=ubah&id=<?php echo $data['id_departmen']; ?>" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                    </div>
+                                        </div>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -265,29 +265,25 @@
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        $(document).ready(function() {
-            $('#dataTables-example').DataTable({
-                pageLength: 25,
-                autoWidth: false,
-                responsive: false,
-                lengthMenu: [
-                    [10, 25, 50, -1],
-                    [10, 25, 50, "Semua"]
-                ],
-                language: {
-                    search: "Cari:",
-                    searchPlaceholder: "Cari departmen...",
-                    lengthMenu: "Tampilkan _MENU_ departmen",
-                    info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ departmen",
-                    paginate: {
-                        previous: "Prev",
-                        next: "Next"
-                    }
-                }
-            });
-            $('.dataTables_filter').css('float', 'right').addClass('mb-3');
-            $('.dataTables_length').css('float', 'left').addClass('mb-3');
+<script>
+    $(document).ready(function() {
+        $('#dataTables-example').DataTable({
+            pageLength: 25,
+            autoWidth: false,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+            language: {
+                search: "Cari:",
+                searchPlaceholder: "Cari departemen...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: { previous: "Prev", next: "Next" }
+            }
         });
-    </script>
+        
+        // Memastikan posisi elemen DataTables rapi
+        $('.dataTables_filter').css('float', 'right').addClass('mb-3');
+        $('.dataTables_length').css('float', 'left').addClass('mb-3');
+    });
+</script>

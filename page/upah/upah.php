@@ -1,158 +1,68 @@
-<div class="container-fluid py-4">
-    <div class="card-modern">
-        <div class="card-modern-header">
-            <h3 class="card-modern-title">
-                <i class="fas fa-building" style="color:#2563eb;"></i> Master Data Upah
-            </h3>
-            <a href="?page=upah&aksi=tambah" class="btn-modern">
-                <i class="fas fa-plus"></i> Tambah Data Upah
-            </a>
-        </div>
-
-        <div class="table-responsive">
-            <table class="table table-modern w-full" id="dataTables-example">
-                <thead class="bg-gray-50 text-gray-600 text-sm">
-                    <tr>
-                        <th width="5%">No</th>
-                        <th>Upah Harian</th>
-                        <th>Upah Mingguan</th>
-                        <th>Upah Bulanan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $no = 1;
-                    $tampil = $koneksi->query("SELECT * FROM ms_upah ORDER BY id_upah DESC");
-                    while ($data = $tampil->fetch_assoc()) {
-                    ?>
-                    <tr>
-                        <td>
-                            <?php echo $no; ?>
-                        </td>
-                        <td> Rp <?php echo number_format($data['upah_harian'], 0, ',', '.'); ?></td>
-                        <td>Rp <?php echo number_format($data['upah_mingguan'], 0, ',', '.'); ?></td>
-                        <td>Rp <?php echo number_format($data['upah_bulanan'], 0, ',', '.'); ?></td>
-                        <td>
-                            <a href="?page=upah&aksi=ubah&id=<?php echo $data['id_upah']; ?>" class="inline-flex items-center px-3 py-2 border border-transparent text-xs font-bold rounded shadow-sm text-white bg-amber-500 hover:bg-amber-600 transition-colors mr-1" title="Edit">
-                                <i class="fas fa-edit mr-1"></i> Edit
-                            </a>
-                            <a href="?page=upah&aksi=hapus&id=<?php echo $data['id_upah']; ?>" class="inline-flex items-center px-3 py-2 border border-transparent text-xs font-bold rounded shadow-sm text-white bg-red-600 hover:bg-red-700 transition-colors" title="Hapus" onclick="return confirm('Yakin ingin menghapus data upah ini?');">
-                                <i class="fas fa-trash mr-1"></i> Hapus
-                            </a>
-                        </td>
-                    </tr>
-                    <?php 
-                        $no++; 
-                    } 
-                    ?>
-                </tbody>   
-            </table>
-        </div>
-    </div>
-</div>
-
 <style>
-    .card-modern {
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        border: 1px solid #f0f0f0;
-        margin-bottom: 24px;
+    /* Card Styling */
+    .panel-primary {
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
         overflow: hidden;
     }
 
-    .card-modern-header {
-        background-color: #ffffff;
-        padding: 20px 24px;
-        border-bottom: 1px solid #f0f0f0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .card-modern-title {
-        font-size: 18px;
+    .box-header {
+        padding: 15px 20px !important;
         font-weight: 600;
-        color: #2c3e50;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 10px;
+        letter-spacing: 0.5px;
     }
 
-    .btn-modern {
-        background-color: #2563eb;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 500;
-        font-size: 13px;
-        transition: all 0.2s;
-        text-decoration: none !important;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .btn-modern:hover {
-        background-color: #1e3a8a;
-        color: white;
-    }
-
-    .table-responsive {
-        padding: 24px;
-    }
-
-    .table-modern thead th {
-        background-color: #f8fafc;
-        color: #64748b;
-        font-weight: 600;
+    /* Table Styling */
+    .table thead th {
+        background-color: #f8f9fa;
+        color: #333;
         text-transform: uppercase;
         font-size: 11px;
-        letter-spacing: 0.05em;
-        padding: 12px 16px;
-        border-bottom: 2px solid #f1f5f9;
-    }
-
-    .table-modern tbody td {
-        padding: 14px 16px;
+        letter-spacing: 1px;
+        border-bottom: 2px solid #dee2e6 !important;
         vertical-align: middle;
-        font-size: 14px;
-        color: #334155;
-        border-bottom: 1px solid #f1f5f9;
     }
 
-    .table-modern tbody tr:hover {
-        background-color: #f8fafc;
+    .table tbody td {
+        vertical-align: middle !important;
+        font-size: 13px;
     }
 
-    .action-links {
-        display: flex;
-        gap: 8px;
-        justify-content: center;
+    .table-hover tbody tr:hover {
+        background-color: rgba(95, 158, 160, 0.1) !important;
+        transition: 0.3s;
     }
 
-    .btn-action {
-        width: 32px;
-        height: 32px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 6px;
-        transition: all 0.2s;
-        text-decoration: none !important;
+    /* Button Styling */
+    .btn {
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 12px;
+        transition: 0.2s;
     }
 
-    .btn-edit {
-        background-color: #fef3c7;
-        color: #d97706;
+    .btn-info {
+        background-color: #5bc0de;
+        border: none;
     }
 
-    .btn-delete {
-        background-color: #fee2e2;
-        color: #dc2626;
+    .btn-info:hover {
+        background-color: #31b0d5;
+        transform: translateY(-1px);
+    }
+
+    .btn-warning {
+        color: #fff !important;
+    }
+
+    /* Utility */
+    .m-b-10 {
+        margin-bottom: 10px;
+    }
+
+    .p-20 {
+        padding: 20px;
     }
 
     /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
@@ -164,6 +74,7 @@
     .dataTables_wrapper::before,
     .dataTables_wrapper::after {
         display: none !important;
+        /* Hapus clearfix bawaan yang mengganggu */
     }
 
     /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
@@ -241,6 +152,10 @@
         border-color: #cbd5e1 !important;
     }
 
+    h3 {
+        color: #2563eb !important;
+    }
+
     .dataTables_paginate .paginate_button.current {
         background: #2563eb !important;
         border-color: #2563eb !important;
@@ -294,36 +209,87 @@
             min-width: 120px;
             margin-right: 15px;
         }
+
+        h3 {
+            color: #2563eb !important;
+        }
     }
 </style>
 
+<div class="container-fluid px-2 mt-4 mb-4">
+    <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
+
+        <div class="border-b border-gray-100 py-4 px-5 flex justify-between items-center bg-white">
+            <div>
+                <h3 class="text-xl font-bold text-indigo-600 m-0">
+                    <i class="fas fa-wallet mr-2"></i>Master Data Upah
+                </h3>
+                <p class="text-[12px] text-gray-400 mt-0.5 mb-0">Kelola template nominal upah</p>
+            </div>
+            <div>
+                <a href="?page=upah&aksi=tambah" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                    <i class="fas fa-plus mr-1.5"></i> Tambah Upah
+                </a>
+            </div>
+        </div>
+
+        <div class="p-0">
+            <div class="table-responsive px-3 py-3">
+                <table class="w-full text-left border-collapse" id="dataTables-example">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center" width="5%">No</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center">Upah Harian</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center">Upah Mingguan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center">Upah Bulanan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-600 uppercase text-center" width="15%">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php
+                        $no = 1;
+                        $tampil = $koneksi->query("SELECT * FROM ms_upah ORDER BY id_upah DESC");
+                        while ($data = $tampil->fetch_assoc()) : ?>
+                            <tr class="hover:bg-blue-50/50 transition-colors duration-200">
+                                <td class="py-2 px-2 text-center text-sm text-gray-600 font-medium py-3" data-label="No"><?php echo $no++; ?></td>
+                                <td class="py-2 px-2 text-center text-sm text-gray-700 font-semibold py-3" data-label="Upah Harian">Rp <?php echo number_format($data['upah_harian'], 0, ',', '.'); ?></td>
+                                <td class="py-2 px-2 text-center text-sm text-gray-700 font-semibold py-3" data-label="Upah Mingguan">Rp <?php echo number_format($data['upah_mingguan'], 0, ',', '.'); ?></td>
+                                <td class="py-2 px-2 text-center text-sm text-gray-700 font-semibold py-3" data-label="Upah Bulanan">Rp <?php echo number_format($data['upah_bulanan'], 0, ',', '.'); ?></td>
+                                <td class="py-2 px-2 text-center py-3" data-label="Aksi">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <a href="?page=upah&aksi=ubah&id=<?php echo $data['id_upah']; ?>" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="?page=upah&aksi=hapus&id=<?php echo $data['id_upah']; ?>" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all" title="Hapus" onclick="return confirm('Yakin ingin menghapus data ini?');">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function() {
-        var table = $('#dataTables-example').DataTable({
+        $('#dataTables-example').DataTable({
             pageLength: 25,
-            lengthMenu: [
-                [10, 25, 50, -1],
-                [10, 25, 50, "Semua"]
-            ],
+            autoWidth: false,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
             language: {
                 search: "Cari:",
-                searchPlaceholder: "Cari...",
-                lengthMenu: "Tampilkan _MENU_ data upah",
-                info: "Menampilkan _START_ sd _END_ dari _TOTAL_ data upah"
-            },
-            initComplete: function() {
-                // Memindahkan posisi secara paksa setelah tabel ter-render
-                var $wrapper = $('#dataTables-example_wrapper');
-                var $length = $wrapper.find('.dataTables_length');
-                var $filter = $wrapper.find('.dataTables_filter');
-
-                // Membuat wadah flex baru di atas tabel
-                $('<div class="d-flex justify-content-between align-items-center mb-3"></div>')
-                    .insertBefore('#dataTables-example_wrapper .row:first-child')
-                    .append($length)
-                    .append($filter);
+                searchPlaceholder: "Cari data...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: { previous: "Prev", next: "Next" }
             }
         });
+        // Mengikuti gaya layout tabel yang sebelumnya
+        $('.dataTables_filter').css('float', 'right').addClass('mb-3');
+        $('.dataTables_length').css('float', 'left').addClass('mb-3');
     });
 </script>
