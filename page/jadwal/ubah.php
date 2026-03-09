@@ -7,79 +7,7 @@ if(isset($_GET['id'])){
     echo "<script>window.location.href='?page=jadwal';</script>";
     exit;
 }
-?>
 
-<style>
-    .card-modern { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #f0f0f0; margin-bottom: 24px; padding: 24px; }
-    .card-modern-header { margin-bottom: 24px; border-bottom: 2px solid #f8f9fa; padding-bottom: 12px; }
-    .card-modern-title { font-size: 18px; font-weight: 600; color: #2c3e50; margin: 0; display: flex; align-items: center; gap: 8px; }
-    
-    .form-modern label { font-weight: 500; color: #5a6a85; font-size: 13px; margin-bottom: 6px; display: block; }
-    .form-modern .form-control { border-radius: 8px; border: 1px solid #e0e6ed; padding: 10px 14px; font-size: 14px; background-color: #fafbfc; transition: all 0.3s; }
-    .form-modern .form-control:focus { border-color: #2563eb; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(95, 158, 160, 0.15); outline: none; }
-    
-    .btn-modern { background-color: #2563eb; color: white; border: none; border-radius: 8px; padding: 10px 24px; font-weight: 500; font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-modern:hover { background-color: #1e3a8a; color: white; }
-    
-    .required-text { font-size: 12px; color: #8898aa; margin-top: 10px; }
-    .required-star { color: #e74c3c; font-weight: bold; }
-    .form-group { margin-bottom: 16px; }
-</style>
-
-<div class="row">
-    <div class="col-md-12">
-        <div class="card-modern">
-            <div class="card-modern-header">
-                <h3 class="card-modern-title">
-                    <i class="fa fa-edit" style="color:#2563eb;"></i> Ubah Jadwal Karyawan
-                </h3>
-            </div>
-            
-            <form method="POST" class="form-modern">
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        <label>Nama Shift <span class="required-star">*</span></label>
-                        <input autocomplete="off" type="text" name="tketerangan" value="<?php echo $datadetail['keterangan']; ?>" required class="form-control" />
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label>Jam Masuk <span class="required-star">*</span></label>
-                        <input autocomplete="off" type="time" name="tjammasuk" value="<?php echo $datadetail['jam_masuk']; ?>" required class="form-control" />
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label>Jam Keluar <span class="required-star">*</span></label>
-                        <input autocomplete="off" type="time" name="tjamkeluar" value="<?php echo $datadetail['jam_keluar']; ?>" required class="form-control" />
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="form-group col-md-4">
-                        <label>Istirahat Keluar <span class="required-star">*</span></label>
-                        <input autocomplete="off" type="time" name="tistirahatkeluar" value="<?php echo $datadetail['istirahat_keluar']; ?>" required class="form-control" />
-                    </div>
-                    <div class="form-group col-md-4">
-                        <label>Istirahat Masuk <span class="required-star">*</span></label>
-                        <input autocomplete="off" type="time" name="tistirahatmasuk" value="<?php echo $datadetail['istirahat_masuk']; ?>" required class="form-control" />
-                    </div>
-                </div>
-
-                <hr style="border-top: 1px dashed #e0e6ed; margin: 24px 0;" />
-
-                <div class="row">
-                    <div class="col-md-12">
-                        <button type="submit" name="simpan" value="Simpan" class="btn-modern">
-                            <i class="fa fa-save"></i> Perbarui Jadwal
-                        </button>
-                        <div class="required-text">
-                            <span class="required-star">*</span> Kolom wajib diisi
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<?php
 if(isset($_POST['simpan'])) {
     $keterangan = $_POST['tketerangan'];
     $jammasuk   = $_POST['tjammasuk'];
@@ -100,3 +28,62 @@ if(isset($_POST['simpan'])) {
     }
 }
 ?>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
+    <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
+        
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+            <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
+                <i class="fas fa-edit mr-3"></i>
+                Ubah Jadwal Karyawan
+            </h3>
+            <p class="text-slate-300 text-sm mt-1">Perbarui detail shift dan jam kerja</p>
+        </div>
+        
+        <form method="POST" class="p-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="md:col-span-3">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Nama Shift <span class="text-rose-500">*</span></label>
+                    <input type="text" name="tketerangan" value="<?= htmlspecialchars($datadetail['keterangan']) ?>" required 
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition outline-none font-medium"/>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Jam Masuk <span class="text-rose-500">*</span></label>
+                    <input type="time" name="tjammasuk" value="<?= $datadetail['jam_masuk'] ?>" required 
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Jam Keluar <span class="text-rose-500">*</span></label>
+                    <input type="time" name="tjamkeluar" value="<?= $datadetail['jam_keluar'] ?>" required 
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none"/>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Istirahat Keluar <span class="text-rose-500">*</span></label>
+                    <input type="time" name="tistirahatkeluar" value="<?= $datadetail['istirahat_keluar'] ?>" required 
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none"/>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Istirahat Masuk <span class="text-rose-500">*</span></label>
+                    <input type="time" name="tistirahatmasuk" value="<?= $datadetail['istirahat_masuk'] ?>" required 
+                           class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none"/>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                <div class="text-xs text-gray-500 italic">
+                    <span class="text-rose-500">*</span> Wajib diisi
+                </div>
+                <div class="flex gap-3">
+                    <a href="?page=jadwal" class="px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition">
+                        Batal
+                    </a>
+                    <button type="submit" name="simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-0.5">
+                        <i class="fas fa-save mr-2"></i> Perbarui Jadwal
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
