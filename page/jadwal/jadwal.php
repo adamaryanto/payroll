@@ -287,8 +287,8 @@
             language: {
                 search: "Cari:",
                 searchPlaceholder: "Cari jadwal...",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                lengthMenu: "Tampilkan _MENU_ jadwal",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ jadwal",
                 paginate: { previous: "Prev", next: "Next" }
             }
         });
