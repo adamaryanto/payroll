@@ -26,62 +26,61 @@ if (isset($_POST['simpan'])) {
 }
 ?>
 
-<div class="container-fluid px-2 mt-5 mb-5">
-    <div class="max-w-3xl mx-auto">
-        <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
-            
-            <div class="border-b border-gray-100 py-5 px-6 bg-white">
-                <h3 class="text-xl font-bold text-gray-800 m-0">Pengaturan Denda</h3>
-                <p class="text-[14px] text-gray-500 mt-1 mb-0">Atur nominal potongan denda untuk keterlambatan dan waktu istirahat.</p>
-            </div>
-            
-            <form method="POST" enctype="multipart/form-data">
-                <div class="p-6">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        
-                        <div>
-                            <label class="block text-[14px] font-semibold text-gray-700 mb-2">
-                                Denda Masuk <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 font-medium text-[15px]">Rp</span>
-                                </div>
-                                <input type="number" name="tdendamasuk" value="<?= htmlspecialchars($dendamasuk) ?>" required autocomplete="off"
-                                       class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-[15px] text-gray-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors outline-none" 
-                                       placeholder="0">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
+    <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
+        
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+            <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
+                <i class="fas fa-money-bill-wave mr-3"></i>
+                Pengaturan Denda
+            </h3>
+            <p class="text-slate-300 text-sm mt-1">Atur nominal potongan denda untuk keterlambatan kerja</p>
+        </div>
+        
+        <form method="POST">
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">
+                            Denda Masuk <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 font-bold">Rp</span>
                             </div>
+                            <input placeholder="0" autocomplete="off" type="number" name="tdendamasuk" value="<?= htmlspecialchars($dendamasuk) ?>" required 
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
                         </div>
-
-                        <div>
-                            <label class="block text-[14px] font-semibold text-gray-700 mb-2">
-                                Denda Istirahat <span class="text-rose-500">*</span>
-                            </label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 font-medium text-[15px]">Rp</span>
-                                </div>
-                                <input type="number" name="tdendaistirahat" value="<?= htmlspecialchars($dendaistirahat) ?>" required autocomplete="off"
-                                       class="w-full pl-11 pr-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-[15px] text-gray-900 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors outline-none" 
-                                       placeholder="0">
-                            </div>
-                        </div>
-
                     </div>
 
-                    <div class="flex items-center justify-between mt-8 pt-5 border-t border-gray-100">
-                        <div class="text-[13px] text-gray-500 flex items-center">
-                            <span class="text-rose-500 font-bold text-lg mr-1.5 leading-none">*</span> Wajib diisi
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">
+                            Denda Istirahat <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 font-bold">Rp</span>
+                            </div>
+                            <input placeholder="0" autocomplete="off" type="number" name="tdendaistirahat" value="<?= htmlspecialchars($dendaistirahat) ?>" required 
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
                         </div>
-                        <button type="submit" name="simpan" class="inline-flex items-center justify-center px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium rounded-lg shadow-sm transition-colors focus:outline-none focus:ring-4 focus:ring-indigo-100 border-0">
-                            <i class="fas fa-save mr-2"></i> Simpan Pengaturan
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                    <div class="text-xs text-gray-500 italic">
+                        <span class="text-rose-500">*</span> Wajib diisi
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="?page=home" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out">
+                            Batal
+                        </a>
+                        <button type="submit" name="simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
+                            <i class="fas fa-save mr-2"></i> Simpan
                         </button>
                     </div>
-
                 </div>
-            </form>
-
-        </div>
+            </div>
+        </form>
     </div>
 </div>
