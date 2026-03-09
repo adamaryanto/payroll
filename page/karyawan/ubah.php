@@ -121,7 +121,7 @@ if (isset($_POST['update'])) {
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Status Karyawan</label>
                             <select name="tstatuskaryawan" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
                                 <option value="Aktif" <?= ($statuskaryawan == 'Aktif') ? 'selected' : ''; ?>>Aktif</option>
-                                <option value="Nonaktif" <?= ($statuskaryawan == 'Nonaktif') ? 'selected' : ''; ?>>Nonaktif</option>
+                                <option value="Non Aktif" <?= ($statuskaryawan == 'Non Aktif') ? 'selected' : ''; ?>>Non Aktif</option>
                             </select>
                         </div>
 

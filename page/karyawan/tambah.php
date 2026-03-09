@@ -36,14 +36,20 @@ if (isset($_POST['simpan'])) {
 }
 ?>
 
-
-
 <div class="container-fluid px-4 mt-5 mb-5">
     <div class="card border-0 shadow-lg rounded-xl overflow-hidden">
-        
-        <div class="card-header bg-white border-b border-gray-100 py-5 px-6">
-            <h3 class="text-2xl font-extrabold text-gray-800 tracking-tight m-0">Tambah Data Karyawan</h3>
-            <p class="text-sm text-gray-500 mt-1">Lengkapi formulir di bawah ini untuk mendaftarkan karyawan baru.</p>
+
+        <div class="card-header bg-white border-b border-gray-100 py-5 px-6 flex flex-row items-center justify-between">
+            <div class="flex-grow">
+                <h3 class="text-2xl font-extrabold text-indigo-600 tracking-tight m-0"><i class="fas fa-user-tie mr-3 text-indigo-600"></i>Tambah Data Karyawan</h3>
+                <p class="text-sm text-gray-500 mt-1">Lengkapi formulir di bawah ini untuk mendaftarkan karyawan baru.</p>
+            </div>
+            <div class="flex-shrink-0 ml-4">
+                <a href="?page=karyawan" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-6 rounded-lg transition duration-200 shadow-md">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Kembali
+                </a>
+            </div>
         </div>
 
         <form method="POST" enctype="multipart/form-data" id="formTambahKaryawan">
@@ -57,19 +63,27 @@ if (isset($_POST['simpan'])) {
                         
                         <input type="hidden" name="tid">
 
-                        <div class="form-group md:col-span-2">
+                          <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. Absen</label>
+                                  <?php
+                                $q_absen = $koneksi->query("SELECT MAX(CAST(no_absen AS UNSIGNED)) as max_absen FROM ms_karyawan");
+                                $dt_absen = $q_absen->fetch_assoc();
+                                $new_absen = (int)$dt_absen['max_absen'] + 1;
+                            ?>
+                            <input type="text" name="tnoabsen" value="<?= $new_absen; ?>" readonly class="w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 font-bold cursor-not-allowed">
+                        </div>
+
+                        <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                             <input autocomplete="off" type="text" name="tnama" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none" placeholder="Masukkan nama lengkap">
                         </div>
 
                         <div class="form-group">
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">No. Absen</label>
-                            <?php
-                                $q_absen = $koneksi->query("SELECT MAX(CAST(no_absen AS UNSIGNED)) as max_absen FROM ms_karyawan");
-                                $dt_absen = $q_absen->fetch_assoc();
-                                $new_absen = (int)$dt_absen['max_absen'] + 1;
-                            ?>
-                            <input type="text" name="tnoabsen" value="<?= $new_absen; ?>" readonly class="max-w-[150px] w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-gray-100 text-gray-500 font-bold cursor-not-allowed">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Status Karyawan</label>
+                            <select name="tstatuskaryawan" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="Aktif">Aktif</option>
+                                <option value="Non Aktif">Non Aktif</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
@@ -220,10 +234,10 @@ if (isset($_POST['simpan'])) {
             <div class="card-footer bg-gray-50 px-8 py-5 flex items-center justify-between border-t border-gray-200">
                 <p class="text-xs text-gray-400 italic">Tanda <span class="text-red-500 font-bold">*</span> wajib diisi.</p>
                 <div class="flex gap-3">
-                    <a href="?page=karyawan" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all no-underline">
-                        Batal
-                    </a>
-                    <button type="submit" name="simpan" value="Simpan" class="px-8 py-2.5 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5">
+                     <button type="reset" class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-bold hover:bg-gray-100 transition-all cursor-pointer">
+                        <i class="fas fa-undo mr-2"></i> Batal
+                    </button>
+                    <button type="submit" name="simpan" value="Simpan" class="px-8 py-2.5 border-0 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-0.5">
                         <i class="fas fa-save mr-2"></i> Simpan Data
                     </button>
                 </div>
@@ -238,9 +252,6 @@ if (isset($_POST['simpan'])) {
     input::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
-    }
-    input[type=number] {
-        -moz-appearance: textfield;
     }
 </style>
 
@@ -275,6 +286,13 @@ $(document).ready(function() {
                 $select.val('').trigger('change');
             }
         }
+           // 2. Logika untuk Reset Form
+        $('#formUbahKaryawan').on('reset', function() {
+            setTimeout(function() {
+                $('.select2-manage').trigger('change.select2');
+                $('.select2').trigger('change.select2');
+            }, 10);
+        });
     });
 });
 </script>
