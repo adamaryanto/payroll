@@ -3,11 +3,19 @@
 
 if (isset($_GET['id'])) {
     $idu = $_GET['id'];
-    $tampil = $koneksi->query("SELECT ms_karyawan.* from ms_karyawan WHERE id_karyawan = '$idu' ");
+    $tampil = $koneksi->query("SELECT k.*, d.nama_departmen, s.nama_sub_department, j.jabatan 
+                               FROM ms_karyawan k
+                               LEFT JOIN ms_departmen d ON k.id_departmen = d.id_departmen
+                               LEFT JOIN ms_sub_department s ON k.id_sub_department = s.id_sub_department
+                               LEFT JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
+                               WHERE k.id_karyawan = '$idu'");
     $data = $tampil->fetch_assoc();
     $idkaryawan = $data['id_karyawan'];
     $noabsen = $data['no_absen'];
     $namakaryawan = $data['nama_karyawan'];
+    $namadep = $data['nama_departmen'] ?? '-';
+    $namasub = $data['nama_sub_department'] ?? '-';
+    $namajab = $data['jabatan'] ?? '-';
     $tempatlahir = $data['tempat_lahir'];
     $tgllahir = $data['tgl_lahir'];
     $agama = $data['agama'];
@@ -98,6 +106,27 @@ if (isset($_GET['id'])) {
                                 echo '<span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold"><i class="fas fa-times-circle mr-1"></i> Non-Aktif</span>';
                             }
                             ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Departemen</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $namadep; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Sub Departemen</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $namasub; ?>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Jabatan</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 text-gray-800 font-medium">
+                            <?php echo $namajab; ?>
                         </div>
                     </div>
 
