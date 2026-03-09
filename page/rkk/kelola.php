@@ -358,7 +358,7 @@ if ($datastatusrkk == 3) {
 
     <div class="p-0">
       <div class="table-responsive px-3 py-3">
-        <table class="w-full text-left border-collapse" id="dataTables-example">
+        <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
           <thead class="bg-gray-50 border-b border-gray-200">
             <tr>
               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">No</th>
@@ -376,8 +376,8 @@ if ($datastatusrkk == 3) {
             $no = 1;
             while ($data = $tampil->fetch_assoc()) : ?>
               <tr>
-                <td><?= $no++ ?></td>
-                <td>
+                <td data-label="No"><?= $no++ ?></td>
+                <td data-label="Karyawan">
                   <strong><?= $data['nama_karyawan'] ?></strong><br>
                   <small><?= $data['no_absen'] ?></small>
                   <?php if (!empty($data['menggantikan'])) : ?>
@@ -403,26 +403,27 @@ if ($datastatusrkk == 3) {
                     <?php endif; ?>
                   </div>
                 </td>
-                <td><?= $data['nama_departmen'] ?><br><small><?= $data['nama_sub_department'] ?></small></td>
-                <td><span class="badge"><?= $data['nama_shift'] ?></span></td>
-                <td><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></td>
-                <td>Rp <?= number_format($data['upahkaryawan'], 0, ',', '.') ?></td>
-                <td class="text-[12px] leading-tight">
+                <td data-label="Penempatan"><?= $data['nama_departmen'] ?><br><small><?= $data['nama_sub_department'] ?></small></td>
+                <td data-label="Shift"><span class="badge"><?= $data['nama_shift'] ?></span></td>
+                <td data-label="Jam"><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></td>
+                <td data-label="Upah">Rp <?= number_format($data['upahkaryawan'], 0, ',', '.') ?></td>
+                <td data-label="Potongan" class="text-[12px] leading-tight">
                   <div class="text-amber-700">Telat: <?= number_format($data['potongan_telat'], 0, ',', '.') ?></div>
                   <div class="text-amber-700">Istirahat: <?= number_format($data['potongan_istirahat'], 0, ',', '.') ?></div>
                   <div class="text-amber-700">Lain: <?= number_format($data['potongan_lainnya'], 0, ',', '.') ?></div>
                 </td>
-                <td class="text-center">
-                  <div class="flex flex-col gap-1">
+                <td data-label="Aksi" class="text-center">
+                  <div class="flex md:flex-col gap-1 flex-wrap justify-center">
                     <a href="?page=rkk&aksi=karyawanupdate&id=<?= $data['id_rkk_detail']; ?>"
-                      class="btn btn-warning btn-xs" title="Ganti Karyawan">
+                      class="px-2 py-1 text-[11px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200 transition-colors" title="Ganti Karyawan">
                       <i class="fas fa-sync-alt"></i> Ganti
                     </a>
                     <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
-                      class="btn btn-info btn-xs"><i class="fas fa-eye"></i> Detail</a>
-
+                      class="px-2 py-1 text-[11px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors">
+                      <i class="fas fa-eye"></i> Detail
+                    </a>
                     <a href="?page=rkk&aksi=hapusdetail&id=<?= $idrkk; ?>&iddetail=<?= $data['id_rkk_detail']; ?>"
-                      class="btn btn-danger btn-xs" onclick="return confirm('Hapus?');">
+                      class="px-2 py-1 text-[11px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors" onclick="return confirm('Hapus?');">
                       <i class="fas fa-trash"></i>
                     </a>
                   </div>
