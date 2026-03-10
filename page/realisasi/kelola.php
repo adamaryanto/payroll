@@ -172,7 +172,6 @@ if (!function_exists('rupiah')) {
         width: 100%;
     }
 
-    /* Padding lebar dan larangan bungkus teks (nowrap) untuk PC */
     #dataTables-example thead th {
         padding: 8px 4px !important;
         font-size: 11px !important;
@@ -249,7 +248,6 @@ if (!function_exists('rupiah')) {
        RESPONSIVE TABLE FIT SCREEN (Mobile View) 
        ========================================= */
     @media screen and (max-width: 768px) {
-        /* Fit Screen: Buang semua jarak tepi */
         .container-fluid {
             padding-left: 0 !important;
             padding-right: 0 !important;
@@ -307,18 +305,16 @@ if (!function_exists('rupiah')) {
             margin: 0 !important;
         }
 
-        /* Kotak tiap karyawan menempel layar (Fit) */
+        /* --- STYLING MODERN CARD KARYAWAN --- */
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1rem;
-            border-top: 3px solid #e2e8f0; 
-            border-bottom: 3px solid #e2e8f0;
-            border-left: none;
-            border-right: none;
-            border-radius: 0; 
-            padding: 15px 20px; /* Jarak kiri kanan ke text agak lega */
-            background: #fff;
-            box-shadow: none;
+            margin: 0 5px 20px 5px; /* Jarak antar card */
+            border: 1px solid #cbd5e1 !important; /* Border card */
+            border-radius: 12px !important; /* Sudut melengkung halus */
+            background: #ffffff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Shadow elegan */
+            overflow: hidden;
+            padding: 0;
         }
 
         .table-modern thead {
@@ -329,58 +325,63 @@ if (!function_exists('rupiah')) {
             display: flex;
             flex-direction: column; 
             align-items: flex-start !important;
-            text-align: left !important;
-            padding: 12px 0 !important;
+            text-align: left !important; /* Memaksa rata kiri */
+            padding: 12px 16px !important;
             border: none !important;
-            border-bottom: 1px dashed #e2e8f0 !important;
+            border-bottom: 1px solid #f1f5f9 !important; /* Garis tipis antar baris di dalam card */
             width: 100% !important;
-            font-size: 15px; /* DIBESARKAN: ukuran isi datanya */
+            font-size: 14px;
             white-space: normal !important; 
         }
 
-        .table-modern tbody td:first-child {
-            padding-top: 0 !important;
-        }
-
-        .table-modern tbody td:last-child {
-            border-bottom: none !important;
-            padding-bottom: 0 !important;
+        /* OVERRIDE CLASS TEXT-RIGHT AGAR TIDAK NUMPUK DI KANAN PADA MOBILE */
+        .table-modern tbody td.text-right,
+        .table-modern tbody td.text-center {
+            text-align: left !important;
+            align-items: flex-start !important;
         }
 
         .table-modern tbody td:before {
             content: attr(data-label);
             font-weight: 700;
-            color: #64748b;
+            color: #475569;
             text-transform: uppercase;
-            font-size: 13px; /* DIBESARKAN: ukuran judul labelnya */
+            font-size: 11px;
             letter-spacing: 0.5px;
             margin-bottom: 6px; 
             display: block;
             width: 100%;
         }
 
+        .table-modern tbody td:last-child {
+            border-bottom: none !important;
+            background-color: #f8fafc; /* Highlight area tombol aksi */
+            padding-top: 16px !important;
+            padding-bottom: 16px !important;
+        }
+
         .flex-action {
             display: flex;
             justify-content: flex-start;
             width: 100%;
-            margin-top: 5px;
+            margin-top: 0;
         }
 
         .flex-action a {
             width: 100%; 
             text-align: center;
             padding: 12px !important;
-            font-size: 15px !important; /* DIBESARKAN: tombol aksi */
-            border-radius: 6px;
+            font-size: 15px !important; 
+            border-radius: 8px;
         }
 
         .card-header-clean {
-            font-size: 16px; /* DIBESARKAN */
+            font-size: 16px; 
             padding: 15px;
         }
 
         .section-title {
-            font-size: 15px; /* DIBESARKAN */
+            font-size: 15px; 
             margin-top: 15px;
             padding-left: 15px;
         }
@@ -398,11 +399,11 @@ if (!function_exists('rupiah')) {
         }
 
         .form-control-clean {
-            font-size: 15px; /* DIBESARKAN: input form */
+            font-size: 15px; 
             padding: 10px; 
         }
         .form-group label {
-            font-size: 14px; /* DIBESARKAN: label form */
+            font-size: 14px; 
         }
 
         .total-box {
@@ -423,7 +424,7 @@ if (!function_exists('rupiah')) {
             width: 100%;
             text-align: center;
             padding: 12px !important;
-            font-size: 15px; /* DIBESARKAN: tombol form */
+            font-size: 15px; 
         }
     }
 </style>
