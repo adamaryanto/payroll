@@ -94,7 +94,6 @@ if ($datastatusrkk == 3) {
     color: #333;
     text-transform: uppercase;
     font-size: 13px;
-    /* Diperbesar */
     letter-spacing: 0.5px;
     border-bottom: 2px solid #dee2e6 !important;
     vertical-align: middle;
@@ -103,7 +102,6 @@ if ($datastatusrkk == 3) {
   .table tbody td {
     vertical-align: middle !important;
     font-size: 14px;
-    /* Diperbesar */
   }
 
   .table-hover tbody tr:hover {
@@ -254,12 +252,10 @@ if ($datastatusrkk == 3) {
     .table-modern tbody td {
       display: flex;
       flex-direction: column;
-      /* Label di atas, value di bawah pada layar sangat kecil, atau biarkan flex-row dengan jarak */
       padding: 10px 0 !important;
       border: none !important;
       border-bottom: 1px solid #f1f5f9 !important;
       font-size: 15px;
-      /* Lebih besar untuk ortu */
     }
 
     .table-modern tbody td:last-child {
@@ -349,7 +345,7 @@ if ($datastatusrkk == 3) {
             <?php
             $no = 1;
             while ($data = $tampil->fetch_assoc()) : ?>
-                <tr data-id="<?= $data['id_rkk_detail']; ?>">
+              <tr>
                 <td data-label="No"><?= $no++ ?></td>
                 <td data-label="Karyawan">
                   <span class="text-base font-bold text-gray-900"><?= $data['nama_karyawan'] ?></span><br>
@@ -417,55 +413,27 @@ if ($datastatusrkk == 3) {
 </div>
 
 <script>
-  $(document).ready(function() {  
-    // 1. Inisialisasi DataTable ke dalam variabel agar bisa dimanipulasi
+  $(document).ready(function() {
+
     var table = $('#dataTables-example').DataTable({
-        pageLength: 5,
-        autoWidth: false,
-        responsive: false,
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
-        language: {
-            search: "Cari Data:",
-            searchPlaceholder: "Ketik nama/shift...",
-            lengthMenu: "Tampilkan _MENU_ baris",
-            info: "Menampilkan _START_ s/d _END_ dari total _TOTAL_ data",
-            paginate: { previous: "Prev", next: "Next" }
+      pageLength: 5,
+      autoWidth: false,
+      responsive: false,
+      lengthMenu: [
+        [10, 25, 50, -1],
+        [10, 25, 50, "Semua"]
+      ],
+
+      language: {
+        search: "Cari Data:",
+        searchPlaceholder: "Ketik nama/shift...",
+        lengthMenu: "Tampilkan _MENU_ baris",
+        info: "Menampilkan _START_ s/d _END_ dari total _TOTAL_ data",
+        paginate: {
+          previous: "Prev",
+          next: "Next"
         }
+      }
     });
-
-    // 2. Logika pencarian baris baru
-    const urlParams = new URLSearchParams(window.location.search);
-    const newId = urlParams.get('new_id');
-
-    if (newId) {
-        // Cari baris berdasarkan atribut data-id yang kita buat di PHP tadi
-        var targetRow = table.row('[data-id="' + newId + '"]');
-
-        if (targetRow.any()) {
-            var rowIndex = targetRow.index();
-            var pageLength = table.page.info().length;
-            
-            // Hitung halaman (index dimulai dari 0)
-            var targetPage = Math.floor(rowIndex / pageLength);
-
-            // Pindah ke halaman tersebut
-            table.page(targetPage).draw(false);
-
-            // Highlight baris agar user langsung lihat
-            var rowNode = targetRow.node();
-            $(rowNode).css('background-color', '#d1fae5'); // Warna hijau emerald muda
-            
-            // Scroll otomatis ke posisi baris (opsional)
-            $('html, body').animate({
-                scrollTop: $(rowNode).offset().top - 200
-            }, 800);
-
-            // 3. Bersihkan URL dari parameter new_id agar jika di-refresh tidak loncat lagi
-            setTimeout(function() {
-                var cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.search.replace(/&new_id=\d+/, "");
-                window.history.replaceState({path: cleanUrl}, '', cleanUrl);
-            }, 2000);
-        }
-    }
   });
 </script>
