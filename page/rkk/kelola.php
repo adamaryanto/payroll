@@ -300,7 +300,7 @@ if ($datastatusrkk == 3) {
             <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=app" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center" onclick="return confirm('Approve Rencana Kerja ini?');">
               <i class="fas fa-check-circle mr-1.5"></i> Approve
             </a>
-          <?php elseif ($datastatusrkk == 2) : ?>
+          <?php elseif ($datastatusrkk == 2 || $datastatusrkk == 3) : ?>
             <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=unapp" class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center" onclick="return confirm('Batalkan Approve Rencana Kerja ini?');">
               <i class="fas fa-times-circle mr-1.5"></i> Un-Approve
             </a>

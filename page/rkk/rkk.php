@@ -330,7 +330,7 @@ if ($_SESSION['role'] == "owner") {
                                                 onclick="return confirm('Approve data ini?');"><i class="fas fa-check mr-1"></i> Approve</a>
                                         <?php endif; ?>
 
-                                        <?php if ($data['status_rkk'] == '2' && $is_authorized) : ?>
+                                        <?php if (($data['status_rkk'] == '2' || $data['status_rkk'] == '3') && $is_authorized) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unapp"
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors"
                                                 onclick="return confirm('Batalkan Approve data ini?');"><i class="fas fa-times mr-1"></i> Un-Approve</a>
