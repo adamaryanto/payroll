@@ -75,7 +75,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
       .nav-sidebar .nav-item:hover>.nav-link, .nav-sidebar .nav-item>.nav-link.active { background-color: #eff6ff !important; color: #2563eb !important; }
       .nav-sidebar .nav-item>.nav-link>i { color: #64748b !important; margin-right: 8px; transition: all 0.2s ease; }
       .nav-sidebar .nav-item:hover>.nav-link>i, .nav-sidebar .nav-item>.nav-link.active>i { color: #2563eb !important; }
-      .nav-treeview { background-color: #f8fafc !important; padding-left: 10px; border-radius: 0.5rem; }
+      .nav-treeview { background-color: #f8fafc !important; padding-left: 10px; border-radius: 0.5rem; display: none; }
       .nav-treeview>.nav-item>.nav-link { color: #64748b !important; padding: 8px 15px 8px 25px; transition: all 0.2s; }
       .nav-treeview>.nav-item>.nav-link:hover { color: #2563eb !important; background-color: transparent !important; transform: translateX(4px); }
       .nav-treeview>.nav-item>.nav-link>i { color: #94a3b8 !important; }
@@ -351,7 +351,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
         </section>
       </div>
 
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
       <script src="assets/bower_components/jquery-ui/jquery-ui.min.js"></script>
@@ -422,6 +421,29 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
 
             function formatSelection(state) {
               return state.text;
+            }
+          });
+
+          // Manual Sidebar Toggle Fallback
+          $(document).on('click', '.nav-item.has-treeview > a', function(e) {
+            var $this = $(this);
+            var $parent = $this.parent();
+            var $treeview = $parent.find('> .nav-treeview');
+            
+            if ($treeview.length > 0) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              $parent.toggleClass('menu-open');
+              $treeview.stop(true, true).slideToggle(300);
+              
+              // Rotate icon
+              var $icon = $this.find('i.right');
+              if ($parent.hasClass('menu-open')) {
+                $icon.css('transform', 'rotate(-90deg)');
+              } else {
+                $icon.css('transform', 'rotate(0deg)');
+              }
             }
           });
         });
