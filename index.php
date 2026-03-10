@@ -75,7 +75,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
       .nav-sidebar .nav-item:hover>.nav-link, .nav-sidebar .nav-item>.nav-link.active { background-color: #eff6ff !important; color: #2563eb !important; }
       .nav-sidebar .nav-item>.nav-link>i { color: #64748b !important; margin-right: 8px; transition: all 0.2s ease; }
       .nav-sidebar .nav-item:hover>.nav-link>i, .nav-sidebar .nav-item>.nav-link.active>i { color: #2563eb !important; }
-      .nav-treeview { background-color: #f8fafc !important; padding-left: 10px; border-radius: 0.5rem; display: none; }
+      .nav-treeview { background-color: #f8fafc !important; padding-left: 10px; border-radius: 0.5rem; }
       .nav-treeview>.nav-item>.nav-link { color: #64748b !important; padding: 8px 15px 8px 25px; transition: all 0.2s; }
       .nav-treeview>.nav-item>.nav-link:hover { color: #2563eb !important; background-color: transparent !important; transform: translateX(4px); }
       .nav-treeview>.nav-item>.nav-link>i { color: #94a3b8 !important; }
@@ -137,7 +137,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               </li>
 
               <?php if ($role != 'owner') { ?>
-              <li class="nav-item has-treeview">
+              <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-cogs"></i>
                   <p>MASTER <i class="right fas fa-angle-left"></i></p>
@@ -179,7 +179,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 <a href="?page=generate&aksi=tarik" class="nav-link"><i class="nav-icon fas fa-download"></i><p>Tarik Data</p></a>
               </li>
 
-              <li class="nav-item has-treeview">
+              <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-clipboard-list"></i>
                   <p>SIA <i class="right fas fa-angle-left"></i></p>
@@ -421,29 +421,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
 
             function formatSelection(state) {
               return state.text;
-            }
-          });
-
-          // Manual Sidebar Toggle Fallback
-          $(document).on('click', '.nav-item.has-treeview > a', function(e) {
-            var $this = $(this);
-            var $parent = $this.parent();
-            var $treeview = $parent.find('> .nav-treeview');
-            
-            if ($treeview.length > 0) {
-              e.preventDefault();
-              e.stopPropagation();
-              
-              $parent.toggleClass('menu-open');
-              $treeview.stop(true, true).slideToggle(300);
-              
-              // Rotate icon
-              var $icon = $this.find('i.right');
-              if ($parent.hasClass('menu-open')) {
-                $icon.css('transform', 'rotate(-90deg)');
-              } else {
-                $icon.css('transform', 'rotate(0deg)');
-              }
             }
           });
         });
