@@ -47,7 +47,12 @@ if ($simpan) {
         <div class="col-md-10">
             <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
                 <div class="border-b border-gray-100 py-4 px-5 bg-white flex justify-between items-center">
-                    <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-edit mr-2"></i>Ubah Data Boneless</h3>
+                    <div class="flex items-center gap-3">
+                        <a href="?page=boneless" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200">
+                            <i class="fas fa-arrow-left text-xs"></i>
+                        </a>
+                        <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-edit mr-2"></i>Ubah Data Boneless</h3>
+                    </div>
                     <div class="text-sm text-gray-500 font-medium">Record ID: #<?= $id ?></div>
                 </div>
 

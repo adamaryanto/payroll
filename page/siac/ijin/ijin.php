@@ -78,7 +78,7 @@ if(isset($_GET['ttgl1']) || isset($_GET['ttgl2'])){
                                 <td data-label="Sampai Jam" class="text-center text-sm text-gray-700 font-medium"><?php echo date('H:i', strtotime($data['waktu_akhir'])); ?></td>
                                 <td data-label="Aksi" class="text-center align-middle">
                                     <div class="flex flex-wrap gap-2 justify-end sm:justify-center mt-2 sm:mt-0">
-                                        <a href="?page=ijin&aksi=hapus&id=<?php echo $data['id_ijin'];?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Batal Ijin">
+                                        <a href="?page=ijin&aksi=hapus&id=<?php echo $data['id_sia'];?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Batal Data">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

@@ -270,25 +270,25 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "tambah") { include "page/upah/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/upah/ubah.php"; }
                   } else if ($page == 'sakit') {
-                    if ($aksi == "") { include "page/sakit/sakit.php"; } 
-                    elseif ($aksi == "hapus") { include "page/sakit/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/sakit/tambah.php"; } 
-                    elseif ($aksi == "cari") { include "page/sakit/karyawan.php"; }
+                    if ($aksi == "") { include "page/siac/sakit/sakit.php"; } 
+                    elseif ($aksi == "hapus") { include "page/siac/sakit/hapus.php"; } 
+                    elseif ($aksi == "tambah") { include "page/siac/sakit/tambah.php"; } 
+                    elseif ($aksi == "cari") { include "page/siac/sakit/karyawan.php"; }
                   } else if ($page == 'cuti') {
-                    if ($aksi == "") { include "page/cuti/cuti.php"; } 
-                    elseif ($aksi == "hapus") { include "page/cuti/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/cuti/tambah.php"; } 
-                    elseif ($aksi == "cari") { include "page/cuti/karyawan.php"; }
+                    if ($aksi == "") { include "page/siac/cuti/cuti.php"; } 
+                    elseif ($aksi == "hapus") { include "page/siac/cuti/hapus.php"; } 
+                    elseif ($aksi == "tambah") { include "page/siac/cuti/tambah.php"; } 
+                    elseif ($aksi == "cari") { include "page/siac/cuti/karyawan.php"; }
                   } else if ($page == 'alfa') {
-                    if ($aksi == "") { include "page/alfa/alfa.php"; } 
-                    elseif ($aksi == "hapus") { include "page/alfa/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/alfa/tambah.php"; } 
-                    elseif ($aksi == "cari") { include "page/alfa/karyawan.php"; }
+                    if ($aksi == "") { include "page/siac/alfa/alfa.php"; } 
+                    elseif ($aksi == "hapus") { include "page/siac/alfa/hapus.php"; } 
+                    elseif ($aksi == "tambah") { include "page/siac/alfa/tambah.php"; } 
+                    elseif ($aksi == "cari") { include "page/siac/alfa/karyawan.php"; }
                   } else if ($page == 'ijin') {
-                    if ($aksi == "") { include "page/ijin/ijin.php"; } 
-                    elseif ($aksi == "hapus") { include "page/ijin/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/ijin/tambah.php"; } 
-                    elseif ($aksi == "cari") { include "page/ijin/karyawan.php"; }
+                    if ($aksi == "") { include "page/siac/ijin/ijin.php"; } 
+                    elseif ($aksi == "hapus") { include "page/siac/ijin/hapus.php"; } 
+                    elseif ($aksi == "tambah") { include "page/siac/ijin/tambah.php"; } 
+                    elseif ($aksi == "cari") { include "page/siac/ijin/karyawan.php"; }
                   } else if ($page == 'denda') {
                     if ($aksi == "") { include "page/denda/denda.php"; }
                   } else if ($page == 'mesin') {
@@ -312,10 +312,10 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "accept") { include "page/rkk/app.php"; }
                   } else if ($page == 'siac') {
                     if ($aksi == "") { include "page/siac/karyawan.php"; } 
-                    elseif ($aksi == "sakit") { include "page/siac/sakit.php"; } 
-                    elseif ($aksi == "ijin") { include "page/siac/ijin.php"; } 
-                    elseif ($aksi == "alfa") { include "page/siac/alfa.php"; } 
-                    elseif ($aksi == "cuti") { include "page/siac/cuti.php"; }
+                    elseif ($aksi == "sakit") { include "page/siac/sakit/sakit.php"; } 
+                    elseif ($aksi == "ijin") { include "page/siac/ijin/ijin.php"; } 
+                    elseif ($aksi == "alfa") { include "page/siac/alfa/alfa.php"; } 
+                    elseif ($aksi == "cuti") { include "page/siac/cuti/cuti.php"; }
                   } elseif ($page == "") {
                     include "home.php";
                   } else if ($page == 'dailyactivity') {

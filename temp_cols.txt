@@ -1,0 +1,38 @@
+Field	Type	Null	Key	Default	Extra
+id_rkk_detail	int	NO	PRI	NULL	auto_increment
+id_rkk	int	NO		0	
+id_karyawan	int	NO		NULL	
+upah	int	NO		NULL	
+id_departmen	int	YES		NULL	
+id_sub_department	int	YES		NULL	
+status_rkk	enum('Hadir','Tidak Hadir','Digantikan','Pengganti')	NO		NULL	
+id_jadwal	int	NO		NULL	
+potongan_telat	int	NO		NULL	
+potongan_istirahat	int	NO		NULL	
+potongan_lainnya	int	NO		NULL	
+tgl_updt	varchar(20)	NO		NULL	
+Field	Type	Null	Key	Default	Extra
+id_realisasi_detail	int	NO	PRI	NULL	auto_increment
+id_realisasi	int	NO		NULL	
+id_rkk_detail	int	NO		NULL	
+id_rkk	int	NO		NULL	
+id_karyawan	int	NO		NULL	
+r_upah	int	NO		NULL	
+r_potongan_telat	int	NO		0	
+r_potongan_istirahat	int	NO		0	
+r_potongan_lainnya	int	NO		0	
+r_jam_masuk	varchar(20)	NO		NULL	
+r_jam_keluar	varchar(20)	NO		NULL	
+r_istirahat_masuk	varchar(20)	NO		NULL	
+r_istirahat_keluar	varchar(20)	NO		NULL	
+r_status	int	NO		0	
+r_update	varchar(20)	NO			
+ra_masuk	varchar(20)	NO			
+ra_keluar	varchar(20)	NO			
+ra_istirahat_masuk	varchar(20)	NO			
+ra_istirahat_keluar	varchar(20)	NO			
+id_jadwal	int	NO		NULL	
+status_realisasi_detail	int	NO		0	
+hasil_kerja	varchar(255)	NO			
+lembur	int	NO		0	
+tgl_realisasi_detail	date	NO		NULL	

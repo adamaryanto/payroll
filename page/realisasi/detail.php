@@ -199,9 +199,9 @@ if (isset($_GET['id'])) {
                 </div>
 
                 <div class="row">
-                    <div class="form-group col-md-3"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" required> </div>
-                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $globalDendaMasuk ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $globalDendaIstirahat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-3"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. LAINNYA</label> <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required> </div>
                     <div class="form-group col-md-3"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
                 </div>

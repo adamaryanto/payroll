@@ -292,6 +292,9 @@ if ($datastatusrkk == 3) {
       <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
 
       <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <a href="?page=rkk" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+          <i class="fas fa-arrow-left mr-1.5"></i> Kembali
+        </a>
         <?php if ($_SESSION['role'] == "owner") : ?>
           <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
             <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=app" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center" onclick="return confirm('Approve Rencana Kerja ini?');">
