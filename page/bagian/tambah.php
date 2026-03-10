@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
     <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
         
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 sm:px-8 py-4 sm:py-6">
             <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
                 <i class="fas fa-plus-circle mr-3"></i>
                 Tambah Data Bagian
@@ -10,7 +10,7 @@
         </div>
         
         <form method="POST" enctype="multipart/form-data">
-            <div class="p-8">
+            <div class="p-6 sm:p-8">
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-2">
                         Nama Bagian <span class="text-rose-500">*</span>
@@ -24,15 +24,15 @@
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between pt-6 border-t border-gray-100">
-                    <div class="text-xs text-gray-500 italic">
+                <div class="flex flex-col sm:flex-row items-center justify-between pt-6 border-t border-gray-100 mt-4 gap-4">
+                    <div class="text-xs text-gray-500 italic order-2 sm:order-1">
                         <span class="text-rose-500">*</span> Wajib diisi
                     </div>
-                    <div class="flex gap-3">
-                        <a href="?page=bagian" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out">
+                    <div class="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
+                        <a href="?page=bagian" class="flex-1 sm:flex-none inline-flex items-center justify-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition duration-150 ease-in-out">
                             Batal
                         </a>
-                        <button type="submit" name="simpan" value="Simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
+                        <button type="submit" name="simpan" value="Simpan" class="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
                             <i class="fas fa-save mr-2"></i> Simpan
                         </button>
                     </div>

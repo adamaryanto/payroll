@@ -16,10 +16,10 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
 <table border="1">
     <thead>
         <tr>
-            <th colspan="16" style="text-align:center; font-size:20px; font-weight:bold;">LAPORAN RENCANA UPAH</th>
+            <th colspan="17" style="text-align:center; font-size:20px; font-weight:bold;">LAPORAN RENCANA UPAH</th>
         </tr>
         <tr>
-            <th colspan="16" style="text-align:center; font-size:16px;">
+            <th colspan="17" style="text-align:center; font-size:16px;">
                 Tanggal Realisasi: <?php echo $info['tgl_realisasi'] ?? '-'; ?> | 
                 Jam Kerja: <?php echo $info['jam_kerja'] ?? '-'; ?>
             </th>
@@ -35,7 +35,7 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
 
             // 2. Tampilkan Header Departemen (Wrapping/Merge)
             echo "<tr>
-                    <td colspan='16' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
+                    <td colspan='17' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
                         DEPARTEMEN: " . strtoupper($dept['nama_departmen']) . "
                     </td>
                   </tr>";
@@ -46,7 +46,7 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
                     <th>Sub Bagian</th><th>OS/DHK</th><th>Gol</th><th>Masuk</th>
                     <th>Pulang</th><th>Ist. Keluar</th><th>Ist. Masuk</th>
                     <th>Upah</th><th>Pot. Telat</th><th>Pot. Istirahat</th>
-                    <th>Pot. Lain</th><th>Hasil Kerja</th>
+                    <th>Pot. Lain</th><th>Upah Setelah Potongan</th><th>Hasil Kerja</th>
                   </tr>";
 
             // 4. Ambil data karyawan di departemen ini saja
@@ -96,22 +96,23 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
                         <td>{$data['r_potongan_telat']}</td>
                         <td>{$data['r_potongan_istirahat']}</td>
                         <td>{$data['r_potongan_lainnya']}</td>
+                        <td>" . number_format($data['upah'] - $potongan, 0, ',', '.') . "</td>
                         <td>{$data['hasil_kerja']}</td>
                       </tr>";
                 $no++;
             }
             echo "<tr>
-                    <td colspan='16' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
+                    <td colspan='17' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
                         TOTAL UPAH ($jml_karyawan Karyawan) | Rp " . number_format($total_dept, 0, ",", ".") . "
                     </td>
                   </tr>";
             // Tambahkan baris kosong sebagai pemisah antar departemen
-            echo "<tr><td colspan='16' style='height:20px;'></td></tr>";
+            echo "<tr><td colspan='17' style='height:20px;'></td></tr>";
         }
         
         // Grand Total Row for the top tables
         echo "<tr>
-                <td colspan='16' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
+                <td colspan='17' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
                     GRAND TOTAL UPAH | Rp " . number_format($grand_upah_total, 0, ",", ".") . "
                 </td>
               </tr>";

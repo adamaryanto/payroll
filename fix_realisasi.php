@@ -26,37 +26,43 @@ function syncRealisasiData($koneksi, $id_realisasi) {
     while ($detail = $queryDetails->fetch_assoc()) {
         $idDetail = $detail['id_realisasi_detail'];
         $idRkkDetail = $detail['id_rkk_detail'];
-        $userid = $detail['no_absen'];
+        $userid = trim($detail['no_absen'] ?? '');
         $originalWage = $detail['upah_rkk'];
         
-        // Skip if no_absen is missing
-        if (empty($userid)) continue;
+        $jamMasuk = '00:00:00';
+        $jamPulang = '00:00:00';
+        $jamIstK = '00:00:00';
+        $jamIstM = '00:00:00';
 
-        // 4. Fetch Attendance Logs from tb_record
-        $qMasuk = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 0 ORDER BY detail_waktu ASC LIMIT 1");
-        $qPulang = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 1 ORDER BY detail_waktu DESC LIMIT 1");
-        $qIstK = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 2 ORDER BY detail_waktu ASC LIMIT 1");
-        $qIstM = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 3 ORDER BY detail_waktu ASC LIMIT 1");
+        // 4. Fetch Attendance Logs from tb_record (only if NIK exists)
+        if (!empty($userid)) {
+            $qMasuk = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 0 ORDER BY detail_waktu ASC LIMIT 1");
+            $qPulang = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 1 ORDER BY detail_waktu DESC LIMIT 1");
+            $qIstK = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 2 ORDER BY detail_waktu ASC LIMIT 1");
+            $qIstM = $koneksi->query("SELECT detail_waktu FROM tb_record WHERE userid = '$userid' AND tgl = '$tgl' AND status = 3 ORDER BY detail_waktu ASC LIMIT 1");
 
-        $recMasuk = $qMasuk->fetch_assoc()['detail_waktu'] ?? '00:00:00';
-        $recPulang = $qPulang->fetch_assoc()['detail_waktu'] ?? '00:00:00';
-        $recIstK = $qIstK->fetch_assoc()['detail_waktu'] ?? '00:00:00';
-        $recIstM = $qIstM->fetch_assoc()['detail_waktu'] ?? '00:00:00';
+            $resM = $qMasuk->fetch_assoc();
+            $resP = $qPulang->fetch_assoc();
+            $resIK = $qIstK->fetch_assoc();
+            $resIM = $qIstM->fetch_assoc();
 
-        $jamMasuk = ($recMasuk != '00:00:00') ? date('H:i:s', strtotime($recMasuk)) : '00:00:00';
-        $jamPulang = ($recPulang != '00:00:00') ? date('H:i:s', strtotime($recPulang)) : '00:00:00';
-        $jamIstK = ($recIstK != '00:00:00') ? date('H:i:s', strtotime($recIstK)) : '00:00:00';
-        $jamIstM = ($recIstM != '00:00:00') ? date('H:i:s', strtotime($recIstM)) : '00:00:00';
+            if ($resM) $jamMasuk = date('H:i:s', strtotime($resM['detail_waktu']));
+            if ($resP) $jamPulang = date('H:i:s', strtotime($resP['detail_waktu']));
+            if ($resIK) $jamIstK = date('H:i:s', strtotime($resIK['detail_waktu']));
+            if ($resIM) $jamIstM = date('H:i:s', strtotime($resIM['detail_waktu']));
+        }
 
         // 5. Calculate Deductions and Determine Attendance Status
         $potTelat = 0;
         $potIstirahat = 0;
         $realizedWage = $originalWage;
-        $newRkkStatus = 'Hadir';
+        $newRkkStatus = ($detail['current_rkk_status'] == 'Pengganti') ? 'Pengganti' : (($detail['current_rkk_status'] == 'Digantikan') ? 'Digantikan' : 'Hadir');
 
         // Check if Absent (No entry AND No exit)
         if ($jamMasuk == '00:00:00' && $jamPulang == '00:00:00') {
-            $newRkkStatus = 'Tidak Hadir';
+            if ($newRkkStatus != 'Pengganti' && $newRkkStatus != 'Digantikan') {
+                $newRkkStatus = 'Tidak Hadir';
+            }
             $realizedWage = 0;
         } else {
             // Late deduction logic
@@ -72,11 +78,11 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                     $potIstirahat = $dendaIstirahat;
                 }
             }
-            
-            // Maintain status if it was 'Pengganti' or 'Digantikan'
-            if ($detail['current_rkk_status'] == 'Pengganti' || $detail['current_rkk_status'] == 'Digantikan') {
-                $newRkkStatus = $detail['current_rkk_status'];
-            }
+        }
+        
+        // Force 0 wage for 'Digantikan'
+        if ($newRkkStatus == 'Digantikan') {
+            $realizedWage = 0;
         }
 
         // 6. Update tb_realisasi_detail
