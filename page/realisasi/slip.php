@@ -21,7 +21,6 @@ if (!function_exists('rupiah')) {
 <div class="container-fluid px-3 md:px-6 mt-6 mb-10">
     <div class="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden">
         
-        <!-- Premium Modern Header -->
         <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 px-6 md:px-8 py-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="flex items-center space-x-4">
@@ -30,11 +29,11 @@ if (!function_exists('rupiah')) {
                     </div>
                     <div>
                         <h3 class="text-xl md:text-2xl font-bold text-white m-0 tracking-tight">Preview Slip Gaji</h3>
-                        <p class="text-blue-100 text-sm font-medium opacity-90"><?= $namaKaryawan ?> • <span class="bg-white/20 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider"><?= $deptKaryawan ?></span></p>
+                        <p class="text-blue-100 text-sm font-medium opacity-90 mt-1"><?= $namaKaryawan ?> • <span class="bg-white/20 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider"><?= $deptKaryawan ?></span></p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="?page=realisasi&aksi=karyawan" class="inline-flex items-center bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2 px-4 rounded-xl border border-white/20 transition-all backdrop-blur-sm">
+                <div class="flex items-center w-full md:w-auto mt-2 md:mt-0">
+                    <a href="?page=realisasi&aksi=karyawan" class="w-full md:w-auto inline-flex justify-center items-center bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-5 rounded-xl border border-white/20 transition-all backdrop-blur-sm">
                         <i class="fas fa-arrow-left mr-2"></i> Kembali
                     </a>
                 </div>
@@ -42,7 +41,6 @@ if (!function_exists('rupiah')) {
         </div>
 
         <div class="p-4 md:p-8">
-            <!-- Modern Search Form -->
             <form method="POST" enctype="multipart/form-data" class="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl mb-8">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
                     <div class="md:col-span-4">
@@ -65,8 +63,8 @@ if (!function_exists('rupiah')) {
                                 class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-gray-700 font-medium">
                         </div>
                     </div>
-                    <div class="md:col-span-4">
-                        <button type="submit" name="simpan" value="Search" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-blue-200 transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <div class="md:col-span-4 mt-2 md:mt-0">
+                        <button type="submit" name="simpan" value="Search" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                             <i class="fas fa-search shadow-sm"></i>
                             <span>Cari Slip Gaji</span>
                         </button>
@@ -86,16 +84,18 @@ if (!function_exists('rupiah')) {
                 $result = $koneksi->query($sql);
                 ?>
 
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pt-4 border-t border-gray-100">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pt-4 border-t border-gray-100">
                     <div>
                         <h4 class="text-lg font-bold text-gray-800 m-0">Hasil Pencarian</h4>
-                        <p class="text-gray-500 text-xs">Menampilkan data slip gaji periode <?= date('d/m/Y', strtotime($ttgl11)) ?> - <?= date('d/m/Y', strtotime($ttgl22)) ?></p>
+                        <p class="text-gray-500 text-xs mt-1">Menampilkan data slip gaji periode <?= date('d/m/Y', strtotime($ttgl11)) ?> - <?= date('d/m/Y', strtotime($ttgl22)) ?></p>
                     </div>
                     <?php if ($result && $result->num_rows > 0): ?>
-                        <a target="_blank" href="slip.php?id=<?= $id ?>&ttgl1=<?= $ttgl11 ?>&ttgl2=<?= $ttgl22 ?>" 
-                           class="inline-flex items-center px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg shadow-emerald-100 transition-all transform hover:-translate-y-0.5">
-                            <i class="fas fa-file-excel mr-2"></i> Download Excel
-                        </a>
+                        <div class="w-full md:w-auto">
+                            <a target="_blank" href="slip.php?id=<?= $id ?>&ttgl1=<?= $ttgl11 ?>&ttgl2=<?= $ttgl22 ?>" 
+                               class="w-full md:w-auto flex justify-center items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-0.5">
+                                <i class="fas fa-file-excel mr-2"></i> Download Excel
+                            </a>
+                        </div>
                     <?php endif; ?>
                 </div>
 
@@ -149,10 +149,7 @@ if (!function_exists('rupiah')) {
                         </tbody>
                     </table>
                 </div>
-                <?php
-            } else {
-                ?>
-                <!-- Empty State Initial -->
+            <?php } else { ?>
                 <div class="py-16 text-center border-2 border-dashed border-gray-100 rounded-3xl">
                     <div class="flex flex-col items-center justify-center">
                         <div class="w-16 h-16 bg-blue-50 text-blue-300 rounded-full flex items-center justify-center mb-4">
@@ -162,9 +159,7 @@ if (!function_exists('rupiah')) {
                         <p class="text-gray-400 text-sm italic">Pilih rentang tanggal di atas untuk melihat preview slip gaji</p>
                     </div>
                 </div>
-                <?php
-            }
-            ?>
+            <?php } ?>
         </div>
     </div>
 </div>
@@ -175,28 +170,28 @@ if (!function_exists('rupiah')) {
         .table-modern thead { display: none !important; }
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 15px;
+            border-radius: 12px;
+            padding: 12px;
             background: #fff;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         .table-modern tbody td {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0 !important;
+            padding: 8px 0 !important;
             border: none !important;
             border-bottom: 1px dashed #f1f5f9 !important;
             text-align: right !important;
         }
         .table-modern tbody td:last-child { 
             border-bottom: none !important; 
-            padding-top: 15px !important;
+            padding-top: 12px !important;
             margin-top: 5px;
             background: #f8fafc;
-            border-radius: 0 0 12px 12px;
+            border-radius: 8px;
             padding-left: 10px !important;
             padding-right: 10px !important;
         }
@@ -210,6 +205,61 @@ if (!function_exists('rupiah')) {
             text-align: left;
         }
     }
+
+    /* Styling Pagination & Info */
+    .dataTables_info {
+        color: #64748b !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+    }
+
+    .dataTables_paginate {
+        display: flex !important;
+        gap: 4px !important;
+        align-items: center !important;
+    }
+
+    .dataTables_paginate .paginate_button {
+        padding: 5px 12px !important;
+        border-radius: 8px !important;
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        color: #475569 !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
+        outline: none !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+        text-decoration: none !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        color: white !important;
+        border-color: #2563eb !important;
+        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
+    }
+
+    .dataTables_paginate .paginate_button.disabled {
+        color: #94a3b8 !important;
+        background: #f1f5f9 !important;
+        border-color: #e2e8f0 !important;
+        cursor: not-allowed !important;
+    }
+
+    .dataTables_paginate .paginate_button.previous,
+    .dataTables_paginate .paginate_button.next {
+        background: #f8fafc !important;
+        font-weight: 700 !important;
+        border-color: #e2e8f0 !important;
+    }
 </style>
 
 <script>
@@ -219,16 +269,18 @@ if (!function_exists('rupiah')) {
             $('#slipTable').DataTable({
                 "pageLength": 10,
                 "autoWidth": false,
+                "responsive": true,
                 "language": {
                     "search": "Cari Baris:",
                     "lengthMenu": "_MENU_",
                     "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data"
                 },
-                "dom": '<"flex flex-col md:flex-row justify-between mb-4"f>t<"flex flex-col md:flex-row justify-between mt-4"ip>'
+                "dom": '<"flex flex-col md:flex-row justify-between items-center mb-4 gap-3"f>t<"flex flex-col md:flex-row justify-between items-center mt-4 gap-3"ip>'
             });
             
             // Perbaiki gaya input DataTables agar matching
-            $('.dataTables_filter input').addClass('ml-2 px-3 py-1.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500');
+            $('.dataTables_filter input').addClass('w-full md:w-auto px-3 py-1.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500');
+            $('.dataTables_filter label').addClass('w-full md:w-auto flex flex-col md:flex-row md:items-center gap-2');
         }
     });
 </script>

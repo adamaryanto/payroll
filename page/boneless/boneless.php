@@ -10,7 +10,7 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                 <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-truck-loading mr-2"></i>Data Boneless</h3>
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-                <a href="?page=" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+                <a href="?page=realisasi" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
                     <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                 </a>
                 <a href="?page=boneless&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
