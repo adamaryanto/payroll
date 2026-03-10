@@ -5,7 +5,9 @@ $is_authorized = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin ma
 
 // 2.hak Propose/Un-Propose (HRD & Admin Master)
 $can_propose = ($_SESSION['role'] == "admin" || $_SESSION['role'] == "kepala gudang");
-$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A");
+
+$where_rkk = ($_SESSION['role'] == 'owner') ? " WHERE A.status_rkk > 0 " : "";
+$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A $where_rkk");
 if ($_SESSION['role'] != "owner") {
     $level_status =  "Hidden";
 } else {

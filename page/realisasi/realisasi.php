@@ -1,12 +1,13 @@
 <?php
 // Query utama
+$where_real = ($_SESSION['role'] == 'owner') ? " WHERE A.status_realisasi != 'pending' " : "";
 $tampil = $koneksi->query("SELECT A.*, 
     (select count(id_realisasi_detail) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as jml, 
     (select sum(r_upah) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as ttl, 
     (select sum(r_potongan_telat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as pottelat,
     (select sum(r_potongan_istirahat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potistirahat, 
     (select sum(r_potongan_lainnya) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potlainnya
-    from tb_realisasi A");
+    from tb_realisasi A $where_real");
 
 // Logika Akses: Owner dan Admin bisa Approve/Unapprove
 $role_akses = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin" || $_SESSION['role'] == "admin master");
