@@ -6,21 +6,21 @@ $idrkk = $_GET['id'] ?? '';
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-10">
     <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
         
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 md:px-8 py-4 md:py-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
+                    <h3 class="text-xl md:text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
                         <i class="fas fa-users mr-3"></i>
                         Data Karyawan Aktif
                     </h3>
-                    <p class="text-slate-300 text-sm mt-1">Daftar seluruh karyawan yang terdaftar dalam sistem</p>
+                    <p class="text-blue-100 text-xs md:text-sm mt-1">Daftar seluruh karyawan yang terdaftar dalam sistem</p>
                 </div>
             </div>
         </div>
         
-        <div class="p-6">
+        <div class="p-3 md:p-6">
             <div class="table-responsive">
-                <table class="w-full text-left border-separate border-spacing-y-2" id="dataTables-example">
+                <table class="w-full text-left border-separate border-spacing-y-2 table-modern" id="dataTables-example">
                     <thead>
                         <tr class="text-gray-500 uppercase text-[11px] tracking-wider font-bold">
                             <th hidden>ID Karyawan</th>
@@ -28,7 +28,7 @@ $idrkk = $_GET['id'] ?? '';
                             <th class="px-4 py-3 border-b border-gray-100">Nama Lengkap</th>
                             <th class="px-4 py-3 border-b border-gray-100">Bagian / Dept</th>
                             <th class="px-4 py-3 border-b border-gray-100">Gender</th>
-                            <th class="px-4 py-3 border-b border-gray-100">Tgl Aktif</th>
+                            <th class="px-4 py-3 border-b border-gray-100 uppercase">Tgl Aktif</th>
                             <th class="px-4 py-3 border-b border-gray-100 text-center">Opsi</th>
                         </tr>
                     </thead>
@@ -60,10 +60,10 @@ $idrkk = $_GET['id'] ?? '';
                             <td data-label="Tgl Aktif" class="px-4 py-4 text-gray-600">
                                 <?= date('d M Y', strtotime($datakaryawan['tgl_aktif'])) ?>
                             </td>
-                            <td data-label="Aksi" class="px-4 py-4 text-center">
+                            <td data-label="Aksi" class="px-4 py-4 md:text-center mt-2 md:mt-0">
                                 <a href="?page=realisasi&aksi=slip&id=<?= $id ?>" 
-                                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md transition transform hover:-translate-y-0.5">
-                                    <i class="fas fa-file-invoice-dollar mr-2"></i> Slip
+                                   class="inline-flex items-center justify-center w-full md:w-auto px-6 py-3 md:py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-[11px] font-bold rounded-xl shadow-md transition transform hover:-translate-y-0.5 uppercase tracking-wider">
+                                    <i class="fas fa-file-invoice-dollar mr-2"></i> Slip Gaji
                                 </a>
                             </td>
                         </tr>
@@ -191,6 +191,7 @@ $idrkk = $_GET['id'] ?? '';
     @media screen and (max-width: 768px) {
         .table-responsive {
             padding: 12px !important;
+            border: none !important;
         }
         
         #dataTables-example_wrapper .row:first-child {
@@ -221,7 +222,7 @@ $idrkk = $_GET['id'] ?? '';
             border: 1px solid #e2e8f0;
             border-radius: 12px;
             padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             background-color: #fff;
         }
 
@@ -232,6 +233,7 @@ $idrkk = $_GET['id'] ?? '';
             padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
             border-bottom: 1px dashed #e2e8f0 !important;
+            text-align: left !important;
         }
         .table-modern tbody td:first-child {
             padding-top: 0 !important;
@@ -251,25 +253,6 @@ $idrkk = $_GET['id'] ?? '';
             margin-bottom: 6px; /* Memberi jarak ke datanya */
             display: block;
             width: 100%;
-        }
-
-        /* Memperbesar Tombol Aksi di Mobile */
-        .action-btn-group {
-            width: 100%;
-            display: flex;
-            gap: 8px;
-            padding-top: 5px;
-        }
-        .action-btn-group > a, .action-btn-group > div {
-            flex: 1; /* Lebar tombol menyesuaikan merata */
-        }
-        .action-btn-group a {
-            padding: 10px !important; /* Area klik jadi besar */
-            width: 100%;
-        }
-
-        h3 {
-            color: #2563eb !important;
         }
     }
 </style>
