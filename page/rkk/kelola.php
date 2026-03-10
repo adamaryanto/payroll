@@ -416,7 +416,7 @@ if ($datastatusrkk == 3) {
   $(document).ready(function() {
 
     var table = $('#dataTables-example').DataTable({
-      pageLength: 5,
+      pageLength: 10,
       autoWidth: false,
       responsive: false,
       lengthMenu: [
