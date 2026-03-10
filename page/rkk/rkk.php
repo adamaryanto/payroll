@@ -202,6 +202,7 @@ if ($_SESSION['role'] == "owner") {
             flex-direction: column; /* Label di atas, data di bawah (stacking) */
             align-items: flex-start;
             padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
+            text-align: left !important;
             border: none !important;
             border-bottom: 1px dashed #e2e8f0 !important;
         }
@@ -265,7 +266,7 @@ if ($_SESSION['role'] == "owner") {
                 <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
                     <thead class="bg-gray-100 border-b border-gray-300">
                         <tr>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">No</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">No</th>
                             <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Tanggal</th>
                             <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Keterangan</th>
                             <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Jumlah Karyawan</th>
@@ -356,7 +357,7 @@ if ($_SESSION['role'] == "owner") {
             language: {
                 search: "Cari Data:",
                 searchPlaceholder: "Ketik pencarian...",
-                lengthMenu: "Tampilkan _MENU_ baris",
+                lengthMenu: "Tampilkan _MENU_ data",
                 info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
                 paginate: {
                     previous: "Prev",
