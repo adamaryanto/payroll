@@ -182,14 +182,14 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-clipboard-list"></i>
-                  <p>SIA <i class="right fas fa-angle-left"></i></p>
+                  <p>SIAC <i class="right fas fa-angle-left"></i></p>
                 </a>
                 <ul class="nav nav-treeview">
-                  <li class="nav-item"><a href="?page=siac" class="nav-link"><i class="far fa-star nav-icon"></i><p>Data Karyawan SIA</p></a></li>
+                  <li class="nav-item"><a href="?page=siac" class="nav-link"><i class="far fa-star nav-icon"></i><p>Data Karyawan SIAC</p></a></li>
                   <li class="nav-item"><a href="?page=sakit" class="nav-link"><i class="fas fa-briefcase-medical nav-icon"></i><p>Sakit</p></a></li>
                   <li class="nav-item"><a href="?page=ijin" class="nav-link"><i class="fas fa-envelope-open-text nav-icon"></i><p>Ijin</p></a></li>
-                  <li class="nav-item"><a href="?page=cuti" class="nav-link"><i class="fas fa-plane-departure nav-icon"></i><p>Cuti</p></a></li>
                   <li class="nav-item"><a href="?page=alfa" class="nav-link"><i class="fas fa-times-circle nav-icon"></i><p>Alfa</p></a></li>
+                  <li class="nav-item"><a href="?page=cuti" class="nav-link"><i class="fas fa-plane-departure nav-icon"></i><p>Cuti</p></a></li>
                 </ul>
               </li>
 

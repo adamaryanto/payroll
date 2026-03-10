@@ -17,7 +17,7 @@ if (isset($_GET['idkaryawan'])) {
 
     <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
       <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
-        <i class="fas fa-suitcase mr-3"></i>
+        <i class="fas fa-umbrella-beach mr-3"></i>
         Tambah Data Cuti
       </h3>
       <p class="text-indigo-100 text-sm mt-1">Masukkan detail pengajuan cuti karyawan</p>
