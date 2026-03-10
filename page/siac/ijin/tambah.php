@@ -1,152 +1,113 @@
 <?php
-
-
-if(isset($_GET['idkaryawan'])){
-   $idkaryawan = $_GET['idkaryawan'];
-
-  $tampildetail=$koneksi->query("select * from ms_karyawan where id_karyawan = '$idkaryawan' ");
-$datadetail=$tampildetail->fetch_assoc();
-$datanamakaryawan = $datadetail['nama_karyawan'];
-$datanoabsen   = $datadetail['no_absen'];
-
-}else{
-  $idproduk = "";
 $datanamakaryawan = "";
 $datanoabsen = "";
+
+if (isset($_GET['idkaryawan'])) {
+    $idkaryawan = $_GET['idkaryawan'];
+    $tampildetail = $koneksi->query("SELECT * FROM ms_karyawan WHERE id_karyawan = '$idkaryawan'");
+    $datadetail = $tampildetail->fetch_assoc();
+    $datanamakaryawan = $datadetail['nama_karyawan'] ?? '';
+    $datanoabsen = $datadetail['no_absen'] ?? '';
 }
-
 ?>
-<div class="row">
-                <div class="col-md-12">
-                    <!-- Advanced Tables -->
-                    <div class="panel panel-primary"  >
-                    <div class="box-header with-border" style=" background-color:#5F9EA0; border:1px ; color:white; ">
-              <h3 class="box-title">Tambah Data Karyawan Ijin</h3>
-            </div>
-             <form method="POST"  enctype="multipart/form-data">
-                        <div class="panel-body">
-                           <div class="panel-body">
-                           
-                            <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                             <div hidden="hidden"  class="form-group col-md-4">
-                    <label class="font-weight-bold">Id Karyawan</label>
-                    
-                    <input  autocomplete="off" type="text" name="tid"   class="form-control"/>
-                </div>
 
-                 <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Nama </label>
-                    <select name="idkaryawan" id="idkaryawan" class="form-control" required onchange="
-                        var selected = this.options[this.selectedIndex];
-                        document.getElementById('tnoabsen').value = selected.getAttribute('data-absen');
-                        document.getElementById('tnama').value = selected.getAttribute('data-nama');
-                    ">
-                        <option value="">-- Pilih Karyawan --</option>
-                        <?php
-                        $sql_kry = $koneksi->query("SELECT * FROM ms_karyawan ORDER BY nama_karyawan ASC");
-                        while($dkry = $sql_kry->fetch_assoc()) {
-                            $sel = ($idkaryawan == $dkry['id_karyawan']) ? 'selected' : '';
-                            echo "<option value='".$dkry['id_karyawan']."' data-absen='".$dkry['no_absen']."' data-nama='".addslashes($dkry['nama_karyawan'])."' $sel>".$dkry['nama_karyawan']." (".$dkry['no_absen'].")</option>";
-                        }
-                        ?>
-                    </select>
-                    <input type="hidden" name="tnama" id="tnama" value="<?php echo $datanamakaryawan; ?>">
-                </div>
-                 <div class="form-group col-md-2">
-                    <label class="font-weight-bold">No. Absen</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tnoabsen" id="tnoabsen" value ="<?php echo $datanoabsen; ?>" readonly required class="form-control"/>
-                    
-                </div>
-          
-             <div class="form-group col-md-3">
-                    <label class="font-weight-bold">Tanggal Ijin</label>
-                    <input placeholder="*" autocomplete="off" type="date" name="ttgl1" value="<?php echo date("Y-m-d"); ?>" required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-3">
-                    <label class="font-weight-bold">Jenis Ijin</label>
-                   <select name="tjenis" class="form-control" required>
-                     
-                        <option value="Datang Terlambat">Datang Terlambat</option>
-                         <option value="Pulang Lebih Awal">Pulang Lebih Awal</option>
-                         <option value="Meninggalkan Tempat Kerja">Meninggalkan Tempat Kerja</option>
-                         
-                        </select>
-                    
-                </div>
-                
-                
-                 
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 mb-10">
+    <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
 
-                </div>
-
- <div class="row" style=" background-color:white; border:1px ; color:black; ">
-  <div class="form-group col-md-3">
-                    <label class="font-weight-bold">Dari Jam</label>
-                    <input placeholder="*" autocomplete="off" type="time" name="ttime1" value="<?php echo date("H:i"); ?>" required class="form-control"/>
-                    
-                </div>
-                 <div class="form-group col-md-3">
-                    <label class="font-weight-bold">Sampai Jam</label>
-                    <input placeholder="*" autocomplete="off" type="time" name="ttime2" value="<?php echo date("H:i"); ?>" required class="form-control"/>
-                    
-                </div> 
-                   <div class="form-group col-md-4">
-                    <label class="font-weight-bold">Keterangan Ijin</label>
-                    <input placeholder="*" autocomplete="off" type="text" name="tketerangan"  required class="form-control"/>
-                    
-                </div>
-                 </div>
-                  
-
-
-
-                  <div class="row" style=" background-color:white; border:1px ; color:black; "> 
-                    <div class="form-group col-md-4">
-                 <div>
-                                            <input type="submit" name="simpan"  value="Simpan" class="btn btn-primary">
-                                              <div class="col"> <h3><label style="color:red ;" >* </label><label>HArus Diisi</label> </h3> </div>
-                                        </div>
-                                           
-                                        </div></div>
-                                    </form>
-             
-                                    </form>
-                                  
-                            </div>
-                          
-                           
-
-                    </div>
-                </div>
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+            <h3 class="text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
+                <i class="fas fa-clock mr-3"></i>
+                Tambah Data Karyawan Izin
+            </h3>
+            <p class="text-amber-100 text-sm mt-1">Masukkan detail perizinan karyawan</p>
         </div>
 
+        <form method="POST">
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nama Karyawan <span class="text-rose-500">*</span></label>
+                        <select name="idkaryawan" class="block w-full py-3 px-4 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-medium" required onchange="
+                            var selected = this.options[this.selectedIndex];
+                            document.getElementById('tnoabsen').value = selected.getAttribute('data-absen');
+                        ">
+                            <option value="">-- Pilih Karyawan --</option>
+                            <?php
+                            $sql_kry = $koneksi->query("SELECT * FROM ms_karyawan ORDER BY nama_karyawan ASC");
+                            while ($dkry = $sql_kry->fetch_assoc()) {
+                                echo "<option value='" . $dkry['id_karyawan'] . "' data-absen='" . $dkry['no_absen'] . "'>" . $dkry['nama_karyawan'] . " (" . $dkry['no_absen'] . ")</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">No. Absen</label>
+                        <input type="text" name="tnoabsen" id="tnoabsen" readonly class="block w-full py-3 px-4 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 font-medium" placeholder="-" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tanggal Izin <span class="text-rose-500">*</span></label>
+                        <input type="date" name="ttgl1" value="<?= date('Y-m-d') ?>" required class="block w-full py-3 px-4 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-medium" />
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Jenis Izin <span class="text-rose-500">*</span></label>
+                        <select name="tjenis" class="block w-full py-3 px-4 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-medium" required>
+                            <option value="Datang Terlambat">Datang Terlambat</option>
+                            <option value="Pulang Lebih Awal">Pulang Lebih Awal</option>
+                            <option value="Meninggalkan Tempat Kerja">Meninggalkan Tempat Kerja</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Dari Jam <span class="text-rose-500">*</span></label>
+                        <input type="time" name="ttime1" value="<?= date('H:i') ?>" required class="block w-full py-3 px-4 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-medium" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Sampai Jam <span class="text-rose-500">*</span></label>
+                        <input type="time" name="ttime2" value="<?= date('H:i') ?>" required class="block w-full py-3 px-4 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-medium" />
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Keterangan Izin <span class="text-rose-500">*</span></label>
+                        <input type="text" name="tketerangan" required class="block w-full py-3 px-4 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-medium" placeholder="Masukkan alasan izin..." />
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+                    <div class="text-xs text-gray-500 italic">
+                        <span class="text-rose-500">*</span> Wajib diisi
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="?page=ijin" class="inline-flex items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition">
+                            Batal
+                        </a>
+                        <button type="submit" name="simpan" class="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition duration-150 ease-in-out transform hover:-translate-y-0.5">
+                            <i class="fas fa-save mr-2"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <?php
+if (isset($_POST['simpan'])) {
+    $idkaryawan = $_POST['idkaryawan'];
+    $ttgl1 = $_POST['ttgl1'];
+    $ttime1 = $_POST['ttime1'];
+    $ttime2 = $_POST['ttime2'];
+    $tjenis = $_POST['tjenis'];
+    $tketerangan = $_POST['tketerangan'];
+    $tgl = date("Y-m-d");
 
-$tid = @$_POST['tid'] ;
-$idkaryawan_post = @$_POST['idkaryawan'];
-$tnama = @$_POST ['tnama'];
-$tnoabsen = @$_POST ['tnoabsen'];
-$ttgl1 = @$_POST ['ttgl1'];
-$tjenis = @$_POST ['tjenis'];
-$ttime1 = @$_POST ['ttime1'];
-$ttime2 = @$_POST ['ttime2'];
-$tketerangan = @$_POST ['tketerangan'];
+    $sql = $koneksi->query("INSERT INTO tb_ijin (id_karyawan, tgl_pengajuan_ijin, tgl_ijin, waktu_awal, waktu_akhir, keterangan, jenis_ijin) VALUES ('$idkaryawan', '$tgl', '$ttgl1', '$ttime1', '$ttime2', '$tketerangan', '$tjenis')");
 
-$tgldetail = date("Y-m-d-H-i-s");
-$tgl = date("Y-m-d");
-$simpan = @$_POST ['simpan'];
-if($simpan) {
-if ($idkaryawan_post != "") { $idkaryawan = $idkaryawan_post; }
-$sql = $koneksi->query("insert into tb_ijin (id_karyawan,tgl_pengajuan_ijin,tgl_ijin,waktu_awal,waktu_akhir,keterangan,jenis_ijin) values ('$idkaryawan','$tgl','$ttgl1','$ttime1','$ttime2','$tketerangan','$tjenis')  ");
-if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Data Tersimpan");
-                window.location.href="?page=ijin";
-
-            </script>
-            <?php
+    if ($sql) {
+        echo '<script>alert("Data Izin Tersimpan"); window.location.href="?page=ijin";</script>';
     }
-}//simpan if
+}
 ?>

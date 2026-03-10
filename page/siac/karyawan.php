@@ -64,7 +64,7 @@
 
                                         <a href="?page=siac&aksi=ijin&id=<?= $datakaryawan['id_karyawan'] ?>"
                                             class="flex items-center px-3 py-2 text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-all">
-                                            <i class="fas fa-clipboard-check mr-1"></i> Ijin
+                                            <i class="fas fa-clipboard-check mr-1"></i> Izin
                                         </a>
 
                                         <a href="?page=siac&aksi=alfa&id=<?= $datakaryawan['id_karyawan'] ?>"

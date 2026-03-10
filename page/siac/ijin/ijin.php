@@ -17,7 +17,7 @@ if(isset($_GET['ttgl1']) || isset($_GET['ttgl2'])){
         <div class="card rounded-2xl shadow-sm border-0 bg-white">
             <div class="bg-white border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-clock mr-2"></i>Data Karyawan Ijin</h3>
+                    <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-clock mr-2"></i>Data Karyawan Izin</h3>
                     <p class="text-xs text-gray-500 mt-1">Kelola data perijinan karyawan berdasarkan periode</p>
                 </div>
                 <div class="w-full md:w-auto">
