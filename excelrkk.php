@@ -1,17 +1,17 @@
 <?php
-include "koneksi.php";  // sesuaikan koneksi
+include "koneksi.php";
 
-$id = $_GET['id']; // parameter ?tgl=2025-10-30
+$id = $_GET['id'];
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=export_rencana_$id.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
-function rupiah($angka){
+function rupiah($angka)
+{
     return "Rp " . number_format($angka, 0, ',', '.');
 }
 
-// Query join lengkap
 $sql = "
 SELECT 
     K.nama_karyawan, K.OS_DHK,K.golongan,
@@ -19,8 +19,9 @@ SELECT
     D.nama_departmen,
     R.jam_kerja,
     JD.jam_masuk,
-    JD.istirahat_masuk,
     JD.jam_keluar,
+    JD.istirahat_keluar,
+    JD.istirahat_masuk,
     RD.upah,
     RD.potongan_telat,
     RD.potongan_istirahat,
@@ -37,200 +38,97 @@ ORDER BY D.nama_departmen, K.nama_karyawan ASC
 ";
 
 $result = $koneksi->query($sql);
-
-// MULAI OUTPUT EXCEL (format tabel HTML)
 $row1 = $result->fetch_assoc();
 echo "
-<table>
-<tr>
- <td colspan= '14'  style='text-align:center;'>Realisasi Absensi Karyawan Tanggal ". $row1['tgl_rkk'] ."</td>   
-</tr>
-";
+<table> <tr><td colspan= '15'  style='text-align:center;'>Realisasi Absensi Karyawan Tanggal " . $row1['tgl_rkk'] . "</td></tr>
 
-echo "
-<tr>
- <td colspan= '14'  style='text-align:center;'>JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td>   
-</tr>
-";
+<tr><td colspan= '15'  style='text-align:center;'>JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
 
-echo "
+<tr><td colspan= '15'  style='text-align:center;'>JIKALAU ISITIRAHAT KURANG DARI JAM 12:00 DAN MASUK SETELAH ISTIRAHAT LEBIH DARI JAM 13:00 MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
 
-<tr>
- <td colspan= '14'  style='text-align:center;'>JIKALAU ISITIRAHAT KURANG DARI JAM 12:00 DAN MASUK SETELAH ISTIRAHAT LEBIH DARI JAM 13:00 MAKA KENA POTONG SEBESAR RP.50,000!!!                          
-</td>   
-</tr>
+<tr><td colspan= '15'  style='text-align:center;'>MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td></tr>
 
-";
+<tr><td colspan= '15' style='text-align:center;'>MASUK JAM 09:00-10:00 ISTIRAHAT JAM 13:00 MASUK JAM ISTIRAHAT JAM 14:00</td></tr>
 
-echo "
+</table>";
 
-<tr>
- <td colspan= '14'  style='text-align:center;'>MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td>   
-</tr>
-
-";
-
-echo "
-
-<tr>
- <td colspan= '16' style='text-align:center;'>MASUK JAM 09:00-10:00 ISTIRAHAT JAM 13:00 MASUK JAM ISTIRAHAT JAM 14:00</td>   
-</tr>
-</table>
-";
 $result->data_seek(0);
-echo "<table border='1'>";
-echo "
-<tr>
- <th>No.</th>
-    <th>Nama Karyawan</th>
-    <th>Jabatan</th>
-    <th>Bagian</th>
-    <th>OS/DHK</th>
-    <th>Golongan</th>
-    <th>Jam Kerja</th>
-    <th>Masuk</th>
-    <th>Istirahat Masuk</th>
-    <th>Keluar</th>
-    <th>Upah</th>
-    <th>Potongan</th>
-    <th>Potongan Istirahat</th>
-    <th>Potongan lainnya</th>
-    <th>Upah Setelah Potongan</th>
-</tr>
+echo "<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse; width: 100%;'>
+<thead style='background-color: #e9ecef;'>
+    <tr>
+        <th rowspan='2'>No.</th>
+        <th rowspan='2'>Nama Karyawan</th>
+        <th rowspan='2'>Jabatan</th>
+        <th rowspan='2'>Bagian</th>
+        <th rowspan='2'>OS/DHK</th>
+        <th rowspan='2'>Gol.</th>
+        <th colspan='5'>Log Absensi</th>
+        <th rowspan='2'>Upah Kotor</th>
+        <th colspan='3'>Rincian Potongan</th>
+        <th rowspan='2'>Upah Bersih</th>
+    </tr>
+    <tr>
+        <th>J. Kerja</th>
+        <th>Masuk</th>
+        <th>Pulang</th>
+        <th>Ist. Keluar</th>
+        <th>Ist. Masuk</th>
+        <th>Terlambat</th>
+        <th>Istirahat</th>
+        <th>Lainnya</th>
+    </tr>
+</thead>
+<tbody>
 ";
-$no=1;
+
+$no = 1;
 $total_upah = 0;
 $total_potongan_telat = 0;
 $total_potongan_istirahat = 0;
 $total_potongan_lainnya = 0;
 $total_akhir = 0;
 
-while($row = $result->fetch_assoc()){
+while ($row = $result->fetch_assoc()) {
+    $upah_bersih = $row['upah'] - ($row['potongan_telat'] + $row['potongan_istirahat'] + $row['potongan_lainnya']);
 
     echo "
     <tr>
-     <td>".$no."</td>
-        <td>".$row['nama_karyawan']."</td>
-        <td>".$row['jabatan']."</td>
-        <td>".$row['nama_departmen']."</td>
-         <td>".$row['OS_DHK']."</td>
-         <td>".$row['golongan']."</td>
-        <td>".$row['jam_kerja']."</td>
-        <td>".$row['jam_masuk']."</td>
-        <td>".$row['istirahat_masuk']."</td>
-        <td>".$row['jam_keluar']."</td>
-         <td>".rupiah($row['upah'])."</td>
-        <td>".rupiah($row['potongan_telat'])."</td>
-        <td>".rupiah($row['potongan_istirahat'])."</td>
-        <td>".rupiah($row['potongan_lainnya'])."</td>
-        <td>".rupiah($row['upah'] - ($row['potongan_telat'] + $row['potongan_istirahat'] + $row['potongan_lainnya']))."</td>
-
-    </tr>
-    ";
+        <td align='center'>" . $no . "</td>
+        <td>" . $row['nama_karyawan'] . "</td>
+        <td>" . $row['jabatan'] . "</td>
+        <td>" . $row['nama_departmen'] . "</td>
+        <td align='center'>" . $row['OS_DHK'] . "</td>
+        <td align='center'>" . $row['golongan'] . "</td>
+        <td align='center'>" . $row['jam_kerja'] . "</td>
+        <td align='center'>" . $row['jam_masuk'] . "</td>
+        <td align='center'>" . $row['jam_keluar'] . "</td>
+        <td align='center'>" . $row['istirahat_keluar'] . "</td>
+        <td align='center'>" . $row['istirahat_masuk'] . "</td>
+        <td align='right'>" . rupiah($row['upah']) . "</td>
+        <td align='right' style='color: red;'>" . rupiah($row['potongan_telat']) . "</td>
+        <td align='right' style='color: red;'>" . rupiah($row['potongan_istirahat']) . "</td>
+        <td align='right' style='color: red;'>" . rupiah($row['potongan_lainnya']) . "</td>
+        <td align='right' style='font-weight: bold;'>" . rupiah($upah_bersih) . "</td>
+    </tr>";
 
     $total_upah += $row['upah'];
     $total_potongan_telat += $row['potongan_telat'];
     $total_potongan_istirahat += $row['potongan_istirahat'];
     $total_potongan_lainnya += $row['potongan_lainnya'];
-    $total_akhir += ($row['upah'] - ($row['potongan_telat'] + $row['potongan_istirahat'] + $row['potongan_lainnya']));
-
-
+    $total_akhir += $upah_bersih;
     $no++;
 }
+
 echo "
-<tr style='font-weight:bold; background-color: #f2f2f2;'>
-    <td colspan='13' style='text-align:right;'></td>
-    <td style='text-align:right;'>SUBTOTAL</td>
-    <td>".rupiah($total_akhir)."</td>
-</tr>
-";
-
-
-echo "</table>";
-
-
-// SEKSI SUMMARY BIAYA
-$result->data_seek(0);
-$grand_total_upah = 0;
-while($row_total = $result->fetch_assoc()){
-    $grand_total_upah += ($row_total['upah'] - ($row_total['potongan_telat'] + $row_total['potongan_istirahat'] + $row_total['potongan_lainnya']));
-}
-
-$tanggal = $row1['tgl_rkk'];
-$queryBoneless = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal'");
-$bonelessHeader = $queryBoneless->fetch_assoc();
-
-if ($bonelessHeader) {
-    $id_boneless = $bonelessHeader['id_boneless'];
-    $queryBonelessDetail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
-    
-    echo "<br><br>";
-    echo "<table border='1' style='border-collapse:collapse; width:900px;'>
-            <thead>
-                <tr>
-                    <th colspan='4' style='background-color:#4f81bd; color:white; text-align:center; font-weight:bold; height:30px; font-size:14px;'>
-                        DETAIL BONELESS - " . date('d-m-Y', strtotime($tanggal)) . "
-                    </th>
-                </tr>
-                <tr style='background-color:#dbe5f1; font-weight:bold;'>
-                    <th style='width:50px;'>No</th>
-                    <th style='width:400px;'>Nama Item</th>
-                    <th style='width:150px;'>Qty / Harga</th>
-                    <th style='width:200px;'>Total</th>
-                </tr>
-            </thead>
-            <tbody>";
-    
-    $no_b = 1;
-    $total_boneless = 0;
-    while ($item = $queryBonelessDetail->fetch_assoc()) {
-        $total_boneless += $item['total'];
-        echo "<tr>
-                <td style='text-align:center;'>$no_b</td>
-                <td>" . strtoupper($item['nama_item']) . "</td>
-                <td style='text-align:center;'>" . number_format($item['qty'], 1, ',', '.') . " x Rp" . number_format($item['harga'], 0, ',', '.') . "</td>
-                <td style='text-align:right;'>Rp " . number_format($item['total'], 0, ',', '.') . "</td>
-              </tr>";
-        $no_b++;
-    }
-    
-    echo "      <tr style='font-weight:bold; background-color:#f1f5f9;'>
-                    <td colspan='3' style='text-align:center;'>TOTAL BONELESS</td>
-                    <td style='text-align:right;'>Rp " . number_format($total_boneless, 0, ',', '.') . "</td>
-                </tr>
-            </tbody>
-          </table>";
-
-    // Summary Table
-    $biaya_pabrik = $grand_total_upah;
-    $potong = $bonelessHeader['jumlah_mobil'];
-    $combined_total = $biaya_pabrik + $total_boneless;
-    $biaya_per_mobil = ($potong > 0) ? ($combined_total / $potong) : 0;
-
-    echo "<br><br>
-    <table border='1' style='border-collapse:collapse;'>
-        <thead>
-            <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
-                <th style='width:250px; height:25px;'>BIAYA PABRIK</th>
-                <th style='width:100px;'></th>
-                <th style='width:100px;'></th>
-                <th style='width:150px;'>BONLESS</th>
-                <th style='width:150px;'>POTONG</th>
-                <th style='width:200px;'>TOTAL</th>
-                <th style='width:250px;'>Biaya Per mobil</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style='font-weight:bold; text-align:center; height:30px; font-size:14px;'>
-                <td style='text-align:right;'>" . number_format($biaya_pabrik, 2, ',', '.') . "</td>
-                <td></td>
-                <td></td>
-                <td style='text-align:right;'>" . number_format($total_boneless, 2, ',', '.') . "</td>
-                <td>$potong</td>
-                <td style='text-align:right;'>" . number_format($combined_total, 2, ',', '.') . "</td>
-                <td style='text-align:right;'>Rp" . number_format($biaya_per_mobil, 2, ',', '.') . "</td>
-            </tr>
-        </tbody>
-    </table>";
-}
-?>
+</tbody>
+<tfoot>
+    <tr style='font-weight:bold; background-color: #f2f2f2;'>
+        <td colspan='11' align='right'>TOTAL KESELURUHAN</td>
+        <td align='right'>" . rupiah($total_upah) . "</td>
+        <td align='right' style='color: red;'>" . rupiah($total_potongan_telat) . "</td>
+        <td align='right' style='color: red;'>" . rupiah($total_potongan_istirahat) . "</td>
+        <td align='right' style='color: red;'>" . rupiah($total_potongan_lainnya) . "</td>
+        <td align='right' style='background-color: #d4edda;'>" . rupiah($total_akhir) . "</td>
+    </tr>
+</tfoot>
+</table>";
