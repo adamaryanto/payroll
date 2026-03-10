@@ -35,7 +35,7 @@ if (isset($_GET['id'])) {
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
                                 <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase text-center">Pilih</th>
-                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">NIK</th>
+                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">No. Absen</th>
                                 <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Nama Karyawan</th>
                                 <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Departemen</th>
                                 <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase">Bagian</th>

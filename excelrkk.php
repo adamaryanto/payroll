@@ -15,12 +15,12 @@ function rupiah($angka){
 $sql = "
 SELECT 
     K.nama_karyawan, K.OS_DHK,K.golongan,
-    J.jabatan,
+    JB.jabatan,
     D.nama_departmen,
     R.jam_kerja,
-    RD.jam_masuk,
-    RD.istirahat_masuk,
-    RD.jam_keluar,
+    JD.jam_masuk,
+    JD.istirahat_masuk,
+    JD.jam_keluar,
     RD.upah,
     RD.potongan_telat,
     RD.potongan_istirahat,
@@ -28,10 +28,10 @@ SELECT
     R.tgl_rkk
 FROM tb_rkk_detail RD
 LEFT JOIN tb_rkk R ON RD.id_rkk = R.id_rkk
-LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
+LEFT JOIN tb_jadwal JD ON RD.id_jadwal = JD.id_jadwal
 LEFT JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
 LEFT JOIN ms_departmen D ON K.id_departmen = D.id_departmen
-LEFT JOIN ms_jabatan J ON K.id_jabatan = J.id_jabatan
+LEFT JOIN ms_jabatan JB ON K.id_jabatan = JB.id_jabatan
 WHERE R.id_rkk = '$id'
 ORDER BY D.nama_departmen, K.nama_karyawan ASC
 ";

@@ -1,163 +1,206 @@
 <?php
-
-
-  
-
-
 if(isset($_GET['ttgl1']) || isset($_GET['ttgl2'])){
     $ttgl1 = $_GET['ttgl1'];
     $ttgl2 = $_GET['ttgl2'];
 
-$tampil = $koneksi->query("SELECT A.* , B.nama_karyawan , B.no_absen , B.jenis_kelamin FROM tb_ijin A LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan where A.tgl_ijin  between '$ttgl1' AND '$ttgl2' ");
-  
-
-
+    $tampil = $koneksi->query("SELECT A.* , B.nama_karyawan , B.no_absen , B.jenis_kelamin FROM tb_ijin A LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan where A.tgl_ijin  between '$ttgl1' AND '$ttgl2' ");
 }else{
-     $ttgl1 = '';
+    $ttgl1 = '';
     $ttgl2 = '';
 
-$tampil = $koneksi->query("SELECT A.* , B.nama_karyawan , B.no_absen , B.jenis_kelamin FROM tb_ijin A LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan  ");
+    $tampil = $koneksi->query("SELECT A.* , B.nama_karyawan , B.no_absen , B.jenis_kelamin FROM tb_ijin A LEFT JOIN ms_karyawan B on A.id_karyawan = B.id_karyawan  ");
 }
+?>
 
-    ?>
-
-<div class="row px-3 mt-4">
+<div class="row px-2 sm:px-3 mt-4">
     <div class="col-md-12">
         <div class="card rounded-2xl shadow-sm border-0">
-            <div class="card-header bg-white border-b border-gray-100 py-4 flex justify-between items-center rounded-t-2xl">
+            <div class="card-header bg-white border-b border-gray-100 py-4 px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 rounded-t-2xl">
                 <h3 class="card-title text-xl font-bold text-gray-800 m-0">Data Karyawan Ijin</h3>
-                <div class="card-tools">
-                    <a href="?page=ijin&aksi=tambah" class="btn btn-primary bg-brand-600 hover:bg-brand-700 border-0 rounded-lg shadow-sm px-4 py-2 font-medium transition-colors">
+                <div class="card-tools w-full sm:w-auto">
+                    <a href="?page=ijin&aksi=tambah" class="btn w-full sm:w-auto btn-primary bg-brand-600 hover:bg-brand-700 border-0 rounded-lg shadow-sm px-4 py-2 font-medium transition-colors flex justify-center items-center">
                         <i class="fas fa-plus mr-2"></i> Tambah Data Ijin
                     </a>
                 </div>
             </div>
             
-            <div class="card-body">
-                <!-- Search Filter Form -->
+            <div class="card-body p-3 sm:p-5">
                 <form method="POST" enctype="multipart/form-data" class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-100 shadow-sm">
                     <div class="row items-end"> 
-                        <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
                             <label class="font-medium text-gray-700 text-sm mb-1">Dari Tanggal</label>
-                            <input autocomplete="off" type="date" name="ttgl1" required value="<?php echo $ttgl1 ; ?>" class="form-control rounded-lg border-gray-300 focus:border-brand-500 focus:ring focus:ring-brand-200 transition-all shadow-sm"/>
+                            <input autocomplete="off" type="date" name="ttgl1" required value="<?php echo $ttgl1 ; ?>" class="form-control rounded-lg border-gray-300 focus:border-brand-500 focus:ring focus:ring-brand-200 transition-all shadow-sm w-full"/>
                         </div>
-                        <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="col-12 col-md-4 mb-3 mb-md-0">
                             <label class="font-medium text-gray-700 text-sm mb-1">Sampai Tanggal</label>
-                            <input autocomplete="off" type="date" name="ttgl2" value="<?php echo $ttgl2 ; ?>" required class="form-control rounded-lg border-gray-300 focus:border-brand-500 focus:ring focus:ring-brand-200 transition-all shadow-sm"/>
+                            <input autocomplete="off" type="date" name="ttgl2" value="<?php echo $ttgl2 ; ?>" required class="form-control rounded-lg border-gray-300 focus:border-brand-500 focus:ring focus:ring-brand-200 transition-all shadow-sm w-full"/>
                         </div>
-                        <div class="col-md-2">
-                            <button type="submit" name="simpan" value="Search" class="btn btn-primary w-full bg-slate-800 hover:bg-slate-900 border-0 rounded-lg shadow-sm font-medium transition-colors">
-                                <i class="fas fa-search mr-1"></i> Tampilkan
+                        <div class="col-12 col-md-4 mt-2 sm:mt-0">
+                            <button type="submit" name="simpan" value="Search" class="btn btn-primary w-full bg-slate-800 hover:bg-slate-900 border-0 rounded-lg shadow-sm font-medium transition-colors py-2 flex justify-center items-center">
+                                <i class="fas fa-search mr-2"></i> Tampilkan
                             </button>
                         </div>
                     </div>
                 </form>
 
                 <div class="table-responsive">
-                    <table class="table table-hover table-striped border-b border-gray-100" id="dataTables-example">
+                    <table class="table table-hover table-striped border-b border-gray-100" id="dataTables-example" style="width:100%">
                         <thead class="bg-gray-50 text-gray-600 text-sm">
-                                        <tr>
-                                        <th width="5%">No</th>
-                                           <th >No. Absen</th>
-                                            <th >Nama Karyawan</th>
-                                             <th >Jenis Kelamin</th>
-                                              <th >Tanggal Ijin</th>
-                                        <th >Jenis Ijin</th>
-                                        <th >Keterangan Ijin</th>       
-                                             <th >Dari Jam</th>
-                                               <th >Sampai Jam</th>
-                                       
-                                        
-                        
-                                         <th class="text-center" width="10%">Aksi</th>
-
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                                                <?php
-
-
-$no = 1;
-
-
-    while ($data=$tampil->fetch_assoc())
-    {
-
-?>
-
-
-                                        <tr>
-<td><?php echo $no ?></td>
-<td><?php echo $data['no_absen'] ?></td>
-<td><?php echo $data['nama_karyawan'] ?></td>
-<td><?php echo $data['jenis_kelamin'] ?></td>
-
-<td><?php echo $data['tgl_ijin'] ?></td>
-<td><?php echo $data['jenis_ijin'] ?></td>
-<td><?php echo $data['keterangan'] ?></td>
-<td><?php echo $data['waktu_awal'] ?></td>
-<td><?php echo $data['waktu_akhir'] ?></td>
-
-
-<td class="text-center align-middle">
-    <div class="flex flex-wrap gap-2 justify-center">
-        <a href="?page=ijin&aksi=hapus&id=<?php echo $data['id_ijin'];?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Batal Ijin"><i class="fas fa-trash"></i></a>
-    </div>
-</td>
-                                        </tr>
-
-                                       <?php  $no++; } ?>
-
-                                    </tbody>   
-                                    </table>
-                            </div>
-                        </div><!-- /.card-body -->
-                    </div><!-- /.card -->
+                            <tr>
+                                <th width="5%" class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-center">No</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider">No. Absen</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider">Nama Karyawan</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-center">L/P</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-center">Tanggal Ijin</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider">Jenis Ijin</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider">Keterangan Ijin</th>       
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-center">Dari Jam</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-center">Sampai Jam</th>
+                                <th class="px-3 py-3 text-xs font-bold uppercase tracking-wider text-center" width="8%">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php
+                            $no = 1;
+                            while ($data=$tampil->fetch_assoc()) {
+                            ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td data-label="No" class="text-center text-sm text-gray-700 font-medium"><?php echo $no ?></td>
+                                <td data-label="No. Absen" class="text-sm font-bold text-gray-900"><?php echo $data['no_absen'] ?></td>
+                                <td data-label="Nama Karyawan" class="text-sm font-bold text-gray-900 uppercase"><?php echo $data['nama_karyawan'] ?></td>
+                                <td data-label="L/P" class="text-center text-sm text-gray-700"><?php echo $data['jenis_kelamin'] ?></td>
+                                <td data-label="Tanggal Ijin" class="text-center text-sm font-medium text-gray-800"><?php echo date('d-m-Y', strtotime($data['tgl_ijin'])); ?></td>
+                                <td data-label="Jenis Ijin" class="text-sm text-gray-700">
+                                    <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-md text-xs font-bold border border-blue-200"><?php echo $data['jenis_ijin'] ?></span>
+                                </td>
+                                <td data-label="Keterangan Ijin" class="text-sm text-gray-700"><?php echo $data['keterangan'] ?></td>
+                                <td data-label="Dari Jam" class="text-center text-sm text-gray-700 font-medium"><?php echo date('H:i', strtotime($data['waktu_awal'])); ?></td>
+                                <td data-label="Sampai Jam" class="text-center text-sm text-gray-700 font-medium"><?php echo date('H:i', strtotime($data['waktu_akhir'])); ?></td>
+                                <td data-label="Aksi" class="text-center align-middle">
+                                    <div class="flex flex-wrap gap-2 justify-end sm:justify-center mt-2 sm:mt-0">
+                                        <a href="?page=ijin&aksi=hapus&id=<?php echo $data['id_ijin'];?>" class="btn btn-sm bg-rose-500 hover:bg-rose-600 text-white border-0 shadow-sm rounded-md transition-colors" title="Batal Ijin">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php $no++; } ?>
+                        </tbody>   
+                    </table>
                 </div>
-        </div>
-    </div>
+            </div></div></div>
+</div>
   
-    <script>
- $(document).ready( function () {
-$('#dataTables-example').DataTable({
-    pageLength: 100,
-    "searching": true
-}
-);
+<style>
+    /* Styling Dasar Table DataTables */
+    #dataTables-example {
+        border-collapse: separate !important;
+        border-spacing: 0 !important;
+    }
 
-} );
+    /* Form Filter & Length Menu DataTables Desktop */
+    .dataTables_wrapper .dataTables_length select {
+        border-radius: 6px; border: 1px solid #e5e7eb; padding: 4px 8px; margin: 0 5px; font-size: 0.875rem;
+    }
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 6px !important; border: 1px solid #e5e7eb !important; padding: 6px 10px !important; outline: none; font-size: 0.875rem;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #4f46e5 !important; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    /* Pagination DataTables */
+    .dataTables_wrapper .dataTables_paginate {
+        padding-top: 1rem !important; padding-bottom: 1rem !important; display: flex; justify-content: flex-end; align-items: center; gap: 4px; font-size: 0.875rem;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border: 1px solid #e5e7eb !important; background: white !important; border-radius: 6px !important; padding: 4px 10px !important; color: #4b5563 !important; font-weight: 500 !important; cursor: pointer;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #f3f4f6 !important; color: #111827 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #4f46e5 !important; border-color: #4f46e5 !important; color: white !important;
+    }
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 1.2rem !important; margin-bottom: 1rem !important; font-size: 0.875rem; color: #6b7280; float: left;
+    }
+
+    /* RESPONSIVE TABLE "STACKED" VIEW MOBILE */
+    @media screen and (max-width: 768px) {
+        /* Styling Search & Entries DataTables agar tidak meluber */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter { text-align: left !important; float: none !important; margin-bottom: 1rem; }
+        .dataTables_wrapper .dataTables_filter input { width: 100% !important; margin-left: 0 !important; display: block; margin-top: 0.5rem; }
+        .dataTables_wrapper .dataTables_info { float: none !important; text-align: center !important; margin-bottom: 0.5rem !important; }
+        .dataTables_wrapper .dataTables_paginate { justify-content: center !important; flex-wrap: wrap; margin-top: 0.5rem !important; }
+
+        /* Sembunyikan Header Table di Mobile */
+        #dataTables-example thead { display: none; }
+
+        /* Transform Table Row jadi "Card" */
+        #dataTables-example tbody tr {
+            display: block; margin-bottom: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; padding: 0.75rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); background: #fff;
+        }
+
+        /* Transform Table Cell jadi Block */
+        #dataTables-example tbody td {
+            display: flex; justify-content: flex-start; align-items: flex-start; text-align: right !important; padding: 0.5rem 0.25rem !important; border: none !important; border-bottom: 1px solid #f3f4f6 !important; width: 100% !important;
+        }
+        #dataTables-example tbody td:last-child { border-bottom: none !important; }
+
+        /* Label dari data-label attribute */
+        #dataTables-example tbody td:before {
+            content: attr(data-label); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; color: #6b7280; flex-shrink: 0; width: 45%; text-align: left; line-height: 1.5; padding-right: 0.5rem;
+        }
+        
+        /* Konten isi */
+        #dataTables-example tbody td > * { flex-grow: 1; }
+    }
+</style>
+
+<script>
+$(document).ready( function () {
+    $('#dataTables-example').DataTable({
+        pageLength: 100,
+        responsive: true,
+        language: {
+            search: "",
+            searchPlaceholder: "Cari data ijin...",
+            lengthMenu: "Tampilkan _MENU_",
+            info: "Menampilkan _START_ sampai _END_ dari _TOTAL_",
+            paginate: {
+                previous: "Prev",
+                next: "Next"
+            }
+        }
+    });
+    $('.dataTables_filter').addClass('mb-3');
+});
 </script>
 
 <?php
-
 $ttgl1 = @$_POST ['ttgl1'];
 $ttgl2 = @$_POST ['ttgl2'];
-
 $simpan = @$_POST ['simpan'];
 $print = @$_POST ['print'];
 $excel = @$_POST ['excel'];
+
+// Perbaikan: Di koding asli Anda redirect-nya ke '?page=cuti', 
+// saya ubah ke '?page=ijin' agar sesuai dengan halamannya
 if($simpan){
     ?><script type="text/javascript">
-                 window.location.href="?page=cuti&ttgl1=<?php echo $ttgl1 ; ?>&ttgl2=<?php echo$ttgl2 ; ?>";
-
-            </script>
-            <?php
+        window.location.href="?page=ijin&ttgl1=<?php echo $ttgl1 ; ?>&ttgl2=<?php echo $ttgl2 ; ?>";
+    </script><?php
 }
 if($print){
     ?><script type="text/javascript">
-                 window.location.href="laporanpendapatan.php?ttgl1=<?php echo $ttgl1 ; ?>&ttgl2=<?php echo$ttgl2 ; ?>";
-
-            </script>
-            <?php
+        window.location.href="laporanpendapatan.php?ttgl1=<?php echo $ttgl1 ; ?>&ttgl2=<?php echo $ttgl2 ; ?>";
+    </script><?php
 }
 if($excel){
     ?><script type="text/javascript">
-                 window.location.href="excelpendapatan.php?ttgl1=<?php echo $ttgl1 ; ?>&ttgl2=<?php echo$ttgl2 ; ?>";
-
-            </script>
-            <?php
+        window.location.href="excelpendapatan.php?ttgl1=<?php echo $ttgl1 ; ?>&ttgl2=<?php echo $ttgl2 ; ?>";
+    </script><?php
 }
- 
-
-
 ?>
