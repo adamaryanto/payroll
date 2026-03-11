@@ -149,7 +149,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $nama_display = $data['nama_karyawan'];
                 if (!empty($data['menggantikan'])) {
                     $nama_display .= " (Menggantikan " . $data['menggantikan'] . ")";
-                } elseif (!empty($data['digantikan_oleh'])) {
+                }
+                if (!empty($data['digantikan_oleh'])) {
                     $nama_display .= " (Digantikan oleh " . $data['digantikan_oleh'] . ")";
                 }
 
