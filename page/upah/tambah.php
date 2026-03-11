@@ -1,8 +1,8 @@
 <?php
 if (isset($_POST['simpan'])) {
-    $tharian = $_POST['tharian'] ?? 0;
-    $tmingguan = $_POST['tmingguan'] ?? 0;
-    $tbulanan = $_POST['tbulanan'] ?? 0;
+    $tharian = str_replace('.', '', $_POST['tharian'] ?? 0);
+    $tmingguan = str_replace('.', '', $_POST['tmingguan'] ?? 0);
+    $tbulanan = str_replace('.', '', $_POST['tbulanan'] ?? 0);
 
     $sql = $koneksi->query("INSERT INTO ms_upah (upah_harian, upah_mingguan, upah_bulanan) VALUES ('$tharian', '$tmingguan', '$tbulanan')");
     if ($sql) {
@@ -31,21 +31,21 @@ if (isset($_POST['simpan'])) {
                     <label class="block text-sm font-bold text-gray-700 mb-2">Upah Harian <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-3 top-3 text-gray-400 text-sm font-semibold">Rp</span>
-                        <input type="number" name="tharian" required placeholder="0" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
+                        <input type="text" name="tharian" id="tharian" required placeholder="0" class="input-rupiah block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
                     </div>
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Upah Mingguan <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-3 top-3 text-gray-400 text-sm font-semibold">Rp</span>
-                        <input type="number" name="tmingguan" required placeholder="0" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
+                        <input type="text" name="tmingguan" id="tmingguan" required placeholder="0" class="input-rupiah block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
                     </div>
                 </div>
                 <div class="mb-8">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Upah Bulanan <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-3 top-3 text-gray-400 text-sm font-semibold">Rp</span>
-                        <input type="number" name="tbulanan" required placeholder="0" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
+                        <input type="text" name="tbulanan" id="tbulanan" required placeholder="0" class="input-rupiah block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
                     </div>
                 </div>
 
@@ -62,3 +62,12 @@ if (isset($_POST['simpan'])) {
         </form>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.input-rupiah').forEach(input => {
+    input.addEventListener('keyup', function(e) {
+        let val = this.value.replace(/\D/g, '');
+        this.value = val ? new Intl.NumberFormat('id-ID').format(val) : '';
+    });
+});
+</script>

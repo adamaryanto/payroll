@@ -34,6 +34,20 @@ if (isset($_GET['id'])) {
                     </div>
                 </div>
 
+                <!-- Password Input -->
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">
+                        Password <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input placeholder="Masukkan password..." autocomplete="off" type="text" name="tpassword" value="<?php echo $data['password']; ?>" required 
+                               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm transition duration-150 ease-in-out font-medium"/>
+                    </div>
+                </div>
+
                 <!-- Role Selection -->
                 <div class="mb-8">
                     <label class="block text-sm font-bold text-gray-700 mb-2">
@@ -82,18 +96,19 @@ if (isset($_GET['id'])) {
 </style>
 
 <?php
-$tnama = @$_POST['tnama'];
-$trole = @$_POST['trole'];
-$simpan = @$_POST['simpan'];
-if ($simpan) {
-    $sql = $koneksi->query("UPDATE ms_login SET username='$tnama', role='$trole' WHERE id_login = '$idu'");
+if (isset($_POST['simpan'])) {
+    $tnama     = $_POST['tnama'] ?? '';
+    $trole     = $_POST['trole'] ?? '';
+    $tpassword = $_POST['tpassword'] ?? '';
+    
+    $sql = $koneksi->query("UPDATE ms_login SET username='$tnama', password='$tpassword', role='$trole' WHERE id_login = '$idu'");
     if ($sql) {
         ?>
         <script type="text/javascript">
-            alert("Data Tersimpan");
+            alert("Data Berhasil Tersimpan");
             window.location.href = "?page=user";
         </script>
         <?php
     }
 }
-?>
+?>

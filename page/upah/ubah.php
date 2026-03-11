@@ -5,9 +5,9 @@ if (isset($_GET['id'])) {
 
 if (isset($_POST['simpan'])) {
     $idu = $_GET['id'];
-    $tharian = $_POST['tharian'] ?? 0;
-    $tmingguan = $_POST['tmingguan'] ?? 0;
-    $tbulanan = $_POST['tbulanan'] ?? 0;
+    $tharian = str_replace('.', '', $_POST['tharian'] ?? 0);
+    $tmingguan = str_replace('.', '', $_POST['tmingguan'] ?? 0);
+    $tbulanan = str_replace('.', '', $_POST['tbulanan'] ?? 0);
     
     $sql = $koneksi->query("UPDATE ms_upah SET upah_harian='$tharian', upah_mingguan='$tmingguan', upah_bulanan='$tbulanan' WHERE id_upah = '$idu'");
     if ($sql) {
@@ -41,21 +41,21 @@ if (isset($_GET['id'])) {
                     <label class="block text-sm font-bold text-gray-700 mb-2">Upah Harian <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-3 top-3 text-gray-400 text-sm font-semibold">Rp</span>
-                        <input type="number" name="tharian" value="<?php echo $data['upah_harian']; ?>" required placeholder="0" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
+                        <input type="text" name="tharian" id="tharian" value="<?php echo number_format($data['upah_harian'], 0, ',', '.'); ?>" required placeholder="0" class="input-rupiah block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
                     </div>
                 </div>
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Upah Mingguan <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-3 top-3 text-gray-400 text-sm font-semibold">Rp</span>
-                        <input type="number" name="tmingguan" value="<?php echo $data['upah_mingguan']; ?>" required placeholder="0" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
+                        <input type="text" name="tmingguan" id="tmingguan" value="<?php echo number_format($data['upah_mingguan'], 0, ',', '.'); ?>" required placeholder="0" class="input-rupiah block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
                     </div>
                 </div>
                 <div class="mb-8">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Upah Bulanan <span class="text-red-500">*</span></label>
                     <div class="relative">
                         <span class="absolute left-3 top-3 text-gray-400 text-sm font-semibold">Rp</span>
-                        <input type="number" name="tbulanan" value="<?php echo $data['upah_bulanan']; ?>" required placeholder="0" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
+                        <input type="text" name="tbulanan" id="tbulanan" value="<?php echo number_format($data['upah_bulanan'], 0, ',', '.'); ?>" required placeholder="0" class="input-rupiah block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"/>
                     </div>
                 </div>
 
@@ -72,3 +72,12 @@ if (isset($_GET['id'])) {
         </form>
     </div>
 </div>
+
+<script>
+document.querySelectorAll('.input-rupiah').forEach(input => {
+    input.addEventListener('keyup', function(e) {
+        let val = this.value.replace(/\D/g, '');
+        this.value = val ? new Intl.NumberFormat('id-ID').format(val) : '';
+    });
+});
+</script>

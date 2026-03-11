@@ -8,7 +8,7 @@ if (isset($_POST['simpan_karyawan'])) {
     $id_dept    = $_POST['id_departmen'];
     $id_sub     = $_POST['id_sub_department'];
     $id_jadwal  = $_POST['id_jadwal']; 
-    $upah       = $_POST['upah_manual'];
+    $upah       = str_replace('.', '', $_POST['upah_manual']); // Strip dots for database
 
     if (!empty($idkaryawan) && !empty($id_jadwal) && $idrkk > 0) {
         $cek = $koneksi->query("SELECT id_karyawan FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$idkaryawan'");
@@ -88,11 +88,11 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                         <input type="text" id="tgl_aktif" readonly class="block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed outline-none font-medium text-sm sm:text-base"/>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Upah <span class="text-rose-500">*</span></label>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Upah <span class="text-rose-500">*</span></label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400 font-bold text-sm">Rp</div>
-                            <input type="number" name="upah_manual" id="upah_manual" required placeholder="0"
-                                   class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 outline-none font-bold text-blue-600 text-sm sm:text-base"/>
+                            <input type="text" name="upah_manual" id="upah_manual" required placeholder="0" readonly
+                                   class="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-100 text-gray-500 cursor-not-allowed outline-none font-medium text-sm sm:text-base"/>
                         </div>
                     </div>
                 </div>
@@ -150,6 +150,10 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
 <script>
     const globalRates = { harian: <?= $g_harian ?>, mingguan: <?= $g_mingguan ?>, bulanan: <?= $g_bulanan ?> };
 
+    function formatRupiah(number) {
+        return new Intl.NumberFormat('id-ID').format(number);
+    }
+
     document.getElementById('search_karyawan').addEventListener('change', function() {
         var selectedOption = this.options[this.selectedIndex];
         
@@ -169,7 +173,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
 
         document.getElementById('jk').value = selectedOption.getAttribute('data-jk');
         document.getElementById('tgl_aktif').value = selectedOption.getAttribute('data-tgl');
-        document.getElementById('upah_manual').value = finalWage;
+        document.getElementById('upah_manual').value = formatRupiah(finalWage);
         document.getElementById('id_departmen').value = selectedOption.getAttribute('data-dept');
         document.getElementById('id_sub_department').value = selectedOption.getAttribute('data-sub');
     });

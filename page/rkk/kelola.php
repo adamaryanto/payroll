@@ -393,10 +393,12 @@ if ($datastatusrkk == 3) {
                       class="px-3 py-2 text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors text-center w-full md:w-auto mb-1">
                       <i class="fas fa-sync-alt mr-1"></i> Ganti
                     </a>
-                    <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
-                      class="px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors text-center w-full md:w-auto mb-1">
-                      <i class="fas fa-eye mr-1"></i> Detail
-                    </a>
+                    <?php if (strtolower($_SESSION['role']) != 'admin hr') : ?>
+                      <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
+                        class="px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors text-center w-full md:w-auto mb-1">
+                        <i class="fas fa-eye mr-1"></i> Detail
+                      </a>
+                    <?php endif; ?>
                     <a href="?page=rkk&aksi=hapusdetail&id=<?= $idrkk; ?>&iddetail=<?= $data['id_rkk_detail']; ?>"
                       class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                       <i class="fas fa-trash mr-1"></i> Hapus
