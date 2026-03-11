@@ -343,7 +343,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                         elseif ($aksi == "tambah") { include "page/realisasi/tambah.php"; } 
                         elseif ($aksi == "kelola") { include "page/realisasi/kelola.php"; } 
                         elseif ($aksi == "accept") { include "page/realisasi/app.php"; } 
-                        elseif ($aksi == "unapprove") { include "page/realisasi/unapp.php"; } 
+                        elseif ($aksi == "unapprove") { include "page/realisasi/app.php"; } 
                         elseif ($aksi == "detail") { include "page/realisasi/detail.php"; } 
                         elseif ($aksi == "karyawan") { include "page/realisasi/karyawan.php"; } 
                         elseif ($aksi == "slip") { include "page/realisasi/slip.php"; }

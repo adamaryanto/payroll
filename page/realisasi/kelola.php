@@ -76,8 +76,14 @@ if (isset($_GET['id'])) {
     $datastatusrealisasi = 'pending';
 }
 
+// 1. hak Approve/Un-Approve (Owner)
+$is_authorized = (strtolower($_SESSION['role']) == "owner");
+
+// 2. hak Propose/Un-Propose (Admin HR & Kepala Pabrik)
+$can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
+
 if ($datastatusrealisasi == 'approve') {
-    if ($_SESSION['role'] != "owner") {
+    if (!$is_authorized) {
         $status = "hidden";
     } else {
         $status = "";
@@ -131,6 +137,38 @@ if (!function_exists('rupiah')) {
                         <a href="?page=realisasi" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
                             <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                         </a>
+
+                        <?php if ($can_propose) : ?>
+                            <?php if ($datastatusrealisasi == 'pending') : ?>
+                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>&iddetail=pro"
+                                    class="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
+                                    onclick="return confirm('Propose data ini ke Owner?');">
+                                    <i class="fas fa-paper-plane mr-1.5"></i> Propose
+                                </a>
+                            <?php elseif ($datastatusrealisasi == 'propose') : ?>
+                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>&iddetail=unpro"
+                                    class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
+                                    onclick="return confirm('Tarik kembali data (Un-propose)?');">
+                                    <i class="fas fa-undo mr-1.5"></i> Un-Propose
+                                </a>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php if ($is_authorized) : ?>
+                            <?php if ($datastatusrealisasi == 'propose') : ?>
+                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>&iddetail=app"
+                                    class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
+                                    onclick="return confirm('Approve Realisasi ini?');">
+                                    <i class="fas fa-check-circle mr-1.5"></i> Approve
+                                </a>
+                            <?php elseif ($datastatusrealisasi == 'approve') : ?>
+                                <a href="?page=realisasi&aksi=unapprove&id=<?= $idrealisasi; ?>&iddetail=unapp"
+                                    class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
+                                    onclick="return confirm('Batalkan Approve Realisasi ini?');">
+                                    <i class="fas fa-times-circle mr-1.5"></i> Un-Approve
+                                </a>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </div>
                 </div>
 
@@ -233,7 +271,7 @@ if (!function_exists('rupiah')) {
                                 ?>
                                     <tr>
                                         <td data-label="No"><?php echo $no; ?></td>
-                                        <td data-label="NIK"><?php echo $data['no_absen']; ?></td>
+                                        <td data-label="No Absen"><?php echo $data['no_absen']; ?></td>
                                         <td data-label="Nama Karyawan">
                                             <strong><?php echo $data['nama_karyawan']; ?></strong>
                                             <?php if (!empty($data['menggantikan'])) : ?>
@@ -262,16 +300,16 @@ if (!function_exists('rupiah')) {
                                         <td data-label="Departemen"><?php echo $data['nama_departmen']; ?></td>
                                         <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                         <td data-label="OS/DHK"><?php echo $data['OS_DHK']; ?></td>
-                                        <td data-label="Gol"><?php echo $data['golongan']; ?></td>
-                                        <td data-label="Rec. Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
-                                        <td data-label="Rec. Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
-                                        <td data-label="Rec. Ist. K" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
-                                        <td data-label="Rec. Ist. M" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+                                        <td data-label="Golongan"><?php echo $data['golongan']; ?></td>
+                                        <td data-label="Jam Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
+                                        <td data-label="Jam Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
+                                        <td data-label="Istirahat Keluar" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
+                                        <td data-label="Istirahat Masuk" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
 
-                                        <td data-label="Real. Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
-                                        <td data-label="Real. Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
-                                        <td data-label="Real. Ist. K" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
-                                        <td data-label="Real. Ist. M" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
+                                        <td data-label="Absen Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
+                                        <td data-label="Absen Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Masuk" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
                                         <td data-label="Upah Pokok" class="text-right">
                                             <?= rupiah($data['upah_rkk']) ?>
