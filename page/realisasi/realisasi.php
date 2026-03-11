@@ -2,7 +2,7 @@
 // Query utama
 $where_real = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_realisasi != 'pending' " : "";
 $tampil = $koneksi->query("SELECT A.*, 
-    (select count(id_realisasi_detail) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as jml, 
+    (select count(RD.id_realisasi_detail) from tb_realisasi_detail RD join tb_rkk_detail RKD on RD.id_rkk_detail = RKD.id_rkk_detail where RD.id_realisasi = A.id_realisasi and RKD.status_rkk != 'Digantikan') as jml, 
     (select sum(r_upah) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as ttl, 
     (select sum(r_potongan_telat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as pottelat,
     (select sum(r_potongan_istirahat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potistirahat, 

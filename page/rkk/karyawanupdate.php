@@ -138,7 +138,7 @@ if (isset($_POST['simpan'])) {
 
         if ($koneksi->query($q_insert)) {
             // 2. Update status karyawan lama
-            $koneksi->query("UPDATE tb_rkk_detail SET status_rkk = 'Digantikan' WHERE id_rkk_detail = '$idrkkdetail'");
+            $koneksi->query("UPDATE tb_rkk_detail SET status_rkk = 'Digantikan', upah = 0 WHERE id_rkk_detail = '$idrkkdetail'");
 
             // 3. Catat di tabel histori update
             $koneksi->query("INSERT INTO tb_rkk_update (id_rkk_detail, id_karyawan, status) VALUES ('$idrkkdetail', '$idkaryawan_pengganti', 'Pengganti')");

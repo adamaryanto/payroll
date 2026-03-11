@@ -221,10 +221,10 @@ if (!function_exists('rupiah')) {
                                 <?php
                                 $no = 1;
                                 $total = 0;
+                                $jml_active = 0;
 
                                 while ($data = $tampil->fetch_assoc()) {
                                     $upah = $data['upahkaryawan'];
-                                    $total += $upah;
 
                                     $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                         (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
@@ -293,9 +293,11 @@ if (!function_exists('rupiah')) {
                                         }
                                         $upah_setelah_potongan = $data['upah_rkk'] + $data['lembur'] - $data['r_potongan_telat'] - $data['r_potongan_istirahat'] - $data['r_potongan_lainnya'];
                                         ?>
+                                        <?php if ($data['status_rkk'] != 'Digantikan') $jml_active++; ?>
                                         <td data-label="Upah Setelah Potongan" class="text-right font-black text-blue-700">
                                             <?= rupiah($upah_setelah_potongan) ?>
                                         </td>
+                                        <?php $total += $upah_setelah_potongan; ?>
 
                                         <td data-label="Hasil"><?php echo $data['hasil_kerja']; ?></td>
                                         <?php if (strtolower($_SESSION['role']) != 'admin hr') { ?>
@@ -314,7 +316,7 @@ if (!function_exists('rupiah')) {
                                 <?php
                                     $no++;
                                 }
-                                $jml_karyawan = $no - 1;
+                                $jml_karyawan = $jml_active;
                                 ?>
                             </tbody>
                         </table>
