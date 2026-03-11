@@ -245,9 +245,10 @@ if (!function_exists('rupiah')) {
                                     $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                         (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
 
-                                    $rowClass = $isFullMissing ? 'bg-red-custom' : '';
+                                    // Highlight if status is 'Tidak Hadir' or data is fully missing
+                                    $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || $isFullMissing) ? 'bg-red-custom' : '';
                                 ?>
-                                    <tr>
+                                    <tr class="<?= $rowClass ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
                                         <td data-label="No Absen"><?php echo $data['no_absen']; ?></td>
                                         <td data-label="Nama Karyawan">
