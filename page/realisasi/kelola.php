@@ -263,15 +263,23 @@ if (!function_exists('rupiah')) {
                                                 </div>
                                             <?php endif; ?>
 
-                                            <div class="mt-1">
+                                            <div class="mt-1 flex flex-wrap gap-1">
                                                 <?php if ($data['status_rkk'] == 'Hadir') : ?>
-                                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
+                                                    <span class="inline-flex items-center bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-100 shadow-sm">
+                                                        <i class="fas fa-check-circle mr-1 text-[8px]"></i> Hadir
+                                                    </span>
                                                 <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
-                                                    <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir</span>
+                                                    <span class="inline-flex items-center bg-rose-50 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded border border-rose-100 shadow-sm">
+                                                        <i class="fas fa-times-circle mr-1 text-[8px]"></i> Tidak Hadir
+                                                    </span>
                                                 <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
-                                                    <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Digantikan</span>
+                                                    <span class="inline-flex items-center bg-amber-50 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-100 shadow-sm">
+                                                        <i class="fas fa-user-minus mr-1 text-[8px]"></i> Digantikan
+                                                    </span>
                                                 <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
-                                                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Pengganti</span>
+                                                    <span class="inline-flex items-center bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded border border-indigo-100 shadow-sm">
+                                                        <i class="fas fa-user-plus mr-1 text-[8px]"></i> Pengganti
+                                                    </span>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
@@ -356,341 +364,222 @@ if (!function_exists('rupiah')) {
 <style>
     .card-clean {
         background: #fff;
-        border: 1px solid #E0E4E8;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.03);
-        margin-bottom: 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin-bottom: 24px;
         overflow: hidden;
     }
 
-    .card-header-clean {
-        background-color: #2C3E50;
-        color: #ffffff;
-        padding: 12px 15px;
-        font-weight: 600;
-        font-size: 15px;
-    }
-
-    .section-title {
-        color: #34495E;
-        border-left: 4px solid #3498DB;
-        padding-left: 8px;
-        font-weight: bold;
-        margin-bottom: 10px;
-        font-size: 14px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .form-group {
-        margin-bottom: 10px;
-    }
-
-    .form-control-clean {
-        border-radius: 4px;
-        border: 1px solid #CCD1D1;
-        padding: 6px 10px;
-        background-color: #FAFAFA;
-        width: 100%;
-        font-size: 13px;
-    }
-
-    .form-control-clean:focus {
-        border-color: #3498DB;
-        box-shadow: none;
-        background-color: #FFFFFF;
-    }
-
+    /* Total Box modern style */
     .total-box {
-        background-color: #EAF2F8;
-        border: 1px solid #AED6F1;
-        color: #1A5276;
-        height: 45px;
-        font-size: 18px;
-        font-weight: bold;
+        background-color: #f8fafc;
+        border: 2px solid #e2e8f0;
+        color: #1e3a8a;
+        height: 52px;
+        font-size: 20px;
+        font-weight: 800;
         text-align: right;
-        border-radius: 6px;
-        padding-right: 15px;
+        border-radius: 10px;
+        padding: 0 16px;
+        transition: all 0.2s;
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
     }
 
-    /* Styling Dasar Table */
-    #dataTables-example {
+    .total-box:focus {
+        border-color: #3b82f6;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Modern Table Desktop */
+    .table-modern {
         border-collapse: separate !important;
         border-spacing: 0 !important;
         width: 100%;
+        margin: 0 !important;
+        border: none !important;
     }
 
-    #dataTables-example thead th {
-        padding: 8px 4px !important;
-        font-size: 11px !important;
+    .table-modern thead th {
+        background-color: #f8fafc !important;
+        color: #475569 !important;
+        font-weight: 700 !important;
+        font-size: 12px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.05em !important;
+        padding: 14px 12px !important;
+        border-bottom: 2px solid #e2e8f0 !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
     }
 
-    .table-clean tbody td {
-        vertical-align: middle;
-        font-size: 11px;
-        color: #000;
-        font-weight: bold;
-        border-top: 1px solid #E0E4E8;
-        padding: 6px 4px !important;
+    .table-modern tbody tr {
+        transition: all 0.2s ease;
     }
 
+    .table-modern tbody tr:hover {
+        background-color: #f1f5f9 !important;
+    }
+
+    .table-modern tbody td {
+        padding: 12px 12px !important;
+        font-size: 13px !important;
+        color: #334155 !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        border-top: none !important;
+        border-left: none !important;
+        border-right: none !important;
+        vertical-align: middle !important;
+    }
+
+    .table-modern tbody td strong {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    /* Custom Highlight Colors */
     .bg-red-custom {
-        background-color: #e74c3c !important;
-        color: #fff !important;
+        background-color: #fef2f2 !important;
+        color: #991b1b !important;
+        font-weight: 700 !important;
     }
 
     .bg-yellow-custom {
-        background-color: #f1c40f !important;
-        color: #000 !important;
+        background-color: #fffbeb !important;
+        color: #92400e !important;
+        font-weight: 700 !important;
     }
 
-    /* Form Filter & Length Menu DataTables */
-    .dataTables_wrapper .dataTables_length select {
-        border-radius: 6px;
-        border: 1px solid #e5e7eb;
-        padding: 2px 6px;
-        margin: 0 5px;
-    }
-
+    /* DataTables Pagination & Filter Modernization */
+    .dataTables_wrapper .dataTables_length select,
     .dataTables_wrapper .dataTables_filter input {
-        border-radius: 6px !important;
-        border: 1px solid #e5e7eb !important;
-        padding: 6px 10px !important;
-        outline: none;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        font-size: 14px !important;
+        color: #475569 !important;
+        outline: none !important;
         transition: all 0.2s;
     }
 
     .dataTables_wrapper .dataTables_filter input:focus {
-        border-color: #3498DB !important;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-    }
-
-    /* PAGINATION STYLING DataTables */
-    .dataTables_wrapper .dataTables_paginate {
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        gap: 2px;
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
     .dataTables_wrapper .dataTables_paginate .paginate_button {
-        border: 1px solid #e5e7eb !important;
-        background: white !important;
-        border-radius: 6px !important;
-        padding: 4px 10px !important;
-        color: #4b5563 !important;
-        font-weight: 500 !important;
-        font-size: 12px;
-        cursor: pointer;
+        border: 1px solid #e2e8f0 !important;
+        background: #ffffff !important;
+        border-radius: 8px !important;
+        padding: 6px 12px !important;
+        font-size: 13px !important;
+        color: #475569 !important;
+        font-weight: 600 !important;
+        margin: 0 2px !important;
+        transition: all 0.2s;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background-color: #f8fafc !important;
+        color: #3b82f6 !important;
     }
 
     .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background: #3498DB !important;
-        border-color: #3498DB !important;
-        color: white !important;
+        background: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
     }
 
-    /* =========================================
-       RESPONSIVE TABLE FIT SCREEN (Mobile View) 
-       ========================================= */
+    /* ===========================
+       MODERN MOBILE CARD STYLING 
+       =========================== */
     @media screen and (max-width: 768px) {
-        .container-fluid {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-
-        .row {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-        }
-
-        .col-md-12 {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-
         .card-clean {
             border-radius: 0 !important;
             border-left: none !important;
             border-right: none !important;
-            margin-bottom: 0 !important;
+            box-shadow: none !important;
         }
 
         .table-responsive {
-            border: none !important;
-            overflow-x: visible !important;
-            padding: 0 !important;
-            margin: 0 !important;
+            padding: 8px !important;
         }
 
-        #dataTables-example_wrapper {
-            padding: 0 10px;
-        }
-
-        #dataTables-example_wrapper .row:first-child {
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 15px;
-            margin-bottom: 15px !important;
-            width: 100% !important;
-        }
-
-        .dataTables_filter,
-        .dataTables_length {
-            display: flex !important;
-            width: 100% !important;
-            justify-content: flex-start !important;
-        }
-
-        .dataTables_filter input {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-
-        .dataTables_paginate {
-            justify-content: center !important;
-            flex-wrap: wrap;
-        }
-
-        #dataTables-example {
-            width: 100% !important;
-            margin: 0 !important;
-        }
-
-        /* --- STYLING MODERN CARD KARYAWAN --- */
         .table-modern tbody tr {
-            display: block;
-            margin: 0 5px 20px 5px;
-            /* Jarak antar card */
-            border: 1px solid #cbd5e1 !important;
-            /* Border card */
-            border-radius: 12px !important;
-            /* Sudut melengkung halus */
-            background: #ffffff;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            /* Shadow elegan */
-            overflow: hidden;
-            padding: 0;
-        }
-
-        .table-modern thead {
-            display: none !important;
+            display: block !important;
+            margin-bottom: 20px !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 16px !important;
+            background: #ffffff !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+            padding: 4px !important;
+            overflow: hidden !important;
         }
 
         .table-modern tbody td {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start !important;
-            text-align: left !important;
-            /* Memaksa rata kiri */
-            padding: 12px 16px !important;
-            border: none !important;
+            display: flex !important;
+            flex-direction: row !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 10px 16px !important;
             border-bottom: 1px solid #f1f5f9 !important;
-            /* Garis tipis antar baris di dalam card */
             width: 100% !important;
-            font-size: 14px;
-            white-space: normal !important;
-        }
-
-        /* OVERRIDE CLASS TEXT-RIGHT AGAR TIDAK NUMPUK DI KANAN PADA MOBILE */
-        .table-modern tbody td.text-right,
-        .table-modern tbody td.text-center {
-            text-align: left !important;
-            align-items: flex-start !important;
+            font-size: 14px !important;
         }
 
         .table-modern tbody td:before {
-            content: attr(data-label);
-            font-weight: 700;
-            color: #475569;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-            display: block;
-            width: 100%;
+            content: attr(data-label) !important;
+            font-weight: 800 !important;
+            color: #64748b !important;
+            text-transform: uppercase !important;
+            font-size: 10px !important;
+            letter-spacing: 0.05em !important;
+            margin-bottom: 0 !important;
+            width: 40% !important;
+            text-align: left !important;
         }
 
+        /* Styling area Row pertama (Nama & No Absen) */
+        .table-modern tbody td[data-label="Nama Karyawan"] {
+            background-color: #f8fafc !important;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 16px !important;
+        }
+
+        .table-modern tbody td[data-label="Nama Karyawan"]:before {
+            display: none !important;
+        }
+
+        .table-modern tbody td[data-label="Nama Karyawan"] strong {
+            font-size: 16px !important;
+            color: #1e3a8a !important;
+        }
+
+        /* Area Aksi di paling bawah */
         .table-modern tbody td:last-child {
             border-bottom: none !important;
-            background-color: #f8fafc;
-            /* Highlight area tombol aksi */
-            padding-top: 16px !important;
-            padding-bottom: 16px !important;
-        }
-
-        .flex-action {
-            display: flex;
-            justify-content: flex-start;
-            width: 100%;
-            margin-top: 0;
+            background-color: #f8fafc !important;
+            padding: 16px !important;
+            border-radius: 0 0 12px 12px !important;
         }
 
         .flex-action a {
-            width: 100%;
-            text-align: center;
-            padding: 12px !important;
-            font-size: 15px !important;
-            border-radius: 8px;
-        }
-
-        .card-header-clean {
-            font-size: 16px;
-            padding: 15px;
-        }
-
-        .section-title {
-            font-size: 15px;
-            margin-top: 15px;
-            padding-left: 15px;
-        }
-
-        .panel-body {
-            padding: 15px 0 !important;
-        }
-
-        .panel-body .row,
-        .panel-body .form-group {
-            padding: 0 15px;
-        }
-
-        .panel-body hr {
-            margin: 15px !important;
-        }
-
-        .form-control-clean {
-            font-size: 15px;
-            padding: 10px;
-        }
-
-        .form-group label {
-            font-size: 14px;
+            flex: 1 !important;
+            justify-content: center !important;
+            background-color: #3b82f6 !important;
+            color: white !important;
+            font-weight: 700 !important;
+            padding: 10px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.4) !important;
         }
 
         .total-box {
-            font-size: 16px;
-            height: 45px;
-            text-align: left;
-            padding-left: 10px;
-            margin-bottom: 15px;
-        }
-
-        .header-btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-        }
-
-        .header-btn-group button,
-        .header-btn-group a {
-            width: 100%;
-            text-align: center;
-            padding: 12px !important;
-            font-size: 15px;
+            margin: 0 15px 15px 15px !important;
+            width: calc(100% - 30px) !important;
         }
     }
 </style>
