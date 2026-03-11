@@ -3,16 +3,11 @@ $id = $_GET['id'];
 $status = $_GET['iddetail'] ?? '';
 $tgl = date("Y-m-d H:i:s");
 
-if ($status == "pro") {
-    $sql = $koneksi->query("UPDATE tb_realisasi SET status_realisasi = 'propose', tgl_status = '$tgl' WHERE id_realisasi = '$id'");
-} elseif ($status == "app") {
-    $sql = $koneksi->query("UPDATE tb_realisasi SET status_realisasi = 'approve', tgl_status = '$tgl' WHERE id_realisasi = '$id'");
-} elseif ($status == "unpro") {
+// Reverted to direct Approval system
+if ($status == "unapp") {
     $sql = $koneksi->query("UPDATE tb_realisasi SET status_realisasi = 'pending', tgl_status = '$tgl' WHERE id_realisasi = '$id'");
-} elseif ($status == "unapp") {
-    $sql = $koneksi->query("UPDATE tb_realisasi SET status_realisasi = 'propose', tgl_status = '$tgl' WHERE id_realisasi = '$id'");
 } else {
-    // Default fallback to old behavior if iddetail is missing (for backward compatibility during transition)
+    // Default to 'approve' for backward compatibility and direct approval
     $sql = $koneksi->query("UPDATE tb_realisasi SET status_realisasi = 'approve', tgl_status = '$tgl' WHERE id_realisasi = '$id'");
 }
 

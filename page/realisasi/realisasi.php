@@ -9,12 +9,8 @@ $tampil = $koneksi->query("SELECT A.*,
     (select sum(r_potongan_lainnya) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potlainnya
     from tb_realisasi A $where_real");
 
-// 1. hak Approve/Un-Approve (Owner)
+// Logika Akses: Hanya Owner yang bisa Approve/Unapprove Realisasi
 $is_authorized = (strtolower($_SESSION['role']) == "owner");
-
-// 2. hak Propose/Un-Propose (Admin HR & Kepala Pabrik)
-$can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
-
 $level_status = (!$is_authorized) ? "hidden" : "";
 
 ?>
@@ -60,9 +56,6 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                             if ($data['status_realisasi'] == 'approve') {
                                 $row_class = "bg-slate-50/40";
                                 $status_badge = '<span class="px-2 py-1 rounded bg-emerald-100 text-emerald-800 text-[13px] font-bold tracking-wide">ACC</span>';
-                            } elseif ($data['status_realisasi'] == 'propose') {
-                                $row_class = "bg-amber-50/40";
-                                $status_badge = '<span class="px-2 py-1 rounded bg-indigo-100 text-indigo-800 text-[13px] font-bold tracking-wide">PROP</span>';
                             } else {
                                 $row_class = "hover:bg-gray-50 transition-colors";
                                 $status_badge = '<span class="px-2 py-1 rounded bg-amber-100 text-amber-800 text-[13px] font-bold tracking-wide">PEND</span>';
@@ -101,36 +94,19 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                             <i class="fas fa-eye md:mr-1"></i> <span class="ml-1 md:inline">Detail</span>
                                         </a>
 
-                                         <!-- Propose/Unpropose: Admin HR / Ka. Pabrik -->
-                                         <?php if ($can_propose) : ?>
-                                             <?php if ($data['status_realisasi'] == 'pending') : ?>
-                                                 <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>&iddetail=pro"
-                                                     class="px-2 py-1 text-[13px] font-bold text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-200 transition-colors flex justify-center items-center"
-                                                     onclick="return confirm('Propose data ini ke Owner?');" title="Propose">
-                                                     <i class="fas fa-paper-plane md:mr-1"></i> <span class="ml-1 md:inline">Propose</span>
-                                                 </a>
-                                             <?php elseif ($data['status_realisasi'] == 'propose') : ?>
-                                                 <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>&iddetail=unpro"
-                                                     class="px-2 py-1 text-[13px] font-bold text-gray-600 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-200 transition-colors flex justify-center items-center"
-                                                     onclick="return confirm('Tarik kembali data (Un-propose)?');" title="Unpropose">
-                                                     <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Un-Propose</span>
-                                                 </a>
-                                             <?php endif; ?>
-                                         <?php endif; ?>
-
                                          <!-- Approve/Unapprove: Only for Owner -->
                                          <?php if ($is_authorized) : ?>
-                                             <?php if ($data['status_realisasi'] == 'propose') : ?>
-                                                 <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>&iddetail=app"
+                                             <?php if ($data['status_realisasi'] != 'approve') : ?>
+                                                 <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
                                                      class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
                                                      onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
                                                      <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
                                                  </a>
-                                             <?php elseif ($data['status_realisasi'] == 'approve') : ?>
+                                             <?php else : ?>
                                                  <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi']; ?>&iddetail=unapp"
                                                      class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
                                                      onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
-                                                     <i class="fas fa-times md:mr-1"></i> <span class="ml-1 md:inline">Un-Approve</span>
+                                                     <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Un-Approve</span>
                                                  </a>
                                              <?php endif; ?>
                                          <?php endif; ?>
@@ -148,8 +124,6 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                  <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
                                      <?php if ($data['status_realisasi'] == 'approve') : ?>
                                          <div class="stamp stamp-approved">Approved</div>
-                                     <?php elseif ($data['status_realisasi'] == 'propose') : ?>
-                                         <div class="stamp stamp-unapproved" style="color: #6366f1; border-color: #6366f1; box-shadow: 0 0 0 2px #6366f1;">Proposed</div>
                                      <?php else : ?>
                                          <div class="stamp stamp-unapproved">Unapproved</div>
                                      <?php endif; ?>

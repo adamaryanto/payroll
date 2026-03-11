@@ -76,14 +76,8 @@ if (isset($_GET['id'])) {
     $datastatusrealisasi = 'pending';
 }
 
-// 1. hak Approve/Un-Approve (Owner)
-$is_authorized = (strtolower($_SESSION['role']) == "owner");
-
-// 2. hak Propose/Un-Propose (Admin HR & Kepala Pabrik)
-$can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
-
 if ($datastatusrealisasi == 'approve') {
-    if (!$is_authorized) {
+    if ($_SESSION['role'] != "owner") {
         $status = "hidden";
     } else {
         $status = "";
@@ -138,30 +132,14 @@ if (!function_exists('rupiah')) {
                             <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                         </a>
 
-                        <?php if ($can_propose) : ?>
-                            <?php if ($datastatusrealisasi == 'pending') : ?>
-                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>&iddetail=pro"
-                                    class="inline-flex items-center bg-amber-600 hover:bg-amber-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
-                                    onclick="return confirm('Propose data ini ke Owner?');">
-                                    <i class="fas fa-paper-plane mr-1.5"></i> Propose
-                                </a>
-                            <?php elseif ($datastatusrealisasi == 'propose') : ?>
-                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>&iddetail=unpro"
-                                    class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
-                                    onclick="return confirm('Tarik kembali data (Un-propose)?');">
-                                    <i class="fas fa-undo mr-1.5"></i> Un-Propose
-                                </a>
-                            <?php endif; ?>
-                        <?php endif; ?>
-
-                        <?php if ($is_authorized) : ?>
-                            <?php if ($datastatusrealisasi == 'propose') : ?>
-                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>&iddetail=app"
+                        <?php if (strtolower($_SESSION['role']) == "owner") : ?>
+                            <?php if ($datastatusrealisasi != 'approve') : ?>
+                                <a href="?page=realisasi&aksi=accept&id=<?= $idrealisasi; ?>"
                                     class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
                                     onclick="return confirm('Approve Realisasi ini?');">
                                     <i class="fas fa-check-circle mr-1.5"></i> Approve
                                 </a>
-                            <?php elseif ($datastatusrealisasi == 'approve') : ?>
+                            <?php else : ?>
                                 <a href="?page=realisasi&aksi=unapprove&id=<?= $idrealisasi; ?>&iddetail=unapp"
                                     class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center"
                                     onclick="return confirm('Batalkan Approve Realisasi ini?');">
