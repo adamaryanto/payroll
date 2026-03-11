@@ -12,6 +12,27 @@ function rupiah($angka)
     return "Rp " . number_format($angka, 0, ',', '.');
 }
 
+// Subqueries for replacement info
+$subquery_menggantikan = "(SELECT K3.nama_karyawan 
+         FROM tb_rkk_update U1 
+         JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
+         JOIN ms_karyawan K3 ON U2.id_karyawan = K3.id_karyawan 
+         JOIN tb_rkk_detail RD2 ON U1.id_rkk_detail = RD2.id_rkk_detail
+         WHERE U1.id_karyawan = K.id_karyawan 
+         AND U1.status = 'Pengganti' 
+         AND U2.status = 'Digantikan' 
+         AND RD2.id_rkk = R.id_rkk
+         LIMIT 1)";
+
+$subquery_digantikan_oleh = "(SELECT K4.nama_karyawan 
+         FROM tb_rkk_update U3 
+         JOIN tb_rkk_update U4 ON U3.id_rkk_detail = U4.id_rkk_detail 
+         JOIN ms_karyawan K4 ON U4.id_karyawan = K4.id_karyawan 
+         WHERE U3.id_rkk_detail = RD.id_rkk_detail 
+         AND U3.status = 'Digantikan' 
+         AND U4.status = 'Pengganti' 
+         LIMIT 1)";
+
 $sql = "
 SELECT 
     K.nama_karyawan, K.OS_DHK,K.golongan,
@@ -26,7 +47,9 @@ SELECT
     RD.potongan_telat,
     RD.potongan_istirahat,
     RD.potongan_lainnya,
-    R.tgl_rkk
+    R.tgl_rkk,
+    $subquery_menggantikan as menggantikan,
+    $subquery_digantikan_oleh as digantikan_oleh
 FROM tb_rkk_detail RD
 LEFT JOIN tb_rkk R ON RD.id_rkk = R.id_rkk
 LEFT JOIN tb_jadwal JD ON RD.id_jadwal = JD.id_jadwal
@@ -89,12 +112,18 @@ $total_potongan_lainnya = 0;
 $total_akhir = 0;
 
 while ($row = $result->fetch_assoc()) {
+    if (!empty($row['digantikan_oleh'])) {
+        $row['upah'] = 0;
+        $row['potongan_telat'] = 0;
+        $row['potongan_istirahat'] = 0;
+        $row['potongan_lainnya'] = 0;
+    }
     $upah_bersih = $row['upah'] - ($row['potongan_telat'] + $row['potongan_istirahat'] + $row['potongan_lainnya']);
 
     echo "
     <tr>
         <td align='center'>" . $no . "</td>
-        <td>" . $row['nama_karyawan'] . "</td>
+        <td>" . $row['nama_karyawan'] . (!empty($row['menggantikan']) ? " (Menggantikan " . $row['menggantikan'] . ")" : (!empty($row['digantikan_oleh']) ? " (Digantikan oleh " . $row['digantikan_oleh'] . ")" : "")) . "</td>
         <td>" . $row['jabatan'] . "</td>
         <td>" . $row['nama_departmen'] . "</td>
         <td align='center'>" . $row['OS_DHK'] . "</td>

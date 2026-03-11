@@ -185,20 +185,20 @@ INSERT INTO `ms_karyawan` (`id_karyawan`, `id_departmen`, `id_jabatan`, `no_abse
 CREATE TABLE `ms_login` (
   `id_login` int NOT NULL,
   `id_perusahaan` int NOT NULL,
-  `user_login` varchar(225) NOT NULL,
-  `lg_password` varchar(255) NOT NULL,
-  `role` enum('kepala gudang','admin','admin master','owner') DEFAULT NULL
+  `username` varchar(225) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` enum('Kepala Pabrik','Admin HR','Admin Master','Owner') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `ms_login`
 --
 
-INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `role`) VALUES
-(1, 1, 'admin', '123', 'admin'),
-(2, 1, 'kepala gudang', '123', 'kepala gudang'),
-(3, 1, 'owner', '123', 'owner'),
-(4, 1, 'admin master', '123', 'admin master');
+INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `username`, `password`, `role`) VALUES
+(1, 1, 'admin', '123', 'Admin HR'),
+(2, 1, 'kepalapabrik', '123', 'Kepala Pabrik'),
+(3, 1, 'owner', '123', 'Owner'),
+(4, 1, 'adminmaster', '123', 'Admin Master');
 
 -- --------------------------------------------------------
 

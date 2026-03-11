@@ -136,7 +136,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 </a>
               </li>
 
-              <?php if ($role != 'owner') { ?>
+              <?php if (strtolower($role) != 'owner') { ?>
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon fas fa-cogs"></i>
@@ -145,7 +145,9 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 <ul class="nav nav-treeview">
                   <li class="nav-item"><a href="?page=karyawan" class="nav-link"><i class="fas fa-users nav-icon"></i><p>Karyawan</p></a></li>
                   <li class="nav-item"><a href="?page=bagian" class="nav-link"><i class="far fa-building nav-icon"></i><p>Bagian</p></a></li>
+                  <?php if (strtolower($role) != 'admin hr') { ?>
                   <li class="nav-item"><a href="?page=user" class="nav-link"><i class="fas fa-user-shield nav-icon"></i><p>User</p></a></li>
+                  <?php } ?>
                   <li class="nav-item"><a href="?page=upah" class="nav-link"><i class="fas fa-money-bill-wave nav-icon"></i><p>Master Upah</p></a></li>
                   <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="far fa-clock nav-icon"></i><p>Jadwal</p></a></li>
                   <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><p>Denda</p></a></li>
@@ -174,7 +176,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 </a>
               </li>
 
-              <?php if ($role != 'owner') { ?>
+              <?php if (strtolower($role) != 'owner') { ?>
               <li class="nav-item">
                 <a href="?page=generate&aksi=tarik" class="nav-link"><i class="nav-icon fas fa-download"></i><p>Tarik Data</p></a>
               </li>
@@ -259,11 +261,15 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "tambah") { include "page/os_dhk/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/os_dhk/ubah.php"; }
                   } else if ($page == 'user') {
-                    if ($aksi == "") { include "page/user/user.php"; } 
-                    elseif ($aksi == "hapus") { include "page/user/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/user/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/user/ubah.php"; } 
-                    elseif ($aksi == "ubahpass") { include "page/user/ubahpass.php"; }
+                    if (strtolower($role) == 'admin hr' && $aksi != 'ubahpass') {
+                      echo "<script>alert('Anda tidak memiliki akses ke halaman ini!'); window.location.href='index.php';</script>";
+                    } else {
+                      if ($aksi == "") { include "page/user/user.php"; } 
+                      elseif ($aksi == "hapus") { include "page/user/hapus.php"; } 
+                      elseif ($aksi == "tambah") { include "page/user/tambah.php"; } 
+                      elseif ($aksi == "ubah") { include "page/user/ubah.php"; } 
+                      elseif ($aksi == "ubahpass") { include "page/user/ubahpass.php"; }
+                    }
                   } else if ($page == 'upah') {
                     if ($aksi == "") { include "page/upah/upah.php"; } 
                     elseif ($aksi == "hapus") { include "page/upah/hapus.php"; } 
@@ -329,15 +335,19 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     if ($aksi == "") { include "page/report/report.php"; } 
                     elseif ($aksi == "daily") { include "page/report/Daily.php"; }
                   } else if ($page == 'realisasi') {
-                    if ($aksi == "") { include "page/realisasi/realisasi.php"; } 
-                    elseif ($aksi == "rkk") { include "page/realisasi/rkk.php"; } 
-                    elseif ($aksi == "tambah") { include "page/realisasi/tambah.php"; } 
-                    elseif ($aksi == "kelola") { include "page/realisasi/kelola.php"; } 
-                    elseif ($aksi == "accept") { include "page/realisasi/app.php"; } 
-                    elseif ($aksi == "unapprove") { include "page/realisasi/unapp.php"; } 
-                    elseif ($aksi == "detail") { include "page/realisasi/detail.php"; } 
-                    elseif ($aksi == "karyawan") { include "page/realisasi/karyawan.php"; } 
-                    elseif ($aksi == "slip") { include "page/realisasi/slip.php"; }
+                    if (strtolower($role) == 'admin hr' && $aksi == 'detail') {
+                        echo "<script>alert('Anda tidak memiliki akses ke halaman ini!'); window.location.href='index.php';</script>";
+                    } else {
+                        if ($aksi == "") { include "page/realisasi/realisasi.php"; } 
+                        elseif ($aksi == "rkk") { include "page/realisasi/rkk.php"; } 
+                        elseif ($aksi == "tambah") { include "page/realisasi/tambah.php"; } 
+                        elseif ($aksi == "kelola") { include "page/realisasi/kelola.php"; } 
+                        elseif ($aksi == "accept") { include "page/realisasi/app.php"; } 
+                        elseif ($aksi == "unapprove") { include "page/realisasi/unapp.php"; } 
+                        elseif ($aksi == "detail") { include "page/realisasi/detail.php"; } 
+                        elseif ($aksi == "karyawan") { include "page/realisasi/karyawan.php"; } 
+                        elseif ($aksi == "slip") { include "page/realisasi/slip.php"; }
+                    }
                   } else if ($page == 'boneless') {
                     if ($aksi == "") { include "page/boneless/boneless.php"; } 
                     elseif ($aksi == "hapus") { include "page/boneless/hapus.php"; } 

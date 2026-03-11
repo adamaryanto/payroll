@@ -112,15 +112,15 @@ include "koneksi.php";
     $username = trim($_POST['tusername']); 
     $pass = $_POST['tpass'];
 
-    $sql = $koneksi->query("SELECT * FROM ms_login WHERE user_login = '$username' AND lg_password = '$pass'");
+    $sql = $koneksi->query("SELECT * FROM ms_login WHERE username = '$username' AND password = '$pass'");
     
     $ketemu = $sql->num_rows;
     $tampil = $sql->fetch_assoc();
 
     if ($ketemu > 0) {
         $_SESSION['iduser'] = $tampil['id_login'];
-        $_SESSION['nama'] = $tampil['user_login'];
-        $_SESSION['passuser'] = $tampil['lg_password'];
+        $_SESSION['nama'] = $tampil['username'];
+        $_SESSION['passuser'] = $tampil['password'];
         $_SESSION['role'] = $tampil['role'];
 
         header("location:index.php"); 

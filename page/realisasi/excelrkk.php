@@ -11,6 +11,27 @@ $tanggal = $info ? $info['tgl_realisasi'] : 'TanpaTanggal';
 // 2. Gunakan variabel $tanggal untuk nama file
 header("Content-type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.xls");
+
+// Subqueries for replacement info
+$subquery_menggantikan = "(SELECT K3.nama_karyawan 
+         FROM tb_rkk_update U1 
+         JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
+         JOIN ms_karyawan K3 ON U2.id_karyawan = K3.id_karyawan 
+         JOIN tb_rkk_detail RD2 ON U1.id_rkk_detail = RD2.id_rkk_detail
+         WHERE U1.id_karyawan = A.id_karyawan 
+         AND U1.status = 'Pengganti' 
+         AND U2.status = 'Digantikan' 
+         AND RD2.id_rkk = A.id_rkk
+         LIMIT 1)";
+
+$subquery_digantikan_oleh = "(SELECT K4.nama_karyawan 
+         FROM tb_rkk_update U3 
+         JOIN tb_rkk_update U4 ON U3.id_rkk_detail = U4.id_rkk_detail 
+         JOIN ms_karyawan K4 ON U4.id_karyawan = K4.id_karyawan 
+         WHERE U3.id_rkk_detail = A.id_rkk_detail 
+         AND U3.status = 'Digantikan' 
+         AND U4.status = 'Pengganti' 
+         LIMIT 1)";
 ?>
 
 <table border="1">
@@ -58,7 +79,9 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
     B.golongan, 
     D.nama_departmen, 
     S.nama_sub_department, 
-    RD.upah as upah
+    RD.upah as upah,
+    $subquery_menggantikan as menggantikan,
+    $subquery_digantikan_oleh as digantikan_oleh
     FROM tb_realisasi_detail A 
     JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
     JOIN ms_departmen D ON B.id_departmen = D.id_departmen
@@ -74,16 +97,33 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
             while ($data = $tampil->fetch_assoc()) {
                 $potongan = $data['r_potongan_telat'] + $data['r_potongan_istirahat'] + $data['r_potongan_lainnya'];
                 $lembur = $data['lembur'] ?? 0;
+                
+                if (!empty($data['digantikan_oleh'])) {
+                    $data['upah'] = 0;
+                    $data['r_potongan_telat'] = 0;
+                    $data['r_potongan_istirahat'] = 0;
+                    $data['r_potongan_lainnya'] = 0;
+                    $potongan = 0;
+                    $lembur = 0;
+                }
+                
                 $upah_dibayar = $data['upah'] - $potongan + $lembur;
                 
                 $total_dept += $upah_dibayar;
                 $grand_upah_total += $upah_dibayar;
                 $jml_karyawan++;
 
+                $nama_display = $data['nama_karyawan'];
+                if (!empty($data['menggantikan'])) {
+                    $nama_display .= " (Menggantikan " . $data['menggantikan'] . ")";
+                } elseif (!empty($data['digantikan_oleh'])) {
+                    $nama_display .= " (Digantikan oleh " . $data['digantikan_oleh'] . ")";
+                }
+
                 echo "<tr>
                         <td>{$no}</td>
                         <td>{$data['no_absen']}</td>
-                        <td>{$data['nama_karyawan']}</td>
+                        <td>{$nama_display}</td>
                         <td>{$data['nama_departmen']}</td>
                         <td>{$data['nama_sub_department']}</td>
                         <td>{$data['OS_DHK']}</td>
@@ -108,7 +148,7 @@ header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.
                   </tr>";
             // Tambahkan baris kosong sebagai pemisah antar departemen
             echo "<tr><td colspan='17' style='height:20px;'></td></tr>";
-        }
+}
         
         // Grand Total Row for the top tables
         echo "<tr>

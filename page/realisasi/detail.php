@@ -26,6 +26,11 @@ if (isset($_GET['id'])) {
     $tampildetail = $koneksi->query($queryDetail);
     $datadetail = $tampildetail->fetch_assoc();
 
+    if (!$datadetail) {
+        echo "<script>alert('Data Detail Realisasi tidak ditemukan!'); window.location.href='?page=realisasi';</script>";
+        exit;
+    }
+
     // Mapping Data Detail
     $dataidrealisasi = $datadetail['id_realisasi'];
     $datatglrealisasi = $datadetail['tgl_realisasi'];
@@ -259,7 +264,7 @@ if (isset($_POST['simpan'])) {
         WHERE id_realisasi_detail = '$id'");
 
     if ($update) {
-        echo "<script>alert('Data Berhasil Disimpan'); window.location.href='?page=realisasi&aksi=kelola&id=$dataidrealisasi';</script>";
+        echo "<script>alert('Data Berhasil Disimpan'); window.location.href='?page=realisasi&aksi=detail&id=$id';</script>";
     }
 }
 ?>

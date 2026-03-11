@@ -23,6 +23,27 @@ $tanggal = $info ? $info['tgl_realisasi'] : 'TanpaTanggal';
 header("Content-type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.xls");
 echo "<meta charset='UTF-8'>";
+
+// Subqueries for replacement info
+$subquery_menggantikan = "(SELECT K3.nama_karyawan 
+         FROM tb_rkk_update U1 
+         JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
+         JOIN ms_karyawan K3 ON U2.id_karyawan = K3.id_karyawan 
+         JOIN tb_rkk_detail RD2 ON U1.id_rkk_detail = RD2.id_rkk_detail
+         WHERE U1.id_karyawan = A.id_karyawan 
+         AND U1.status = 'Pengganti' 
+         AND U2.status = 'Digantikan' 
+         AND RD2.id_rkk = A.id_rkk
+         LIMIT 1)";
+
+$subquery_digantikan_oleh = "(SELECT K4.nama_karyawan 
+         FROM tb_rkk_update U3 
+         JOIN tb_rkk_update U4 ON U3.id_rkk_detail = U4.id_rkk_detail 
+         JOIN ms_karyawan K4 ON U4.id_karyawan = K4.id_karyawan 
+         WHERE U3.id_rkk_detail = A.id_rkk_detail 
+         AND U3.status = 'Digantikan' 
+         AND U4.status = 'Pengganti' 
+         LIMIT 1)";
 ?>
 
 <table border="1" style="border-collapse:collapse;">
@@ -85,7 +106,9 @@ echo "<meta charset='UTF-8'>";
             J.jam_masuk,
             J.jam_keluar,
             J.istirahat_masuk,
-            J.istirahat_keluar
+            J.istirahat_keluar,
+            $subquery_menggantikan as menggantikan,
+            $subquery_digantikan_oleh as digantikan_oleh
             FROM tb_realisasi_detail A 
             JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
             JOIN ms_departmen D ON B.id_departmen = D.id_departmen
@@ -105,6 +128,15 @@ echo "<meta charset='UTF-8'>";
 
                 $lembur = $data['lembur'] ?? 0;
 
+                if (!empty($data['digantikan_oleh'])) {
+                    $data['upah'] = 0;
+                    $data['r_potongan_telat'] = 0;
+                    $data['r_potongan_istirahat'] = 0;
+                    $data['r_potongan_lainnya'] = 0;
+                    $potongan = 0;
+                    $lembur = 0;
+                }
+
                 $upah_dibayar = $data['upah'] - $potongan + $lembur;
                 $total += $upah_dibayar;
                 $jml_karyawan++;
@@ -112,9 +144,16 @@ echo "<meta charset='UTF-8'>";
                 $grand_total += $upah_dibayar;
                 $grand_karyawan++;
 
+                $nama_display = $data['nama_karyawan'];
+                if (!empty($data['menggantikan'])) {
+                    $nama_display .= " (Menggantikan " . $data['menggantikan'] . ")";
+                } elseif (!empty($data['digantikan_oleh'])) {
+                    $nama_display .= " (Digantikan oleh " . $data['digantikan_oleh'] . ")";
+                }
+
                 echo "<tr>
                 <td>{$no}</td>
-                <td>{$data['nama_karyawan']}</td>
+                <td>{$nama_display}</td>
                 <td>{$data['OS_DHK']}</td>
                 <td>{$data['golongan']}</td>
                 <td>{$data['nama_sub_department']}</td>
@@ -153,7 +192,7 @@ echo "<meta charset='UTF-8'>";
 $rekap = $koneksi->query("
 SELECT 
 B.OS_DHK,
-SUM(RD.upah - (A.r_potongan_telat + A.r_potongan_istirahat + A.r_potongan_lainnya) + IFNULL(A.lembur, 0)) as total_upah
+SUM(CASE WHEN $subquery_digantikan_oleh IS NOT NULL THEN 0 ELSE (RD.upah - (A.r_potongan_telat + A.r_potongan_istirahat + A.r_potongan_lainnya) + IFNULL(A.lembur, 0)) END) as total_upah
 FROM tb_realisasi_detail A
 JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail

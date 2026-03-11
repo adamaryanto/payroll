@@ -252,7 +252,7 @@
                         while ($data = $tampil->fetch_assoc()) : ?>
                             <tr class="hover:bg-blue-50/50 transition-colors duration-200">
                                 <td class="py-2 px-2 text-center text-sm text-gray-600 font-medium py-3" data-label="No"><?php echo $no++; ?></td>
-                                <td class="py-2 px-2 text-sm text-gray-700 font-semibold py-3" data-label="Username"><?php echo htmlspecialchars($data['user_login']); ?></td>
+                                <td class="py-2 px-2 text-sm text-gray-700 font-semibold py-3" data-label="Username"><?php echo htmlspecialchars($data['username']); ?></td>
                                 <td class="py-2 px-2 text-center text-sm py-3" data-label="Role">
                                     <span class="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold rounded-full"><?php echo $data['role']; ?></span>
                                 </td>

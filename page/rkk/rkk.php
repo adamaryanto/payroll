@@ -1,19 +1,19 @@
 <?php
 
 // 1. hak Approve/Un-Approve
-$is_authorized = ($_SESSION['role'] == "owner" || $_SESSION['role'] == "admin master");
+$is_authorized = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin master");
 
 // 2.hak Propose/Un-Propose (HRD & Admin Master)
-$can_propose = ($_SESSION['role'] == "admin" || $_SESSION['role'] == "kepala gudang");
+$can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
 
-$where_rkk = ($_SESSION['role'] == 'owner') ? " WHERE A.status_rkk > 0 " : "";
+$where_rkk = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_rkk > 0 " : "";
 $tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A $where_rkk");
-if ($_SESSION['role'] != "owner") {
+if (strtolower($_SESSION['role']) != "owner") {
     $level_status =  "Hidden";
 } else {
     $level_status = "";
 }
-if ($_SESSION['role'] == "owner") {
+if (strtolower($_SESSION['role']) == "owner") {
     $hr =  "Hidden";
 } else {
     $hr = "";
@@ -301,7 +301,7 @@ if ($_SESSION['role'] == "owner") {
                                             class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors">
                                             <i class="fa fa-print mr-1"></i> Cetak
                                         </a>
-                                        <?php if ($_SESSION['role'] == "owner") : ?>
+                                        <?php if (strtolower($_SESSION['role']) == "owner") : ?>
                                             <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded border border-indigo-300 transition-colors">
                                                 <i class="fas fa-user-plus mr-1"></i> Tetapkan
@@ -324,7 +324,7 @@ if ($_SESSION['role'] == "owner") {
                                                 onclick="return confirm('Tarik kembali data (Un-propose)?');"><i class="fas fa-undo mr-1"></i> Un-Propose</a>
                                         <?php endif; ?>
 
-                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && $_SESSION['role'] == "owner")) : ?>
+                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && strtolower($_SESSION['role']) == "owner")) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=app"
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors"
                                                 onclick="return confirm('Approve data ini?');"><i class="fas fa-check mr-1"></i> Approve</a>

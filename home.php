@@ -4,7 +4,7 @@
   $jmlkaryawan = $datadetail['jmlkaryawan'];
 
 // Rencana Upah Terbaru
-$where_rkk = ($role == 'owner') ? " WHERE status_rkk > 0 " : "";
+$where_rkk = (strtolower($role) == 'owner') ? " WHERE status_rkk > 0 " : "";
 $rkk_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk) as jml, (SELECT SUM(upah) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk) as ttl FROM tb_rkk A $where_rkk ORDER BY tgl_rkk DESC, id_rkk DESC LIMIT 1");
 $rkk_d = $rkk_q->fetch_assoc();
 if($rkk_d) {
@@ -19,7 +19,7 @@ if($rkk_d) {
 }
 
 // Realisasi Upah Terbaru
-$where_real = ($role == 'owner') ? " WHERE status_realisasi != 'pending' " : "";
+$where_real = (strtolower($role) == 'owner') ? " WHERE status_realisasi != 'pending' " : "";
 $real_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_realisasi_detail) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as jml, (SELECT SUM(r_upah) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as ttl FROM tb_realisasi A $where_real ORDER BY tgl_realisasi DESC, id_realisasi DESC LIMIT 1");
 $real_d = $real_q->fetch_assoc();
 if($real_d) {
@@ -103,7 +103,7 @@ if($real_d) {
               </a>
               
               <?php if($rkk_status == "0") { ?>
-                  <?php if ($role != 'owner') { ?>
+                  <?php if (strtolower($role) != 'owner') { ?>
                   <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-paper-plane mr-1 sm:mr-2"></i> Propose
                   </a>
@@ -113,7 +113,7 @@ if($real_d) {
                   </a>
                   <?php } ?>
               <?php } elseif($rkk_status == "1") { ?>
-                  <?php if ($role == 'owner') { ?>
+                  <?php if (strtolower($role) == 'owner') { ?>
                   <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Approve
                   </a>
@@ -123,7 +123,7 @@ if($real_d) {
                   </a>
                   <?php } ?>
               <?php } else { 
-                  if ($role == 'owner') { ?>
+                  if (strtolower($role) == 'owner') { ?>
                    <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unapp" onclick="return confirm('Apakah Anda yakin ingin Unapprove Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.5] uppercase tracking-tighter shadow-sm">
                       <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapp
                   </a>
@@ -172,7 +172,7 @@ if($real_d) {
               </a>
               
               <?php if($real_status == 'pending') { 
-                  if ($role != 'owner') { ?>
+                  if (strtolower($role) != 'owner') { ?>
                   <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-paper-plane mr-1 sm:mr-2"></i> Propose
                   </a>
@@ -182,7 +182,7 @@ if($real_d) {
                   </a>
                   <?php } ?>
               <?php } elseif($real_status == 'propose') { 
-                  if ($role == 'Owner') { ?>
+                  if (strtolower($role) == 'owner') { ?>
                   <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-check-circle mr-1 sm:mr-2 opacity-80"></i> Approve
                   </a>
@@ -192,7 +192,7 @@ if($real_d) {
                   </a>
                   <?php } ?>
               <?php } else { 
-                  if ($role == 'Owner') { ?>
+                  if (strtolower($role) == 'owner') { ?>
                    <a href="?page=realisasi&aksi=unapprove&id=<?php echo $real_id; ?>" onclick="return confirm('Apakah Anda yakin ingin Unapprove Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.2] uppercase tracking-tighter shadow-sm">
                       <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapp
                   </a>

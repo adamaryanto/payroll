@@ -11,13 +11,19 @@ $ttgl2 = date("Y-m-d H:i:s");
                     select id_rkk, tgl_rkk, jam_kerja, '$ttgl2', '', CURDATE(), 'pending' 
                     from tb_rkk where id_rkk = '$id' ");
 
-$tampil=$koneksi->query("sELECT * from tb_realisasi WHERE id_rkk = '$id' ");
-$data=$tampil->fetch_assoc();
-$iddetail = $data['id_realisasi'];
-$tglreal = $data['tgl_realisasi'];
+$iddetail = $koneksi->insert_id;
+
+$tampil_tgl = $koneksi->query("SELECT tgl_realisasi FROM tb_realisasi WHERE id_realisasi = '$iddetail'");
+$data_tgl = $tampil_tgl->fetch_assoc();
+$tglreal = $data_tgl['tgl_realisasi'];
 
     $sql =  $koneksi->query("insert into tb_realisasi_detail (id_realisasi,id_rkk_detail,id_rkk,id_karyawan,r_upah,r_jam_masuk,r_jam_keluar,r_istirahat_masuk,r_istirahat_keluar,id_jadwal,tgl_realisasi_detail) 
-        select '$iddetail', A.id_rkk_detail, A.id_rkk, A.id_karyawan, A.upah, B.jam_masuk, B.jam_keluar, B.istirahat_masuk, B.istirahat_keluar, A.id_jadwal, '$tglreal' 
+        select '$iddetail', A.id_rkk_detail, A.id_rkk, A.id_karyawan, A.upah, 
+               COALESCE(B.jam_masuk, '00:00:00'), 
+               COALESCE(B.jam_keluar, '00:00:00'), 
+               COALESCE(B.istirahat_masuk, '00:00:00'), 
+               COALESCE(B.istirahat_keluar, '00:00:00'), 
+               A.id_jadwal, '$tglreal' 
         from tb_rkk_detail A
         LEFT JOIN tb_jadwal B ON A.id_jadwal = B.id_jadwal
         where A.id_rkk = '$id' ");

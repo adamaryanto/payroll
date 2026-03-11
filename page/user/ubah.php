@@ -3,7 +3,7 @@ if (isset($_GET['id'])) {
     $idu = $_GET['id'];
     $tampil = $koneksi->query("SELECT * FROM ms_login WHERE id_login = '$idu'");
     $data = $tampil->fetch_assoc();
-    $nama = $data['user_login'];
+    $nama = $data['username'];
 }
 ?>
 
@@ -44,9 +44,9 @@ if (isset($_GET['id'])) {
                             <i class="fas fa-user-tag text-gray-400"></i>
                         </div>
                         <select name="trole" class="block w-full pl-10 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl appearance-none bg-gray-50 font-medium cursor-pointer" required>
-                            <option value="owner" <?php if($data['role'] == 'owner') echo 'selected'; ?>>Owner</option>
-                            <option value="Admin HRD" <?php if($data['role'] == 'Admin HRD') echo 'selected'; ?>>Admin HRD</option>
-                            <option value="Kepala Gudang" <?php if($data['role'] == 'Kepala Gudang') echo 'selected'; ?>>Kepala Gudang</option>
+                            <option value="Owner" <?php if($data['role'] == 'Owner') echo 'selected'; ?>>Owner</option>
+                            <option value="Admin HR" <?php if($data['role'] == 'Admin HR') echo 'selected'; ?>>Admin HR</option>
+                            <option value="Kepala Pabrik" <?php if($data['role'] == 'Kepala Pabrik') echo 'selected'; ?>>Kepala Pabrik</option>
                             <option value="Admin Master" <?php if($data['role'] == 'Admin Master') echo 'selected'; ?>>Admin Master</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -86,7 +86,7 @@ $tnama = @$_POST['tnama'];
 $trole = @$_POST['trole'];
 $simpan = @$_POST['simpan'];
 if ($simpan) {
-    $sql = $koneksi->query("UPDATE ms_login SET user_login='$tnama', role='$trole' WHERE id_login = '$idu'");
+    $sql = $koneksi->query("UPDATE ms_login SET username='$tnama', role='$trole' WHERE id_login = '$idu'");
     if ($sql) {
         ?>
         <script type="text/javascript">

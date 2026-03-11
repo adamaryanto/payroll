@@ -50,9 +50,9 @@
                         </div>
                         <select name="trole" class="block w-full pl-10 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl appearance-none bg-gray-50 font-medium cursor-pointer" required>
                             <option value="" disabled selected>-- Pilih Role --</option>
-                            <option value="owner">Owner</option>
-                            <option value="Admin HRD">Admin HRD</option>
-                            <option value="Kepala Gudang">Kepala Gudang</option>
+                            <option value="Owner">Owner</option>
+                            <option value="Admin HR">Admin HR</option>
+                            <option value="Kepala Pabrik">Kepala Pabrik</option>
                             <option value="Admin Master">Admin Master</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
@@ -85,7 +85,7 @@ if (isset($_POST['simpan'])) {
     $trole     = $_POST['trole'] ?? '';
     $tpassword = $_POST['tpassword'] ?? '';
     
-    $sql = $koneksi->query("INSERT INTO ms_login (id_perusahaan, user_login, lg_password, role) VALUES ('1', '$tnama', '$tpassword', '$trole')");
+    $sql = $koneksi->query("INSERT INTO ms_login (id_perusahaan, username, password, role) VALUES ('1', '$tnama', '$tpassword', '$trole')");
     
     if ($sql) {
         echo '

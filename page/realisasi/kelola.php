@@ -5,6 +5,11 @@ if (isset($_GET['id'])) {
     $tampildetail = $koneksi->query("SELECT * FROM tb_realisasi WHERE id_realisasi = '$idrealisasi'");
     $datadetail = $tampildetail->fetch_assoc();
 
+    if (!$datadetail) {
+        echo "<script>alert('Data Realisasi tidak ditemukan!'); window.location.href='?page=realisasi';</script>";
+        exit;
+    }
+
     $datatglrealisasi    = $datadetail['tgl_realisasi'];
     $dataketerangan      = $datadetail['keterangan'];
     $datadetailrealisasi = $datadetail['detail_realisasi'];
@@ -53,9 +58,16 @@ if (isset($_GET['id'])) {
 
     $tampilrkk = $koneksi->query("SELECT * FROM tb_rkk WHERE id_rkk = '$idrkk'");
     $datarkk = $tampilrkk->fetch_assoc();
-    $datatglrkk = $datarkk['tgl_rkk'];
-    $dataketeranganrkk = $datarkk['keterangan'];
-    $datajamkerjarkk = $datarkk['jam_kerja'];
+    
+    if (!$datarkk) {
+        $datatglrkk = "";
+        $dataketeranganrkk = "";
+        $datajamkerjarkk = "";
+    } else {
+        $datatglrkk = $datarkk['tgl_rkk'];
+        $dataketeranganrkk = $datarkk['keterangan'];
+        $datajamkerjarkk = $datarkk['jam_kerja'];
+    }
 } else {
     $datatglrealisasi    = "";
     $dataketerangan      = "";
@@ -492,7 +504,7 @@ if (!function_exists('rupiah')) {
                                 <thead class="bg-gray-50 border-b border-gray-200">
                                     <tr>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">No</th>
-                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">NIK</th>
+                                        <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">No Absen</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Nama Karyawan</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Departemen</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Sub Bagian</th>
@@ -513,7 +525,9 @@ if (!function_exists('rupiah')) {
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah Setelah Potongan</th>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Hasil</th>
+                                        <?php if (strtolower($_SESSION['role']) != 'admin hr') { ?>
                                         <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-center">Aksi</th>
+                                        <?php } ?>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -583,6 +597,13 @@ if (!function_exists('rupiah')) {
                                             <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($data['r_potongan_lainnya']) ?></td>
                                             
                                             <?php 
+                                            if (!empty($data['digantikan_oleh'])) {
+                                                $data['upah_rkk'] = 0;
+                                                $data['lembur'] = 0;
+                                                $data['r_potongan_telat'] = 0;
+                                                $data['r_potongan_istirahat'] = 0;
+                                                $data['r_potongan_lainnya'] = 0;
+                                            }
                                             $upah_setelah_potongan = $data['upah_rkk'] + $data['lembur'] - $data['r_potongan_telat'] - $data['r_potongan_istirahat'] - $data['r_potongan_lainnya'];
                                             ?>
                                             <td data-label="Upah Setelah Potongan" class="text-right font-black text-blue-700">
@@ -590,14 +611,18 @@ if (!function_exists('rupiah')) {
                                             </td>
 
                                             <td data-label="Hasil"><?php echo $data['hasil_kerja']; ?></td>
+                                            <?php if (strtolower($_SESSION['role']) != 'admin hr') { ?>
                                             <td data-label="Aksi">
                                                 <div class="flex-action">
+                                                    <?php if (strtolower($_SESSION['role']) != 'admin hr') { ?>
                                                     <a href="?page=realisasi&aksi=detail&id=<?php echo $data['id_realisasi_detail']; ?>"
                                                         class="btn btn-xs btn-info" style="background-color: #3498DB; border:none; border-radius:4px; padding:4px 10px;">
                                                         <i class="fa fa-eye"></i> Detail
                                                     </a>
+                                                    <?php } ?>
                                                 </div>
                                             </td>
+                                            <?php } ?>
                                         </tr>
                                     <?php
                                         $no++;
@@ -632,6 +657,7 @@ if (!function_exists('rupiah')) {
         $('#dataTables-example').DataTable({
             pageLength: 10,
             responsive: false,
+            stateSave: true,
             scrollX: !isMobile, 
             autoWidth: !isMobile,
             language: {
