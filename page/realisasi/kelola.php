@@ -191,20 +191,20 @@ if (!function_exists('rupiah')) {
                             <thead class="bg-gray-50 border-b border-gray-200">
                                 <tr>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">No</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">NIK</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">No Absen</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Nama Karyawan</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Departemen</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Sub Bagian</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">OS/DHK</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Gol</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Rec. Masuk</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Rec. Pulang</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Rec. Ist. K</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Rec. Ist. M</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Real. Masuk</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Real. Pulang</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Real. Ist. K</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Real. Ist. M</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Golongan</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Jam Masuk</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Jam Pulang</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Keluar</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Istirahat Masuk</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Masuk</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Pulang</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Istirahat Keluar</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Absen Istirahat Masuk</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah Pokok</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
@@ -229,12 +229,12 @@ if (!function_exists('rupiah')) {
                                     $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                         (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
 
-                                    // Highlight red if absent or fully missing record
+                                    // Highlight if status is 'Tidak Hadir' or data is fully missing
                                     $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || $isFullMissing) ? 'bg-red-custom' : '';
                                 ?>
                                     <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
-                                        <td data-label="NIK"><?php echo $data['no_absen']; ?></td>
+                                        <td data-label="No Absen"><?php echo $data['no_absen']; ?></td>
                                         <td data-label="Nama Karyawan">
                                             <strong><?php echo $data['nama_karyawan']; ?></strong>
                                             <?php if (!empty($data['menggantikan'])) : ?>
@@ -263,16 +263,16 @@ if (!function_exists('rupiah')) {
                                         <td data-label="Departemen"><?php echo $data['nama_departmen']; ?></td>
                                         <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                         <td data-label="OS/DHK"><?php echo $data['OS_DHK']; ?></td>
-                                        <td data-label="Gol"><?php echo $data['golongan']; ?></td>
-                                        <td data-label="Rec. Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
-                                        <td data-label="Rec. Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
-                                        <td data-label="Rec. Ist. K" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
-                                        <td data-label="Rec. Ist. M" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
-
-                                        <td data-label="Real. Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
-                                        <td data-label="Real. Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
-                                        <td data-label="Real. Ist. K" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
-                                        <td data-label="Real. Ist. M" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
+                                        <td data-label="Golongan"><?php echo $data['golongan']; ?></td>
+                                        <td data-label="Jam Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
+                                        <td data-label="Jam Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
+                                        <td data-label="Istirahat Keluar" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
+                                        <td data-label="Istirahat Masuk" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+|
+                                        <td data-label="Absen Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
+                                        <td data-label="Absen Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Masuk" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
                                         <td data-label="Upah Pokok" class="text-right">
                                             <?= rupiah($data['upah_rkk']) ?>
