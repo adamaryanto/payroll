@@ -232,19 +232,56 @@ if (strtolower($_SESSION['role']) == "owner") {
         .action-btn-group {
             width: 100%;
             display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
             gap: 8px;
             padding-top: 5px;
+            justify-content: flex-start;
         }
         .action-btn-group > a, .action-btn-group > div {
-            flex: 1; /* Lebar tombol menyesuaikan merata */
+            flex: 0 0 auto;
         }
         .action-btn-group a {
-            padding: 10px !important; /* Area klik jadi besar */
-            width: 100%;
+            padding: 8px 12px !important;
+            width: auto;
         }
 
         h3 {
             color: #2563eb !important;
+        }
+    }
+    /* --- STYLING STEMPEL (STAMP) --- */
+    .stamp {
+        display: inline-block;
+        padding: 5px 15px;
+        border: 4px solid;
+        border-radius: 10px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 16px;
+        transform: rotate(-15deg);
+        opacity: 0.8;
+        letter-spacing: 2px;
+        user-select: none;
+        margin: 10px;
+    }
+    .stamp-approved {
+        color: #059669;
+        border-color: #059669;
+        box-shadow: 0 0 0 2px #059669;
+    }
+    .stamp-unapproved {
+        color: #dc2626;
+        border-color: #dc2626;
+        box-shadow: 0 0 0 2px #dc2626;
+    }
+    @media screen and (max-width: 768px) {
+        .stamp {
+            transform: rotate(0deg);
+            margin: 5px 0;
+            font-size: 14px;
+            padding: 2px 10px;
         }
     }
 </style>
@@ -274,6 +311,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                             <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Jumlah Karyawan</th>
                             <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Aksi Data</th>
                             <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Otorisasi</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -292,7 +330,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                                 </td>
                                 
                                 <td data-label="Aksi Data" class="py-3 px-2 align-middle">
-                                    <div class="btn-action-group md:justify-center">
+                                    <div class="action-btn-group md:justify-center">
                                         <a href="?page=rkk&aksi=kelola&id=<?= $data['id_rkk']; ?>"
                                             class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
                                             <i class="fas fa-eye mr-1"></i> Detail
@@ -311,7 +349,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                                 </td>
                                 
                                 <td data-label="Otorisasi" class="py-3 px-2 align-middle">
-                                    <div class="btn-action-group md:justify-center">
+                                    <div class="action-btn-group md:justify-center">
                                         <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
                                             <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors"
@@ -336,6 +374,14 @@ if (strtolower($_SESSION['role']) == "owner") {
                                                 onclick="return confirm('Batalkan Approve data ini?');"><i class="fas fa-times mr-1"></i> Un-Approve</a>
                                         <?php endif; ?>
                                     </div>
+                                </td>
+
+                                <td data-label="Status" class="py-3 px-2 text-center align-middle">
+                                    <?php if ($data['status_rkk'] >= 2) : ?>
+                                        <div class="stamp stamp-approved">Approved</div>
+                                    <?php else : ?>
+                                        <div class="stamp stamp-unapproved">Unapproved</div>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endwhile; ?>

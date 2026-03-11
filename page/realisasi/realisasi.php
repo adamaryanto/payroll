@@ -9,8 +9,8 @@ $tampil = $koneksi->query("SELECT A.*,
     (select sum(r_potongan_lainnya) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potlainnya
     from tb_realisasi A $where_real");
 
-// Logika Akses: Owner dan Admin bisa Approve/Unapprove
-$role_akses = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "admin master");
+// Logika Akses: Hanya Owner yang bisa Approve/Unapprove Realisasi
+$role_akses = (strtolower($_SESSION['role']) == "owner");
 $level_status = (!$role_akses) ? "hidden" : "";
 
 ?>
@@ -45,8 +45,8 @@ $level_status = (!$role_akses) ? "hidden" : "";
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Potongan Telat</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Potongan Istirahat</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -90,42 +90,47 @@ $level_status = (!$role_akses) ? "hidden" : "";
                                     Rp <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
                                 </td>
 
-                                <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
-                                    <?= $status_badge ?>
-                                </td>
-
                                 <td data-label="Aksi" class="py-2 md:py-2.5 px-2 align-middle md:text-center mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
-                                    <div class="flex items-center md:justify-center gap-1.5 flex-wrap action-btn-group">
+                                    <div class="action-btn-group md:justify-center">
+                                        <!-- Detail: Always visible -->
                                         <a href="?page=realisasi&aksi=kelola&id=<?= $data['id_realisasi']; ?>"
                                             class="px-2 py-1 text-[13px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors flex justify-center items-center" title="Detail">
                                             <i class="fas fa-eye md:mr-1"></i> <span class="ml-1 md:inline">Detail</span>
                                         </a>
 
-                                        <div class="<?= $level_status ?> <?= $app ?> flex-1 md:flex-none">
-                                            <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
-                                                class="w-full md:w-auto px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
-                                                onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
-                                                <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
-                                            </a>
-                                        </div>
-
-                                        <?php if ($data['status_realisasi'] == 'approve') : ?>
-                                            <div class="<?= $level_status ?> flex-1 md:flex-none">
+                                        <!-- Approve/Unapprove: Only for Owner -->
+                                        <?php if (strtolower($_SESSION['role']) == "owner") : ?>
+                                            <?php if ($data['status_realisasi'] != 'approve') : ?>
+                                                <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
+                                                    class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
+                                                    onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
+                                                    <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
+                                                </a>
+                                            <?php else : ?>
                                                 <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi']; ?>"
-                                                    class="w-full md:w-auto px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
+                                                    class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
                                                     onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
                                                     <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Unapprove</span>
                                                 </a>
-                                            </div>
+                                            <?php endif; ?>
                                         <?php endif; ?>
 
-                                        <div class="<?= $print ?> flex-1 md:flex-none">
+                                        <!-- Excel: Owner always, Others only if approved -->
+                                        <?php if (strtolower($_SESSION['role']) == "owner" || $data['status_realisasi'] == 'approve') : ?>
                                             <a href="page/realisasi/excelrealisasi.php?id=<?= $data['id_realisasi']; ?>"
-                                                class="w-full md:w-auto px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors flex justify-center items-center" title="Download Payroll">
+                                                class="px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors flex justify-center items-center" title="Excel Report">
                                                 <i class="fas fa-file-excel md:mr-1"></i> <span class="ml-1 md:inline">Excel</span>
                                             </a>
-                                        </div>
+                                        <?php endif; ?>
                                     </div>
+                                </td>
+
+                                <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
+                                    <?php if ($data['status_realisasi'] == 'approve') : ?>
+                                        <div class="stamp stamp-approved">Approved</div>
+                                    <?php else : ?>
+                                        <div class="stamp stamp-unapproved">Unapproved</div>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php $no++;
@@ -319,19 +324,56 @@ $level_status = (!$role_akses) ? "hidden" : "";
         .action-btn-group {
             width: 100%;
             display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
             gap: 8px;
             padding-top: 5px;
+            justify-content: flex-start;
         }
         .action-btn-group > a, .action-btn-group > div {
-            flex: 1; /* Lebar tombol menyesuaikan merata */
+            flex: 0 0 auto;
         }
         .action-btn-group a {
-            padding: 10px !important; /* Area klik jadi besar */
-            width: 100%;
+            padding: 8px 12px !important;
+            width: auto;
         }
 
         h3 {
             color: #2563eb !important;
+        }
+    }
+    /* --- STYLING STEMPEL (STAMP) --- */
+    .stamp {
+        display: inline-block;
+        padding: 5px 15px;
+        border: 4px solid;
+        border-radius: 10px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 16px;
+        transform: rotate(-15deg);
+        opacity: 0.8;
+        letter-spacing: 2px;
+        user-select: none;
+        margin: 10px;
+    }
+    .stamp-approved {
+        color: #059669;
+        border-color: #059669;
+        box-shadow: 0 0 0 2px #059669;
+    }
+    .stamp-unapproved {
+        color: #dc2626;
+        border-color: #dc2626;
+        box-shadow: 0 0 0 2px #dc2626;
+    }
+    @media screen and (max-width: 768px) {
+        .stamp {
+            transform: rotate(0deg);
+            margin: 5px 0;
+            font-size: 14px;
+            padding: 2px 10px;
         }
     }
 </style>
