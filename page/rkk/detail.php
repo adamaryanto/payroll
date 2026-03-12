@@ -110,11 +110,6 @@ if (isset($_GET['id'])) {
         box-shadow: 0 0 0 3px rgba(95, 158, 160, 0.2);
     }
     label { font-size: 0.75rem; color: #6b7280; margin-bottom: 8px; }
-    h3{
-      color: #2563eb;
-      margin: 0 0 20px 0;
-      font-weight: 800;
-    }
 
     /* Tombol Modern */
     .btn-custom {
@@ -133,7 +128,7 @@ if (isset($_GET['id'])) {
     <div class="col-md-12">
         <form method="POST" enctype="multipart/form-data">
             <div class="card-modern">
-               <h3><i class="fas fa-file-invoice-dollar mr-2"></i> Detail Rencana Upah</h3>
+               <h3 class="text-blue-600 font-bold"><i class="fas fa-file-invoice-dollar mr-2"></i> Detail Rencana Upah</h3>
 
                 <div class="section-divider">Rencana Kerja</div>
                 <div class="row">

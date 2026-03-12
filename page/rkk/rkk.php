@@ -246,9 +246,6 @@ if (strtolower($_SESSION['role']) == "owner") {
             width: auto;
         }
 
-        h3 {
-            color: #2563eb !important;
-        }
     }
     /* --- STYLING STEMPEL (STAMP) --- */
     .stamp {
@@ -291,10 +288,10 @@ if (strtolower($_SESSION['role']) == "owner") {
 
         <div class="border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center bg-white gap-4">
             <div>
-                <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
+                <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
             </div>
             <div class="w-full md:w-auto">
-                <a href="?page=rkk&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors w-full md:w-auto">
+                <a href="?page=rkk&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors w-full md:w-auto">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
@@ -325,7 +322,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                                 <td data-label="Tanggal" class="py-3 px-2 text-base md:text-[15px] font-bold text-gray-900"><?= $data['tgl_rkk'] ?></td>
                                 <td data-label="Keterangan" class="py-3 px-2 text-base md:text-[14px] text-gray-700"><?= $data['keterangan'] ?></td>
                                 <td data-label="Jumlah Karyawan" class="py-3 px-2 md:text-center text-base md:text-[15px]">
-                                    <span class="font-bold text-indigo-700"><?= $data['jml'] ?> Orang</span><br>
+                                    <span class="font-bold text-blue-700"><?= $data['jml'] ?> Orang</span><br>
                                     <span class="text-emerald-600 font-semibold text-sm">Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></span>
                                 </td>
                                 
@@ -341,7 +338,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                                         </a>
                                         <?php if (strtolower($_SESSION['role']) == "owner") : ?>
                                             <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded border border-indigo-300 transition-colors">
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
                                                 <i class="fas fa-user-plus mr-1"></i> Tetapkan
                                             </a>
                                         <?php endif; ?>
