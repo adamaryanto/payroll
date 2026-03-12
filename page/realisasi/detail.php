@@ -131,7 +131,6 @@ if (isset($_GET['id'])) {
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
     label { font-size: 0.75rem; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
-    h3 { color: #2563eb; margin: 0 0 20px 0; font-weight: 800; }
     
     /* Tombol Modern */
     .btn-custom { padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
@@ -145,7 +144,7 @@ if (isset($_GET['id'])) {
     <div class="col-md-12">
         <form method="POST" enctype="multipart/form-data">
             <div class="card-modern">
-                <h3><i class="fas fa-clipboard-check mr-2"></i> Detail Realisasi Upah</h3>
+                <h3 class="text-blue-600 font-bold"><i class="fas fa-clipboard-check mr-2"></i> Detail Realisasi Upah</h3>
 
                 <div class="section-divider">Rencana Kerja (RKK)</div>
                 <div class="row">

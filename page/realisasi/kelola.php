@@ -123,7 +123,7 @@ if (!function_exists('rupiah')) {
         <div class="col-md-12">
             <div class="card-clean">
                 <div class="border-b border-gray-200 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <h3 class="text-xl font-bold text-indigo-600 m-0">
+                    <h3 class="text-xl font-bold text-blue-600 m-0">
                         <i class="fas fa-list-alt mr-2"></i> Daftar Realisasi Upah
                     </h3>
 
@@ -137,7 +137,7 @@ if (!function_exists('rupiah')) {
                 <form method="POST" enctype="multipart/form-data" class="bg-white">
                     <div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
                         <div class="mb-6">
-                            <div class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-3 border-l-4 border-indigo-600 pl-2">Rencana Upah</div>
+                            <div class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 border-l-4 border-blue-600 pl-2">Rencana Upah</div>
                             <div class="row">
                                 <div class="col-md-3 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Tanggal</label>
@@ -174,7 +174,7 @@ if (!function_exists('rupiah')) {
                     </div>
 
                     <div class="p-4 md:px-5 bg-white border-t border-gray-200" <?php echo $status; ?>>
-                        <button type="submit" name="simpan" value="Simpan" class="btn btn-primary bg-indigo-600 hover:bg-indigo-700 border-none px-6 py-2">
+                        <button type="submit" name="simpan" value="Simpan" class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none px-6 py-2">
                             <i class="fas fa-save mr-1.5"></i> Simpan Ket.
                         </button>
                         <button type="submit" name="cleanup" value="Cleanup" class="btn btn-warning bg-amber-500 hover:bg-amber-600 border-none px-6 py-2 ml-2 text-white" onclick="return confirm('Tarik data dari record mesin?')">
@@ -183,7 +183,7 @@ if (!function_exists('rupiah')) {
                     </div>
                 </form>
 
-                <div class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-3 ml-3 border-l-4 border-indigo-600 pl-2"> <i class="fas fa-users mr-1.5"></i> List Karyawan</div>
+                <div class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 ml-3 border-l-4 border-blue-600 pl-2"> <i class="fas fa-users mr-1.5"></i> List Karyawan</div>
 
                 <div class="p-0">
                     <div class="table-responsive px-3 md:px-4 py-4">
@@ -256,7 +256,7 @@ if (!function_exists('rupiah')) {
                                                 <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
                                                     <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Digantikan</span>
                                                 <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
-                                                    <span class="bg-indigo-100 text-indigo-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Pengganti</span>
+                                                    <span class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Pengganti</span>
                                                 <?php endif; ?>
                                             </div>
                                         </td>
@@ -338,6 +338,111 @@ if (!function_exists('rupiah')) {
 </div>
 
 <style>
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
+    .dataTables_wrapper {
+        display: block !important;
+    }
+
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
+    .dataTables_wrapper::before,
+    .dataTables_wrapper::after {
+        display: none !important;
+    }
+
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
+    #dataTables-example_wrapper .row:first-child {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+    }
+
+    /* 4. Styling Tampil _MENU_ (Kiri) */
+    .dataTables_length {
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+
+    /* 5. Styling Cari: (Kanan) */
+    .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_filter input {
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
+    }
+
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
+    .dataTables_wrapper .dataTables_paginate {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding-top: 15px !important;
+    }
+
+    .dataTables_paginate .paginate_button {
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        border-radius: 6px !important;
+        padding: 5px 12px !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
+        color: white !important;
+    }
+
+    .dataTables_paginate .paginate_button.disabled {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed !important;
+    }
+
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
     .card-clean {
         background: #fff;
         border: 1px solid #E0E4E8;
@@ -684,16 +789,20 @@ if (!function_exists('rupiah')) {
         var isMobile = window.innerWidth <= 768;
 
         $('#dataTables-example').DataTable({
-            pageLength: 10,
+            pageLength: 25,
+            autoWidth: false,
             responsive: false,
-            stateSave: true,
             scrollX: !isMobile,
             autoWidth: !isMobile,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
             language: {
-                search: "",
+                search: "Cari:",
                 searchPlaceholder: "Cari data...",
-                lengthMenu: "Tampil _MENU_",
-                info: "Menampilkan _START_ sd _END_ dari _TOTAL_ data",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
                 paginate: {
                     previous: "Prev",
                     next: "Next"
@@ -701,6 +810,8 @@ if (!function_exists('rupiah')) {
             }
         });
 
-        $('.dataTables_filter').addClass('mb-2');
+        // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile
+        $('.dataTables_filter').addClass('mb-3');
+        $('.dataTables_length').addClass('mb-3');
     });
-</script>
+</script>   
