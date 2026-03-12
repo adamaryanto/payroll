@@ -335,9 +335,9 @@ if ($data['pulanglebihawal'] != ''){echo "#FFEBCD";}
 <td><?php echo $data['lembur'] ?></td>
 
 <td><?php echo number_format( $data['upah_harian'],0,',',',') ?></td>
-<td><?php echo number_format( $data['dendamasuk'] +  $data['dendaistirahat'],0,',',',') ?></td>
-<td><?php echo number_format( $data['upah_harian']-$data['dendaistirahat'] - $data['dendaistirahat'],0,',',',') ;
-$tot2 = $data['upah_harian']-$data['dendamasuk'] - $data['dendaistirahat'];
+<td><?php echo number_format( $data['dendamasuk'] +  $data['dendaistirahat'] + $data['dendapulang'],0,',',',') ?></td>
+<td><?php echo number_format( $data['upah_harian']-$data['dendamasuk'] - $data['dendaistirahat'] - $data['dendapulang'],0,',',',') ;
+$tot2 = $data['upah_harian']-$data['dendamasuk'] - $data['dendaistirahat'] - $data['dendapulang'];
 $tot1 += $tot2;
 
 ?></td>

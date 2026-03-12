@@ -8,7 +8,6 @@ function syncRealisasiData($koneksi, $id_realisasi) {
     $dataDenda = $queryDenda->fetch_assoc();
     $dendaMasuk = $dataDenda['denda_masuk'] ?? 0;
     $dendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
-    $dendaPulang = $dataDenda['denda_pulang'] ?? 0;
 
     // 2. Get Realization Info (to get date)
     $queryRealisasi = $koneksi->query("SELECT tgl_realisasi FROM tb_realisasi WHERE id_realisasi = '$id_realisasi'");
@@ -56,7 +55,6 @@ function syncRealisasiData($koneksi, $id_realisasi) {
         // 5. Calculate Deductions and Determine Attendance Status
         $potTelat = 0;
         $potIstirahat = 0;
-        $potPulang = 0;
         $realizedWage = $originalWage;
         $newRkkStatus = ($detail['current_rkk_status'] == 'Pengganti') ? 'Pengganti' : (($detail['current_rkk_status'] == 'Digantikan') ? 'Digantikan' : 'Hadir');
 
@@ -74,12 +72,6 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                 }
             }
 
-            // Early out deduction logic
-            if ($jamPulang != '00:00:00' && !empty($detail['shift_keluar']) && $detail['shift_keluar'] != '00:00:00') {
-                if (strtotime($jamPulang) < strtotime($detail['shift_keluar'])) {
-                    $potPulang = $dendaPulang;
-                }
-            }
 
             // Break deduction logic
             if ($jamIstM != '00:00:00' && !empty($detail['shift_istirahat_masuk'])) {

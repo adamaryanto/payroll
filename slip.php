@@ -36,7 +36,6 @@ $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
 $d_denda = $q_denda->fetch_assoc();
 $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
 $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
-$globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
 
 // Query join lengkap
 $sql = "SELECT
@@ -55,10 +54,10 @@ $sql = "SELECT
     j.jabatan,
     d.nama_departmen,
     k.nama_karyawan,
-    jd.shift_masuk,
-    jd.shift_keluar,
-    jd.shift_istirahat_masuk,
-    jd.shift_istirahat_keluar
+    jd.jam_masuk,
+    jd.jam_keluar,
+    jd.istirahat_masuk,
+    jd.istirahat_keluar
 FROM tb_realisasi_detail r
 JOIN ms_karyawan k ON r.id_karyawan = k.id_karyawan
 JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
@@ -117,15 +116,12 @@ if($result->num_rows > 0) {
 $no=1;
 while($row = $result->fetch_assoc()){
     // Logika Pelanggaran Dinamis
-    $isLate = (!empty($row['r_jam_masuk']) && $row['r_jam_masuk'] != '00:00:00' && !empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && strtotime($row['r_jam_masuk']) > strtotime($row['ra_masuk']));
-    $isEarlyOut = (!empty($row['r_jam_keluar']) && $row['r_jam_keluar'] != '00:00:00' && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && strtotime($row['r_jam_keluar']) < strtotime($row['ra_keluar']));
-    $isLateBreak = (!empty($row['r_istirahat_masuk']) && $row['r_istirahat_masuk'] != '00:00:00' && !empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && strtotime($row['r_istirahat_masuk']) > strtotime($row['ra_istirahat_masuk']));
-
+    $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
+    $isLateBreak = (!empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && !empty($row['istirahat_masuk']) && $row['istirahat_masuk'] != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($row['istirahat_masuk']));
     $potTelatValue = $isLate ? $globalDendaMasuk : 0;
     $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
-    $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
 
-    $totalRow = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $row['r_potongan_lainnya']);
+    $totalRow = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $row['r_potongan_lainnya']);
 
     echo "
     <tr>

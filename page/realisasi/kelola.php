@@ -77,7 +77,6 @@ if (isset($_GET['id'])) {
     $dataDenda = $queryDenda->fetch_assoc();
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
     $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
-    $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
 } else {
     $datatglrealisasi    = "";
     $dataketerangan      = "";
@@ -219,7 +218,6 @@ if (!function_exists('rupiah')) {
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Pulang</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah Setelah Potongan</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Hasil</th>
@@ -284,8 +282,7 @@ if (!function_exists('rupiah')) {
                                             echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $isLate) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_masuk']; ?></td>
                                         <td data-label="Absen Pulang" class="<?php 
-                                            $isEarlyOut = (!empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00' && !empty($data['r_jam_keluar']) && $data['r_jam_keluar'] != '00:00:00' && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 || $isEarlyOut ? 'bg-yellow-custom' : ''); 
+                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); 
                                         ?>"><?php echo $data['ra_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
@@ -299,31 +296,28 @@ if (!function_exists('rupiah')) {
                                                 $data['upah_rkk'] = 0;
                                             }
                                             ?>
-                                            <?= rupiah($data['upah_rkk']) ?>
+                                            <?= rupiah($data['upahkaryawan']) ?>
                                         </td>
                                         <td data-label="Lembur" class="text-right">
                                             <?= rupiah($data['lembur']) ?>
                                         </td>
                                         <td data-label="Pot. Telat" class="text-right <?php echo ($isLate) ? 'bg-red-custom' : ''; ?>"><?= rupiah($isLate ? $globalDendaMasuk : 0) ?></td>
                                         <td data-label="Pot. Istirahat" class="text-right <?php echo ($isLateBreak) ? 'bg-red-custom' : ''; ?>"><?= rupiah($isLateBreak ? $globalDendaIstirahat : 0) ?></td>
-                                        <td data-label="Pot. Pulang" class="text-right <?php echo ($isEarlyOut) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($isEarlyOut ? $globalDendaPulang : 0) ?></td>
                                         <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($data['r_potongan_lainnya']) ?></td>
 
                                         <?php
                                         // Sesuaikan isi data potongan dengan denda global
                                         $potTelatValue = $isLate ? $globalDendaMasuk : 0;
                                         $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
-                                        $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
 
                                         if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
-                                            $data['upah_rkk'] = 0;
+                                            $data['upahkaryawan'] = 0;
                                             $data['lembur'] = 0;
                                             $potTelatValue = 0;
                                             $potIstirahatValue = 0;
-                                            $potPulangValue = 0;
                                             $data['r_potongan_lainnya'] = 0;
                                         }
-                                        $upah_setelah_potongan = $data['upah_rkk'] + $data['lembur'] - $potTelatValue - $potIstirahatValue - $potPulangValue - $data['r_potongan_lainnya'];
+                                        $upah_setelah_potongan = $data['upahkaryawan'] + $data['lembur'] - $potTelatValue - $potIstirahatValue - $data['r_potongan_lainnya'];
                                         ?>
                                         <?php if ($data['status_rkk'] != 'Digantikan') $jml_active++; ?>
                                         <td data-label="Upah Setelah Potongan" class="text-right font-black text-blue-700">

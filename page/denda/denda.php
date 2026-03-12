@@ -65,6 +65,7 @@ if (isset($_POST['simpan'])) {
                                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
                         </div>
                     </div>
+
                 </div>
 
                 <div class="flex items-center justify-between pt-6 border-t border-gray-100">

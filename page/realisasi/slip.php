@@ -82,7 +82,6 @@ if (!function_exists('rupiah')) {
                 $d_denda = $q_denda->fetch_assoc();
                 $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
                 $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
-                $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
 
                 $sql = "SELECT r.*, j.shift_masuk, j.shift_keluar, j.shift_istirahat_masuk, j.shift_istirahat_keluar 
                         FROM tb_realisasi_detail r
@@ -127,15 +126,13 @@ if (!function_exists('rupiah')) {
                                 if ($result && $result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
                                         // Logika Pelanggaran Dinamis
-                                        $isLate = (!empty($row['r_jam_masuk']) && $row['r_jam_masuk'] != '00:00:00' && !empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && strtotime($row['r_jam_masuk']) > strtotime($row['ra_masuk']));
-                                        $isEarlyOut = (!empty($row['r_jam_keluar']) && $row['r_jam_keluar'] != '00:00:00' && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && strtotime($row['r_jam_keluar']) < strtotime($row['ra_keluar']));
-                                        $isLateBreak = (!empty($row['r_istirahat_masuk']) && $row['r_istirahat_masuk'] != '00:00:00' && !empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && strtotime($row['r_istirahat_masuk']) > strtotime($row['ra_istirahat_masuk']));
+                                        $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
+                                        $isLateBreak = (!empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && !empty($row['istirahat_masuk']) && $row['istirahat_masuk'] != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($row['istirahat_masuk']));
 
                                         $potTelatValue = $isLate ? $globalDendaMasuk : 0;
                                         $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
-                                        $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
 
-                                        $total = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $row['r_potongan_lainnya']);
+                                        $total = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $row['r_potongan_lainnya']);
                                         ?>
                                         <tr class="hover:bg-blue-50/30 transition-colors">
                                             <td data-label="Tanggal" class="py-4 px-3 text-sm font-bold text-gray-900"><?= $row['tgl_realisasi_detail'] ?></td>

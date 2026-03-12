@@ -33,8 +33,6 @@ SELECT
     RD.r_jam_keluar,
     RD.hasil_kerja,
     RD.r_upah,
-    RD.r_potongan_telat,
-    RD.r_potongan_istirahat,
     RD.r_potongan_lainnya,
     RD.lembur
 FROM tb_realisasi_detail RD
@@ -56,10 +54,16 @@ if ($result->num_rows > 0) {
     $result->data_seek(0);
 }
 
+// Ambil Data Denda Global
+$queryDenda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+$dataDenda = $queryDenda->fetch_assoc();
+$globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
+$globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
+
 echo "
 <table border='1'>
     <tr>
-        <th colspan='20' style='text-align:center; background-color:#f8f9fa; font-size:16px;'>LAPORAN REALISASI ABSENSI & UPAH TANGGAL: $tglRealisasi</th>
+        <th colspan='21' style='text-align:center; background-color:#f8f9fa; font-size:16px;'>LAPORAN REALISASI ABSENSI & UPAH TANGGAL: $tglRealisasi</th>
     </tr>
     <tr style='background-color:#5F9EA0; color:white;'>
         <th>No.</th>
@@ -89,8 +93,17 @@ $no = 1;
 $grand_total_dibayar = 0;
 
 while($row = $result->fetch_assoc()){
+    // Logika Pelanggaran Dinamis (untuk menyamakan dengan tampilan web)
+    $isLate = (!empty($row['r_jam_masuk']) && $row['r_jam_masuk'] != '00:00:00' && !empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && strtotime($row['r_jam_masuk']) > strtotime($row['ra_masuk']));
+    $isEarlyOut = (!empty($row['r_jam_keluar']) && $row['r_jam_keluar'] != '00:00:00' && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && strtotime($row['r_jam_keluar']) < strtotime($row['ra_keluar']));
+    $isLateBreak = (!empty($row['r_istirahat_masuk']) && $row['r_istirahat_masuk'] != '00:00:00' && !empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && strtotime($row['r_istirahat_masuk']) > strtotime($row['ra_istirahat_masuk']));
+
+    $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+    $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+    $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+
     // Hitung Upah Dibayar
-    $upah_bersih = ($row['r_upah'] + $row['lembur']) - ($row['r_potongan_telat'] + $row['r_potongan_istirahat'] + $row['r_potongan_lainnya']);
+    $upah_bersih = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $row['r_potongan_lainnya']);
     $grand_total_dibayar += $upah_bersih;
 
     echo "
@@ -110,8 +123,9 @@ while($row = $result->fetch_assoc()){
         <td style='text-align:center;'>".$row['r_jam_keluar']."</td>
         <td style='text-align:right;'>".number_format($row['lembur'], 0, ',', '.')."</td>
         <td style='text-align:right;'>".number_format($row['r_upah'], 0, ',', '.')."</td>
-        <td style='text-align:right; color:red;'>".number_format($row['r_potongan_telat'], 0, ',', '.')."</td>
-        <td style='text-align:right; color:red;'>".number_format($row['r_potongan_istirahat'], 0, ',', '.')."</td>
+        <td style='text-align:right; color:red;'>".number_format($potTelatValue, 0, ',', '.')."</td>
+        <td style='text-align:right; color:red;'>".number_format($potIstirahatValue, 0, ',', '.')."</td>
+        <td style='text-align:right; color:red;'>".number_format($potPulangValue, 0, ',', '.')."</td>
         <td style='text-align:right; color:red;'>".number_format($row['r_potongan_lainnya'], 0, ',', '.')."</td>
         <td style='text-align:right; font-weight:bold;'>".number_format($upah_bersih, 0, ',', '.')."</td>
         <td>".$row['hasil_kerja']."</td>

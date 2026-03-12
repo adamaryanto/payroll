@@ -275,12 +275,10 @@ if (strtolower($_SESSION['role']) == "owner") {
     }
     @media screen and (max-width: 768px) {
         .stamp {
-            transform: rotate(-12deg); /* Tetap miring sedikit di mobile */
-            margin: 15px 0;
+            transform: rotate(0deg);
+            margin: 5px 0;
             font-size: 14px;
-            padding: 4px 12px;
-            display: inline-block;
-            align-self: center; /* Diposisikan ke tengah kotak mobile */
+            padding: 2px 10px;
         }
     }
 </style>
@@ -342,6 +340,13 @@ if (strtolower($_SESSION['role']) == "owner") {
                                             <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
                                                 <i class="fas fa-user-plus mr-1"></i> Tetapkan
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if ($data['status_rkk'] == '2') : ?>
+                                            <a href="?page=realisasi&aksi=tambah&id=<?= $data['id_rkk']; ?>"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded border border-indigo-300 transition-colors"
+                                                onclick="return confirm('Buat Realisasi untuk data ini?');">
+                                                <i class="fas fa-check-circle mr-1"></i> Realisasi
                                             </a>
                                         <?php endif; ?>
                                     </div>

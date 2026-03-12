@@ -80,7 +80,7 @@ $tampil = $koneksi->query($query);
                                 <div class="action-btn-group">
                                     <a href="?page=realisasi&aksi=tambah&id=<?= $data['id_rkk']; ?>" 
                                        class="inline-flex items-center justify-center px-3 py-2 md:py-1.5 text-[13px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded shadow-sm transition-colors w-full md:w-auto">
-                                        Realisasi <i class="fas fa-chevron-right ml-1.5 text-[11px]"></i>
+                                        Approve <i class="fas fa-check ml-1.5 text-[11px]"></i>
                                     </a>
                                 </div>
                             </td>

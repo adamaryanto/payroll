@@ -75,7 +75,6 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $d_denda = $q_denda->fetch_assoc();
             $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
             $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
-            $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
 
             // 4. Ambil data karyawan di departemen ini saja
             $tampil = $koneksi->query("SELECT 
@@ -86,9 +85,9 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
     B.golongan, 
     D.nama_departmen, 
     S.nama_sub_department, 
-    RD.upah as upah,
+    A.r_upah as upah,
     RD.status_rkk,
-    J.shift_masuk, J.shift_keluar, J.shift_istirahat_masuk, J.shift_istirahat_keluar,
+    J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar,
     $subquery_menggantikan as menggantikan,
     $subquery_digantikan_oleh as digantikan_oleh
     FROM tb_realisasi_detail A 
@@ -106,22 +105,19 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $jml_karyawan = 0;
             while ($data = $tampil->fetch_assoc()) {
                 // Logika Pelanggaran Dinamis
-                $isLate = (!empty($data['r_jam_masuk']) && $data['r_jam_masuk'] != '00:00:00' && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && strtotime($data['r_jam_masuk']) > strtotime($data['ra_masuk']));
-                $isEarlyOut = (!empty($data['r_jam_keluar']) && $data['r_jam_keluar'] != '00:00:00' && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00' && strtotime($data['r_jam_keluar']) < strtotime($data['ra_keluar']));
-                $isLateBreak = (!empty($data['r_istirahat_masuk']) && $data['r_istirahat_masuk'] != '00:00:00' && !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00' && strtotime($data['r_istirahat_masuk']) > strtotime($data['ra_istirahat_masuk']));
+                $isLate = (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && !empty($data['jam_masuk']) && $data['jam_masuk'] != '00:00:00' && strtotime($data['ra_masuk']) > strtotime($data['jam_masuk']));
+                $isLateBreak = (!empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00' && !empty($data['istirahat_masuk']) && $data['istirahat_masuk'] != '00:00:00' && strtotime($data['ra_istirahat_masuk']) > strtotime($data['istirahat_masuk']));
 
                 $potTelatValue = $isLate ? $globalDendaMasuk : 0;
                 $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
-                $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
 
-                $potTotalDynamic = $potTelatValue + $potIstirahatValue + $potPulangValue + $data['r_potongan_lainnya'];
+                $potTotalDynamic = $potTelatValue + $potIstirahatValue + $data['r_potongan_lainnya'];
                 $lembur = $data['lembur'] ?? 0;
                 
                 if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
                     $data['upah'] = 0;
                     $potTelatValue = 0;
                     $potIstirahatValue = 0;
-                    $potPulangValue = 0;
                     $data['r_potongan_lainnya'] = 0;
                     $potTotalDynamic = 0;
                     $lembur = 0;

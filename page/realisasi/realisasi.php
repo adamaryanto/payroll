@@ -2,10 +2,43 @@
 // Query utama
 $where_real = "";
 $tampil = $koneksi->query("SELECT A.*, 
-    (select count(RD.id_realisasi_detail) from tb_realisasi_detail RD join tb_rkk_detail RKD on RD.id_rkk_detail = RKD.id_rkk_detail where RD.id_realisasi = A.id_realisasi and RKD.status_rkk != 'Digantikan') as jml, 
-    (select sum(r_upah) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as ttl, 
-    (select sum(r_potongan_lainnya) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potlainnya
-    from tb_realisasi A $where_real");
+    (SELECT COUNT(RD.id_realisasi_detail) 
+     FROM tb_realisasi_detail RD 
+     JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
+     WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan'
+    ) as jml,
+    (SELECT SUM(
+        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan',
+            0,
+            RD.r_upah + IFNULL(RD.lembur, 0) - (
+                IF(RD.ra_masuk > J.jam_masuk AND RD.ra_masuk != '00:00:00' AND RD.ra_masuk != '' AND J.jam_masuk != '00:00:00' AND J.jam_masuk != '', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0) + 
+                IF(RD.ra_istirahat_masuk > J.istirahat_masuk AND RD.ra_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0) + 
+                RD.r_potongan_lainnya
+            )
+        )
+    ) 
+    FROM tb_realisasi_detail RD 
+    JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
+    LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
+    WHERE RD.id_realisasi = A.id_realisasi 
+    AND RKD.status_rkk != 'Digantikan'
+    ) as ttl, 
+    (SELECT SUM(IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan', 0, RD.r_potongan_lainnya)) 
+     FROM tb_realisasi_detail RD 
+     JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
+     WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan'
+    ) as potlainnya,
+    (SELECT SUM(
+        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan', 0,
+            IF(RD.ra_masuk > J.jam_masuk AND RD.ra_masuk != '00:00:00' AND RD.ra_masuk != '' AND J.jam_masuk != '00:00:00' AND J.jam_masuk != '', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0)
+        )
+    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_telat,
+    (SELECT SUM(
+        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan', 0,
+            IF(RD.ra_istirahat_masuk > J.istirahat_masuk AND RD.ra_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0)
+        )
+    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_istirahat
+    FROM tb_realisasi A $where_real");
 
 // Logika Akses: Hanya Owner yang bisa Approve/Unapprove Realisasi
 $is_authorized = (strtolower($_SESSION['role']) == "owner");
@@ -35,14 +68,16 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                 <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-8">No</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-8">No</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
+                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
+                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Potongan Telat</th>
+                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Potongan Istirahat</th>
+                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -69,8 +104,14 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                     <span class="md:hidden font-bold">Total: </span><?= $data['jml'] ?> <span class="md:hidden">Orang</span>
                                 </td>
 
-                                <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
+                                 <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Potongan Telat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['p_telat'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Potongan Istirahat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['p_istirahat'] ?? 0, 0, ',', '.') ?>
                                 </td>
                                 <td data-label="Potongan Lainnya" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
