@@ -30,7 +30,7 @@ if ($simpan) {
         ?>
         <script type="text/javascript">
             alert("Data Berhasil Disimpan");
-            window.location.href = "?page=boneless";
+            window.location.href = "?page=boneless&ref=<?= $ref ?><?= $view_param ?>";
         </script>
         <?php
     }
@@ -53,7 +53,7 @@ $default_items = [
             <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
                 <div class="border-b border-gray-100 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                     <div class="flex items-center gap-3">
-                        <a href="?page=boneless" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200">
+                        <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200">
                             <i class="fas fa-arrow-left text-xs"></i>
                         </a>
                         <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-plus mr-2"></i>Tambah Data Boneless</h3>
@@ -142,7 +142,7 @@ $default_items = [
                             <button type="submit" name="simpan" value="simpan" class="w-full md:w-auto px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md text-center">
                                 <i class="fas fa-save mr-2"></i> Simpan Laporan
                             </button>
-                            <a href="?page=boneless" class="w-full md:w-auto px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors text-center border border-gray-200">
+                            <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="w-full md:w-auto px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors text-center border border-gray-200">
                                 Batal / Kembali
                             </a>
                         </div>

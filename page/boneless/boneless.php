@@ -1,5 +1,7 @@
 <?php
 $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detail WHERE id_boneless = A.id_boneless) as grand_total FROM tb_boneless A ORDER BY tgl DESC");
+$ref = $_GET['ref'] ?? 'realisasi';
+$view_param = isset($_GET['view']) ? '&view=1' : '';
 ?>
 
 <div class="container-fluid px-2 mt-4 mb-4">
@@ -10,11 +12,11 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                 <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-truck-loading mr-2"></i>Data Boneless</h3>
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-                <a href="javascript:history.back()" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+                <a href="?page=<?= $ref ?>" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
                     <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                 </a>
                 <?php if (!isset($_GET['view'])) : ?>
-                <a href="?page=boneless&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
+                <a href="?page=boneless&aksi=tambah&ref=<?= $ref ?><?= $view_param ?>" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
                 <?php endif; ?>
@@ -52,7 +54,7 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                                 
                                 <td data-label="Aksi" class="py-3 px-4 md:text-center mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
                                     <div class="flex items-center md:justify-center gap-2 action-btn-group">
-                                        <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center">
+                                        <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>&ref=<?= $ref ?><?= $view_param ?>" class="p-2 md:p-1 md:px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center">
                                             <i class="fas fa-edit md:mr-1"></i> <span class="ml-1 md:inline">Lihat / Edit</span>
                                         </a>
                                         <?php if (!isset($_GET['view'])) : ?>

@@ -1,4 +1,6 @@
 <?php
+$ref = $_GET['ref'] ?? 'boneless';
+$view_param = isset($_GET['view']) ? '&view=1' : '';
 $id = $_GET['id'];
 $sql_header = $koneksi->query("SELECT * FROM tb_boneless WHERE id_boneless = '$id'");
 $header = $sql_header->fetch_assoc();
@@ -36,7 +38,7 @@ if ($simpan) {
     ?>
     <script type="text/javascript">
         alert("Data Berhasil Diubah");
-        window.location.href = "?page=boneless";
+        window.location.href = "?page=boneless&ref=<?= $ref ?><?= $view_param ?>";
     </script>
     <?php
 }
@@ -48,7 +50,7 @@ if ($simpan) {
             <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
                 <div class="border-b border-gray-100 py-4 px-5 bg-white flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <a href="?page=boneless" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200">
+                        <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200">
                             <i class="fas fa-arrow-left text-xs"></i>
                         </a>
                         <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-edit mr-2"></i>Ubah Data Boneless</h3>
@@ -139,7 +141,7 @@ if ($simpan) {
                             <button type="submit" name="simpan" value="simpan" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md">
                                 <i class="fas fa-save mr-2"></i> Simpan Perubahan
                             </button>
-                            <a href="?page=boneless" class="px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors">
+                            <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors">
                                 Kembali
                             </a>
                         </div>
