@@ -1,4 +1,6 @@
 <?php
+$ref = $_GET['ref'] ?? 'boneless';
+$view_param = isset($_GET['view']) ? '&view=1' : '';
 $simpan = @$_POST['simpan'];
 if ($simpan) {
     $tgl = @$_POST['tgl'];
