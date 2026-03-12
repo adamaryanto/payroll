@@ -13,7 +13,7 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                 <a href="?page=realisasi" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
                     <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                 </a>
-                <a href="?page=boneless&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
+                <a href="?page=boneless&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
@@ -68,14 +68,18 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
 </div>
 
 <style>
-    /* Reset DataTables Wrapper untuk penyesuaian flexbox */
+     /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
         display: block !important;
     }
+
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
     .dataTables_wrapper::before,
     .dataTables_wrapper::after {
         display: none !important;
     }
+
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
     #dataTables-example_wrapper .row:first-child {
         display: flex !important;
         justify-content: space-between !important;
@@ -83,38 +87,48 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
         margin-bottom: 20px !important;
         width: 100% !important;
     }
+
+    /* 4. Styling Tampil _MENU_ (Kiri) */
     .dataTables_length {
         display: flex !important;
         align-items: center !important;
     }
+
     .dataTables_length label {
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
         margin: 0 !important;
     }
+
     .dataTables_length select {
         padding: 5px 10px !important;
         border: 1px solid #e0e6ed !important;
         border-radius: 8px !important;
     }
+
+    /* 5. Styling Cari: (Kanan) */
     .dataTables_filter {
         text-align: right !important;
         display: flex !important;
         justify-content: flex-end !important;
     }
+
     .dataTables_filter label {
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
         margin: 0 !important;
     }
+
     .dataTables_filter input {
         padding: 6px 12px !important;
         border: 1px solid #e0e6ed !important;
         border-radius: 8px !important;
         width: 200px !important;
     }
+
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
     .dataTables_wrapper .dataTables_paginate {
         display: flex !important;
         justify-content: flex-end !important;
@@ -123,21 +137,54 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
         padding-top: 15px !important;
     }
 
+    .dataTables_paginate .paginate_button {
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        border-radius: 6px !important;
+        padding: 5px 12px !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
+        background: #f8fafc !important;
+        color: #2563eb !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    .dataTables_paginate .paginate_button.current {
+        background: #2563eb !important;
+        border-color: #2563eb !important;
+        color: white !important;
+    }
+
+    .dataTables_paginate .paginate_button.disabled {
+        background: #f1f5f9 !important;
+        color: #94a3b8 !important;
+        cursor: not-allowed !important;
+    }
+
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
     /* =========================================
        KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
        ========================================= */
     @media screen and (max-width: 768px) {
         .table-responsive {
-            padding: 0 !important;
-            overflow-x: visible !important;
+            padding: 12px !important;
         }
-
-        /* Merapikan form cari dan length di HP */
+        
         #dataTables-example_wrapper .row:first-child {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 15px;
-            margin-bottom: 15px !important;
         }
         .dataTables_filter, .dataTables_length {
             width: 100% !important;
@@ -156,28 +203,23 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
             display: none !important;
         }
 
-        /* Box Data (Setiap Baris menjadi Kotak Terpisah) */
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1.5rem; /* Jarak antar kotak */
+            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 16px; /* Padding dalam kotak dilebarkan */
-            background: #fff;
+            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
             box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            background-color: #fff;
         }
 
-        /* Baris Data di dalam Kotak */
         .table-modern tbody td {
             display: flex;
             flex-direction: column; /* Label di atas, data di bawah (stacking) */
-            align-items: flex-start !important;
-            text-align: left !important;
-            padding: 12px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
+            align-items: flex-start;
+            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
             border-bottom: 1px dashed #e2e8f0 !important;
-            width: 100% !important;
-            font-size: 14px;
         }
         .table-modern tbody td:first-child {
             padding-top: 0 !important;
@@ -187,7 +229,6 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
             padding-bottom: 0 !important;
         }
 
-        /* Label Judul Kolom */
         .table-modern tbody td:before {
             content: attr(data-label);
             font-weight: 700;
@@ -195,7 +236,7 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
-            margin-bottom: 6px; /* Jarak antara label dan isi data */
+            margin-bottom: 6px; /* Memberi jarak ke datanya */
             display: block;
             width: 100%;
         }
@@ -204,13 +245,20 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
         .action-btn-group {
             width: 100%;
             display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
             gap: 8px;
             padding-top: 5px;
+            justify-content: flex-start;
+        }
+        .action-btn-group > a, .action-btn-group > div {
+            flex: 0 0 auto;
         }
         .action-btn-group a {
-            flex: 1; /* Lebar tombol menyesuaikan merata (50:50) */
-            padding: 12px !important; /* Area klik diperbesar */
+            padding: 8px 12px !important;
+            width: auto;
         }
+
     }
 </style>
 
@@ -219,16 +267,24 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
         $('#dataTables-example').DataTable({
             pageLength: 25,
             autoWidth: false,
-            // Mematikan responsive bawaan datatables agar tidak bentrok dengan CSS kustom kita
-            responsive: false, 
+            responsive: false,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
             language: {
-                search: "Cari Data:",
-                lengthMenu: "Tampil _MENU_",
-                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data"
+                search: "Cari:",
+                searchPlaceholder: "Cari data...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Prev",
+                    next: "Next"
+                }
             }
         });
         
-        // Membersihkan gaya float bawaan Datatables
+        // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');
     });

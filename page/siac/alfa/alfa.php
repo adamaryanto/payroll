@@ -18,11 +18,11 @@ if (isset($_GET['ttgl1']) || isset($_GET['ttgl2'])) {
         <div class="card rounded-2xl shadow-sm border-0 bg-white">
             <div class="bg-white border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-user-slash mr-2"></i>Data Karyawan Alfa</h3>
+                    <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-user-times mr-2"></i>Data Karyawan Alfa</h3>
                     <p class="text-xs text-gray-500 mt-1">Kelola data alfa karyawan berdasarkan periode</p>
                 </div>
                 <div class="w-full md:w-auto">
-                    <a href="?page=alfa&aksi=tambah" class="flex justify-center items-center w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-bold text-sm transition-all">
+                    <a href="?page=alfa&aksi=tambah" class="flex justify-center items-center w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-bold text-sm transition-all">
                         <i class="fas fa-plus mr-2"></i> Tambah Data Alfa
                     </a>
                 </div>
@@ -40,7 +40,7 @@ if (isset($_GET['ttgl1']) || isset($_GET['ttgl2'])) {
                             <input autocomplete="off" type="date" name="ttgl2" value="<?php echo $ttgl2; ?>" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all shadow-sm" />
                         </div>
                         <div>
-                            <button type="submit" name="simpan" value="Search" class="w-full border-0 bg-indigo-600 hover:bg-slate-900 text-white py-2.5 rounded-lg shadow-md font-bold transition-all flex justify-center items-center">
+                            <button type="submit" name="simpan" value="Search" class="w-full border-0 bg-blue-600 hover:bg-blue-900 text-white py-2.5 rounded-lg shadow-md font-bold transition-all flex justify-center items-center">
                                 <i class="fas fa-search mr-2"></i> Tampilkan Data
                             </button>
                         </div>

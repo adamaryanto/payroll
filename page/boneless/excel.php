@@ -13,9 +13,15 @@ $queryDetail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_bonele
 
 // 3. Ambil Biaya Pabrik (Total Upah Realisasi pada tanggal yang sama)
 $queryUpah = $koneksi->query("
-    SELECT SUM(r_upah - r_potongan_telat - r_potongan_istirahat - r_potongan_lainnya + lembur) as total_upah 
-    FROM tb_realisasi_detail 
-    WHERE tgl_realisasi_detail = '$tgl'
+    SELECT 
+        SUM(RD.r_upah + RD.lembur - RD.r_potongan_lainnya - 
+            IF(RD.r_jam_masuk > J.shift_masuk AND RD.r_jam_masuk != '00:00:00' AND RD.ra_masuk != '00:00:00', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0) -
+            IF(RD.r_istirahat_masuk > J.shift_istirahat_masuk AND RD.r_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '00:00:00', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0) -
+            IF(RD.r_jam_keluar < J.shift_keluar AND RD.r_jam_keluar != '00:00:00' AND RD.ra_keluar != '00:00:00', (SELECT denda_pulang FROM tb_denda LIMIT 1), 0)
+        ) as total_upah 
+    FROM tb_realisasi_detail RD
+    LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
+    WHERE RD.tgl_realisasi_detail = '$tgl'
 ");
 $rowUpah = $queryUpah->fetch_assoc();
 $biaya_pabrik = $rowUpah['total_upah'] ?? 0;

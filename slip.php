@@ -31,23 +31,39 @@ function rupiah($angka){
     return "Rp " . number_format($angka, 0, ',', '.');
 }
 
+// Ambil denda global
+$q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+$d_denda = $q_denda->fetch_assoc();
+$globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
+$globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
+$globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
+
 // Query join lengkap
 $sql = "SELECT
     r.tgl_realisasi_detail,
     r.r_upah,
+    r.r_jam_masuk,
+    r.r_jam_keluar,
+    r.r_istirahat_masuk,
+    r.r_istirahat_keluar,
     r.ra_masuk,
     r.ra_keluar,
-    r.r_potongan_telat,
-    r.r_potongan_istirahat,
+    r.ra_istirahat_masuk,
+    r.ra_istirahat_keluar,
     r.r_potongan_lainnya,
     r.lembur,
     j.jabatan,
     d.nama_departmen,
-    k.nama_karyawan
+    k.nama_karyawan,
+    jd.shift_masuk,
+    jd.shift_keluar,
+    jd.shift_istirahat_masuk,
+    jd.shift_istirahat_keluar
 FROM tb_realisasi_detail r
 JOIN ms_karyawan k ON r.id_karyawan = k.id_karyawan
 JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
 JOIN ms_departmen d ON k.id_departmen = d.id_departmen
+LEFT JOIN tb_jadwal jd ON r.id_jadwal = jd.id_jadwal
 WHERE r.id_karyawan = '$id_karyawan'
   AND r.tgl_realisasi_detail BETWEEN '$tanggal_mulai' AND '$tanggal_akhir'
 ORDER BY r.tgl_realisasi_detail ASC;
@@ -100,6 +116,16 @@ if($result->num_rows > 0) {
 }
 $no=1;
 while($row = $result->fetch_assoc()){
+    // Logika Pelanggaran Dinamis
+    $isLate = (!empty($row['r_jam_masuk']) && $row['r_jam_masuk'] != '00:00:00' && !empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && strtotime($row['r_jam_masuk']) > strtotime($row['ra_masuk']));
+    $isEarlyOut = (!empty($row['r_jam_keluar']) && $row['r_jam_keluar'] != '00:00:00' && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && strtotime($row['r_jam_keluar']) < strtotime($row['ra_keluar']));
+    $isLateBreak = (!empty($row['r_istirahat_masuk']) && $row['r_istirahat_masuk'] != '00:00:00' && !empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && strtotime($row['r_istirahat_masuk']) > strtotime($row['ra_istirahat_masuk']));
+
+    $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+    $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+    $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+
+    $totalRow = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $row['r_potongan_lainnya']);
 
     echo "
     <tr>
@@ -107,11 +133,11 @@ while($row = $result->fetch_assoc()){
         <td>".rupiah($row['r_upah'])."</td>
          <td>".$row['ra_masuk']."</td>
         <td>".$row['ra_keluar']."</td>
-         <td>".rupiah($row['r_potongan_telat'])."</td>
-        <td>".rupiah($row['r_potongan_istirahat'])."</td>
+         <td>".rupiah($potTelatValue)."</td>
+        <td>".rupiah($potIstirahatValue)."</td>
         <td>".rupiah($row['r_potongan_lainnya'])."</td>
          <td>".rupiah($row['lembur'])."</td>
-         <td>".rupiah($row['r_upah'] + $row['lembur']-$row['r_potongan_telat'] - $row['r_potongan_istirahat'] - $row['r_potongan_lainnya'])."</td>
+         <td>".rupiah($totalRow)."</td>
 
         <td></td>
         <td></td>

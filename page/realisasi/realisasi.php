@@ -1,11 +1,9 @@
 <?php
 // Query utama
-$where_real = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_realisasi != 'pending' " : "";
+$where_real = "";
 $tampil = $koneksi->query("SELECT A.*, 
     (select count(RD.id_realisasi_detail) from tb_realisasi_detail RD join tb_rkk_detail RKD on RD.id_rkk_detail = RKD.id_rkk_detail where RD.id_realisasi = A.id_realisasi and RKD.status_rkk != 'Digantikan') as jml, 
     (select sum(r_upah) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as ttl, 
-    (select sum(r_potongan_telat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as pottelat,
-    (select sum(r_potongan_istirahat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potistirahat, 
     (select sum(r_potongan_lainnya) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potlainnya
     from tb_realisasi A $where_real");
 
@@ -20,13 +18,13 @@ $level_status = (!$is_authorized) ? "hidden" : "";
 
         <div class="border-b border-gray-100 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white">
             <div>
-                <h3 class="text-xl font-bold m-0"><i class="fas fa-file-invoice-dollar mr-2"></i>List Realisasi Upah</h3>
+                <h3 class="text-xl text-blue-600 font-bold m-0"><i class="fas fa-file-invoice-dollar mr-2"></i>List Realisasi Upah</h3>
             </div>
             <div class="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
                 <a href="?page=boneless" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
                 </a>
-                <a href="?page=realisasi&aksi=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                <a href="?page=realisasi&aksi=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
@@ -41,10 +39,8 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Potongan Telat</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Potongan Istirahat</th>
-                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
+                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                         </tr>
@@ -75,12 +71,6 @@ $level_status = (!$is_authorized) ? "hidden" : "";
 
                                 <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
-                                </td>
-                                <td data-label="Potongan Telat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
-                                    Rp <?= number_format($data['pottelat'] ?? 0, 0, ',', '.') ?>
-                                </td>
-                                <td data-label="Potongan Istirahat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
-                                    Rp <?= number_format($data['potistirahat'] ?? 0, 0, ',', '.') ?>
                                 </td>
                                 <td data-label="Potongan Lainnya" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
@@ -225,10 +215,6 @@ $level_status = (!$is_authorized) ? "hidden" : "";
         border-color: #cbd5e1 !important;
     }
 
-    h3{
-        color: #2563eb !important;
-    }
-
     .dataTables_paginate .paginate_button.current {
         background: #2563eb !important;
         border-color: #2563eb !important;
@@ -334,9 +320,6 @@ $level_status = (!$is_authorized) ? "hidden" : "";
             width: auto;
         }
 
-        h3 {
-            color: #2563eb !important;
-        }
     }
     /* --- STYLING STEMPEL (STAMP) --- */
     .stamp {

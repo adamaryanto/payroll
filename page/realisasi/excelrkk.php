@@ -70,6 +70,13 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                     <th>Pot. Lain</th><th>Upah Setelah Potongan</th><th>Hasil Kerja</th>
                   </tr>";
 
+            // Ambil denda global
+            $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+            $d_denda = $q_denda->fetch_assoc();
+            $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
+            $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
+            $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
+
             // 4. Ambil data karyawan di departemen ini saja
             $tampil = $koneksi->query("SELECT 
     A.*, 
@@ -80,12 +87,15 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
     D.nama_departmen, 
     S.nama_sub_department, 
     RD.upah as upah,
+    RD.status_rkk,
+    J.shift_masuk, J.shift_keluar, J.shift_istirahat_masuk, J.shift_istirahat_keluar,
     $subquery_menggantikan as menggantikan,
     $subquery_digantikan_oleh as digantikan_oleh
     FROM tb_realisasi_detail A 
     JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
     JOIN ms_departmen D ON B.id_departmen = D.id_departmen
     LEFT JOIN ms_sub_department S ON B.id_sub_department = S.id_sub_department
+    LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
     /* JOIN ke tabel tb_rkk_detail agar bisa akses field upah */
     LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
     WHERE A.id_realisasi = '$id' 
@@ -95,19 +105,29 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $total_dept = 0; // Use a specific variable for department total
             $jml_karyawan = 0;
             while ($data = $tampil->fetch_assoc()) {
-                $potongan = $data['r_potongan_telat'] + $data['r_potongan_istirahat'] + $data['r_potongan_lainnya'];
+                // Logika Pelanggaran Dinamis
+                $isLate = (!empty($data['r_jam_masuk']) && $data['r_jam_masuk'] != '00:00:00' && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && strtotime($data['r_jam_masuk']) > strtotime($data['ra_masuk']));
+                $isEarlyOut = (!empty($data['r_jam_keluar']) && $data['r_jam_keluar'] != '00:00:00' && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00' && strtotime($data['r_jam_keluar']) < strtotime($data['ra_keluar']));
+                $isLateBreak = (!empty($data['r_istirahat_masuk']) && $data['r_istirahat_masuk'] != '00:00:00' && !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00' && strtotime($data['r_istirahat_masuk']) > strtotime($data['ra_istirahat_masuk']));
+
+                $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+                $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+                $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+
+                $potTotalDynamic = $potTelatValue + $potIstirahatValue + $potPulangValue + $data['r_potongan_lainnya'];
                 $lembur = $data['lembur'] ?? 0;
                 
-                if (!empty($data['digantikan_oleh'])) {
+                if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
                     $data['upah'] = 0;
-                    $data['r_potongan_telat'] = 0;
-                    $data['r_potongan_istirahat'] = 0;
+                    $potTelatValue = 0;
+                    $potIstirahatValue = 0;
+                    $potPulangValue = 0;
                     $data['r_potongan_lainnya'] = 0;
-                    $potongan = 0;
+                    $potTotalDynamic = 0;
                     $lembur = 0;
                 }
                 
-                $upah_dibayar = $data['upah'] - $potongan + $lembur;
+                $upah_dibayar = $data['upah'] - $potTotalDynamic + $lembur;
                 
                 $total_dept += $upah_dibayar;
                 $grand_upah_total += $upah_dibayar;
@@ -133,10 +153,10 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                         <td>{$data['r_istirahat_keluar']}</td>
                         <td>{$data['r_istirahat_masuk']}</td>
                         <td>{$data['upah']}</td>
-                        <td>{$data['r_potongan_telat']}</td>
-                        <td>{$data['r_potongan_istirahat']}</td>
+                        <td>{$potTelatValue}</td>
+                        <td>{$potIstirahatValue}</td>
                         <td>{$data['r_potongan_lainnya']}</td>
-                        <td>" . number_format($data['upah'] - $potongan, 0, ',', '.') . "</td>
+                        <td>" . number_format($data['upah'] - $potTotalDynamic, 0, ',', '.') . "</td>
                         <td>{$data['hasil_kerja']}</td>
                       </tr>";
                 $no++;

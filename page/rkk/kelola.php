@@ -195,10 +195,6 @@ if ($datastatusrkk == 3) {
     border-color: #cbd5e1 !important;
   }
 
-  h3 {
-    color: #2563eb !important;
-  }
-
   .dataTables_paginate .paginate_button.current {
     background: #2563eb !important;
     border-color: #2563eb !important;
@@ -285,7 +281,7 @@ if ($datastatusrkk == 3) {
 <div class="container-fluid px-3 mt-4 mb-4">
   <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
     <div class="border-b border-gray-200 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <h3 class="text-xl font-bold text-indigo-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
+      <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
 
       <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
         <a href="?page=rkk" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
@@ -303,7 +299,7 @@ if ($datastatusrkk == 3) {
           <?php endif; ?>
         <?php endif; ?>
 
-        <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+        <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
           <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
         </a>
       </div>
@@ -371,7 +367,7 @@ if ($datastatusrkk == 3) {
                     <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
                       <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full">Digantikan</span>
                     <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
-                      <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded-full">Pengganti</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">Pengganti</span>
                     <?php endif; ?>
                   </div>
                 </td>

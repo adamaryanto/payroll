@@ -3,8 +3,8 @@
 
         <div class="border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center bg-white gap-4">
             <div>
-                <h3 class="text-xl font-bold m-0"><i class="fas fa-user-tie mr-2"></i>Data Karyawan (SIAC)</h3>
-                <p class="text-xs text-gray-500 mt-1">Kelola data sakit, ijin, alfa, dan cuti karyawan</p>
+                <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-user-tie mr-2"></i>Data Karyawan (SIAC)</h3>
+                <p class="text-xs text-gray-500 mt-1">Kelola data sakit, izin, alfa, dan cuti karyawan</p>
             </div>
         </div>
 
@@ -59,12 +59,12 @@
                                     <div class="flex flex-wrap gap-1.5 md:justify-center">
                                         <a href="?page=siac&aksi=sakit&id=<?= $datakaryawan['id_karyawan'] ?>"
                                             class="flex items-center px-3 py-2 text-[12px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-all">
-                                            <i class="fas fa-procedures mr-1"></i> Sakit
+                                            <i class="fas fa-user-injured mr-1"></i> Sakit
                                         </a>
 
                                         <a href="?page=siac&aksi=ijin&id=<?= $datakaryawan['id_karyawan'] ?>"
                                             class="flex items-center px-3 py-2 text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-all">
-                                            <i class="fas fa-clipboard-check mr-1"></i> Izin
+                                            <i class="fas fa-clock mr-1"></i> Izin
                                         </a>
 
                                         <a href="?page=siac&aksi=alfa&id=<?= $datakaryawan['id_karyawan'] ?>"
@@ -74,7 +74,7 @@
 
                                         <a href="?page=siac&aksi=cuti&id=<?= $datakaryawan['id_karyawan'] ?>"
                                             class="flex items-center px-3 py-2 text-[12px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded border border-indigo-300 transition-all">
-                                            <i class="fas fa-umbrella-beach mr-1"></i> Cuti
+                                            <i class="fas fa-plane-departure mr-1"></i> Cuti
                                         </a>
                                     </div>
                                 </td>
@@ -205,10 +205,6 @@
         border-color: #cbd5e1 !important;
     }
 
-    h3 {
-        color: #2563eb !important;
-    }
-
     .dataTables_paginate .paginate_button.current {
         background: #2563eb !important;
         border-color: #2563eb !important;
@@ -232,6 +228,7 @@
        KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
        ========================================= */
     @media screen and (max-width: 768px) {
+        
         .table-responsive {
             padding: 12px !important;
         }
@@ -326,10 +323,6 @@
             padding: 10px !important;
             /* Area klik jadi besar */
             width: 100%;
-        }
-
-        h3 {
-            color: #2563eb !important;
         }
     }
 </style>

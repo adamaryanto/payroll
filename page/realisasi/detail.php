@@ -64,6 +64,7 @@ if (isset($_GET['id'])) {
     $dataDenda = $queryDenda->fetch_assoc();
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
     $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
+    $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
 
     // Logika Perhitungan Potongan Otomatis
     $jamMasukAbsensi = strtotime($datadetailabsen['absen_masuk'] ?? '');
@@ -73,6 +74,10 @@ if (isset($_GET['id'])) {
     $jamIstirahatMasukAbsensi = strtotime($datadetailabsen['istirahat_masuk'] ?? '');
     $jamIstirahatRKK          = strtotime($datadetailrkk['istirahat_masuk'] ?? '');
     $hasilpotonganistirahat   = ($jamIstirahatMasukAbsensi > $jamIstirahatRKK && $jamIstirahatMasukAbsensi && $jamIstirahatRKK) ? $globalDendaIstirahat : 0;
+
+    $jamKeluarAbsensi = strtotime($datadetailabsen['absen_keluar'] ?? '');
+    $jamKeluarRKK     = strtotime($datadetailrkk['jam_keluar'] ?? '');
+    $hasilpotonganpulang = ($jamKeluarAbsensi < $jamKeluarRKK && $jamKeluarAbsensi && $jamKeluarRKK) ? $globalDendaPulang : 0;
 
     // Tentukan data mana yang ditampilkan (Manual vs Auto)
     if($status_realisasi_detail == 0){
@@ -85,8 +90,11 @@ if (isset($_GET['id'])) {
         $hasilabsenkeluar = $datadetail['ra_keluar'];
         $hasilabsenistirahatmasuk = $datadetail['ra_istirahat_masuk'];
         $hasilabsenistirahatkeluar = $datadetail['ra_istirahat_keluar'];
-        $hasilpotongantelat = $datadetail['r_potongan_telat'];
-        $hasilpotonganistirahat = $datadetail['r_potongan_istirahat'];
+        // Deductions are now calculated dynamically from log times vs global settings
+        // and do not exist in the database table anymore.
+        $hasilpotongantelat = $hasilpotongantelat; 
+        $hasilpotonganistirahat = $hasilpotonganistirahat;
+        $hasilpotonganpulang = $hasilpotonganpulang;
     }
 }
 ?>
@@ -131,7 +139,6 @@ if (isset($_GET['id'])) {
         box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
     }
     label { font-size: 0.75rem; color: #6b7280; margin-bottom: 8px; font-weight: 600; }
-    h3 { color: #2563eb; margin: 0 0 20px 0; font-weight: 800; }
     
     /* Tombol Modern */
     .btn-custom { padding: 10px 20px; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
@@ -145,7 +152,7 @@ if (isset($_GET['id'])) {
     <div class="col-md-12">
         <form method="POST" enctype="multipart/form-data">
             <div class="card-modern">
-                <h3><i class="fas fa-clipboard-check mr-2"></i> Detail Realisasi Upah</h3>
+                <h3 class="text-blue-600 font-bold"><i class="fas fa-clipboard-check mr-2"></i> Detail Realisasi Upah</h3>
 
                 <div class="section-divider">Rencana Kerja (RKK)</div>
                 <div class="row">
@@ -204,11 +211,12 @@ if (isset($_GET['id'])) {
                 </div>
 
                 <div class="row">
-                    <div class="form-group col-md-3"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. PULANG</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. LAINNYA</label> <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required> </div>
-                    <div class="form-group col-md-3"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
+                    <div class="form-group col-md-2"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
                 </div>
 
                 <div class="row">
@@ -239,6 +247,7 @@ if (isset($_POST['simpan'])) {
     $tshift = $_POST['tshift'];
     $tpottelat = $_POST['tpottelat'];
     $tpotistirahat = $_POST['tpotistirahat'];
+    $tpotpulang = $_POST['tpotpulang'];
     $tpotlainnya = $_POST['tpotlainnya'];
     $tjammasuk = $_POST['tjammasuk'];
     $tjamkeluar = $_POST['tjamkeluar'];
@@ -250,8 +259,6 @@ if (isset($_POST['simpan'])) {
     $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
         r_upah = '$tupah', 
         id_jadwal = '$tshift',
-        r_potongan_telat = '$tpottelat',
-        r_potongan_istirahat = '$tpotistirahat',
         r_potongan_lainnya = '$tpotlainnya',
         ra_masuk = '$tjammasuk',
         ra_keluar = '$tjamkeluar',

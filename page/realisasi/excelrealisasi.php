@@ -58,6 +58,13 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 <?php echo $info['jam_masuk'] . " / " . $info['jam_keluar']; ?></td>
             </th>
         </tr>
+        <?php
+        $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+        $d_denda = $q_denda->fetch_assoc();
+        $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
+        $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
+        $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
+        ?>
     </thead>
     <tbody>
         <?php
@@ -107,6 +114,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             J.jam_keluar,
             J.istirahat_masuk,
             J.istirahat_keluar,
+            RD.status_rkk,
             $subquery_menggantikan as menggantikan,
             $subquery_digantikan_oleh as digantikan_oleh
             FROM tb_realisasi_detail A 
@@ -122,16 +130,24 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $total = 0;
             $jml_karyawan = 0;
             while ($data = $tampil->fetch_assoc()) {
-                $potongan = $data['r_potongan_telat'] +
-                    $data['r_potongan_istirahat'] +
-                    $data['r_potongan_lainnya'];
+                // Logika Pelanggaran Dinamis
+                $isLate = (!empty($data['r_jam_masuk']) && $data['r_jam_masuk'] != '00:00:00' && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && strtotime($data['r_jam_masuk']) > strtotime($data['ra_masuk']));
+                $isEarlyOut = (!empty($data['r_jam_keluar']) && $data['r_jam_keluar'] != '00:00:00' && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00' && strtotime($data['r_jam_keluar']) < strtotime($data['ra_keluar']));
+                $isLateBreak = (!empty($data['r_istirahat_masuk']) && $data['r_istirahat_masuk'] != '00:00:00' && !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00' && strtotime($data['r_istirahat_masuk']) > strtotime($data['ra_istirahat_masuk']));
+
+                $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+                $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+                $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+
+                $potongan = $potTelatValue + $potIstirahatValue + $potPulangValue + $data['r_potongan_lainnya'];
 
                 $lembur = $data['lembur'] ?? 0;
 
-                if (!empty($data['digantikan_oleh'])) {
+                if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
                     $data['upah'] = 0;
-                    $data['r_potongan_telat'] = 0;
-                    $data['r_potongan_istirahat'] = 0;
+                    $potTelatValue = 0;
+                    $potIstirahatValue = 0;
+                    $potPulangValue = 0;
                     $data['r_potongan_lainnya'] = 0;
                     $potongan = 0;
                     $lembur = 0;
@@ -141,7 +157,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $total += $upah_dibayar;
                 $grand_total += $upah_dibayar;
 
-                if (empty($data['digantikan_oleh'])) {
+                if (empty($data['digantikan_oleh']) && $data['status_rkk'] != 'Tidak Hadir') {
                     $jml_karyawan++;
                     $grand_karyawan++;
                 }
@@ -195,10 +211,17 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 $rekap = $koneksi->query("
 SELECT 
 B.OS_DHK,
-SUM(CASE WHEN $subquery_digantikan_oleh IS NOT NULL THEN 0 ELSE (RD.upah - (A.r_potongan_telat + A.r_potongan_istirahat + A.r_potongan_lainnya) + IFNULL(A.lembur, 0)) END) as total_upah
+SUM(CASE WHEN $subquery_digantikan_oleh IS NOT NULL OR RD.status_rkk = 'Tidak Hadir' THEN 0 
+    ELSE (RD.upah - (
+        IF(A.r_jam_masuk > J.shift_masuk AND A.r_jam_masuk != '00:00:00' AND A.ra_masuk != '00:00:00', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0) + 
+        IF(A.r_istirahat_masuk > J.shift_istirahat_masuk AND A.r_istirahat_masuk != '00:00:00' AND A.ra_istirahat_masuk != '00:00:00', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0) + 
+        IF(A.r_jam_keluar < J.shift_keluar AND A.r_jam_keluar != '00:00:00' AND A.ra_keluar != '00:00:00', (SELECT denda_pulang FROM tb_denda LIMIT 1), 0) + 
+        A.r_potongan_lainnya
+    ) + IFNULL(A.lembur, 0)) END) as total_upah
 FROM tb_realisasi_detail A
 JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
+LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
 WHERE A.id_realisasi = '$id'
 GROUP BY B.OS_DHK
 ");
