@@ -94,7 +94,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                         ?>
                             <tr class="<?= $row_class ?>">
                                 <td data-label="No" class="md:text-center text-sm md:text-[15px] text-gray-700 font-medium align-middle"><?= $no ?></td>
-                                <td data-label="Tanggal" class="py-2 md:py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= date('d/m/y', strtotime($data['tgl_realisasi'])) ?></td>
+                                <td data-label="Tanggal" class="py-2 md:py-2.5 px-2 text-[15px] font-medium text-gray-900 align-middle whitespace-nowrap"><?= date('d/m/Y', strtotime($data['tgl_realisasi'])) ?></td>
                                 <td data-label="Keterangan" class="py-2 md:py-2.5 px-2 align-middle">
                                     <div class="text-[14px] text-gray-700 md:max-w-[150px] md:truncate" title="<?= htmlspecialchars($data['keterangan']) ?>">
                                         <?= htmlspecialchars($data['keterangan']) ?>

@@ -150,7 +150,7 @@ if (!function_exists('rupiah')) {
                             <div class="row">
                                 <div class="col-md-3 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Tanggal</label>
-                                    <input readonly type="text" value="<?php echo date('d/m/y', strtotime($datatglrkk)); ?>" class="form-control text-base py-2" />
+                                    <input readonly type="text" value="<?php echo date('d/m/Y', strtotime($datatglrkk)); ?>" class="form-control text-base py-2" />
                                 </div>
                                 <div class="col-md-6 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Keterangan</label>
@@ -168,7 +168,7 @@ if (!function_exists('rupiah')) {
                             <div class="row">
                                 <div class="col-md-3 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Tanggal</label>
-                                    <input readonly type="text" name="ttgl1" value="<?php echo date('d/m/y', strtotime($datatglrealisasi)); ?>" class="form-control text-base py-2" />
+                                    <input readonly type="text" name="ttgl1" value="<?php echo date('d/m/Y', strtotime($datatglrealisasi)); ?>" class="form-control text-base py-2" />
                                 </div>
                                 <div class="col-md-6 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Keterangan</label>

@@ -309,7 +309,7 @@ if ($datastatusrkk == 3) {
       <div class="row">
         <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
           <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
-          <input type="text" value="<?= date('d/m/y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
+          <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
         </div>
         <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
           <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
