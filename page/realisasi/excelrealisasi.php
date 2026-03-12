@@ -53,7 +53,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         </tr>
         <tr>
             <th colspan="14" style="text-align:center; font-size:16px;">
-                Tanggal Realisasi: <?php echo $info['tgl_realisasi'] ?? '-'; ?> |
+                Tanggal Realisasi: <?php echo $info['tgl_realisasi'] ? date('d/m/Y', strtotime($info['tgl_realisasi'])) : '-'; ?> |
                 Jam Kerja: <?php echo $info['jam_kerja'] ?? '-'; ?> |
                 <?php echo $info['jam_masuk'] . " / " . $info['jam_keluar']; ?></td>
             </th>
@@ -223,7 +223,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 <table border="1" style="border-collapse:collapse; width:600px;">
     <thead>
         <tr style="background-color:#dbe5f1; font-weight:bold;">
-            <th colspan="3" style="height:30px; font-size:14px; text-align:center;">REALISASI TOTAL REKAP OUTSOURCING CIKUPA <?php echo $info['tgl_realisasi']; ?></th>
+            <th colspan="3" style="height:30px; font-size:14px; text-align:center;">REALISASI TOTAL REKAP OUTSOURCING CIKUPA <?php echo date('d/m/Y', strtotime($info['tgl_realisasi'])); ?></th>
         </tr>
     </thead>
     <tbody>
@@ -273,7 +273,7 @@ if ($bonelessHeader) {
             <thead>
                 <tr>
                     <th colspan='4' style='background-color:#4f81bd; color:white; text-align:center; font-weight:bold; height:30px; font-size:14px;'>
-                        DETAIL BONELESS - " . date('d-m-Y', strtotime($tanggal)) . "
+                        DETAIL BONELESS - " . date('d/m/Y', strtotime($tanggal)) . "
                     </th>
                 </tr>
                 <tr style='background-color:#dbe5f1; font-weight:bold;'>

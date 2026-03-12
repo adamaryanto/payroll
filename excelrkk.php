@@ -63,7 +63,7 @@ ORDER BY D.nama_departmen, K.nama_karyawan ASC
 $result = $koneksi->query($sql);
 $row1 = $result->fetch_assoc();
 echo "
-<table> <tr><td colspan= '15'  style='text-align:center;'>Realisasi Absensi Karyawan Tanggal " . $row1['tgl_rkk'] . "</td></tr>
+<table> <tr><td colspan= '15'  style='text-align:center;'>Realisasi Absensi Karyawan Tanggal " . date('d/m/Y', strtotime($row1['tgl_rkk'])) . "</td></tr>
 
 <tr><td colspan= '15'  style='text-align:center;'>JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
 
@@ -186,7 +186,7 @@ echo "<br><br>
 <table border='1' style='border-collapse:collapse; width:600px;'>
     <thead>
         <tr style='background-color:#dbe5f1; font-weight:bold;'>
-            <th colspan='3' style='height:30px; font-size:14px; text-align:center;'>REKAP OUTSOURCING CIKUPA " . $row1['tgl_rkk'] . "</th>
+            <th colspan='3' style='height:30px; font-size:14px; text-align:center;'>REKAP OUTSOURCING CIKUPA " . date('d/m/Y', strtotime($row1['tgl_rkk'])) . "</th>
         </tr>
     </thead>
     <tbody>
@@ -239,7 +239,7 @@ if ($bonelessHeader) {
             <thead>
                 <tr>
                     <th colspan='4' style='background-color:#4f81bd; color:white; text-align:center; font-weight:bold; height:30px; font-size:14px;'>
-                        DETAIL BONELESS - " . date('d-m-Y', strtotime($tanggal)) . "
+                        DETAIL BONELESS - " . date('d/m/Y', strtotime($tanggal)) . "
                     </th>
                 </tr>
                 <tr style='background-color:#dbe5f1; font-weight:bold;'>
