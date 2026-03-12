@@ -54,7 +54,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                 <h3 class="text-xl text-blue-600 font-bold m-0"><i class="fas fa-file-invoice-dollar mr-2"></i>List Realisasi Upah</h3>
             </div>
             <div class="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
-                <a href="?page=boneless" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
+                <a href="?page=boneless&view=1" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
                 </a>
                 <a href="?page=realisasi&aksi=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">

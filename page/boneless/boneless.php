@@ -10,12 +10,14 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                 <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-truck-loading mr-2"></i>Data Boneless</h3>
             </div>
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto mt-2 md:mt-0">
-                <a href="?page=realisasi" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+                <a href="javascript:history.back()" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
                     <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                 </a>
+                <?php if (!isset($_GET['view'])) : ?>
                 <a href="?page=boneless&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -53,9 +55,11 @@ $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detai
                                         <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center">
                                             <i class="fas fa-edit md:mr-1"></i> <span class="ml-1 md:inline">Lihat / Edit</span>
                                         </a>
+                                        <?php if (!isset($_GET['view'])) : ?>
                                         <a href="?page=boneless&aksi=hapus&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-rose-600 bg-rose-50 border border-rose-100 rounded hover:bg-rose-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center" onclick="return confirm('Hapus data ini? Semua rincian item juga akan terhapus.')">
                                             <i class="fas fa-trash md:mr-1"></i> <span class="ml-1 md:inline">Hapus</span>
                                         </a>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

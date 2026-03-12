@@ -290,8 +290,11 @@ if (strtolower($_SESSION['role']) == "owner") {
             <div>
                 <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
             </div>
-            <div class="w-full md:w-auto">
-                <a href="?page=rkk&aksi=tambah" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors w-full md:w-auto">
+            <div class="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
+                <a href="?page=boneless" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
+                    <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
+                </a>
+                <a href="?page=rkk&aksi=tambah" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
             </div>
