@@ -2,7 +2,7 @@
 // Query utama
 $where_real = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_realisasi != 'pending' " : "";
 $tampil = $koneksi->query("SELECT A.*, 
-    (select count(id_realisasi_detail) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as jml, 
+    (select count(RD.id_realisasi_detail) from tb_realisasi_detail RD join tb_rkk_detail RKD on RD.id_rkk_detail = RKD.id_rkk_detail where RD.id_realisasi = A.id_realisasi and RKD.status_rkk != 'Digantikan') as jml, 
     (select sum(r_upah) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as ttl, 
     (select sum(r_potongan_telat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as pottelat,
     (select sum(r_potongan_istirahat) from tb_realisasi_detail where id_realisasi = A.id_realisasi ) as potistirahat, 
@@ -10,8 +10,8 @@ $tampil = $koneksi->query("SELECT A.*,
     from tb_realisasi A $where_real");
 
 // Logika Akses: Hanya Owner yang bisa Approve/Unapprove Realisasi
-$role_akses = (strtolower($_SESSION['role']) == "owner");
-$level_status = (!$role_akses) ? "hidden" : "";
+$is_authorized = (strtolower($_SESSION['role']) == "owner");
+$level_status = (!$is_authorized) ? "hidden" : "";
 
 ?>
 
@@ -54,13 +54,9 @@ $level_status = (!$role_akses) ? "hidden" : "";
                         $no = 1;
                         while ($data = $tampil->fetch_assoc()) :
                             if ($data['status_realisasi'] == 'approve') {
-                                $app = "hidden";
-                                $print = "";
                                 $row_class = "bg-slate-50/40";
                                 $status_badge = '<span class="px-2 py-1 rounded bg-emerald-100 text-emerald-800 text-[13px] font-bold tracking-wide">ACC</span>';
                             } else {
-                                $app = "";
-                                $print = "hidden";
                                 $row_class = "hover:bg-gray-50 transition-colors";
                                 $status_badge = '<span class="px-2 py-1 rounded bg-amber-100 text-amber-800 text-[13px] font-bold tracking-wide">PEND</span>';
                             }
@@ -98,22 +94,22 @@ $level_status = (!$role_akses) ? "hidden" : "";
                                             <i class="fas fa-eye md:mr-1"></i> <span class="ml-1 md:inline">Detail</span>
                                         </a>
 
-                                        <!-- Approve/Unapprove: Only for Owner -->
-                                        <?php if (strtolower($_SESSION['role']) == "owner") : ?>
-                                            <?php if ($data['status_realisasi'] != 'approve') : ?>
-                                                <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
-                                                    class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
-                                                    onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
-                                                    <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
-                                                </a>
-                                            <?php else : ?>
-                                                <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi']; ?>"
-                                                    class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
-                                                    onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
-                                                    <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Unapprove</span>
-                                                </a>
-                                            <?php endif; ?>
-                                        <?php endif; ?>
+                                         <!-- Approve/Unapprove: Only for Owner -->
+                                         <?php if ($is_authorized) : ?>
+                                             <?php if ($data['status_realisasi'] != 'approve') : ?>
+                                                 <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
+                                                     class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
+                                                     onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
+                                                     <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
+                                                 </a>
+                                             <?php else : ?>
+                                                 <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi']; ?>&iddetail=unapp"
+                                                     class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
+                                                     onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
+                                                     <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Un-Approve</span>
+                                                 </a>
+                                             <?php endif; ?>
+                                         <?php endif; ?>
 
                                         <!-- Excel: Owner always, Others only if approved -->
                                         <?php if (strtolower($_SESSION['role']) == "owner" || $data['status_realisasi'] == 'approve') : ?>
@@ -125,13 +121,13 @@ $level_status = (!$role_akses) ? "hidden" : "";
                                     </div>
                                 </td>
 
-                                <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
-                                    <?php if ($data['status_realisasi'] == 'approve') : ?>
-                                        <div class="stamp stamp-approved">Approved</div>
-                                    <?php else : ?>
-                                        <div class="stamp stamp-unapproved">Unapproved</div>
-                                    <?php endif; ?>
-                                </td>
+                                 <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
+                                     <?php if ($data['status_realisasi'] == 'approve') : ?>
+                                         <div class="stamp stamp-approved">Approved</div>
+                                     <?php else : ?>
+                                         <div class="stamp stamp-unapproved">Unapproved</div>
+                                     <?php endif; ?>
+                                 </td>
                             </tr>
                         <?php $no++;
                         endwhile; ?>

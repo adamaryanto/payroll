@@ -7,7 +7,7 @@ $is_authorized = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSI
 $can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
 
 $where_rkk = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_rkk > 0 " : "";
-$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk ) as jml, (select sum(upah) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A $where_rkk");
+$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk and status_rkk != 'Digantikan' ) as jml, (select sum(case when status_rkk = 'Digantikan' then 0 else upah end) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A $where_rkk");
 if (strtolower($_SESSION['role']) != "owner") {
     $level_status =  "Hidden";
 } else {

@@ -221,19 +221,20 @@ if (!function_exists('rupiah')) {
                                 <?php
                                 $no = 1;
                                 $total = 0;
+                                $jml_active = 0;
 
                                 while ($data = $tampil->fetch_assoc()) {
                                     $upah = $data['upahkaryawan'];
-                                    $total += $upah;
 
                                     $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                         (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
 
-                                    $rowClass = $isFullMissing ? 'bg-red-custom' : '';
+                                    // Highlight if status is 'Tidak Hadir' or data is fully missing
+                                    $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || $isFullMissing) ? 'bg-red-custom' : '';
                                 ?>
-                                    <tr>
+                                    <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
-                                        <td data-label="NIK"><?php echo $data['no_absen']; ?></td>
+                                        <td data-label="No Absen"><?php echo $data['no_absen']; ?></td>
                                         <td data-label="Nama Karyawan">
                                             <strong><?php echo $data['nama_karyawan']; ?></strong>
                                             <?php if (!empty($data['menggantikan'])) : ?>
@@ -262,16 +263,15 @@ if (!function_exists('rupiah')) {
                                         <td data-label="Departemen"><?php echo $data['nama_departmen']; ?></td>
                                         <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                         <td data-label="OS/DHK"><?php echo $data['OS_DHK']; ?></td>
-                                        <td data-label="Gol"><?php echo $data['golongan']; ?></td>
-                                        <td data-label="Rec. Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
-                                        <td data-label="Rec. Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
-                                        <td data-label="Rec. Ist. K" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
-                                        <td data-label="Rec. Ist. M" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
-
-                                        <td data-label="Real. Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
-                                        <td data-label="Real. Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
-                                        <td data-label="Real. Ist. K" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
-                                        <td data-label="Real. Ist. M" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
+                                        <td data-label="Golongan"><?php echo $data['golongan']; ?></td>
+                                        <td data-label="Jam Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
+                                        <td data-label="Jam Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
+                                        <td data-label="Istirahat Keluar" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
+                                        <td data-label="Istirahat Masuk" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+                                        <td data-label="Absen Masuk" class="<?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $data['r_potongan_telat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_masuk']; ?></td>
+                                        <td data-label="Absen Pulang" class="<?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); ?>"><?php echo $data['ra_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Masuk" class="<?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $data['r_potongan_istirahat'] > 0) ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
                                         <td data-label="Upah Pokok" class="text-right">
                                             <?= rupiah($data['upah_rkk']) ?>
@@ -293,9 +293,11 @@ if (!function_exists('rupiah')) {
                                         }
                                         $upah_setelah_potongan = $data['upah_rkk'] + $data['lembur'] - $data['r_potongan_telat'] - $data['r_potongan_istirahat'] - $data['r_potongan_lainnya'];
                                         ?>
+                                        <?php if ($data['status_rkk'] != 'Digantikan') $jml_active++; ?>
                                         <td data-label="Upah Setelah Potongan" class="text-right font-black text-blue-700">
                                             <?= rupiah($upah_setelah_potongan) ?>
                                         </td>
+                                        <?php $total += $upah_setelah_potongan; ?>
 
                                         <td data-label="Hasil"><?php echo $data['hasil_kerja']; ?></td>
                                         <?php if (strtolower($_SESSION['role']) != 'admin hr') { ?>
@@ -314,7 +316,7 @@ if (!function_exists('rupiah')) {
                                 <?php
                                     $no++;
                                 }
-                                $jml_karyawan = $no - 1;
+                                $jml_karyawan = $jml_active;
                                 ?>
                             </tbody>
                         </table>
