@@ -110,6 +110,11 @@ $total_potongan_telat = 0;
 $total_potongan_istirahat = 0;
 $total_potongan_lainnya = 0;
 $total_akhir = 0;
+$total_tagihan_os = 0;
+$total_tagihan_dhk = 0;
+$total_tagihan_wjs = 0;
+$total_tagihan_rka = 0;
+$total_tagihan_mhs = 0;
 
 while ($row = $result->fetch_assoc()) {
     if (!empty($row['digantikan_oleh'])) {
@@ -145,6 +150,20 @@ while ($row = $result->fetch_assoc()) {
     $total_potongan_istirahat += $row['potongan_istirahat'];
     $total_potongan_lainnya += $row['potongan_lainnya'];
     $total_akhir += $upah_bersih;
+    
+    // Track Outsourcing categories
+    if ($row['OS_DHK'] == 'OS') {
+        $total_tagihan_os += $upah_bersih;
+    } elseif ($row['OS_DHK'] == 'DHK') {
+        $total_tagihan_dhk += $upah_bersih;
+    } elseif ($row['OS_DHK'] == 'WJS') {
+        $total_tagihan_wjs += $upah_bersih;
+    } elseif ($row['OS_DHK'] == 'RKA') {
+        $total_tagihan_rka += $upah_bersih;
+    } elseif ($row['OS_DHK'] == 'MHS') {
+        $total_tagihan_mhs += $upah_bersih;
+    }
+    
     $no++;
 }
 
@@ -161,3 +180,126 @@ echo "
     </tr>
 </tfoot>
 </table>";
+
+// REKAP OUTSOURCING
+echo "<br><br>
+<table border='1' style='border-collapse:collapse; width:600px;'>
+    <thead>
+        <tr style='background-color:#dbe5f1; font-weight:bold;'>
+            <th colspan='3' style='height:30px; font-size:14px; text-align:center;'>REKAP OUTSOURCING CIKUPA " . $row1['tgl_rkk'] . "</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style='font-weight:bold;'>
+            <td style='width:300px; height:25px;'>BIAYA TAGIHAN OS</td>
+            <td style='width:50px; text-align:center;'>Rp</td>
+            <td style='width:250px; text-align:right;'>" . number_format($total_tagihan_os, 0, ',', '.') . "</td>
+        </tr>
+        <tr style='font-weight:bold;'>
+            <td style='height:25px;'>BIAYA TAGIHAN DHK</td>
+            <td style='text-align:center;'>Rp</td>
+            <td style='text-align:right;'>" . number_format($total_tagihan_dhk, 0, ',', '.') . "</td>
+        </tr>
+        <tr style='font-weight:bold;'>
+            <td style='height:25px;'>BIAYA TAGIHAN WJS</td>
+            <td style='text-align:center;'>Rp</td>
+            <td style='text-align:right;'>" . number_format($total_tagihan_wjs, 0, ',', '.') . "</td>
+        </tr>
+        <tr style='font-weight:bold;'>
+            <td style='height:25px;'>BIAYA TAGIHAN RKA</td>
+            <td style='text-align:center;'>Rp</td>
+            <td style='text-align:right;'>" . number_format($total_tagihan_rka, 0, ',', '.') . "</td>
+        </tr>
+        <tr style='font-weight:bold;'>
+            <td style='height:25px;'>BIAYA TAGIHAN MHS</td>
+            <td style='text-align:center;'>Rp</td>
+            <td style='text-align:right;'>" . number_format($total_tagihan_mhs, 0, ',', '.') . "</td>
+        </tr>
+        <tr style='background-color:yellow; font-weight:bold;'>
+            <td style='height:30px; font-size:16px;'>Rp</td>
+            <td colspan='2' style='text-align:right; font-size:16px;'>" . number_format($total_tagihan_os + $total_tagihan_dhk + $total_tagihan_wjs + $total_tagihan_rka + $total_tagihan_mhs, 0, ',', '.') . "</td>
+        </tr>
+    </tbody>
+</table>";
+
+// 3. Ambil data Boneless untuk tanggal yang sama
+$queryRKK = $koneksi->query("SELECT tgl_rkk FROM tb_rkk WHERE id_rkk = '$id'");
+$rkkInfo = $queryRKK->fetch_assoc();
+$tanggal = $rkkInfo['tgl_rkk'] ?? '';
+
+$queryBoneless = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal'");
+$bonelessHeader = $queryBoneless->fetch_assoc();
+
+if ($bonelessHeader) {
+    $id_boneless = $bonelessHeader['id_boneless'];
+    $queryBonelessDetail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
+    
+    echo "<br><br>";
+    echo "<table border='1' style='border-collapse:collapse; width:900px;'>
+            <thead>
+                <tr>
+                    <th colspan='4' style='background-color:#4f81bd; color:white; text-align:center; font-weight:bold; height:30px; font-size:14px;'>
+                        DETAIL BONELESS - " . date('d-m-Y', strtotime($tanggal)) . "
+                    </th>
+                </tr>
+                <tr style='background-color:#dbe5f1; font-weight:bold;'>
+                    <th style='width:50px;'>No</th>
+                    <th style='width:400px;'>Nama Item</th>
+                    <th style='width:150px;'>Qty / Harga</th>
+                    <th style='width:200px;'>Total</th>
+                </tr>
+            </thead>
+            <tbody>";
+    
+    $no_b = 1;
+    $total_boneless = 0;
+    while ($item = $queryBonelessDetail->fetch_assoc()) {
+        $total_boneless += $item['total'];
+        echo "<tr>
+                <td style='text-align:center;'>$no_b</td>
+                <td>" . strtoupper($item['nama_item']) . "</td>
+                <td style='text-align:center;'>" . number_format($item['qty'], 1, ',', '.') . " x Rp" . number_format($item['harga'], 0, ',', '.') . "</td>
+                <td style='text-align:right;'>Rp " . number_format($item['total'], 0, ',', '.') . "</td>
+              </tr>";
+        $no_b++;
+    }
+    
+    echo "      <tr style='font-weight:bold; background-color:#f1f5f9;'>
+                    <td colspan='3' style='text-align:center;'>TOTAL BONELESS</td>
+                    <td style='text-align:right;'>Rp " . number_format($total_boneless, 0, ',', '.') . "</td>
+                </tr>
+            </tbody>
+          </table>";
+
+    // Summary Table
+    $biaya_pabrik = $total_akhir;
+    $potong = $bonelessHeader['jumlah_mobil'];
+    $combined_total = $biaya_pabrik + $total_boneless;
+    $biaya_per_mobil = ($potong > 0) ? ($combined_total / $potong) : 0;
+
+    echo "<br><br>
+    <table border='1' style='border-collapse:collapse;'>
+        <thead>
+            <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
+                <th style='width:250px; height:25px;'>BIAYA PABRIK</th>
+                <th style='width:100px;'></th>
+                <th style='width:100px;'></th>
+                <th style='width:150px;'>BONLESS</th>
+                <th style='width:150px;'>POTONG</th>
+                <th style='width:200px;'>TOTAL</th>
+                <th style='width:250px;'>Biaya Per mobil</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style='font-weight:bold; text-align:center; height:30px; font-size:14px;'>
+                <td style='text-align:right;'>" . number_format($biaya_pabrik, 0, ',', '.') . "</td>
+                <td></td>
+                <td></td>
+                <td style='text-align:right;'>" . number_format($total_boneless, 0, ',', '.') . "</td>
+                <td>$potong</td>
+                <td style='text-align:right;'>" . number_format($combined_total, 0, ',', '.') . "</td>
+                <td style='text-align:right;'>Rp" . number_format($biaya_per_mobil, 0, ',', '.') . "</td>
+            </tr>
+        </tbody>
+    </table>";
+}

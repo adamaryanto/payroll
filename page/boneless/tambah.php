@@ -67,13 +67,13 @@ $default_items = [
                     <form method="POST">
                         <div class="row mb-2">
                             <div class="col-md-4 form-group mb-3 md:mb-0">
-                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Realisasi</label>
+                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Rencana</label>
                                 <select name="tgl" class="form-control h-[42px]" required>
-                                    <option value="">-- Pilih Realisasi --</option>
+                                    <option value="">-- Pilih Rencana --</option>
                                     <?php
-                                    $sql_realisasi = $koneksi->query("SELECT * FROM tb_realisasi ORDER BY tgl_realisasi DESC");
-                                    while ($row_realisasi = $sql_realisasi->fetch_assoc()) {
-                                        echo '<option value="' . $row_realisasi['tgl_realisasi'] . '">' . date('d-m-Y', strtotime($row_realisasi['tgl_realisasi'])) . ' - ' . $row_realisasi['keterangan'] . '</option>';
+                                    $sql_rkk = $koneksi->query("SELECT * FROM tb_rkk ORDER BY tgl_rkk DESC");
+                                    while ($row_rkk = $sql_rkk->fetch_assoc()) {
+                                        echo '<option value="' . $row_rkk['tgl_rkk'] . '">' . date('d-m-Y', strtotime($row_rkk['tgl_rkk'])) . ' - ' . $row_rkk['keterangan'] . '</option>';
                                     }
                                     ?>
                                 </select>

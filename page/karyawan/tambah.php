@@ -137,6 +137,8 @@ if (isset($_POST['simpan'])) {
                                 <option value="OS">OS</option>
                                 <option value="DHK">DHK</option>
                                 <option value="WJS">WJS</option>
+                                <option value="RKA">RKA</option>
+                                <option value="MHS">MHS</option>
                             </select>
                         </div>
 

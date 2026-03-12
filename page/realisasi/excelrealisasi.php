@@ -69,6 +69,11 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         <?php
         $grand_total = 0;
         $grand_karyawan = 0;
+        $total_tagihan_os = 0;
+        $total_tagihan_dhk = 0;
+        $total_tagihan_wjs = 0;
+        $total_tagihan_rka = 0;
+        $total_tagihan_mhs = 0;
         // 1. Ambil list departemen terlebih dahulu
         $sqlDept = $koneksi->query("SELECT * FROM ms_departmen");
         while ($dept = $sqlDept->fetch_assoc()) {
@@ -153,6 +158,19 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 if (empty($data['digantikan_oleh']) && $data['status_rkk'] != 'Tidak Hadir') {
                     $jml_karyawan++;
                     $grand_karyawan++;
+                    
+                    // Track Outsourcing categories
+                    if ($data['OS_DHK'] == 'OS') {
+                        $total_tagihan_os += $upah_dibayar;
+                    } elseif ($data['OS_DHK'] == 'DHK') {
+                        $total_tagihan_dhk += $upah_dibayar;
+                    } elseif ($data['OS_DHK'] == 'WJS') {
+                        $total_tagihan_wjs += $upah_dibayar;
+                    } elseif ($data['OS_DHK'] == 'RKA') {
+                        $total_tagihan_rka += $upah_dibayar;
+                    } elseif ($data['OS_DHK'] == 'MHS') {
+                        $total_tagihan_mhs += $upah_dibayar;
+                    }
                 }
 
                 $nama_display = $data['nama_karyawan'];
@@ -200,58 +218,45 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
 </table>
 
-<?php
-$rekap = $koneksi->query("
-SELECT 
-B.OS_DHK,
-SUM(CASE WHEN $subquery_digantikan_oleh IS NOT NULL OR RD.status_rkk = 'Tidak Hadir' THEN 0 
-    ELSE (A.r_upah - (
-        IF(A.ra_masuk > J.jam_masuk AND A.ra_masuk != '00:00:00' AND A.ra_masuk != '' AND J.jam_masuk != '00:00:00' AND J.jam_masuk != '', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0) + 
-        IF(A.ra_istirahat_masuk > J.istirahat_masuk AND A.ra_istirahat_masuk != '00:00:00' AND A.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0) + 
-        A.r_potongan_lainnya
-    ) + IFNULL(A.lembur, 0)) END) as total_upah
-FROM tb_realisasi_detail A
-JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
-LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
-LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
-WHERE A.id_realisasi = '$id'
-GROUP BY B.OS_DHK
-");
-?>
-
-<br><br><br>
-
-<table border="1" style="border-collapse:collapse; width:900px;">
-
-    <tr>
-        <td colspan="3" style="background:#dbe5f1; font-weight:bold; text-align:center;">
-            REALISASI TOTAL REKAP OUTSOURCING CIKUPA <?php echo $info['tgl_realisasi']; ?>
-        </td>
-    </tr>
-
-    <?php
-    $total_semua = 0;
-
-    while ($row = $rekap->fetch_assoc()) {
-
-        $total = $row['total_upah'];
-        $total_semua += $total;
-
-        echo "<tr>
-<td style='font-weight:bold;'>BIAYA TAGIHAN {$row['OS_DHK']}</td>
-<td style='text-align:center;'>Rp</td>
-<td style='text-align:right;'>" . number_format($total, 0, ",", ".") . "</td>
-</tr>";
-    }
-    ?>
-
-    <tr>
-        <td colspan="2" style="background:yellow; font-weight:bold;">Rp</td>
-        <td style="background:yellow; font-weight:bold; text-align:right;">
-            <?php echo number_format($total_semua, 0, ",", "."); ?>
-        </td>
-    </tr>
-
+<!-- REKAP OUTSOURCING -->
+<br><br>
+<table border="1" style="border-collapse:collapse; width:600px;">
+    <thead>
+        <tr style="background-color:#dbe5f1; font-weight:bold;">
+            <th colspan="3" style="height:30px; font-size:14px; text-align:center;">REALISASI TOTAL REKAP OUTSOURCING CIKUPA <?php echo $info['tgl_realisasi']; ?></th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="font-weight:bold;">
+            <td style="width:300px; height:25px;">BIAYA TAGIHAN OS</td>
+            <td style="width:50px; text-align:center;">Rp</td>
+            <td style="width:250px; text-align:right;"><?php echo number_format($total_tagihan_os, 0, ',', '.'); ?></td>
+        </tr>
+        <tr style="font-weight:bold;">
+            <td style="height:25px;">BIAYA TAGIHAN DHK</td>
+            <td style="text-align:center;">Rp</td>
+            <td style="text-align:right;"><?php echo number_format($total_tagihan_dhk, 0, ',', '.'); ?></td>
+        </tr>
+        <tr style="font-weight:bold;">
+            <td style="height:25px;">BIAYA TAGIHAN WJS</td>
+            <td style="text-align:center;">Rp</td>
+            <td style="text-align:right;"><?php echo number_format($total_tagihan_wjs, 0, ',', '.'); ?></td>
+        </tr>
+        <tr style="font-weight:bold;">
+            <td style="height:25px;">BIAYA TAGIHAN RKA</td>
+            <td style="text-align:center;">Rp</td>
+            <td style="text-align:right;"><?php echo number_format($total_tagihan_rka, 0, ',', '.'); ?></td>
+        </tr>
+        <tr style="font-weight:bold;">
+            <td style="height:25px;">BIAYA TAGIHAN MHS</td>
+            <td style="text-align:center;">Rp</td>
+            <td style="text-align:right;"><?php echo number_format($total_tagihan_mhs, 0, ',', '.'); ?></td>
+        </tr>
+        <tr style="background-color:yellow; font-weight:bold;">
+            <td style="height:30px; font-size:16px;">Rp</td>
+            <td colspan="2" style="text-align:right; font-size:16px;"><?php echo number_format($total_tagihan_os + $total_tagihan_dhk + $total_tagihan_wjs + $total_tagihan_rka + $total_tagihan_mhs, 0, ',', '.'); ?></td>
+        </tr>
+    </tbody>
 </table>
 
 <?php
