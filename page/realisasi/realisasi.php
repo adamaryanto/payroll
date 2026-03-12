@@ -366,10 +366,12 @@ $level_status = (!$is_authorized) ? "hidden" : "";
     }
     @media screen and (max-width: 768px) {
         .stamp {
-            transform: rotate(0deg);
-            margin: 5px 0;
+            transform: rotate(-12deg); /* Tetap miring sedikit di mobile */
+            margin: 15px 0;
             font-size: 14px;
-            padding: 2px 10px;
+            padding: 4px 12px;
+            display: inline-block;
+            align-self: center;
         }
     }
 </style>
