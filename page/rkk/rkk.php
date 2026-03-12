@@ -322,7 +322,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                         ?>
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td data-label="No" class="py-3 px-2 text-center text-base md:text-[15px] font-bold md:font-normal"><?= $no++ ?></td>
-                                <td data-label="Tanggal" class="py-3 px-2 text-base md:text-[15px] font-bold text-gray-900"><?= $data['tgl_rkk'] ?></td>
+                                <td data-label="Tanggal" class="py-3 px-2 text-base md:text-[15px] font-bold text-gray-900"><?= date('d/m/y', strtotime($data['tgl_rkk'])) ?></td>
                                 <td data-label="Keterangan" class="py-3 px-2 text-base md:text-[14px] text-gray-700"><?= $data['keterangan'] ?></td>
                                 <td data-label="Jumlah Karyawan" class="py-3 px-2 md:text-center text-base md:text-[15px]">
                                     <span class="font-bold text-blue-700"><?= $data['jml'] ?> Orang</span><br>
