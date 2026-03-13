@@ -89,6 +89,13 @@ if (isset($_GET['id'])) {
         $upahPokokTampil = 0;
     }
 }
+
+if (!function_exists('rupiah')) {
+    function rupiah($angka) {
+        if ($angka === null || $angka === "") $angka = 0;
+        return "Rp " . number_format($angka, 0, ',', '.');
+    }
+}
 ?>
 
 <style>
