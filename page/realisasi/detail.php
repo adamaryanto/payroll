@@ -14,13 +14,14 @@ if (isset($_GET['id'])) {
                            BB.no_absen, 
                            BB.nama_karyawan, 
                            BB.jenis_kelamin,
-                           BB.upahkaryawan,
                            D.nama_departmen, 
-                           SD.nama_sub_department
+                           SD.nama_sub_department,
+                           RD.upah as upah_master
                     FROM tb_realisasi_detail A 
                     LEFT JOIN tb_realisasi B ON A.id_realisasi = B.id_realisasi
                     LEFT JOIN tb_jadwal C ON A.id_jadwal = C.id_jadwal
                     LEFT JOIN ms_karyawan BB ON A.id_karyawan = BB.id_karyawan
+                    LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
                     /* Mengambil data Departemen & Sub-Dept langsung dari master karyawan */
                     LEFT JOIN ms_departmen D ON BB.id_departmen = D.id_departmen
                     LEFT JOIN ms_sub_department SD ON BB.id_sub_department = SD.id_sub_department
@@ -80,7 +81,10 @@ if (isset($_GET['id'])) {
     $hasilpotonganistirahat = $isLateBreak ? $globalDendaIstirahat : 0;
 
     // Logika Upah Pokok: Jika Absen Masuk kosong maka Upah jadi 0
-    $upahPokokTampil = $datadetail['upahkaryawan'];
+    // Gunakan r_upah jika sudah ada, atau upah_master sebagai fallback
+    $upahPokokAsli = ($datadetail['r_upah'] > 0) ? $datadetail['r_upah'] : $datadetail['upah_master'];
+    $upahPokokTampil = $upahPokokAsli;
+    
     if (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') {
         $upahPokokTampil = 0;
     }
@@ -251,7 +255,7 @@ if (isset($_POST['simpan'])) {
     } else {
         // Jika ada jam masuk, kembalikan ke upah master jika sebelumnya 0
         if ($tupah == 0) {
-            $tupah = $datadetail['upahkaryawan'];
+            $tupah = $datadetail['upah_master'];
         }
     }
 
