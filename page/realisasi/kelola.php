@@ -282,7 +282,8 @@ if (!function_exists('rupiah')) {
                                             echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $isLate) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_masuk']; ?></td>
                                         <td data-label="Absen Pulang" class="<?php 
-                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); 
+                                            $isEarlyOut = (!empty($data['ra_keluar']) && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
+                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($isEarlyOut || $data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); 
                                         ?>"><?php echo $data['ra_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
