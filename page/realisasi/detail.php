@@ -9,9 +9,12 @@ if (isset($_GET['id'])) {
                            B.detail_realisasi, 
                            B.jam_kerja, 
                            C.keterangan as shift, 
+                           C.jam_masuk as shift_masuk,
+                           C.istirahat_masuk as shift_istirahat_masuk,
                            BB.no_absen, 
                            BB.nama_karyawan, 
                            BB.jenis_kelamin,
+                           BB.upahkaryawan,
                            D.nama_departmen, 
                            SD.nama_sub_department
                     FROM tb_realisasi_detail A 
@@ -65,33 +68,21 @@ if (isset($_GET['id'])) {
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
     $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
 
-    // Logika Perhitungan Potongan Otomatis
-    $jamMasukAbsensi = strtotime($datadetailabsen['absen_masuk'] ?? '');
-    $jamMasukRKK     = strtotime($datadetailrkk['jam_masuk'] ?? '');
-    $hasilpotongantelat = ($jamMasukAbsensi > $jamMasukRKK && $jamMasukAbsensi && $jamMasukRKK) ? $globalDendaMasuk : 0;
+    // Tentukan data yang digunakan untuk kalkulasi potongan (Input ra_ atau Log Mesin)
+    $jamMasukRealisasi = !empty($datadetail['ra_masuk']) ? $datadetail['ra_masuk'] : ($datadetailabsen['absen_masuk'] ?? '');
+    $jamIstirahatMasukRealisasi = !empty($datadetail['ra_istirahat_masuk']) ? $datadetail['ra_istirahat_masuk'] : ($datadetailabsen['istirahat_masuk'] ?? '');
 
-    $jamIstirahatMasukAbsensi = strtotime($datadetailabsen['istirahat_masuk'] ?? '');
-    $jamIstirahatRKK          = strtotime($datadetailrkk['istirahat_masuk'] ?? '');
-    $hasilpotonganistirahat   = ($jamIstirahatMasukAbsensi > $jamIstirahatRKK && $jamIstirahatMasukAbsensi && $jamIstirahatRKK) ? $globalDendaIstirahat : 0;
+    // Logika Perhitungan Potongan Otomatis (Sesuai realisasi kelola)
+    $isLate = (!empty($jamMasukRealisasi) && !empty($datadetail['shift_masuk']) && strtotime($jamMasukRealisasi) > strtotime($datadetail['shift_masuk']));
+    $hasilpotongantelat = $isLate ? $globalDendaMasuk : 0;
 
-    $jamKeluarAbsensi = strtotime($datadetailabsen['absen_keluar'] ?? '');
-    $jamKeluarRKK     = strtotime($datadetailrkk['jam_keluar'] ?? '');
+    $isLateBreak = (!empty($jamIstirahatMasukRealisasi) && !empty($datadetail['shift_istirahat_masuk']) && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
+    $hasilpotonganistirahat = $isLateBreak ? $globalDendaIstirahat : 0;
 
-    // Tentukan data mana yang ditampilkan (Manual vs Auto)
-    if($status_realisasi_detail == 0){
-        $hasilabsenmasuk = $datadetailabsen['absen_masuk'];
-        $hasilabsenkeluar = $datadetailabsen['absen_keluar'];
-        $hasilabsenistirahatmasuk = $datadetailabsen['istirahat_masuk'];
-        $hasilabsenistirahatkeluar = $datadetailabsen['istirahat_keluar'];
-    } else {
-        $hasilabsenmasuk = $datadetail['ra_masuk'];
-        $hasilabsenkeluar = $datadetail['ra_keluar'];
-        $hasilabsenistirahatmasuk = $datadetail['ra_istirahat_masuk'];
-        $hasilabsenistirahatkeluar = $datadetail['ra_istirahat_keluar'];
-        // Deductions are now calculated dynamically from log times vs global settings
-        // and do not exist in the database table anymore.
-        $hasilpotongantelat = $hasilpotongantelat; 
-        $hasilpotonganistirahat = $hasilpotonganistirahat;
+    // Logika Upah Pokok: Jika Absen Masuk kosong maka Upah jadi 0
+    $upahPokokTampil = $datadetail['upahkaryawan'];
+    if (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') {
+        $upahPokokTampil = 0;
     }
 }
 ?>
@@ -201,16 +192,16 @@ if (isset($_GET['id'])) {
                             ?>
                         </select>
                     </div>
-                    <div class="form-group col-md-2"> <label>ABSEN MASUK</label> <input type="time" name="tjammasuk" value="<?= $hasilabsenmasuk ?>" class="form-control" readonly> </div>
-                    <div class="form-group col-md-2"> <label>ABSEN KELUAR</label> <input type="time" name="tjamkeluar" value="<?= $hasilabsenkeluar ?>" class="form-control" readonly> </div>
-                    <div class="form-group col-md-2"> <label>ISTIRAHAT MASUK</label> <input type="time" name="tistirahatmasuk" value="<?= $hasilabsenistirahatmasuk ?>" class="form-control" readonly> </div>
-                    <div class="form-group col-md-2"> <label>ISTIRAHAT KELUAR</label> <input type="time" name="tistirahatkeluar" value="<?= $hasilabsenistirahatkeluar ?>" class="form-control" readonly> </div>
+                    <div class="form-group col-md-2"> <label>ABSEN MASUK</label> <input type="time" name="tjammasuk" value="<?= $datadetail['ra_masuk'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ABSEN KELUAR</label> <input type="time" name="tjamkeluar" value="<?= $datadetail['ra_keluar'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ISTIRAHAT MASUK</label> <input type="time" name="tistirahatmasuk" value="<?= $datadetail['ra_istirahat_masuk'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ISTIRAHAT KELUAR</label> <input type="time" name="tistirahatkeluar" value="<?= $datadetail['ra_istirahat_keluar'] ?>" class="form-control"> </div>
                 </div>
 
                 <div class="row">
-                    <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $datadetail['r_upah'] ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $upahPokokTampil ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
                     <div class="form-group col-md-2"> <label>POT. LAINNYA</label> <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required> </div>
                     <div class="form-group col-md-2"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
                 </div>
