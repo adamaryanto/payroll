@@ -11,6 +11,7 @@ if (isset($_GET['id'])) {
                            C.keterangan as shift, 
                            C.jam_masuk as shift_masuk,
                            C.istirahat_masuk as shift_istirahat_masuk,
+                           C.istirahat_keluar as shift_istirahat_keluar,
                            BB.no_absen, 
                            BB.nama_karyawan, 
                            BB.jenis_kelamin,
@@ -89,24 +90,25 @@ if (isset($_GET['id'])) {
         (!empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00' && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00')) ||
         ((empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && !empty($jamKeluarRealisasi) && $jamKeluarRealisasi != '00:00:00')
     );
-    $hasIncompleteBreak = (
-        (!empty($jamIstirahatKeluarRealisasi) && $jamIstirahatKeluarRealisasi != '00:00:00' && (empty($jamIstirahatMasukRealisasi) || $jamIstirahatMasukRealisasi == '00:00:00')) ||
-        ((empty($jamIstirahatKeluarRealisasi) || $jamIstirahatKeluarRealisasi == '00:00:00') && !empty($jamIstirahatMasukRealisasi) && $jamIstirahatMasukRealisasi != '00:00:00')
-    );
+    $isRestExpected = (!empty($datadetail['shift_istirahat_keluar']) && $datadetail['shift_istirahat_keluar'] != '00:00:00');
+    $hasIncompleteBreak = ($isRestExpected && (
+        (empty($jamIstirahatKeluarRealisasi) || $jamIstirahatKeluarRealisasi == '00:00:00') ||
+        (empty($jamIstirahatMasukRealisasi) || $jamIstirahatMasukRealisasi == '00:00:00')
+    ));
     
     $isEarlyOut = (!empty($jamKeluarRealisasi) && !empty($datadetail['r_jam_keluar']) && strtotime($jamKeluarRealisasi) < strtotime($datadetail['r_jam_keluar']));
-
-    // Incomplete if: One is missing OR (Both missing AND status is NOT 'Tidak Hadir')
     $isTotalMissing = (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00');
-    $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $datadetail['status_rkk'] != 'Tidak Hadir'));
 
     // Logic denda: Prioritaskan data tersimpan jika sudah ada (status detail > 0), 
     // Jika belum ada/masih draft, gunakan kalkulasi otomatis sebagai saran.
-    if ($datadetail['status_realisasi_detail'] > 0) {
+    if ($datadetail['status_realisasi_detail'] == 1) {
         $hasilpotonganpulang = $datadetail['r_potongan_pulang'];
         $hasilpotongantidaklengkap = $datadetail['r_potongan_tidak_lengkap'];
     } else {
-        $hasilpotonganpulang = $isEarlyOut ? $globalDendaPulang : 0;
+        // Dynamic calculation for Draft or Synced
+        $hasilpotonganpulang = ($isEarlyOut && !$isTotalMissing && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaPulang : 0;
+        
+        // Always apply incomplete log penalty if any part of a pair is missing
         $hasilpotongantidaklengkap = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
     }
 
@@ -115,8 +117,10 @@ if (isset($_GET['id'])) {
     $upahPokokAsli = ($datadetail['r_upah'] > 0) ? $datadetail['r_upah'] : $datadetail['upah_master'];
     $upahPokokTampil = $upahPokokAsli;
     
-    if (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') {
+    // Check if truly present (must have Masuk log) - only if already synced
+    if ($datadetail['status_realisasi_detail'] > 0 && (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00')) {
         $upahPokokTampil = 0;
+        $tlembur = 0; // Lembur also zero if not present
     }
 }
 

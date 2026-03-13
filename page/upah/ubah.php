@@ -11,10 +11,10 @@ if (isset($_POST['simpan'])) {
     
     $sql = $koneksi->query("UPDATE ms_upah SET upah_harian='$tharian', upah_mingguan='$tmingguan', upah_bulanan='$tbulanan' WHERE id_upah = '$idu'");
     if ($sql) {
-        echo "<script>swalAlert('Berhasil', 'Data Tersimpan', 'success', '?page=upah');</script>";
+        echo '<script>alert("Data Tersimpan"); window.location.href="?page=upah";</script>';
         exit;
     } else {
-        echo "<script>swalAlert('Gagal', 'Gagal menyimpan: " . addslashes($koneksi->error) . "', 'error');</script>";
+        echo '<script>alert("Gagal menyimpan: ' . $koneksi->error . '");</script>';
     }
 }
 

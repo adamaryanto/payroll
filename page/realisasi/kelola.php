@@ -6,7 +6,7 @@ if (isset($_GET['id'])) {
     $datadetail = $tampildetail->fetch_assoc();
 
     if (!$datadetail) {
-        echo "<script>swalAlert('Gagal', 'Data Realisasi tidak ditemukan!', 'error', '?page=realisasi');</script>";
+        echo "<script>alert('Data Realisasi tidak ditemukan!'); window.location.href='?page=realisasi';</script>";
         exit;
     }
 
@@ -31,6 +31,7 @@ if (isset($_GET['id'])) {
         RD.upah as upah_rkk,
         J.jam_masuk as shift_masuk,
         J.istirahat_masuk as shift_istirahat_masuk,
+        J.istirahat_keluar as shift_istirahat_keluar,
         (SELECT K3.nama_karyawan 
          FROM tb_rkk_update U1 
          JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
@@ -102,17 +103,17 @@ if ($simpan) {
     $tketerangan = @$_POST['tketerangan'];
     $sql = $koneksi->query("UPDATE tb_realisasi SET keterangan = '$tketerangan' WHERE id_realisasi = '$idrealisasi'");
     if ($sql) {
-        echo "<script>swalAlert('Berhasil', 'Data Tersimpan', 'success', '?page=realisasi&aksi=kelola&id=$idrealisasi');</script>";
+        echo "<script>alert('Data Tersimpan'); window.location.href='?page=realisasi&aksi=kelola&id=$idrealisasi';</script>";
     }
 }
 
 $cleanup = @$_POST['cleanup'];
 if ($cleanup) {
-    // Run synchronization logic
-    include 'fix_realisasi.php';
     $count = syncRealisasiData($koneksi, $idrealisasi);
-    echo "<script>swalAlert('Berhasil', 'Berhasil menarik " . $count . " data dari record mesin.', 'success', '?page=realisasi&aksi=kelola&id=$idrealisasi');</script>";
+    echo "<script>alert('Berhasil menarik $count data dari record mesin.'); window.location.href='?page=realisasi&aksi=kelola&id=$idrealisasi';</script>";
+    exit;
 }
+
 
 if (!function_exists('rupiah')) {
     function rupiah($angka)
@@ -120,6 +121,63 @@ if (!function_exists('rupiah')) {
         if ($angka === null || $angka === "") $angka = 0;
         return "Rp " . number_format($angka, 0, ',', '.');
     }
+}
+
+/**
+ * Function to synchronize realization detail data with machine records (tb_record)
+ * Specifically for a given id_realisasi
+ */
+function syncRealisasiData($koneksi, $id_realisasi) {
+    // 1. Get the realization date
+    $query_real = $koneksi->query("SELECT tgl_realisasi FROM tb_realisasi WHERE id_realisasi = '$id_realisasi'");
+    $data_real = $query_real->fetch_assoc();
+    if (!$data_real) return 0;
+    $tgl_real = $data_real['tgl_realisasi'];
+
+    // 2. Get all employees in this realization
+    $query_details = $koneksi->query("SELECT RD.id_realisasi_detail, K.no_absen 
+                                      FROM tb_realisasi_detail RD
+                                      JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
+                                      JOIN ms_karyawan K ON RKD.id_karyawan = K.id_karyawan
+                                      WHERE RD.id_realisasi = '$id_realisasi'");
+    
+    $count = 0;
+    while ($row = $query_details->fetch_assoc()) {
+        $id_rd = $row['id_realisasi_detail'];
+        $no_absen = $row['no_absen'];
+
+        if (empty($no_absen)) continue;
+
+        // 3. Query records from tb_record for this employee on this date
+        // Status: 0=Masuk, 1=Keluar, 2=Istirahat Keluar, 3=Istirahat Masuk
+        $query_logs = $koneksi->query("SELECT 
+            (SELECT TIME_FORMAT(detail_waktu, '%H:%i:%s') FROM tb_record WHERE userid = '$no_absen' AND DATE(tgl) = '$tgl_real' AND status = 0 ORDER BY detail_waktu ASC LIMIT 1) AS log_masuk,
+            (SELECT TIME_FORMAT(detail_waktu, '%H:%i:%s') FROM tb_record WHERE userid = '$no_absen' AND DATE(tgl) = '$tgl_real' AND status = 1 ORDER BY detail_waktu DESC LIMIT 1) AS log_keluar,
+            (SELECT TIME_FORMAT(detail_waktu, '%H:%i:%s') FROM tb_record WHERE userid = '$no_absen' AND DATE(tgl) = '$tgl_real' AND status = 2 ORDER BY detail_waktu ASC LIMIT 1) AS log_ist_keluar,
+            (SELECT TIME_FORMAT(detail_waktu, '%H:%i:%s') FROM tb_record WHERE userid = '$no_absen' AND DATE(tgl) = '$tgl_real' AND status = 3 ORDER BY detail_waktu ASC LIMIT 1) AS log_ist_masuk
+        ");
+
+        $logs = $query_logs->fetch_assoc();
+        
+        $ra_masuk = $logs['log_masuk'] ?? '00:00:00';
+        $ra_keluar = $logs['log_keluar'] ?? '00:00:00';
+        $ra_ist_keluar = $logs['log_ist_keluar'] ?? '00:00:00';
+        $ra_ist_masuk = $logs['log_ist_masuk'] ?? '00:00:00';
+
+        // 4. Update the detail record
+        $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
+            ra_masuk = '$ra_masuk',
+            ra_keluar = '$ra_keluar',
+            ra_istirahat_masuk = '$ra_ist_masuk',
+            ra_istirahat_keluar = '$ra_ist_keluar',
+            r_update = NOW(),
+            status_realisasi_detail = 2
+            WHERE id_realisasi_detail = '$id_rd'");
+        
+        if ($update) $count++;
+    }
+
+    return $count;
 }
 ?>
 
@@ -236,35 +294,84 @@ if (!function_exists('rupiah')) {
                                     $isFullMissing = (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') &&
                                         (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00');
 
-                                    // Highlight if status is 'Tidak Hadir' or data is fully missing
-                                    $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || $isFullMissing) ? 'bg-red-custom' : '';
+                                    // Highlight if status is 'Tidak Hadir' or (already synced AND data is fully missing)
+                                    $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || ($isFullMissing && $data['status_realisasi_detail'] > 0)) ? 'bg-red-custom' : '';
 
                                     // Logic Incomplete Log (One sided or missing break)
                                     $hasIncompleteMain = (
                                         (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00')) ||
                                         ((empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00')
                                     );
-                                    $hasIncompleteBreak = (
-                                        (!empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00' && (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00')) ||
-                                        ((empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') && !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00')
-                                    );
+                                    $isRestExpected = (!empty($data['shift_istirahat_keluar']) && $data['shift_istirahat_keluar'] != '00:00:00');
+                                    $hasIncompleteBreak = ($isRestExpected && (
+                                        (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ||
+                                        (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00')
+                                    ));
                                     
                                     $isEarlyOut = (!empty($data['ra_keluar']) && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-                                    
-                                    // Incomplete if: One is missing OR (Both missing AND status is NOT 'Tidak Hadir' AND it's a scheduled workday)
                                     $isTotalMissing = (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00');
-                                    $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $data['status_rkk'] != 'Tidak Hadir'));
+                                    $isLate = (!empty($data['ra_masuk']) && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
+                                    $isLateBreak = (!empty($data['ra_istirahat_masuk']) && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
 
-                                    // Gunakan denda tersimpan jika sudah di-approve/simpan, jika tidak pakai kalkulasi dinamis
-                                    if ($data['status_realisasi_detail'] > 0) {
+                                    // Denda logic
+                                    if ($data['status_realisasi_detail'] == 1) {
+                                        // Data is already saved manually
                                         $potPulangValue = $data['r_potongan_pulang'];
                                         $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
+                                        $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+                                        $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+                                        $potLainnyaValue = $data['r_potongan_lainnya'];
                                     } else {
-                                        $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
-                                        $potTidakLengkapValue = $isIncompleteLog ? $globalDendaTidakLengkap : 0;
+                                        // Still in Draft or Synced from machine
+                                        // Penalties are applied if logs are NOT empty
+                                        $potPulangValue = ($isEarlyOut && !$isTotalMissing && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaPulang : 0;
+                                        
+                                        // Always apply incomplete log penalty if any part of a pair is missing
+                                        $potTidakLengkapValue = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
+                                        
+                                        // Always apply lateness penalty if a valid log exists
+                                        $potTelatValue = ($isLate && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaMasuk : 0;
+                                        $potIstirahatValue = ($isLateBreak && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaIstirahat : 0;
+                                        $potLainnyaValue = $data['r_potongan_lainnya'];
                                     }
-                                    
-                                    $potExtraValue = $potPulangValue + $potTidakLengkapValue;
+
+                                    // Final wage calculation
+                                    $finalUpah = $data['upahkaryawan'];
+                                    $finalLembur = $data['lembur'];
+
+                                    if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir' || ($data['status_realisasi_detail'] > 0 && (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00'))) {
+                                        $finalUpah = 0;
+                                        $finalLembur = 0;
+                                        
+                                        // Still zero out most penalties if it's a Total Missing log or explicitly marked absent
+                                        if (empty($data['digantikan_oleh']) && $data['status_rkk'] != 'Tidak Hadir') {
+                                            // Special case: Incomplete log while syncing (one side missing)
+                                            // We ONLY zero out if BOTH are missing. 
+                                            // If one is present, we keep the potTidakLengkapValue (Calculated above)
+                                            if ($isTotalMissing) {
+                                                $potTelatValue = 0;
+                                                $potIstirahatValue = 0;
+                                                $potPulangValue = 0;
+                                                $potTidakLengkapValue = 0;
+                                                $potLainnyaValue = 0;
+                                            } else {
+                                                // It's incomplete. 
+                                                $potTelatValue = 0;
+                                                $potIstirahatValue = 0;
+                                                $potPulangValue = 0;
+                                                // Keep $potTidakLengkapValue from line 328
+                                            }
+                                        } else {
+                                            // Replaced or marked Tidak Hadir explicitly
+                                            $potTelatValue = 0;
+                                             $potIstirahatValue = 0;
+                                             $potPulangValue = 0;
+                                             $potTidakLengkapValue = 0;
+                                             $potLainnyaValue = 0;
+                                        }
+                                    }
+
+                                    $upah_setelah_potongan = $finalUpah + $finalLembur - $potTelatValue - $potIstirahatValue - $potLainnyaValue - $potPulangValue - $potTidakLengkapValue;
                                 ?>
                                     <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
@@ -284,7 +391,11 @@ if (!function_exists('rupiah')) {
 
                                             <div class="mt-1">
                                                 <?php if ($data['status_rkk'] == 'Hadir') : ?>
-                                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
+                                                    <?php if ($data['status_realisasi_detail'] > 0 && (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00')) : ?>
+                                                        <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir (Sync)</span>
+                                                    <?php else : ?>
+                                                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
+                                                    <?php endif; ?>
                                                 <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
                                                     <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir</span>
                                                 <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
@@ -303,52 +414,29 @@ if (!function_exists('rupiah')) {
                                         <td data-label="Istirahat Keluar" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
                                         <td data-label="Istirahat Masuk" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
                                         <td data-label="Absen Masuk" class="<?php 
-                                            $isLate = (!empty($data['ra_masuk']) && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
-                                            echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $isLate) ? 'bg-red-custom' : ''; 
+                                            echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || ($potTelatValue > 0)) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_masuk']; ?></td>
                                         <td data-label="Absen Pulang" class="<?php 
-                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($isEarlyOut || $data['r_potongan_lainnya'] > 0 || $isIncompleteLog ? 'bg-yellow-custom' : ''); 
+                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($potPulangValue > 0 || $potLainnyaValue > 0 || $potTidakLengkapValue > 0 ? 'bg-yellow-custom' : ''); 
                                         ?>"><?php echo $data['ra_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
-                                            $isLateBreak = (!empty($data['ra_istirahat_masuk']) && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
-                                            echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $isLateBreak) ? 'bg-red-custom' : ''; 
+                                            echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $potIstirahatValue > 0) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
                                         <td data-label="Upah Pokok" class="text-right">
-                                            <?php
-                                            if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
-                                                $data['upah_rkk'] = 0;
-                                            }
-                                            ?>
-                                            <?= rupiah($data['upahkaryawan']) ?>
+                                            <?= rupiah($finalUpah) ?>
                                         </td>
                                         <td data-label="Lembur" class="text-right">
-                                            <?= rupiah($data['lembur']) ?>
+                                            <?= rupiah($finalLembur) ?>
                                         </td>
-                                        <td data-label="Pot. Telat" class="text-right <?php echo ($isLate) ? 'bg-red-custom' : ''; ?>"><?= rupiah($isLate ? $globalDendaMasuk : 0) ?></td>
-                                        <td data-label="Pot. Istirahat" class="text-right <?php echo ($isLateBreak) ? 'bg-red-custom' : ''; ?>"><?= rupiah($isLateBreak ? $globalDendaIstirahat : 0) ?></td>
+                                        <td data-label="Pot. Telat" class="text-right <?php echo ($potTelatValue > 0) ? 'bg-red-custom' : ''; ?>"><?= rupiah($potTelatValue) ?></td>
+                                        <td data-label="Pot. Istirahat" class="text-right <?php echo ($potIstirahatValue > 0) ? 'bg-red-custom' : ''; ?>"><?= rupiah($potIstirahatValue) ?></td>
                                         <td data-label="Pot. Pulang" class="text-right <?php echo ($potPulangValue > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($potPulangValue) ?></td>
                                         <td data-label="Pot. Tidak Absen" class="text-right <?php echo ($potTidakLengkapValue > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($potTidakLengkapValue) ?></td>
-                                        <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>">
-                                            <?= rupiah($data['r_potongan_lainnya']) ?>
+                                        <td data-label="Pot. Lain" class="text-right <?php echo ($potLainnyaValue > 0) ? 'bg-yellow-custom' : ''; ?>">
+                                            <?= rupiah($potLainnyaValue) ?>
                                         </td>
-
-                                        <?php
-                                        // Sesuaikan isi data potongan dengan denda global
-                                        $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-                                        $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
-
-                                        if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
-                                            $data['upahkaryawan'] = 0;
-                                            $data['lembur'] = 0;
-                                            $potTelatValue = 0;
-                                            $potIstirahatValue = 0;
-                                            $potExtraValue = 0;
-                                            $data['r_potongan_lainnya'] = 0;
-                                        }
-                                        $upah_setelah_potongan = $data['upahkaryawan'] + $data['lembur'] - $potTelatValue - $potIstirahatValue - $data['r_potongan_lainnya'] - $potExtraValue;
-                                        ?>
                                         <?php if ($data['status_rkk'] != 'Digantikan') $jml_active++; ?>
                                         <td data-label="Upah Setelah Potongan" class="text-right font-black text-blue-700">
                                             <?= rupiah($upah_setelah_potongan) ?>

@@ -88,9 +88,9 @@ if (isset($_POST['simpan'])) {
     $sql = $koneksi->query("INSERT INTO ms_login (id_perusahaan, username, password, role) VALUES ('1', '$tnama', '$tpassword', '$trole')");
     
     if ($sql) {
-        echo "<script>swalAlert('Berhasil', 'Data Berhasil Tersimpan', 'success', '?page=user');</script>";
+        echo "<script>alert('Data Berhasil Tersimpan'); window.location.href='?page=user';</script>";
     } else {
-        echo "<script>swalAlert('Gagal', 'Gagal menyimpan data!', 'error');</script>";
+        echo "<script>alert('Gagal menyimpan data!');</script>";
     }
 }
 ?>
