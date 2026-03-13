@@ -204,6 +204,11 @@ if (isset($_GET['id'])) {
                     <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
                     <div class="form-group col-md-2"> <label>POT. LAINNYA</label> <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required> </div>
                     <div class="form-group col-md-2"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
+                    <div class="form-group col-md-2"> 
+                        <label>TOTAL UPAH AKHIR</label> 
+                        <?php $totalAkhir = $upahPokokTampil + $datadetail['lembur'] - $hasilpotongantelat - $hasilpotonganistirahat - $datadetail['r_potongan_lainnya']; ?>
+                        <input type="text" value="<?= rupiah($totalAkhir) ?>" class="form-control font-bold text-blue-600" readonly style="background: #eff6ff;"> 
+                    </div>
                 </div>
 
                 <div class="row">
@@ -232,8 +237,6 @@ if (isset($_POST['simpan'])) {
     // Ambil data POST dan bersihkan
     $tupah = $_POST['tupah'];
     $tshift = $_POST['tshift'];
-    $tpottelat = $_POST['tpottelat'];
-    $tpotistirahat = $_POST['tpotistirahat'];
     $tpotlainnya = $_POST['tpotlainnya'];
     $tjammasuk = $_POST['tjammasuk'];
     $tjamkeluar = $_POST['tjamkeluar'];
@@ -241,6 +244,16 @@ if (isset($_POST['simpan'])) {
     $tistirahatkeluar = $_POST['tistirahatkeluar'];
     $hasilkerjanya = mysqli_real_escape_string($koneksi, $_POST['thasilkerja']);
     $tlembur = $_POST['tlembur'];
+
+    // Logika Sinkronisasi: Jika Jam Masuk Kosong, maka Upah = 0
+    if (empty($tjammasuk) || $tjammasuk == '00:00:00') {
+        $tupah = 0;
+    } else {
+        // Jika ada jam masuk, kembalikan ke upah master jika sebelumnya 0
+        if ($tupah == 0) {
+            $tupah = $datadetail['upahkaryawan'];
+        }
+    }
 
     $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
         r_upah = '$tupah', 
