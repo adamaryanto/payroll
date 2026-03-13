@@ -1,6 +1,0 @@
-﻿id_denda	denda_masuk	denda_istirahat	denda_pulang
-1	20000	456	10000
-id_karyawan	r_upah	ra_masuk	ra_keluar	r_jam_keluar	jam_masuk	lembur	r_potongan_lainnya	id_jadwal	status_rkk
-42	150000			17:00	07:00	0	0	1	Hadir
-28	150000			17:00	07:00	0	0	1	Hadir
-83	4000000	09:00	12:00	17:00	07:00	0	0	1	Hadir
