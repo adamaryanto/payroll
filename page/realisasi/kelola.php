@@ -278,7 +278,7 @@ if (!function_exists('rupiah')) {
                                         <td data-label="Istirahat Keluar" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
                                         <td data-label="Istirahat Masuk" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
                                         <td data-label="Absen Masuk" class="<?php 
-                                            $isLate = (!empty($data['ra_masuk']) && !empty($data['shift_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['shift_masuk']));
+                                            $isLate = (!empty($data['ra_masuk']) && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
                                             echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $isLate) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_masuk']; ?></td>
                                         <td data-label="Absen Pulang" class="<?php 
@@ -286,7 +286,7 @@ if (!function_exists('rupiah')) {
                                         ?>"><?php echo $data['ra_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
-                                            $isLateBreak = (!empty($data['ra_istirahat_masuk']) && !empty($data['shift_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['shift_istirahat_masuk']));
+                                            $isLateBreak = (!empty($data['ra_istirahat_masuk']) && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
                                             echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $isLateBreak) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
