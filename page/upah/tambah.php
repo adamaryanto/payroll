@@ -6,10 +6,10 @@ if (isset($_POST['simpan'])) {
 
     $sql = $koneksi->query("INSERT INTO ms_upah (upah_harian, upah_mingguan, upah_bulanan) VALUES ('$tharian', '$tmingguan', '$tbulanan')");
     if ($sql) {
-        echo '<script>alert("Data Tersimpan"); window.location.href="?page=upah";</script>';
+        echo "<script>swalAlert('Berhasil', 'Data Tersimpan', 'success', '?page=upah');</script>";
         exit;
     } else {
-        echo '<script>alert("Gagal menyimpan: ' . $koneksi->error . '");</script>';
+        echo "<script>swalAlert('Gagal', 'Gagal menyimpan: " . addslashes($koneksi->error) . "', 'error');</script>";
     }
 }
 ?>

@@ -243,8 +243,8 @@ if (!function_exists('rupiah')) {
                     <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $upahPokokTampil ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
                     <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. PULANG AWAL</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control"> </div>
-                    <div class="form-group col-md-2"> <label>POT. LOG GAK LENGKAP</label> <input type="number" name="tpotlog" value="<?= $hasilpotongantidaklengkap ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>POT. PULANG AWAL</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control" readonly style="background: #f1f5f9;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. ABSEN TIDAK LENGKAP</label> <input type="number" name="tpotlog" value="<?= $hasilpotongantidaklengkap ?>" class="form-control" readonly style="background: #f1f5f9;"> </div>
                 </div>
 
                 <div class="row">

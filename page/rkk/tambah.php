@@ -74,9 +74,9 @@ if (isset($_POST['simpan'])) {
                             VALUES ('$tgl_rkk', '$keterangan', '$jam_kerja', '$detail_rkk', '0', '$tgl_status')");
 
     if ($sql) {
-        echo '<script>alert("Data Berhasil Disimpan"); window.location.href="?page=rkk";</script>';
+        echo "<script>swalAlert('Berhasil', 'Data Berhasil Disimpan', 'success', '?page=rkk');</script>";
     } else {
-        echo '<script>alert("Gagal Menyimpan Data: ' . $koneksi->error . '");</script>';
+        echo "<script>swalAlert('Gagal', 'Gagal Menyimpan Data: " . addslashes($koneksi->error) . "', 'error');</script>";
     }
 }
 ?>

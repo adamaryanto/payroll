@@ -87,8 +87,8 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Telat</th>
                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Istirahat</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Pulang">Pulang</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Log Kosong">Log</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Denda Pulang Awal">Denda Pulang</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Denda Absensi Tidak Lengkap">Denda Tidak Absen</th>
                                <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Lainnya</th>
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
@@ -127,10 +127,10 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                 <td data-label="Istirahat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['p_istirahat'] ?? 0, 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Pulang" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                <td data-label="Denda Pulang" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['p_pulang'] ?? 0, 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Log" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                <td data-label="Denda Absen" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['p_log'] ?? 0, 0, ',', '.') ?>
                                 </td>
                                 <td data-label="Lainnya" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">

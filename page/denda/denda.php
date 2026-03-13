@@ -90,7 +90,7 @@ if (isset($_POST['simpan'])) {
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">
-                            Denda Log Gak Lengkap <span class="text-rose-500">*</span>
+                            DENDA ABSENSI TIDAK LENGKAP <span class="text-rose-500">*</span>
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

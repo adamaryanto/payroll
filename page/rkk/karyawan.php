@@ -62,8 +62,9 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 <div class="mb-6">
                     <label class="block text-sm font-bold text-gray-700 mb-2">Pilih No. Absen / Nama Karyawan <span class="text-rose-500">*</span></label>
                     <select name="id_karyawan" id="search_karyawan" required
-                            class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none font-medium text-sm sm:text-base">
-                        <option value="">- Pilih Karyawan -</option>
+                            class="select2-manage block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none font-medium text-sm sm:text-base"
+                            data-placeholder="Cari No. Absen atau Nama">
+                        <option value=""></option>
                         <?php
                         $master = $koneksi->query("SELECT * FROM ms_karyawan WHERE status_karyawan = 'Aktif' ORDER BY nama_karyawan ASC");
                         while ($row = $master->fetch_assoc()) {
@@ -154,27 +155,41 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
         return new Intl.NumberFormat('id-ID').format(number);
     }
 
-    document.getElementById('search_karyawan').addEventListener('change', function() {
-        var selectedOption = this.options[this.selectedIndex];
-        
-        if(this.value === "") {
-            document.getElementById('jk').value = "";
-            document.getElementById('tgl_aktif').value = "";
-            document.getElementById('upah_manual').value = "";
-            return;
-        }
+    $(document).ready(function() {
+        $('#search_karyawan').on('change', function() {
+            var $selected = $(this).find(':selected');
+            
+            if($(this).val() === "") {
+                $('#jk').val("");
+                $('#tgl_aktif').val("");
+                $('#upah_manual').val("");
+                return;
+            }
 
-        var gol = selectedOption.getAttribute('data-golongan') || "";
-        var finalWage = 0;
+            var gol = $selected.data('golongan') || "";
+            var finalWage = 0;
 
-        if (gol.toLowerCase().includes("harian") || gol === "1") finalWage = globalRates.harian;
-        else if (gol.toLowerCase().includes("mingguan")) finalWage = globalRates.mingguan;
-        else if (gol.toLowerCase().includes("bulanan") || gol === "3") finalWage = globalRates.bulanan;
+            if (gol.toLowerCase().includes("harian") || gol === "1") finalWage = globalRates.harian;
+            else if (gol.toLowerCase().includes("mingguan")) finalWage = globalRates.mingguan;
+            else if (gol.toLowerCase().includes("bulanan") || gol === "3") finalWage = globalRates.bulanan;
 
-        document.getElementById('jk').value = selectedOption.getAttribute('data-jk');
-        document.getElementById('tgl_aktif').value = selectedOption.getAttribute('data-tgl');
-        document.getElementById('upah_manual').value = formatRupiah(finalWage);
-        document.getElementById('id_departmen').value = selectedOption.getAttribute('data-dept');
-        document.getElementById('id_sub_department').value = selectedOption.getAttribute('data-sub');
+            $('#jk').val($selected.data('jk'));
+            $('#tgl_aktif').val($selected.data('tgl'));
+            $('#upah_manual').val(formatRupiah(finalWage));
+            $('#id_departmen').val($selected.data('dept'));
+            $('#id_sub_department').val($selected.data('sub'));
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+        $("#search_karyawan").on("select2:open", function() {
+            setTimeout(function() {
+                var searchField = document.querySelector(".select2-search__field");
+                if (searchField) {
+                    searchField.setAttribute("placeholder", "Contoh: 001 | Ammar");
+                }
+            }, 50);
+        });
     });
 </script>

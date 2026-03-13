@@ -103,12 +103,7 @@ if (isset($_POST['simpan'])) {
     
     $sql = $koneksi->query("UPDATE ms_login SET username='$tnama', password='$tpassword', role='$trole' WHERE id_login = '$idu'");
     if ($sql) {
-        ?>
-        <script type="text/javascript">
-            alert("Data Berhasil Tersimpan");
-            window.location.href = "?page=user";
-        </script>
-        <?php
+        echo "<script>swalAlert('Berhasil', 'Data Berhasil Tersimpan', 'success', '?page=user');</script>";
     }
 }
 ?>

@@ -86,12 +86,7 @@ $simpan = @$_POST['simpan'];
 if ($simpan) {
     $sql = $koneksi->query("UPDATE tb_user SET lg_password='$tpass' WHERE id_user = '$idu'");
     if ($sql) {
-        ?>
-        <script type="text/javascript">
-            alert("Password Berhasil Diperbarui");
-            window.location.href = "?page=user";
-        </script>
-        <?php
+        echo "<script>swalAlert('Berhasil', 'Password Berhasil Diperbarui', 'success', '?page=user');</script>";
     }
 }
 ?>

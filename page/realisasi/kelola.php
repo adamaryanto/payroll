@@ -6,7 +6,7 @@ if (isset($_GET['id'])) {
     $datadetail = $tampildetail->fetch_assoc();
 
     if (!$datadetail) {
-        echo "<script>alert('Data Realisasi tidak ditemukan!'); window.location.href='?page=realisasi';</script>";
+        echo "<script>swalAlert('Gagal', 'Data Realisasi tidak ditemukan!', 'error', '?page=realisasi');</script>";
         exit;
     }
 
@@ -102,10 +102,7 @@ if ($simpan) {
     $tketerangan = @$_POST['tketerangan'];
     $sql = $koneksi->query("UPDATE tb_realisasi SET keterangan = '$tketerangan' WHERE id_realisasi = '$idrealisasi'");
     if ($sql) {
-        echo '<script type="text/javascript">
-                    alert("Data Tersimpan");
-                    window.location.href="?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
-                  </script>';
+        echo "<script>swalAlert('Berhasil', 'Data Tersimpan', 'success', '?page=realisasi&aksi=kelola&id=$idrealisasi');</script>";
     }
 }
 
@@ -114,10 +111,7 @@ if ($cleanup) {
     // Run synchronization logic
     include 'fix_realisasi.php';
     $count = syncRealisasiData($koneksi, $idrealisasi);
-    echo '<script type="text/javascript">
-                alert("Berhasil menarik ' . $count . ' data dari record mesin.");
-                window.location.href="?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
-              </script>';
+    echo "<script>swalAlert('Berhasil', 'Berhasil menarik " . $count . " data dari record mesin.', 'success', '?page=realisasi&aksi=kelola&id=$idrealisasi');</script>";
 }
 
 if (!function_exists('rupiah')) {
@@ -220,8 +214,8 @@ if (!function_exists('rupiah')) {
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Pulang</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Tidak Absen</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Denda Pulang</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Denda Tidak Absen</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah Setelah Potongan</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Hasil</th>
