@@ -13,6 +13,8 @@ $tampil = $koneksi->query("SELECT A.*,
             RD.r_upah + IFNULL(RD.lembur, 0) - (
                 IF(RD.ra_masuk > J.jam_masuk AND RD.ra_masuk != '00:00:00' AND RD.ra_masuk != '' AND J.jam_masuk != '00:00:00' AND J.jam_masuk != '', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0) + 
                 IF(RD.ra_istirahat_masuk > J.istirahat_masuk AND RD.ra_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0) + 
+                IF(RD.status_realisasi_detail > 0, RD.r_potongan_pulang, IF(RD.ra_keluar < J.jam_keluar AND RD.ra_keluar != '00:00:00' AND RD.ra_keluar != '' AND J.jam_keluar != '00:00:00' AND J.jam_keluar != '', (SELECT denda_pulang FROM tb_denda LIMIT 1), 0)) +
+                IF(RD.status_realisasi_detail > 0, RD.r_potongan_tidak_lengkap, IF(((RD.ra_masuk != '' AND RD.ra_keluar = '') OR (RD.ra_masuk = '' AND RD.ra_keluar != '') OR (RD.ra_istirahat_keluar != '' AND RD.ra_istirahat_masuk = '') OR (RD.ra_istirahat_keluar = '' AND RD.ra_istirahat_masuk != '') OR ((RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00'))) AND RKD.status_rkk != 'Tidak Hadir', (SELECT denda_tidak_lengkap FROM tb_denda LIMIT 1), 0)) +
                 RD.r_potongan_lainnya
             )
         )
@@ -37,7 +39,17 @@ $tampil = $koneksi->query("SELECT A.*,
         IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan', 0,
             IF(RD.ra_istirahat_masuk > J.istirahat_masuk AND RD.ra_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat FROM tb_denda LIMIT 1), 0)
         )
-    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_istirahat
+    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_istirahat,
+    (SELECT SUM(
+        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan', 0,
+            IF(RD.status_realisasi_detail > 0, RD.r_potongan_pulang, IF(RD.ra_keluar < J.jam_keluar AND RD.ra_keluar != '00:00:00' AND RD.ra_keluar != '' AND J.jam_keluar != '00:00:00' AND J.jam_keluar != '', (SELECT denda_pulang FROM tb_denda LIMIT 1), 0))
+        )
+    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_pulang,
+    (SELECT SUM(
+        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan', 0,
+            IF(RD.status_realisasi_detail > 0, RD.r_potongan_tidak_lengkap, IF(((RD.ra_masuk != '' AND RD.ra_keluar = '') OR (RD.ra_masuk = '' AND RD.ra_keluar != '') OR (RD.ra_istirahat_keluar != '' AND RD.ra_istirahat_masuk = '') OR (RD.ra_istirahat_keluar = '' AND RD.ra_istirahat_masuk != '') OR ((RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00'))) AND RKD.status_rkk != 'Tidak Hadir', (SELECT denda_tidak_lengkap FROM tb_denda LIMIT 1), 0))
+        )
+    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_log
     FROM tb_realisasi A $where_real");
 
 // Logika Akses: Hanya Owner yang bisa Approve/Unapprove Realisasi
@@ -72,10 +84,12 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
-                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
-                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Potongan Telat</th>
-                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Potongan Istirahat</th>
-                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Potongan Lainnya</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Telat</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Istirahat</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Pulang">Pulang</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Log Kosong">Log</th>
+                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Lainnya</th>
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
                              <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                         </tr>
@@ -107,13 +121,19 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                  <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Potongan Telat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                <td data-label="Telat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['p_telat'] ?? 0, 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Potongan Istirahat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                <td data-label="Istirahat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['p_istirahat'] ?? 0, 0, ',', '.') ?>
                                 </td>
-                                <td data-label="Potongan Lainnya" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                <td data-label="Pulang" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['p_pulang'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Log" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
+                                    Rp <?= number_format($data['p_log'] ?? 0, 0, ',', '.') ?>
+                                </td>
+                                <td data-label="Lainnya" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['potlainnya'] ?? 0, 0, ',', '.') ?>
                                 </td>
 

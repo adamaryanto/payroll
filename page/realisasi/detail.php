@@ -68,9 +68,13 @@ if (isset($_GET['id'])) {
     $dataDenda = $queryDenda->fetch_assoc();
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
     $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
+    $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
+    $globalDendaTidakLengkap = $dataDenda['denda_tidak_lengkap'] ?? 0;
 
     // Tentukan data yang digunakan untuk kalkulasi potongan (Input ra_ atau Log Mesin)
     $jamMasukRealisasi = !empty($datadetail['ra_masuk']) ? $datadetail['ra_masuk'] : ($datadetailabsen['absen_masuk'] ?? '');
+    $jamKeluarRealisasi = !empty($datadetail['ra_keluar']) ? $datadetail['ra_keluar'] : ($datadetailabsen['absen_keluar'] ?? '');
+    $jamIstirahatKeluarRealisasi = !empty($datadetail['ra_istirahat_keluar']) ? $datadetail['ra_istirahat_keluar'] : ($datadetailabsen['istirahat_keluar'] ?? '');
     $jamIstirahatMasukRealisasi = !empty($datadetail['ra_istirahat_masuk']) ? $datadetail['ra_istirahat_masuk'] : ($datadetailabsen['istirahat_masuk'] ?? '');
 
     // Logika Perhitungan Potongan Otomatis (Sesuai realisasi kelola)
@@ -79,6 +83,32 @@ if (isset($_GET['id'])) {
 
     $isLateBreak = (!empty($jamIstirahatMasukRealisasi) && !empty($datadetail['shift_istirahat_masuk']) && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
     $hasilpotonganistirahat = $isLateBreak ? $globalDendaIstirahat : 0;
+
+    // Logic Incomplete Log
+    $hasIncompleteMain = (
+        (!empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00' && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00')) ||
+        ((empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && !empty($jamKeluarRealisasi) && $jamKeluarRealisasi != '00:00:00')
+    );
+    $hasIncompleteBreak = (
+        (!empty($jamIstirahatKeluarRealisasi) && $jamIstirahatKeluarRealisasi != '00:00:00' && (empty($jamIstirahatMasukRealisasi) || $jamIstirahatMasukRealisasi == '00:00:00')) ||
+        ((empty($jamIstirahatKeluarRealisasi) || $jamIstirahatKeluarRealisasi == '00:00:00') && !empty($jamIstirahatMasukRealisasi) && $jamIstirahatMasukRealisasi != '00:00:00')
+    );
+    
+    $isEarlyOut = (!empty($jamKeluarRealisasi) && !empty($datadetail['r_jam_keluar']) && strtotime($jamKeluarRealisasi) < strtotime($datadetail['r_jam_keluar']));
+
+    // Incomplete if: One is missing OR (Both missing AND status is NOT 'Tidak Hadir')
+    $isTotalMissing = (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00');
+    $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $datadetail['status_rkk'] != 'Tidak Hadir'));
+
+    // Logic denda: Prioritaskan data tersimpan jika sudah ada (status detail > 0), 
+    // Jika belum ada/masih draft, gunakan kalkulasi otomatis sebagai saran.
+    if ($datadetail['status_realisasi_detail'] > 0) {
+        $hasilpotonganpulang = $datadetail['r_potongan_pulang'];
+        $hasilpotongantidaklengkap = $datadetail['r_potongan_tidak_lengkap'];
+    } else {
+        $hasilpotonganpulang = $isEarlyOut ? $globalDendaPulang : 0;
+        $hasilpotongantidaklengkap = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
+    }
 
     // Logika Upah Pokok: Jika Absen Masuk kosong maka Upah jadi 0
     // Gunakan r_upah jika sudah ada, atau upah_master sebagai fallback
@@ -213,11 +243,16 @@ if (!function_exists('rupiah')) {
                     <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $upahPokokTampil ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
                     <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. PULANG AWAL</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>POT. LOG GAK LENGKAP</label> <input type="number" name="tpotlog" value="<?= $hasilpotongantidaklengkap ?>" class="form-control"> </div>
+                </div>
+
+                <div class="row">
                     <div class="form-group col-md-2"> <label>POT. LAINNYA</label> <input type="number" name="tpotlainnya" value="<?= $datadetail['r_potongan_lainnya'] ?>" class="form-control" required> </div>
                     <div class="form-group col-md-2"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
                     <div class="form-group col-md-2"> 
                         <label>TOTAL UPAH AKHIR</label> 
-                        <?php $totalAkhir = $upahPokokTampil + $datadetail['lembur'] - $hasilpotongantelat - $hasilpotonganistirahat - $datadetail['r_potongan_lainnya']; ?>
+                        <?php $totalAkhir = $upahPokokTampil + $datadetail['lembur'] - $hasilpotongantelat - $hasilpotonganistirahat - $datadetail['r_potongan_lainnya'] - $hasilpotonganpulang - $hasilpotongantidaklengkap; ?>
                         <input type="text" value="<?= rupiah($totalAkhir) ?>" class="form-control font-bold text-blue-600" readonly style="background: #eff6ff;"> 
                     </div>
                 </div>
@@ -249,6 +284,8 @@ if (isset($_POST['simpan'])) {
     $tupah = $_POST['tupah'];
     $tshift = $_POST['tshift'];
     $tpotlainnya = $_POST['tpotlainnya'];
+    $tpotpulang = $_POST['tpotpulang'] ?? 0;
+    $tpotlog = $_POST['tpotlog'] ?? 0;
     $tjammasuk = $_POST['tjammasuk'];
     $tjamkeluar = $_POST['tjamkeluar'];
     $tistirahatmasuk = $_POST['tistirahatmasuk'];
@@ -270,6 +307,8 @@ if (isset($_POST['simpan'])) {
         r_upah = '$tupah', 
         id_jadwal = '$tshift',
         r_potongan_lainnya = '$tpotlainnya',
+        r_potongan_pulang = '$tpotpulang',
+        r_potongan_tidak_lengkap = '$tpotlog',
         ra_masuk = '$tjammasuk',
         ra_keluar = '$tjamkeluar',
         ra_istirahat_masuk = '$tistirahatmasuk',

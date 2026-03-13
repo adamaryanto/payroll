@@ -357,15 +357,17 @@ INSERT INTO `tb_cuti` (`id_cuti`, `id_karyawan`, `tgl_pengajuan_cuti`, `tgl_awal
 CREATE TABLE `tb_denda` (
   `id_denda` int NOT NULL,
   `denda_masuk` int NOT NULL,
-  `denda_istirahat` int NOT NULL
+  `denda_istirahat` int NOT NULL,
+  `denda_pulang` int NOT NULL DEFAULT '0',
+  `denda_tidak_lengkap` int NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `tb_denda`
 --
 
-INSERT INTO `tb_denda` (`id_denda`, `denda_masuk`, `denda_istirahat`) VALUES
-(1, 30000, 20000);
+INSERT INTO `tb_denda` (`id_denda`, `denda_masuk`, `denda_istirahat`, `denda_pulang`, `denda_tidak_lengkap`) VALUES
+(1, 30000, 20000, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -528,6 +530,8 @@ CREATE TABLE `tb_realisasi_detail` (
   `id_karyawan` int NOT NULL,
   `r_upah` int NOT NULL,
   `r_potongan_lainnya` int NOT NULL DEFAULT '0',
+  `r_potongan_pulang` int NOT NULL DEFAULT '0',
+  `r_potongan_tidak_lengkap` int NOT NULL DEFAULT '0',
   `r_jam_masuk` varchar(20) NOT NULL,
   `r_jam_keluar` varchar(20) NOT NULL,
   `r_istirahat_masuk` varchar(20) NOT NULL,

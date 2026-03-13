@@ -77,6 +77,8 @@ if (isset($_GET['id'])) {
     $dataDenda = $queryDenda->fetch_assoc();
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
     $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
+    $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
+    $globalDendaTidakLengkap = $dataDenda['denda_tidak_lengkap'] ?? 0;
 } else {
     $datatglrealisasi    = "";
     $dataketerangan      = "";
@@ -218,6 +220,8 @@ if (!function_exists('rupiah')) {
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Pulang</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Tidak Absen</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah Setelah Potongan</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle">Hasil</th>
@@ -240,6 +244,33 @@ if (!function_exists('rupiah')) {
 
                                     // Highlight if status is 'Tidak Hadir' or data is fully missing
                                     $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || $isFullMissing) ? 'bg-red-custom' : '';
+
+                                    // Logic Incomplete Log (One sided or missing break)
+                                    $hasIncompleteMain = (
+                                        (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00')) ||
+                                        ((empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00')
+                                    );
+                                    $hasIncompleteBreak = (
+                                        (!empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00' && (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00')) ||
+                                        ((empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') && !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00')
+                                    );
+                                    
+                                    $isEarlyOut = (!empty($data['ra_keluar']) && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
+                                    
+                                    // Incomplete if: One is missing OR (Both missing AND status is NOT 'Tidak Hadir' AND it's a scheduled workday)
+                                    $isTotalMissing = (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00');
+                                    $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $data['status_rkk'] != 'Tidak Hadir'));
+
+                                    // Gunakan denda tersimpan jika sudah di-approve/simpan, jika tidak pakai kalkulasi dinamis
+                                    if ($data['status_realisasi_detail'] > 0) {
+                                        $potPulangValue = $data['r_potongan_pulang'];
+                                        $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
+                                    } else {
+                                        $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+                                        $potTidakLengkapValue = $isIncompleteLog ? $globalDendaTidakLengkap : 0;
+                                    }
+                                    
+                                    $potExtraValue = $potPulangValue + $potTidakLengkapValue;
                                 ?>
                                     <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
@@ -282,8 +313,7 @@ if (!function_exists('rupiah')) {
                                             echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $isLate) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_masuk']; ?></td>
                                         <td data-label="Absen Pulang" class="<?php 
-                                            $isEarlyOut = (!empty($data['ra_keluar']) && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($isEarlyOut || $data['r_potongan_lainnya'] > 0 ? 'bg-yellow-custom' : ''); 
+                                            echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($isEarlyOut || $data['r_potongan_lainnya'] > 0 || $isIncompleteLog ? 'bg-yellow-custom' : ''); 
                                         ?>"><?php echo $data['ra_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
@@ -304,7 +334,11 @@ if (!function_exists('rupiah')) {
                                         </td>
                                         <td data-label="Pot. Telat" class="text-right <?php echo ($isLate) ? 'bg-red-custom' : ''; ?>"><?= rupiah($isLate ? $globalDendaMasuk : 0) ?></td>
                                         <td data-label="Pot. Istirahat" class="text-right <?php echo ($isLateBreak) ? 'bg-red-custom' : ''; ?>"><?= rupiah($isLateBreak ? $globalDendaIstirahat : 0) ?></td>
-                                        <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($data['r_potongan_lainnya']) ?></td>
+                                        <td data-label="Pot. Pulang" class="text-right <?php echo ($potPulangValue > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($potPulangValue) ?></td>
+                                        <td data-label="Pot. Tidak Absen" class="text-right <?php echo ($potTidakLengkapValue > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($potTidakLengkapValue) ?></td>
+                                        <td data-label="Pot. Lain" class="text-right <?php echo ($data['r_potongan_lainnya'] > 0) ? 'bg-yellow-custom' : ''; ?>">
+                                            <?= rupiah($data['r_potongan_lainnya']) ?>
+                                        </td>
 
                                         <?php
                                         // Sesuaikan isi data potongan dengan denda global
@@ -316,9 +350,10 @@ if (!function_exists('rupiah')) {
                                             $data['lembur'] = 0;
                                             $potTelatValue = 0;
                                             $potIstirahatValue = 0;
+                                            $potExtraValue = 0;
                                             $data['r_potongan_lainnya'] = 0;
                                         }
-                                        $upah_setelah_potongan = $data['upahkaryawan'] + $data['lembur'] - $potTelatValue - $potIstirahatValue - $data['r_potongan_lainnya'];
+                                        $upah_setelah_potongan = $data['upahkaryawan'] + $data['lembur'] - $potTelatValue - $potIstirahatValue - $data['r_potongan_lainnya'] - $potExtraValue;
                                         ?>
                                         <?php if ($data['status_rkk'] != 'Digantikan') $jml_active++; ?>
                                         <td data-label="Upah Setelah Potongan" class="text-right font-black text-blue-700">

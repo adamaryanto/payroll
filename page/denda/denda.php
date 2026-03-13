@@ -4,14 +4,23 @@ $tampil = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
 $data = $tampil->fetch_assoc();
 $dendamasuk = $data['denda_masuk'] ?? '';
 $dendaistirahat = $data['denda_istirahat'] ?? '';
+$dendapulang = $data['denda_pulang'] ?? '';
+$dendatidaklengkap = $data['denda_tidak_lengkap'] ?? '';
 
 // Memproses saat tombol simpan ditekan (Dipindah ke atas agar lebih rapi)
 if (isset($_POST['simpan'])) {
     $tdendamasuk = $_POST['tdendamasuk'] ?? '';
     $tdendaistirahat = $_POST['tdendaistirahat'] ?? '';
+    $tdendapulang = $_POST['tdendapulang'] ?? '';
+    $tdendatidaklengkap = $_POST['tdendatidaklengkap'] ?? '';
     
     // Proses Update ke Database
-    $sql = $koneksi->query("UPDATE tb_denda SET denda_masuk = '$tdendamasuk', denda_istirahat = '$tdendaistirahat'");
+    $sql = $koneksi->query("UPDATE tb_denda SET 
+        denda_masuk = '$tdendamasuk', 
+        denda_istirahat = '$tdendaistirahat',
+        denda_pulang = '$tdendapulang',
+        denda_tidak_lengkap = '$tdendatidaklengkap'
+    ");
     
     if ($sql) {
         echo '<script type="text/javascript">
@@ -34,7 +43,7 @@ if (isset($_POST['simpan'])) {
                 <i class="fas fa-money-bill-wave mr-3"></i>
                 Pengaturan Denda
             </h3>
-            <p class="text-slate-300 text-sm mt-1">Atur nominal potongan denda untuk keterlambatan kerja</p>
+            <p class="text-slate-300 text-sm mt-1">Atur nominal potongan denda untuk kedisiplinan kerja</p>
         </div>
         
         <form method="POST">
@@ -42,7 +51,7 @@ if (isset($_POST['simpan'])) {
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">
-                            Denda Masuk <span class="text-rose-500">*</span>
+                            Denda Masuk (Telat) <span class="text-rose-500">*</span>
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -55,13 +64,39 @@ if (isset($_POST['simpan'])) {
 
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">
-                            Denda Istirahat <span class="text-rose-500">*</span>
+                            Denda Istirahat (Telat) <span class="text-rose-500">*</span>
                         </label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <span class="text-gray-400 font-bold">Rp</span>
                             </div>
                             <input placeholder="0" autocomplete="off" type="number" name="tdendaistirahat" value="<?= htmlspecialchars($dendaistirahat) ?>" required 
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">
+                            Denda Pulang Awal <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 font-bold">Rp</span>
+                            </div>
+                            <input placeholder="0" autocomplete="off" type="number" name="tdendapulang" value="<?= htmlspecialchars($dendapulang) ?>" required 
+                                   class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">
+                            Denda Log Gak Lengkap <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-400 font-bold">Rp</span>
+                            </div>
+                            <input placeholder="0" autocomplete="off" type="number" name="tdendatidaklengkap" value="<?= htmlspecialchars($dendatidaklengkap) ?>" required 
                                    class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out font-medium"/>
                         </div>
                     </div>
