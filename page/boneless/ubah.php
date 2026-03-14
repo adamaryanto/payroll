@@ -98,6 +98,10 @@ if ($simpan) {
                                         <?php 
                                         $no = 1; 
                                         while ($detail = $sql_detail->fetch_assoc()): 
+                                            // Format nilai: jika 0 maka kosongkan string agar input tidak terisi '0'
+                                            $val_qty = ($detail['qty'] == 0) ? "" : $detail['qty'];
+                                            $val_harga = ($detail['harga'] == 0) ? "" : $detail['harga'];
+                                            $val_total = ($detail['total'] == 0) ? "" : $detail['total'];
                                         ?>
                                         <tr class="item-row">
                                             <td class="text-center align-middle font-bold text-gray-400"><?= $no++ ?></td>
@@ -105,13 +109,13 @@ if ($simpan) {
                                                 <input type="text" name="nama_item[]" class="form-control" value="<?= $detail['nama_item'] ?>" required>
                                             </td>
                                             <td>
-                                                <input type="number" step="0.01" name="qty[]" class="form-control text-center qty-input" value="<?= $detail['qty'] ?>" placeholder="0.00">
+                                                <input type="number" step="0.01" name="qty[]" class="form-control text-center qty-input" value="<?= $val_qty ?>" placeholder="0.00">
                                             </td>
                                             <td>
-                                                <input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $detail['harga'] ?>" required>
+                                                <input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $val_harga ?>" required>
                                             </td>
                                             <td>
-                                                <input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 total-row-input" readonly value="<?= $detail['total'] ?>">
+                                                <input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 total-row-input" readonly value="<?= ($val_total === '') ? '0' : $val_total ?>">
                                             </td>
                                             <td class="text-center">
                                                 <button type="button" class="btn btn-xs btn-outline-danger remove-row"><i class="fas fa-times"></i></button>
