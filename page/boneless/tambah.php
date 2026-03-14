@@ -24,7 +24,7 @@ if ($simpan) {
             $hrg = $hargas[$i];
             $ttl = $totals[$i];
 
-            if ($qty > 0 || $ttl > 0) {
+            if ($qty >= 0 || $ttl >= 0) {
                 $koneksi->query("INSERT INTO tb_boneless_detail (id_boneless, nama_item, qty, harga, total) VALUES ('$id_header', '$item', '$qty', '$hrg', '$ttl')");
             }
         }
