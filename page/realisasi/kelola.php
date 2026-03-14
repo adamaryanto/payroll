@@ -77,7 +77,8 @@ if (isset($_GET['id'])) {
     $queryDenda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
     $dataDenda = $queryDenda->fetch_assoc();
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
-    $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
+    $globalDendaIstirahatKeluar = $dataDenda['denda_istirahat_keluar'] ?? 0;
+    $globalDendaIstirahatMasuk = $dataDenda['denda_istirahat_masuk'] ?? 0;
     $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
     $globalDendaTidakLengkap = $dataDenda['denda_tidak_lengkap'] ?? 0;
 } else {
@@ -271,7 +272,8 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Upah Pokok</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Lembur</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Telat</th>
-                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat (Awal)</th>
+                                    <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Istirahat (Telat)</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Denda Pulang</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Denda Tidak Absen</th>
                                     <th class="py-2 px-2 text-[12px] font-bold text-gray-700 uppercase align-middle text-right">Pot. Lain</th>
@@ -313,13 +315,16 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                     $isLate = (!empty($data['ra_masuk']) && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
                                     $isLateBreak = (!empty($data['ra_istirahat_masuk']) && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
 
+                                    $isEarlyBreak = (!empty($data['ra_istirahat_keluar']) && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
+
                                     // Denda logic
                                     if ($data['status_realisasi_detail'] == 1) {
                                         // Data is already saved manually
                                         $potPulangValue = $data['r_potongan_pulang'];
                                         $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
                                         $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-                                        $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+                                        $potIstirahatKeluarValue = $isEarlyBreak ? $globalDendaIstirahatKeluar : 0;
+                                        $potIstirahatMasukValue = $isLateBreak ? $globalDendaIstirahatMasuk : 0;
                                         $potLainnyaValue = $data['r_potongan_lainnya'];
                                     } else {
                                         // Still in Draft or Synced from machine
@@ -331,7 +336,8 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                         
                                         // Always apply lateness penalty if a valid log exists
                                         $potTelatValue = ($isLate && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaMasuk : 0;
-                                        $potIstirahatValue = ($isLateBreak && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaIstirahat : 0;
+                                        $potIstirahatKeluarValue = ($isEarlyBreak && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaIstirahatKeluar : 0;
+                                        $potIstirahatMasukValue = ($isLateBreak && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaIstirahatMasuk : 0;
                                         $potLainnyaValue = $data['r_potongan_lainnya'];
                                     }
 
@@ -357,21 +363,23 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                             } else {
                                                 // It's incomplete. 
                                                 $potTelatValue = 0;
-                                                $potIstirahatValue = 0;
+                                                $potIstirahatKeluarValue = 0;
+                                                $potIstirahatMasukValue = 0;
                                                 $potPulangValue = 0;
                                                 // Keep $potTidakLengkapValue from line 328
                                             }
                                         } else {
                                             // Replaced or marked Tidak Hadir explicitly
                                             $potTelatValue = 0;
-                                             $potIstirahatValue = 0;
+                                             $potIstirahatKeluarValue = 0;
+                                             $potIstirahatMasukValue = 0;
                                              $potPulangValue = 0;
                                              $potTidakLengkapValue = 0;
                                              $potLainnyaValue = 0;
                                         }
                                     }
 
-                                    $upah_setelah_potongan = $finalUpah + $finalLembur - $potTelatValue - $potIstirahatValue - $potLainnyaValue - $potPulangValue - $potTidakLengkapValue;
+                                    $upah_setelah_potongan = $finalUpah + $finalLembur - $potTelatValue - $potIstirahatKeluarValue - $potIstirahatMasukValue - $potLainnyaValue - $potPulangValue - $potTidakLengkapValue;
                                 ?>
                                     <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
@@ -419,9 +427,11 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                         <td data-label="Absen Pulang" class="<?php 
                                             echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($potPulangValue > 0 || $potLainnyaValue > 0 || $potTidakLengkapValue > 0 ? 'bg-yellow-custom' : ''); 
                                         ?>"><?php echo $data['ra_keluar']; ?></td>
-                                        <td data-label="Absen Istirahat Keluar" class="<?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
+                                        <td data-label="Absen Istirahat Keluar" class="<?php 
+                                            echo (((empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') && (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00')) || $isEarlyBreak) ? 'bg-red-custom' : ''; 
+                                        ?>"><?php echo $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
-                                            echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00' || $potIstirahatValue > 0) ? 'bg-red-custom' : ''; 
+                                            echo (((empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00') && (!empty($data['r_istirahat_masuk']) && $data['r_istirahat_masuk'] != '00:00:00')) || $isLateBreak) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo $data['ra_istirahat_masuk']; ?></td>
 
                                         <td data-label="Upah Pokok" class="text-right">
@@ -431,7 +441,8 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                             <?= rupiah($finalLembur) ?>
                                         </td>
                                         <td data-label="Pot. Telat" class="text-right <?php echo ($potTelatValue > 0) ? 'bg-red-custom' : ''; ?>"><?= rupiah($potTelatValue) ?></td>
-                                        <td data-label="Pot. Istirahat" class="text-right <?php echo ($potIstirahatValue > 0) ? 'bg-red-custom' : ''; ?>"><?= rupiah($potIstirahatValue) ?></td>
+                                        <td data-label="Pot. Istirahat (Awal)" class="text-right <?php echo ($potIstirahatKeluarValue > 0) ? 'bg-red-custom' : ''; ?>"><?= rupiah($potIstirahatKeluarValue) ?></td>
+                                        <td data-label="Pot. Istirahat (Telat)" class="text-right <?php echo ($potIstirahatMasukValue > 0) ? 'bg-red-custom' : ''; ?>"><?= rupiah($potIstirahatMasukValue) ?></td>
                                         <td data-label="Pot. Pulang" class="text-right <?php echo ($potPulangValue > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($potPulangValue) ?></td>
                                         <td data-label="Pot. Tidak Absen" class="text-right <?php echo ($potTidakLengkapValue > 0) ? 'bg-yellow-custom' : ''; ?>"><?= rupiah($potTidakLengkapValue) ?></td>
                                         <td data-label="Pot. Lain" class="text-right <?php echo ($potLainnyaValue > 0) ? 'bg-yellow-custom' : ''; ?>">

@@ -68,7 +68,8 @@ if (isset($_GET['id'])) {
     $queryDenda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
     $dataDenda = $queryDenda->fetch_assoc();
     $globalDendaMasuk = $dataDenda['denda_masuk'] ?? 0;
-    $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
+    $globalDendaIstirahatKeluar = $dataDenda['denda_istirahat_keluar'] ?? 0;
+    $globalDendaIstirahatMasuk = $dataDenda['denda_istirahat_masuk'] ?? 0;
     $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
     $globalDendaTidakLengkap = $dataDenda['denda_tidak_lengkap'] ?? 0;
 
@@ -83,7 +84,10 @@ if (isset($_GET['id'])) {
     $hasilpotongantelat = $isLate ? $globalDendaMasuk : 0;
 
     $isLateBreak = (!empty($jamIstirahatMasukRealisasi) && !empty($datadetail['shift_istirahat_masuk']) && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
-    $hasilpotonganistirahat = $isLateBreak ? $globalDendaIstirahat : 0;
+    $hasilpotonganistirahatmasuk = $isLateBreak ? $globalDendaIstirahatMasuk : 0;
+
+    $isEarlyBreak = (!empty($jamIstirahatKeluarRealisasi) && !empty($datadetail['shift_istirahat_keluar']) && strtotime($jamIstirahatKeluarRealisasi) < strtotime($datadetail['shift_istirahat_keluar']));
+    $hasilpotonganistirahatkeluar = $isEarlyBreak ? $globalDendaIstirahatKeluar : 0;
 
     // Logic Incomplete Log
     $hasIncompleteMain = (
@@ -246,7 +250,8 @@ if (!function_exists('rupiah')) {
                 <div class="row">
                     <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $upahPokokTampil ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                     <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. ISTIRAHAT</label> <input type="number" name="tpotistirahat" value="<?= $hasilpotonganistirahat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. IST (AWAL)</label> <input type="number" name="tpotistirahatkeluar" value="<?= $hasilpotonganistirahatkeluar ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. IST (TELAT)</label> <input type="number" name="tpotistirahatmasuk" value="<?= $hasilpotonganistirahatmasuk ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
                     <div class="form-group col-md-2"> <label>POT. PULANG AWAL</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control" readonly style="background: #f1f5f9;"> </div>
                     <div class="form-group col-md-2"> <label>POT. ABSEN TIDAK LENGKAP</label> <input type="number" name="tpotlog" value="<?= $hasilpotongantidaklengkap ?>" class="form-control" readonly style="background: #f1f5f9;"> </div>
                 </div>
@@ -256,7 +261,7 @@ if (!function_exists('rupiah')) {
                     <div class="form-group col-md-2"> <label>LEMBUR</label> <input type="number" name="tlembur" value="<?= $datadetail['lembur'] ?>" class="form-control" required> </div>
                     <div class="form-group col-md-2"> 
                         <label>TOTAL UPAH AKHIR</label> 
-                        <?php $totalAkhir = $upahPokokTampil + $datadetail['lembur'] - $hasilpotongantelat - $hasilpotonganistirahat - $datadetail['r_potongan_lainnya'] - $hasilpotonganpulang - $hasilpotongantidaklengkap; ?>
+                        <?php $totalAkhir = $upahPokokTampil + $datadetail['lembur'] - $hasilpotongantelat - $hasilpotonganistirahatkeluar - $hasilpotonganistirahatmasuk - $datadetail['r_potongan_lainnya'] - $hasilpotonganpulang - $hasilpotongantidaklengkap; ?>
                         <input type="text" value="<?= rupiah($totalAkhir) ?>" class="form-control font-bold text-blue-600" readonly style="background: #eff6ff;"> 
                     </div>
                 </div>
