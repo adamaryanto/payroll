@@ -7,8 +7,10 @@ if ($simpan) {
     $jumlah_mobil = @$_POST['jumlah_mobil'];
     $keterangan = @$_POST['keterangan'];
 
+    $id_rkk = @$_POST['id_rkk'];
+
     // Insert Header
-    $sql_header = $koneksi->query("INSERT INTO tb_boneless (tgl, jumlah_mobil, keterangan, tgl_updt) VALUES ('$tgl', '$jumlah_mobil', '$keterangan', NOW())");
+    $sql_header = $koneksi->query("INSERT INTO tb_boneless (id_rkk, tgl, jumlah_mobil, keterangan, tgl_updt) VALUES ('$id_rkk', '$tgl', '$jumlah_mobil', '$keterangan', NOW())");
     $id_header = $koneksi->insert_id;
 
     if ($id_header) {
@@ -82,15 +84,16 @@ $default_items = [
                         <div class="row mb-2">
                             <div class="col-md-4 form-group mb-3 md:mb-0">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Rencana</label>
-                                <select name="tgl" class="form-control h-[42px]" required>
+                                <select name="id_rkk" id="id_rkk_select" class="form-control h-[42px]" required>
                                     <option value="">-- Pilih Rencana --</option>
                                     <?php
                                     $sql_rkk = $koneksi->query("SELECT * FROM tb_rkk WHERE status_rkk = '0' ORDER BY tgl_rkk DESC");
                                     while ($row_rkk = $sql_rkk->fetch_assoc()) {
-                                        echo '<option value="' . $row_rkk['tgl_rkk'] . '">' . date('d-m-Y', strtotime($row_rkk['tgl_rkk'])) . ' - ' . $row_rkk['keterangan'] . '</option>';
+                                        echo '<option value="' . $row_rkk['id_rkk'] . '" data-tgl="' . $row_rkk['tgl_rkk'] . '">' . date('d-m-Y', strtotime($row_rkk['tgl_rkk'])) . ' - ' . $row_rkk['keterangan'] . '</option>';
                                     }
                                     ?>
                                 </select>
+                                <input type="hidden" name="tgl" id="tgl_hidden">
                             </div>
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Jumlah Mobil (Potong)</label>
@@ -317,5 +320,14 @@ $default_items = [
 
         // Init
         calculate();
+
+        // Update hidden tgl based on selected RKK
+        const rkkSelect = document.getElementById('id_rkk_select');
+        const tglHidden = document.getElementById('tgl_hidden');
+
+        rkkSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            tglHidden.value = selectedOption.getAttribute('data-tgl') || '';
+        });
     });
 </script>

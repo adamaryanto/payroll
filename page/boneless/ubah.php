@@ -9,12 +9,13 @@ $sql_detail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneles
 
 $simpan = @$_POST['simpan'];
 if ($simpan) {
+    $id_rkk = @$_POST['id_rkk'];
     $tgl = @$_POST['tgl'];
     $jumlah_mobil = @$_POST['jumlah_mobil'];
     $keterangan = @$_POST['keterangan'];
 
     // Update Header
-    $koneksi->query("UPDATE tb_boneless SET tgl = '$tgl', jumlah_mobil = '$jumlah_mobil', keterangan = '$keterangan' WHERE id_boneless = '$id'");
+    $koneksi->query("UPDATE tb_boneless SET id_rkk = '$id_rkk', tgl = '$tgl', jumlah_mobil = '$jumlah_mobil', keterangan = '$keterangan' WHERE id_boneless = '$id'");
 
     // Sync Details: Delete and Re-insert
     $koneksi->query("DELETE FROM tb_boneless_detail WHERE id_boneless = '$id'");
@@ -77,16 +78,17 @@ if ($simpan) {
                         <div class="row">
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Rencana</label>
-                                <select name="tgl" class="form-control" required>
+                                <select name="id_rkk" id="id_rkk_select" class="form-control" required>
                                     <option value="">-- Pilih Rencana --</option>
                                     <?php
                                     $sql_rkk = $koneksi->query("SELECT * FROM tb_rkk ORDER BY tgl_rkk DESC");
                                     while ($row_rkk = $sql_rkk->fetch_assoc()) {
-                                        $selected = ($row_rkk['tgl_rkk'] == $header['tgl']) ? 'selected' : '';
-                                        echo '<option value="' . $row_rkk['tgl_rkk'] . '" ' . $selected . '>' . date('d-m-Y', strtotime($row_rkk['tgl_rkk'])) . ' - ' . $row_rkk['keterangan'] . '</option>';
+                                        $selected = ($row_rkk['id_rkk'] == $header['id_rkk']) ? 'selected' : '';
+                                        echo '<option value="' . $row_rkk['id_rkk'] . '" data-tgl="' . $row_rkk['tgl_rkk'] . '" ' . $selected . '>' . date('d-m-Y', strtotime($row_rkk['tgl_rkk'])) . ' - ' . $row_rkk['keterangan'] . '</option>';
                                     }
                                     ?>
                                 </select>
+                                <input type="hidden" name="tgl" id="tgl_hidden" value="<?= $header['tgl'] ?>">
                             </div>
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Jumlah Mobil (Potong)</label>
@@ -233,5 +235,14 @@ if ($simpan) {
 
         // Init
         calculate();
+
+        // Update hidden tgl based on selected RKK
+        const rkkSelect = document.getElementById('id_rkk_select');
+        const tglHidden = document.getElementById('tgl_hidden');
+
+        rkkSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            tglHidden.value = selectedOption.getAttribute('data-tgl') || '';
+        });
     });
 </script>

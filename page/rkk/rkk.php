@@ -10,7 +10,7 @@ $where_rkk = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_rkk >
 $tampil = $koneksi->query("SELECT A.*, 
     (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml, 
     (SELECT SUM(CASE WHEN status_rkk = 'Digantikan' THEN 0 ELSE upah END) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk) as ttl,
-    (SELECT COUNT(id_boneless) FROM tb_boneless WHERE tgl = A.tgl_rkk) as jml_boneless 
+    (SELECT COUNT(id_boneless) FROM tb_boneless WHERE id_rkk = A.id_rkk) as jml_boneless 
     FROM tb_rkk A $where_rkk");
 if (strtolower($_SESSION['role']) != "owner") {
     $level_status =  "Hidden";
@@ -391,6 +391,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                                                 data-id="<?= $data['id_rkk']; ?>"
                                                 data-action="app"
                                                 data-jml="<?= $data['jml']; ?>"
+                                                data-boneless="<?= $data['jml_boneless']; ?>"
                                                 data-text="Approve data ini?">
                                                 <i class="fas fa-check mr-1"></i> Approve
                                             </button>
@@ -467,7 +468,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                     return;
                 }
                 
-                if (action === 'pro' && boneless == 0) {
+                if ((action === 'pro' || action === 'app') && boneless == 0) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Boneless Belum Diinput',

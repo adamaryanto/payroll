@@ -40,8 +40,8 @@ if($status == "pro"){
         exit;
     }
 
-    // Cek apakah ada data Boneless untuk tanggal tersebut
-    $cek_boneless = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE tgl = '$tgl_rkk'");
+    // Cek apakah ada data Boneless untuk RKK ini (Specific by ID)
+    $cek_boneless = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE id_rkk = '$id'");
     
     if ($cek_boneless->num_rows == 0) {
         $pesan = "Tidak bisa propose data! Silakan lengkapi data Boneless untuk tanggal " . date('d/m/Y', strtotime($tgl_rkk)) . " terlebih dahulu.";
@@ -111,6 +111,35 @@ if($status == "pro"){
                     icon: 'error',
                     title: 'Data Kosong',
                     text: 'Tidak bisa approve data! Silakan tambahkan data karyawan terlebih dahulu.',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
+            </script>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+
+    // New: Check Boneless before Approve as well
+    $cek_boneless = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE id_rkk = '$id'");
+    if ($cek_boneless->num_rows == 0) {
+        $cek_rkk = $koneksi->query("SELECT tgl_rkk FROM tb_rkk WHERE id_rkk = '$id'");
+        $tgl_rkk = $cek_rkk->fetch_assoc()['tgl_rkk'];
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Boneless Belum Ada',
+                    text: 'Tidak bisa approve data! Silakan lengkapi data Boneless untuk Rencana ini terlebih dahulu.',
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 }).then((result) => {
