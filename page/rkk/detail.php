@@ -7,7 +7,7 @@ if (isset($_GET['id'])) {
    $tampildetail = $koneksi->query("
    SELECT A.*, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar, J.keterangan as nama_shift, B.nama_karyawan, B.no_absen,
    B.id_departmen, B.id_sub_department, BD.nama_departmen, BC.nama_sub_department, B.jenis_kelamin,
-   R.keterangan as keterangan_rkk, R.tgl_rkk, R.detail_rkk, R.jam_kerja
+   R.keterangan as keterangan_rkk, R.tgl_rkk, R.detail_rkk, R.jam_kerja, R.status_rkk
    FROM tb_rkk_detail A
    LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
    LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
@@ -22,6 +22,9 @@ if (isset($_GET['id'])) {
    $dataketeranganrkk = $datadetail['keterangan_rkk'];
    $datadetailrkk   = $datadetail['detail_rkk'];
    $datajamkerja   = $datadetail['jam_kerja'];
+   $datastatusrkk  = $datadetail['status_rkk'];
+   $readonly       = ($datastatusrkk >= 2) ? "readonly" : "";
+   $disabled       = ($datastatusrkk >= 2) ? "disabled" : "";
 
    $datajammasuk = $datadetail['jam_masuk'];
    $datajamkeluar = $datadetail['jam_keluar'];
@@ -142,7 +145,7 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="form-group col-md-3">
                         <label>JAM KERJA</label>
-                        <input type="number" name="tjamkerja" value="<?= $datajamkerja ?>" class="form-control" />
+                        <input type="number" name="tjamkerja" value="<?= $datajamkerja ?>" class="form-control" <?= $readonly ?> />
                     </div>
                 </div>
 
@@ -158,8 +161,8 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="form-group col-md-4">
                         <label>BAGIAN</label>
-                        <select class="form-control" name="tdepartmen">
-                             <option value="<?= $dataiddepartmen ?>"><?= $databagian ?></option>
+                        <select class="form-control" name="tdepartmen" <?= $disabled ?>>
+                             <option value="<?= $dataididdepartmen ?>"><?= $databagian ?></option>
                              <?php
                              $sqldept = $koneksi->query("select * from ms_departmen");
                              while ($d = $sqldept->fetch_array()) { echo "<option value='$d[id_departmen]'>$d[nama_departmen]</option>"; }
@@ -172,7 +175,7 @@ if (isset($_GET['id'])) {
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label>SHIFT</label>
-                        <select class="form-control" name="tshift" required>
+                        <select class="form-control" name="tshift" required <?= $disabled ?>>
                            <option value="<?= $dataidjadwal ?>"><?= $dataketerangan ?></option>
                            <?php
                            $sql = $koneksi->query("select * from tb_jadwal");
@@ -182,19 +185,19 @@ if (isset($_GET['id'])) {
                     </div>
                     <div class="form-group col-md-2">
                         <label>UPAH</label>
-                        <input type="number" name="tupah" value="<?= $dataupah ?>" class="form-control" required />
+                        <input type="number" name="tupah" value="<?= $dataupah ?>" class="form-control" required <?= $readonly ?> />
                     </div>
                     <div class="form-group col-md-2">
                         <label>POT. TELAT</label>
-                        <input type="number" name="tpottelat" value="<?= $datapotongantelat ?>" class="form-control" required />
+                        <input type="number" name="tpottelat" value="<?= $datapotongantelat ?>" class="form-control" required <?= $readonly ?> />
                     </div>
                     <div class="form-group col-md-2">
                         <label>POT. ISTIRAHAT</label>
-                        <input type="number" name="tpotistirahat" value="<?= $datapotonganistirahat ?>" class="form-control" required />
+                        <input type="number" name="tpotistirahat" value="<?= $datapotonganistirahat ?>" class="form-control" required <?= $readonly ?> />
                     </div>
                     <div class="form-group col-md-3">
                         <label>POT. LAINNYA</label>
-                        <input type="number" name="tpotlainnya" value="<?= $datapotonganlainnya ?>" class="form-control" required />
+                        <input type="number" name="tpotlainnya" value="<?= $datapotonganlainnya ?>" class="form-control" required <?= $readonly ?> />
                     </div>
                 </div>
 
@@ -202,9 +205,11 @@ if (isset($_GET['id'])) {
                     <a href="?page=rkk&aksi=kelola&id=<?= $dataidrkk ?>" class="btn btn-warning-custom btn-custom">
                         <i class="fa fa-arrow-left"></i> Kembali
                     </a>
-                    <button type="submit" name="simpan" class="btn btn-primary-custom btn-custom">
-                        <i class="fa fa-save"></i> Simpan Perubahan
-                    </button>
+                    <?php if ($datastatusrkk < 2) : ?>
+                        <button type="submit" name="simpan" class="btn btn-primary-custom btn-custom">
+                            <i class="fa fa-save"></i> Simpan Perubahan
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
         </form>
@@ -228,6 +233,14 @@ $simpan = @$_POST['simpan'];
 
 
 if ($simpan) {
+   // Server-side validation
+   $cek_rkk = $koneksi->query("SELECT status_rkk FROM tb_rkk WHERE id_rkk = '$dataidrkk'");
+   $data_rkk = $cek_rkk->fetch_assoc();
+   if ($data_rkk['status_rkk'] >= 2) {
+       echo "<script>alert('Gagal: RKK sudah Approved/Realized!'); window.location.href='?page=rkk&aksi=kelola&id=$dataidrkk';</script>";
+       exit;
+   }
+
    $tampil = $koneksi->query("sELECT * from tb_jadwal WHERE id_jadwal = '$tshift' ");
    $data = $tampil->fetch_assoc();
    $tjammasuk = $data['jam_masuk'];

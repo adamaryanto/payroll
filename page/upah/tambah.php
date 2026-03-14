@@ -6,10 +6,44 @@ if (isset($_POST['simpan'])) {
 
     $sql = $koneksi->query("INSERT INTO ms_upah (upah_harian, upah_mingguan, upah_bulanan) VALUES ('$tharian', '$tmingguan', '$tbulanan')");
     if ($sql) {
-        echo '<script>alert("Data Tersimpan"); window.location.href="?page=upah";</script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Tersimpan',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=upah';
+                });
+            </script>
+        </body>
+        </html>";
         exit;
     } else {
-        echo '<script>alert("Gagal menyimpan: ' . $koneksi->error . '");</script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal menyimpan data upah!',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>

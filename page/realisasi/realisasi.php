@@ -150,17 +150,23 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                          <!-- Approve/Unapprove: Only for Owner -->
                                          <?php if ($is_authorized) : ?>
                                              <?php if ($data['status_realisasi'] != 'approve') : ?>
-                                                 <a href="?page=realisasi&aksi=accept&id=<?= $data['id_realisasi']; ?>"
-                                                     class="px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
-                                                     onclick="return confirm('Apakah Anda yakin ingin Approve data ini?');" title="Approve">
+                                                 <button type="button" 
+                                                     class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
+                                                     data-id="<?= $data['id_realisasi']; ?>"
+                                                     data-action="accept"
+                                                     data-text="Apakah Anda yakin ingin Approve data ini?"
+                                                     title="Approve">
                                                      <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
-                                                 </a>
+                                                 </button>
                                              <?php else : ?>
-                                                 <a href="?page=realisasi&aksi=unapprove&id=<?= $data['id_realisasi']; ?>&iddetail=unapp"
-                                                     class="px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
-                                                     onclick="return confirm('Apakah Anda yakin ingin Unapprove data ini?');" title="Unapprove">
+                                                 <button type="button" 
+                                                     class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
+                                                     data-id="<?= $data['id_realisasi']; ?>"
+                                                     data-action="unapprove"
+                                                     data-text="Apakah Anda yakin ingin Unapprove data ini?"
+                                                     title="Unapprove">
                                                      <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Un-Approve</span>
-                                                 </a>
+                                                 </button>
                                              <?php endif; ?>
                                          <?php endif; ?>
 
@@ -422,6 +428,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
     }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
@@ -442,6 +449,36 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                     next: "Next"
                 }
             }
+        });
+
+        // SweetAlert Action Confirmation - Using delegation for better reliability with DataTables
+        $(document).on('click', '.btn-action-realisasi', function() {
+            const id = $(this).data('id');
+            const action = $(this).data('action');
+            const text = $(this).data('text');
+            
+            let confirmButtonColor = '#059669'; // Emerald for accept
+            if (action === 'unapprove') confirmButtonColor = '#e11d48'; // Rose for unapprove
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: text,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: confirmButtonColor,
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Lanjutkan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (action === 'accept') {
+                        window.location.href = '?page=realisasi&aksi=accept&id=' + id;
+                    } else {
+                        window.location.href = '?page=realisasi&aksi=unapprove&id=' + id + '&iddetail=unapp';
+                    }
+                }
+            });
         });
         
         // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile

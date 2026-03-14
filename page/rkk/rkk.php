@@ -7,7 +7,11 @@ $is_authorized = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSI
 $can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
 
 $where_rkk = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_rkk > 0 " : "";
-$tampil = $koneksi->query("SELECT A.*, (select count(id_rkk_detail) from tb_rkk_detail where id_rkk = A.id_rkk and status_rkk != 'Digantikan' ) as jml, (select sum(case when status_rkk = 'Digantikan' then 0 else upah end) from tb_rkk_detail where id_rkk = A.id_rkk ) as ttl from tb_rkk A $where_rkk");
+$tampil = $koneksi->query("SELECT A.*, 
+    (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml, 
+    (SELECT SUM(CASE WHEN status_rkk = 'Digantikan' THEN 0 ELSE upah END) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk) as ttl,
+    (SELECT COUNT(id_boneless) FROM tb_boneless WHERE tgl = A.tgl_rkk) as jml_boneless 
+    FROM tb_rkk A $where_rkk");
 if (strtolower($_SESSION['role']) != "owner") {
     $level_status =  "Hidden";
 } else {
@@ -339,18 +343,20 @@ if (strtolower($_SESSION['role']) == "owner") {
                                             class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors">
                                             <i class="fa fa-print mr-1"></i> Cetak
                                         </a>
-                                        <?php if (strtolower($_SESSION['role']) == "owner") : ?>
+                                        <?php if (strtolower($_SESSION['role']) == "owner" && $data['status_rkk'] < 2) : ?>
                                             <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
-                                                <i class="fas fa-user-plus mr-1"></i> Tetapkan
+                                                <i class="fas fa-user-plus mr-1.5"></i> Tetapkan
                                             </a>
                                         <?php endif; ?>
                                         <?php if ($data['status_rkk'] == '2') : ?>
-                                            <a href="?page=realisasi&aksi=tambah&id=<?= $data['id_rkk']; ?>"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded border border-indigo-300 transition-colors"
-                                                onclick="return confirm('Buat Realisasi untuk data ini?');">
+                                            <button type="button" 
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded border border-indigo-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="realisasi"
+                                                data-text="Buat Realisasi untuk data ini?">
                                                 <i class="fas fa-check-circle mr-1"></i> Realisasi
-                                            </a>
+                                            </button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -358,27 +364,46 @@ if (strtolower($_SESSION['role']) == "owner") {
                                 <td data-label="Otorisasi" class="py-3 px-2 align-middle">
                                     <div class="action-btn-group md:justify-center">
                                         <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
-                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=pro"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors"
-                                                onclick="return confirm('Propose data ini?');"><i class="fas fa-paper-plane mr-1"></i> Propose</a>
+                                            <button type="button" 
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="pro"
+                                                data-jml="<?= $data['jml']; ?>"
+                                                data-boneless="<?= $data['jml_boneless']; ?>"
+                                                data-text="Propose data ini?">
+                                                <i class="fas fa-paper-plane mr-1"></i> Propose
+                                            </button>
                                         <?php endif; ?>
 
                                         <?php if ($data['status_rkk'] == '1' && $can_propose) : ?>
-                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unpro"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-gray-700 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-300 transition-colors"
-                                                onclick="return confirm('Tarik kembali data (Un-propose)?');"><i class="fas fa-undo mr-1"></i> Un-Propose</a>
+                                            <button type="button" 
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-gray-700 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="unpro"
+                                                data-text="Tarik kembali data (Un-propose)?">
+                                                <i class="fas fa-undo mr-1"></i> Un-Propose
+                                            </button>
                                         <?php endif; ?>
 
                                         <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && strtolower($_SESSION['role']) == "owner")) : ?>
-                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=app"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors"
-                                                onclick="return confirm('Approve data ini?');"><i class="fas fa-check mr-1"></i> Approve</a>
+                                            <button type="button" 
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="app"
+                                                data-jml="<?= $data['jml']; ?>"
+                                                data-text="Approve data ini?">
+                                                <i class="fas fa-check mr-1"></i> Approve
+                                            </button>
                                         <?php endif; ?>
 
                                         <?php if (($data['status_rkk'] == '2' || $data['status_rkk'] == '3') && $is_authorized) : ?>
-                                            <a href="?page=rkk&aksi=accept&id=<?= $data['id_rkk']; ?>&iddetail=unapp"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors"
-                                                onclick="return confirm('Batalkan Approve data ini?');"><i class="fas fa-times mr-1"></i> Un-Approve</a>
+                                            <button type="button" 
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="unapp"
+                                                data-text="Batalkan Approve data ini?">
+                                                <i class="fas fa-times mr-1"></i> Un-Approve
+                                            </button>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -399,6 +424,7 @@ if (strtolower($_SESSION['role']) == "owner") {
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
@@ -421,6 +447,62 @@ if (strtolower($_SESSION['role']) == "owner") {
             }
         });
         
+        // SweetAlert Action Confirmation - Using delegation for DataTables compatibility
+        $(document).on('click', '.btn-action-rkk', function() {
+            const id = $(this).data('id');
+            const action = $(this).data('action');
+            const text = $(this).data('text');
+            const jml = $(this).data('jml');
+            const boneless = $(this).data('boneless');
+            
+            // Validasi Data Sebelum Propose/Approve
+            if (action === 'pro' || action === 'app') {
+                if (jml == 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Data Kosong',
+                        text: 'Silakan tambahkan data karyawan terlebih dahulu!',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+                
+                if (action === 'pro' && boneless == 0) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Boneless Belum Diinput',
+                        text: 'Data Boneless untuk tanggal ini belum ditemukan. Silakan input Boneless terlebih dahulu.',
+                        confirmButtonColor: '#2563eb'
+                    });
+                    return;
+                }
+            }
+
+            let confirmButtonColor = '#2563eb'; // Default blue
+            if (action === 'unapp' || action === 'unpro') confirmButtonColor = '#e11d48'; // Rose/Red
+            if (action === 'app' || action === 'pro' || action === 'realisasi') confirmButtonColor = '#059669'; // Emerald
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: text,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: confirmButtonColor,
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Lanjutkan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (action === 'realisasi') {
+                        window.location.href = '?page=realisasi&aksi=tambah&id=' + id;
+                    } else {
+                        window.location.href = '?page=rkk&aksi=accept&id=' + id + '&iddetail=' + action;
+                    }
+                }
+            });
+        });
+
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');
     });

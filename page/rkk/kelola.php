@@ -289,19 +289,29 @@ if ($datastatusrkk == 3) {
         </a>
         <?php if ($_SESSION['role'] == "owner") : ?>
           <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
-            <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=app" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center" onclick="return confirm('Approve Rencana Kerja ini?');">
+            <button type="button" 
+              class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
+              data-id="<?= $idrkk; ?>"
+              data-action="app"
+              data-text="Approve Rencana Kerja ini?">
               <i class="fas fa-check-circle mr-1.5"></i> Approve
-            </a>
+            </button>
           <?php elseif ($datastatusrkk == 2 || $datastatusrkk == 3) : ?>
-            <a href="?page=rkk&aksi=accept&id=<?= $idrkk; ?>&iddetail=unapp" class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center" onclick="return confirm('Batalkan Approve Rencana Kerja ini?');">
+            <button type="button" 
+              class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
+              data-id="<?= $idrkk; ?>"
+              data-action="unapp"
+              data-text="Batalkan Approve Rencana Kerja ini?">
               <i class="fas fa-times-circle mr-1.5"></i> Un-Approve
-            </a>
+            </button>
           <?php endif; ?>
         <?php endif; ?>
 
-        <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
-          <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
-        </a>
+        <?php if ($datastatusrkk < 2) : ?>
+          <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+            <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
+          </a>
+        <?php endif; ?>
       </div>
     </div>
 
@@ -384,8 +394,8 @@ if ($datastatusrkk == 3) {
                   <div>Lain: Rp <?= number_format($data['potongan_lainnya'], 0, ',', '.') ?></div>
                 </td>
                 <td data-label="Aksi">
-                  <div class="aksi-buttons md:flex md:flex-col justify-center">
-                    <?php if ($data['status_rkk'] != 'Digantikan') : ?>
+                  <div class="aksi-buttons md:flex md:flex-col justify-center items-center">
+                    <?php if ($data['status_rkk'] != 'Digantikan' && $datastatusrkk < 2) : ?>
                       <a href="?page=rkk&aksi=karyawanupdate&id=<?= $data['id_rkk_detail']; ?>"
                         class="px-3 py-2 text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors text-center w-full md:w-auto mb-1">
                         <i class="fas fa-sync-alt mr-1"></i> Ganti
@@ -397,10 +407,16 @@ if ($datastatusrkk == 3) {
                         <i class="fas fa-eye mr-1"></i> Detail
                       </a>
                     <?php endif; ?>
-                    <a href="?page=rkk&aksi=hapusdetail&id=<?= $idrkk; ?>&iddetail=<?= $data['id_rkk_detail']; ?>"
-                      class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                      <i class="fas fa-trash mr-1"></i> Hapus
-                    </a>
+                    <?php if ($datastatusrkk < 2) : ?>
+                      <button type="button" 
+                        class="text-rose-500 hover:text-rose-700 transition-colors btn-delete-detail bg-transparent border-0 p-1"
+                        data-id="<?= $idrkk; ?>"
+                        data-detail-id="<?= $data['id_rkk_detail']; ?>"
+                        data-name="<?= $data['nama_karyawan']; ?>"
+                        title="Hapus">
+                        <i class="fas fa-trash-alt text-lg"></i>
+                      </button>
+                    <?php endif; ?>
                   </div>
                 </td>
               </tr>
@@ -412,6 +428,7 @@ if ($datastatusrkk == 3) {
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function() {
 
@@ -434,6 +451,52 @@ if ($datastatusrkk == 3) {
           next: "Next"
         }
       }
+    });
+
+    // SweetAlert Header Action
+    $(document).on('click', '.btn-header-action', function() {
+      const id = $(this).data('id');
+      const action = $(this).data('action');
+      const text = $(this).data('text');
+      
+      Swal.fire({
+        title: 'Konfirmasi',
+        text: text,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: action === 'app' ? '#059669' : '#e11d48',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Lanjutkan',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = '?page=rkk&aksi=accept&id=' + id + '&iddetail=' + action;
+        }
+      });
+    });
+
+    // SweetAlert Delete Detail Action
+    $(document).on('click', '.btn-delete-detail', function() {
+      const id = $(this).data('id');
+      const detailId = $(this).data('detail-id');
+      const name = $(this).data('name');
+      
+      Swal.fire({
+        title: 'Apakah anda yakin?',
+        text: "Data rencana kerja untuk " + name + " akan dihapus!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e11d48',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Ya, Hapus!',
+        cancelButtonText: 'Batal',
+        reverseButtons: true
+      }).then((result) => {
+        if (result.isConfirmed) {
+          window.location.href = '?page=rkk&aksi=hapusdetail&id=' + id + '&iddetail=' + detailId;
+        }
+      });
     });
   });
 </script>

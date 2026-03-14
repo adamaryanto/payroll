@@ -264,9 +264,12 @@
                                         <a href="?page=jadwal&aksi=ubah&id=<?php echo $data['id_jadwal']; ?>" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="?page=jadwal&aksi=hapus&id=<?php echo $data['id_jadwal']; ?>" class="p-2 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-lg transition-all" title="Hapus" onclick="return confirm('Yakin hapus data ini?')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
+                                        <button type="button" class="text-rose-500 hover:text-rose-700 transition-colors btn-delete-jadwal bg-transparent border-0 p-1" 
+                                                data-id="<?php echo $data['id_jadwal']; ?>" 
+                                                data-nama="<?php echo htmlspecialchars($data['keterangan']); ?>"
+                                                title="Hapus">
+                                            <i class="fas fa-trash-alt text-lg"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -278,6 +281,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
@@ -292,6 +296,29 @@
                 paginate: { previous: "Prev", next: "Next" }
             }
         });
+
+        // SweetAlert Delete Confirmation - Using delegation for DataTables compatibility
+        $(document).on('click', '.btn-delete-jadwal', function() {
+            const id = $(this).data('id');
+            const nama = $(this).data('nama');
+            
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Jadwal shift " + nama + " akan dihapus!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '?page=jadwal&aksi=hapus&id=' + id;
+                }
+            });
+        });
+
         $('.dataTables_filter').css('float', 'right').addClass('mb-3');
         $('.dataTables_length').css('float', 'left').addClass('mb-3');
     });

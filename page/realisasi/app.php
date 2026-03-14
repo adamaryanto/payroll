@@ -12,9 +12,25 @@ if ($status == "unapp") {
 }
 
 if ($sql) {
-    echo '<script type="text/javascript">
-            alert("Status Berhasil Di Perbarui");
-            window.location.href="?page=realisasi";
-          </script>';
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: "Status Berhasil Di Perbarui",
+                confirmButtonColor: "#2563eb",
+                confirmButtonText: "OK"
+            }).then((result) => {
+                window.location.href = "?page=realisasi";
+            });
+        </script>
+    </body>
+    </html>';
+    exit;
 }
 ?>

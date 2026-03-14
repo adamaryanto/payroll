@@ -7,6 +7,32 @@ if (isset($_GET['id'])) {
     $idrkkkaryawan = $datadetail['id_karyawan'];
     $orig_upah = $datadetail['upah'];
     $orig_jadwal = $datadetail['id_jadwal'];
+
+    // Validasi: Gabisa ganti kalo status RKK >= 2
+    $cek_rkk = $koneksi->query("SELECT status_rkk FROM tb_rkk WHERE id_rkk = '$idrkk'");
+    $data_rkk = $cek_rkk->fetch_assoc();
+    if ($data_rkk['status_rkk'] >= 2) {
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Akses Ditolak",
+                    text: "Tidak bisa mengganti karyawan karena status RKK sudah Approved/Realized!",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "Kembali"
+                }).then((result) => {
+                    window.location.href="?page=rkk&aksi=kelola&id=' . $idrkk . '";
+                });
+            </script>
+        </body>
+        </html>';
+        exit;
+    }
 } else {
     $idrkkdetail = "";
     $idrkk = "";

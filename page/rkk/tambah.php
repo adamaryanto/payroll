@@ -74,9 +74,43 @@ if (isset($_POST['simpan'])) {
                             VALUES ('$tgl_rkk', '$keterangan', '$jam_kerja', '$detail_rkk', '0', '$tgl_status')");
 
     if ($sql) {
-        echo '<script>alert("Data Berhasil Disimpan"); window.location.href="?page=rkk";</script>';
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Data Berhasil Disimpan",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
+            </script>
+        </body>
+        </html>';
     } else {
-        echo '<script>alert("Gagal Menyimpan Data: ' . $koneksi->error . '");</script>';
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Gagal Menyimpan Data: ' . addslashes($koneksi->error) . '",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                });
+            </script>
+        </body>
+        </html>';
     }
 }
 ?>

@@ -6,7 +6,25 @@ if (isset($_GET['id'])) {
     $datadetail = $tampildetail->fetch_assoc();
 
     if (!$datadetail) {
-        echo "<script>alert('Data Realisasi tidak ditemukan!'); window.location.href='?page=realisasi';</script>";
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Data Realisasi tidak ditemukan!",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    window.location.href = "?page=realisasi";
+                });
+            </script>
+        </body>
+        </html>';
         exit;
     }
 
@@ -104,14 +122,51 @@ if ($simpan) {
     $tketerangan = @$_POST['tketerangan'];
     $sql = $koneksi->query("UPDATE tb_realisasi SET keterangan = '$tketerangan' WHERE id_realisasi = '$idrealisasi'");
     if ($sql) {
-        echo "<script>alert('Data Tersimpan'); window.location.href='?page=realisasi&aksi=kelola&id=$idrealisasi';</script>";
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Data Tersimpan",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    window.location.href = "?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
+                });
+            </script>
+        </body>
+        </html>';
+        exit;
     }
 }
 
 $cleanup = @$_POST['cleanup'];
 if ($cleanup) {
     $count = syncRealisasiData($koneksi, $idrealisasi);
-    echo "<script>alert('Berhasil menarik $count data dari record mesin.'); window.location.href='?page=realisasi&aksi=kelola&id=$idrealisasi';</script>";
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: "Berhasil menarik ' . $count . ' data dari record mesin.",
+                confirmButtonColor: "#2563eb",
+                confirmButtonText: "OK"
+            }).then((result) => {
+                window.location.href = "?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
+            });
+        </script>
+    </body>
+    </html>';
     exit;
 }
 
@@ -241,9 +296,10 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                         <button type="submit" name="simpan" value="Simpan" class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none px-6 py-2">
                             <i class="fas fa-save mr-1.5"></i> Simpan Ket.
                         </button>
-                        <button type="submit" name="cleanup" value="Cleanup" class="btn btn-warning bg-amber-500 hover:bg-amber-600 border-none px-6 py-2 ml-2 text-white" onclick="return confirm('Tarik data dari record mesin?')">
+                        <button type="button" id="btn-cleanup" class="btn btn-warning bg-amber-500 hover:bg-amber-600 border-none px-6 py-2 ml-2 text-white">
                             <i class="fas fa-sync-alt mr-1.5"></i> Tarik Data
                         </button>
+                        <input type="hidden" name="cleanup" id="cleanup-input" value="">
                     </div>
                 </form>
 
@@ -968,5 +1024,26 @@ function syncRealisasiData($koneksi, $id_realisasi) {
         // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');
+
+        // SweetAlert Cleanup (Sync) Confirmation
+        $('#btn-cleanup').on('click', function() {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Tarik data dari record mesin?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b', // Amber
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Tarik Data',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#cleanup-input').val('Cleanup');
+                    $(this).closest('form').submit();
+                }
+            });
+        });
     });
-</script>   
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>   

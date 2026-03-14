@@ -3,10 +3,26 @@ $id = $_GET['id'];
 $sql = $koneksi->query("DELETE FROM ms_upah WHERE id_upah = '$id'");
 if ($sql) {
 ?>
-<script type="text/javascript">
-    alert("Data Berhasil Di Hapus");
-    window.location.href = "?page=upah";
-</script>
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: 'Data Berhasil Dihapus',
+            confirmButtonColor: '#e11d48',
+            confirmButtonText: 'Selesai'
+        }).then((result) => {
+            window.location.href = "?page=upah";
+        });
+    </script>
+</body>
+</html>
 <?php
+exit;
 }
 ?>

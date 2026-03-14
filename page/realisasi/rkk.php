@@ -78,10 +78,13 @@ $tampil = $koneksi->query($query);
                             </td>
                             <td data-label="Aksi" class="py-3 px-3 md:text-center align-middle mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
                                 <div class="action-btn-group">
-                                    <a href="?page=realisasi&aksi=tambah&id=<?= $data['id_rkk']; ?>" 
-                                       class="inline-flex items-center justify-center px-3 py-2 md:py-1.5 text-[13px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded shadow-sm transition-colors w-full md:w-auto">
+                                    <button type="button" 
+                                       class="btn-realize-rkk inline-flex items-center justify-center px-3 py-2 md:py-1.5 text-[13px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded shadow-sm transition-colors w-full md:w-auto"
+                                       data-id="<?= $data['id_rkk']; ?>"
+                                       data-jml="<?= $data['jml']; ?>"
+                                       data-text="Buat Realisasi untuk data RKK ini?">
                                         Approve <i class="fas fa-check ml-1.5 text-[11px]"></i>
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -200,6 +203,7 @@ $tampil = $koneksi->query($query);
     }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
     $('#dataTables-example').DataTable({
@@ -215,6 +219,40 @@ $(document).ready(function() {
             paginate: { previous: "Prev", next: "Next" }
         }
     });
+
+    // SweetAlert Realize Confirmation
+    $(document).on('click', '.btn-realize-rkk', function() {
+        const id = $(this).data('id');
+        const text = $(this).data('text');
+        const jml = $(this).data('jml');
+
+        if (jml == 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Data Kosong',
+                text: 'Rencana kerja ini tidak memiliki data karyawan. Silakan lengkapi data RKK terlebih dahulu!',
+                confirmButtonColor: '#4f46e5'
+            });
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Konfirmasi',
+            text: text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4f46e5', // Indigo
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Ya, Buat Realisasi',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = '?page=realisasi&aksi=tambah&id=' + id;
+            }
+        });
+    });
+
     $('.dataTables_filter').css('float', 'right').addClass('mb-3');
     $('.dataTables_length').css('float', 'left').addClass('mb-3');
 });

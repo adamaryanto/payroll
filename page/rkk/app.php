@@ -9,6 +9,37 @@ if($status == "pro"){
     $data_rkk = $cek_rkk->fetch_assoc();
     $tgl_rkk = $data_rkk['tgl_rkk'];
 
+    // Cek jumlah karyawan
+    $cek_jml = $koneksi->query("SELECT COUNT(id_rkk_detail) as jml FROM tb_rkk_detail WHERE id_rkk = '$id' AND status_rkk != 'Digantikan'");
+    $data_jml = $cek_jml->fetch_assoc();
+    $jml = $data_jml['jml'];
+
+    if ($jml == 0) {
+        $pesan = "Tidak bisa propose data! Silakan tambahkan data karyawan terlebih dahulu.";
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Kosong',
+                    text: '<?= $pesan ?>',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
+            </script>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+
     // Cek apakah ada data Boneless untuk tanggal tersebut
     $cek_boneless = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE tgl = '$tgl_rkk'");
     
@@ -40,48 +71,130 @@ if($status == "pro"){
 
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 1 where id_rkk = '$id' ");
     if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Status Berhasil Di Perbarui");
-                window.location.href="?page=rkk";
-
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Status Berhasil Di Perbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=rkk';
+                });
             </script>
-            <?php
+        </body>
+        </html>";
+        exit;
     }
 }elseif ($status == "app") {
+    // Cek jumlah karyawan sebelum approve
+    $cek_jml = $koneksi->query("SELECT COUNT(id_rkk_detail) as jml FROM tb_rkk_detail WHERE id_rkk = '$id' AND status_rkk != 'Digantikan'");
+    $data_jml = $cek_jml->fetch_assoc();
+    $jml = $data_jml['jml'];
+
+    if ($jml == 0) {
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Kosong',
+                    text: 'Tidak bisa approve data! Silakan tambahkan data karyawan terlebih dahulu.',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
+            </script>
+        </body>
+        </html>
+        <?php
+        exit;
+    }
+
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 2 where id_rkk = '$id' ");
     if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Status Berhasil Di Perbarui");
-                window.location.href="?page=rkk";
-
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Status Berhasil Di Perbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=rkk';
+                });
             </script>
-            <?php
+        </body>
+        </html>";
+        exit;
     }
     
 }elseif ($status == "unpro") {
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 0 where id_rkk = '$id' ");
     if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Status Berhasil Di Perbarui");
-                window.location.href="?page=rkk";
-
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Status Berhasil Di Perbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=rkk';
+                });
             </script>
-            <?php
+        </body>
+        </html>";
+        exit;
     }
     
 }elseif ($status == "unapp") {
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 1 where id_rkk = '$id' ");
     if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Status Berhasil Di Perbarui");
-                window.location.href="?page=rkk";
-
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Status Berhasil Di Perbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=rkk';
+                });
             </script>
-            <?php
+        </body>
+        </html>";
+        exit;
     }
     
 }

@@ -1,6 +1,6 @@
 <?php
 $tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detail WHERE id_boneless = A.id_boneless) as grand_total FROM tb_boneless A ORDER BY tgl DESC");
-$ref = $_GET['ref'] ?? 'realisasi';
+$ref = $_GET['ref'] ?? '';
 $view_param = isset($_GET['view']) ? '&view=1' : '';
 ?>
 
@@ -268,6 +268,7 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
     }
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
@@ -279,8 +280,8 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                 [10, 25, 50, "Semua"]
             ],
             language: {
-                search: "Cari:",
-                searchPlaceholder: "Cari data...",
+                search: "Cari Data:",
+                searchPlaceholder: "Ketik pencarian...",
                 lengthMenu: "Tampilkan _MENU_ data",
                 info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
                 paginate: {
@@ -290,6 +291,28 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
             }
         });
         
+        // SweetAlert Delete Confirmation - Using delegation for DataTables compatibility
+        $(document).on('click', '.btn-delete-boneless', function() {
+            const id = $(this).data('id');
+            const date = $(this).data('date');
+
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Data boneless tanggal " + date + " akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '?page=boneless&aksi=hapus&id=' + id + '&ref=<?= $ref ?><?= $view_param ?>';
+                }
+            });
+        });
+
         // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');

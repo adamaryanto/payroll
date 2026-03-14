@@ -26,14 +26,44 @@ if (isset($_POST['simpan'])) {
     ");
     
     if ($sql) {
-        echo '<script type="text/javascript">
-                alert("Data Pengaturan Denda Berhasil Diperbarui");
-                window.location.href="?page=denda";
-              </script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Pengaturan Denda Berhasil Diperbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=denda';
+                });
+            </script>
+        </body>
+        </html>";
+        exit;
     } else {
-        echo '<script type="text/javascript">
-                alert("Gagal memperbarui data denda!");
-              </script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal memperbarui data denda!',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>

@@ -2,6 +2,34 @@
 // 1. Ambil ID RKK
 $idrkk = !empty($_REQUEST['id']) ? intval($_REQUEST['id']) : (!empty($_POST['id_rkk_hidden']) ? intval($_POST['id_rkk_hidden']) : 0);
 
+// Validasi: Gabisa tambah kalo status RKK >= 2
+if ($idrkk > 0) {
+    $cek_rkk = $koneksi->query("SELECT status_rkk FROM tb_rkk WHERE id_rkk = '$idrkk'");
+    $data_rkk = $cek_rkk->fetch_assoc();
+    if ($data_rkk['status_rkk'] >= 2) {
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Akses Ditolak",
+                    text: "Tidak bisa menambah karyawan karena status RKK sudah Approved/Realized!",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "Kembali"
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
+            </script>
+        </body>
+        </html>';
+        exit;
+    }
+}
+
 // 2. Logika Simpan
 if (isset($_POST['simpan_karyawan'])) {
     $idkaryawan = $_POST['id_karyawan'];

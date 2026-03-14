@@ -32,7 +32,25 @@ if (isset($_GET['id'])) {
     $datadetail = $tampildetail->fetch_assoc();
 
     if (!$datadetail) {
-        echo "<script>alert('Data Detail Realisasi tidak ditemukan!'); window.location.href='?page=realisasi';</script>";
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Gagal",
+                    text: "Data Detail Realisasi tidak ditemukan!",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    window.location.href = "?page=realisasi";
+                });
+            </script>
+        </body>
+        </html>';
         exit;
     }
 
@@ -329,7 +347,26 @@ if (isset($_POST['simpan'])) {
         WHERE id_realisasi_detail = '$id'");
 
     if ($update) {
-        echo "<script>alert('Data Berhasil Disimpan'); window.location.href='?page=realisasi&aksi=detail&id=$id';</script>";
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Data Berhasil Disimpan",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    window.location.href = "?page=realisasi&aksi=detail&id=' . $id . '";
+                });
+            </script>
+        </body>
+        </html>';
+        exit;
     }
 }
 ?>

@@ -92,8 +92,6 @@ $dataistirahatkeluar  = "";
                                            
                                         </div></div>
                                     </form>
-             
-                                    </form>
                                   
                             </div>
                           
@@ -114,13 +112,25 @@ $simpan = @$_POST ['simpan'];
 if($simpan) {
 $sql = $koneksi->query("update tb_rkk set keterangan = '$tketerangan' , jam_masuk ='$tjammasuk' , jam_keluar ='$tjamkeluar' , istirahat_masuk ='$tistirahatmasuk' , istirahat_keluar = '$tistirahatkeluar' , tgl_rkk='$ttgl1' where id_rkk = '$idrkk' ");
 if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Data Tersimpan");
-                window.location.href="?page=rkk";
-
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil",
+                    text: "Data Tersimpan",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "OK"
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
             </script>
-            <?php
+        </body>
+        </html>';
     }
 }//simpan if
 ?>

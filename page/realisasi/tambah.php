@@ -7,6 +7,32 @@ $ttgl2 = date("Y-m-d H:i:s");
 
 
 
+    // Validasi backend: Pastikan RKK punya karyawan sebelum dipindah ke realisasi
+    $cek_jml = $koneksi->query("SELECT COUNT(id_rkk_detail) as jml FROM tb_rkk_detail WHERE id_rkk = '$id'");
+    $data_jml = $cek_jml->fetch_assoc();
+    if ($data_jml['jml'] == 0) {
+        echo '<!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: "error",
+                    title: "Data Kosong",
+                    text: "Tidak bisa membuat realisasi untuk RKK tanpa karyawan!",
+                    confirmButtonColor: "#2563eb",
+                    confirmButtonText: "Kembali"
+                }).then((result) => {
+                    window.location.href = "?page=realisasi&aksi=rkk";
+                });
+            </script>
+        </body>
+        </html>';
+        exit;
+    }
+
    $koneksi->query("insert into tb_realisasi (id_rkk, tgl_realisasi, jam_kerja, detail_realisasi, keterangan, tgl_status, status_realisasi) 
                     select id_rkk, tgl_rkk, jam_kerja, '$ttgl2', '', CURDATE(), 'pending' 
                     from tb_rkk where id_rkk = '$id' ");
@@ -31,14 +57,27 @@ $koneksi->query("update tb_rkk set status_rkk = 3 , tgl_status = '$ttgl2' where 
 
 
 if($sql) {
-        ?>
-                <script type="text/javascript">
-                alert("Data Tersimpan");
-                window.location.href="?page=realisasi";
-
-            </script>
-            <?php
-    }
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: "Data Tersimpan",
+                confirmButtonColor: "#2563eb",
+                confirmButtonText: "OK"
+            }).then((result) => {
+                window.location.href = "?page=realisasi";
+            });
+        </script>
+    </body>
+    </html>';
+    exit;
+}
 
 
 ?>
