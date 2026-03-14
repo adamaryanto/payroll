@@ -9,8 +9,44 @@ $tnama = $_POST['tnama'] ?? '';
 if (isset($_POST['simpan'])) {
     $sql = $koneksi->query("UPDATE ms_departmen SET nama_departmen = '$tnama' WHERE id_departmen = '$idu'");
     if ($sql) {
-        echo '<script>alert("Data Tersimpan"); window.location.href="?page=bagian";</script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Berhasil Diperbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=bagian';
+                });
+            </script>
+        </body>
+        </html>";
         exit;
+    } else {
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal memperbarui data: " . $koneksi->error . "',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>

@@ -6,12 +6,27 @@
  $sql =   $koneksi->query("delete from ms_karyawan where id_karyawan = '$id' ");
     if($sql) {
         ?>
-                <script type="text/javascript">
-                alert("Data Berhasil Di Hapus");
-                window.location.href="?page=karyawan";
-
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Berhasil Dihapus',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href="?page=karyawan";
+                });
             </script>
-            <?php
+        </body>
+        </html>
+        <?php
+        exit;
     }
 
 ?>

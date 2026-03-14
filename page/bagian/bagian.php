@@ -251,12 +251,18 @@
                             <tr class="hover:bg-blue-50/50 transition-colors duration-200">
                                 <td class="py-2 px-2 text-center text-sm text-gray-600 font-medium" data-label="No"><?php echo $no++; ?></td>
                                 <td class="py-2 px-2 text-sm text-gray-700 font-semibold" data-label="Nama Bagian"><?php echo htmlspecialchars($data['nama_departmen']); ?></td>
-                                <td class="py-2 px-2 text-center" data-label="Aksi">
+                                <td data-label="Aksi" class="py-2 px-2 text-center">
                                     <div class="flex items-center justify-center gap-2">
                                         <a href="?page=bagian&aksi=ubah&id=<?php echo $data['id_departmen']; ?>" class="p-2 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition-all" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        </div>
+                                        <button type="button" class="text-rose-500 hover:text-rose-700 transition-colors btn-delete bg-transparent border-0 p-1" 
+                                                data-id="<?php echo $data['id_departmen']; ?>" 
+                                                data-nama="<?php echo htmlspecialchars($data['nama_departmen']); ?>"
+                                                title="Hapus">
+                                            <i class="fas fa-trash-alt text-lg"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endwhile; ?>
@@ -267,6 +273,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
         $('#dataTables-example').DataTable({
@@ -282,6 +289,28 @@
             }
         });
         
+        // Handle delete button click - Using delegation for DataTables compatibility
+        $(document).on('click', '.btn-delete', function() {
+            const id = $(this).data('id');
+            const nama = $(this).data('nama');
+            
+            Swal.fire({
+                title: 'Apakah anda yakin?',
+                text: "Data " + nama + " akan dihapus permanen!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '?page=bagian&aksi=hapus&id=' + id;
+                }
+            });
+        });
+
         // Memastikan posisi elemen DataTables rapi
         $('.dataTables_filter').css('float', 'right').addClass('mb-3');
         $('.dataTables_length').css('float', 'left').addClass('mb-3');

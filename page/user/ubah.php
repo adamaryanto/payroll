@@ -103,7 +103,44 @@ if (isset($_POST['simpan'])) {
     
     $sql = $koneksi->query("UPDATE ms_login SET username='$tnama', password='$tpassword', role='$trole' WHERE id_login = '$idu'");
     if ($sql) {
-        echo "<script>alert('Data Berhasil Tersimpan'); window.location.href='?page=user';</script>";
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Berhasil Diperbarui',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=user';
+                });
+            </script>
+        </body>
+        </html>";
+        exit;
+    } else {
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal memperbarui data: " . $koneksi->error . "',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>

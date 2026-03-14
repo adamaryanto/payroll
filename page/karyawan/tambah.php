@@ -29,9 +29,44 @@ if (isset($_POST['simpan'])) {
     )");
 
     if ($sql) {
-        echo "<script>alert('Data Berhasil Disimpan'); window.location='?page=karyawan';</script>";
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Berhasil Disimpan',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=karyawan';
+                });
+            </script>
+        </body>
+        </html>";
+        exit;
     } else {
-        echo "<script>alert('Gagal Simpan Data: " . $koneksi->error . "');</script>";
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal Simpan Data: " . $koneksi->error . "',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>

@@ -72,9 +72,44 @@ if (isset($_POST['update'])) {
     ");
 
     if ($sql) {
-        echo "<script>alert('Data Berhasil Diperbarui'); window.location='?page=karyawan';</script>";
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Berhasil Diperbarui',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=karyawan';
+                });
+            </script>
+        </body>
+        </html>";
+        exit;
     } else {
-        echo "<script>alert('Gagal Perbarui Data: " . $koneksi->error . "');</script>";
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal Perbarui Data: " . $koneksi->error . "',
+                    confirmButtonColor: '#4f46e5',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>

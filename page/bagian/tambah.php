@@ -46,19 +46,52 @@
 if (isset($_POST['simpan'])) {
     $tnama = $_POST['tnama'] ?? '';
     
+    // Fix: tambahkan id_perusahaan karena tidak memiliki default value di database
+    $id_perusahaan = 1; 
+    
     // Gunakan prepared statement untuk keamanan lebih baik
-    $stmt = $koneksi->prepare("INSERT INTO ms_departmen (nama_departmen) VALUES (?)");
-    $stmt->bind_param("s", $tnama);
+    $stmt = $koneksi->prepare("INSERT INTO ms_departmen (id_perusahaan, nama_departmen) VALUES (?, ?)");
+    $stmt->bind_param("is", $id_perusahaan, $tnama);
     
     if ($stmt->execute()) {
-        echo '<script type="text/javascript">
-                alert("Data Berhasil Tersimpan");
-                window.location.href="?page=bagian";
-              </script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Data Berhasil Tersimpan',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Selesai'
+                }).then((result) => {
+                    window.location.href='?page=bagian';
+                });
+            </script>
+        </body>
+        </html>";
+        exit;
     } else {
-        echo '<script type="text/javascript">
-                alert("Gagal menyimpan data!");
-              </script>';
+        echo "<!DOCTYPE html>
+        <html>
+        <head>
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal',
+                    text: 'Gagal menyimpan data: " . $koneksi->error . "',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'Ok'
+                });
+            </script>
+        </body>
+        </html>";
     }
 }
 ?>
