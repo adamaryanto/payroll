@@ -13,12 +13,27 @@ if($status == "pro"){
     $cek_boneless = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE tgl = '$tgl_rkk'");
     
     if ($cek_boneless->num_rows == 0) {
-        // Jika tidak ada data Boneless, batalkan proses
+        $pesan = "Tidak bisa propose data! Silakan lengkapi data Boneless untuk tanggal " . date('d/m/Y', strtotime($tgl_rkk)) . " terlebih dahulu.";
         ?>
-        <script type="text/javascript">
-            alert("Tidak bisa propose data! Silakan lengkapi data Boneless untuk tanggal <?= date('d/m/Y', strtotime($tgl_rkk)) ?> terlebih dahulu.");
-            window.location.href="?page=rkk";
-        </script>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Akses Ditolak',
+                    text: '<?= $pesan ?>',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    window.location.href="?page=rkk";
+                });
+            </script>
+        </body>
+        </html>
         <?php
         exit;
     }
