@@ -76,7 +76,8 @@ if ($simpan) {
                             </div>
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Jumlah Mobil (Potong)</label>
-                                <input type="number" name="jumlah_mobil" class="form-control" placeholder="0" required value="<?= $header['jumlah_mobil'] ?>">
+                                <?php $val_mobil = ($header['jumlah_mobil'] == 0) ? "" : $header['jumlah_mobil']; ?>
+                                <input type="number" name="jumlah_mobil" class="form-control" placeholder="0" required value="<?= $val_mobil ?>">
                             </div>
                         </div>
 
