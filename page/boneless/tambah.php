@@ -71,7 +71,7 @@ $default_items = [
                                 <select name="tgl" class="form-control h-[42px]" required>
                                     <option value="">-- Pilih Rencana --</option>
                                     <?php
-                                    $sql_rkk = $koneksi->query("SELECT * FROM tb_rkk ORDER BY tgl_rkk DESC");
+                                    $sql_rkk = $koneksi->query("SELECT * FROM tb_rkk WHERE status_rkk = '0' ORDER BY tgl_rkk DESC");
                                     while ($row_rkk = $sql_rkk->fetch_assoc()) {
                                         echo '<option value="' . $row_rkk['tgl_rkk'] . '">' . date('d-m-Y', strtotime($row_rkk['tgl_rkk'])) . ' - ' . $row_rkk['keterangan'] . '</option>';
                                     }
