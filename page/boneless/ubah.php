@@ -25,12 +25,12 @@ if ($simpan) {
     $totals = $_POST['total'];
 
     for ($i = 0; $i < count($nama_items); $i++) {
-        $item = $nama_items[$i];
-        $qty = $qtys[$i];
-        $hrg = $hargas[$i];
-        $ttl = $totals[$i];
+        $item = $koneksi->real_escape_string($nama_items[$i]);
+        $qty = (float)($qtys[$i] ?: 0);
+        $hrg = (float)($hargas[$i] ?: 0);
+        $ttl = (float)($totals[$i] ?: 0);
 
-        if ($qty > 0 || $ttl > 0) {
+        if ($qty >= 0 || $ttl >= 0) {
             $koneksi->query("INSERT INTO tb_boneless_detail (id_boneless, nama_item, qty, harga, total) VALUES ('$id', '$item', '$qty', '$hrg', '$ttl')");
         }
     }
