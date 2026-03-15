@@ -33,7 +33,10 @@
                     <tbody class="divide-y divide-gray-100 bg-white">
                         <?php
                         $no = 1;
-                        $tampil = $koneksi->query("SELECT * FROM ms_karyawan");
+                        $tampil = $koneksi->query("SELECT k.*, o.OS_DHK as label_os, g.golongan as label_gol 
+                                                 FROM ms_karyawan k
+                                                 LEFT JOIN ms_os_dhk o ON k.id_os_dhk = o.id_os_dhk
+                                                 LEFT JOIN ms_golongan g ON k.id_golongan = g.id_golongan");
                         while ($datakaryawan = $tampil->fetch_assoc()) {
                             $status_class = ($datakaryawan['status_karyawan'] == 'Aktif') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
                         ?>
@@ -42,9 +45,9 @@
                                 <td data-label="No. Absen" class="text-sm font-semibold text-gray-700"><?= $datakaryawan['no_absen'] ?></td>
                                 <td data-label="Nama Karyawan">
                                     <div class="font-bold text-gray-900"><?= $datakaryawan['nama_karyawan'] ?></div>
-                                    <div class="text-xs text-gray-400 italic"><?= $datakaryawan['OS_DHK'] ?></div>
+                                    <div class="text-xs text-gray-400 italic"><?= $datakaryawan['label_os'] ?: $datakaryawan['OS_DHK'] ?></div>
                                 </td>
-                                <td data-label="Gol" class="md:text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['golongan'] ?></td>
+                                <td data-label="Gol" class="md:text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['label_gol'] ?: $datakaryawan['golongan'] ?></td>
                                 <td data-label="Jenis Kelamin" class="md:text-center text-sm text-gray-600"><?= $datakaryawan['jenis_kelamin'] ?></td>
                                 <td data-label="Kontak & Dokumen" class="text-xs py-2">
                                     <div class="block mb-1">

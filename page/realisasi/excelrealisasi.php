@@ -111,6 +111,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             A.*, 
             B.no_absen, 
             B.nama_karyawan, 
+            O.OS_DHK as label_os,
+            G.golongan as label_gol,
             B.OS_DHK, 
             B.golongan, 
             D.nama_departmen, 
@@ -124,6 +126,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
             JOIN ms_departmen D ON B.id_departmen = D.id_departmen
             LEFT JOIN ms_sub_department S ON B.id_sub_department = S.id_sub_department
+            LEFT JOIN ms_os_dhk O ON B.id_os_dhk = O.id_os_dhk
+            LEFT JOIN ms_golongan G ON B.id_golongan = G.id_golongan
             LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
             LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
             WHERE A.id_realisasi = '$id' 
@@ -187,15 +191,16 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                     $grand_karyawan++;
                     
                     // Track Outsourcing categories
-                    if ($data['OS_DHK'] == 'OS') {
+                    $os_type = $data['label_os'] ?: $data['OS_DHK'];
+                    if ($os_type == 'OS') {
                         $total_tagihan_os += $upah_dibayar;
-                    } elseif ($data['OS_DHK'] == 'DHK') {
+                    } elseif ($os_type == 'DHK') {
                         $total_tagihan_dhk += $upah_dibayar;
-                    } elseif ($data['OS_DHK'] == 'WJS') {
+                    } elseif ($os_type == 'WJS') {
                         $total_tagihan_wjs += $upah_dibayar;
-                    } elseif ($data['OS_DHK'] == 'RKA') {
+                    } elseif ($os_type == 'RKA') {
                         $total_tagihan_rka += $upah_dibayar;
-                    } elseif ($data['OS_DHK'] == 'MHS') {
+                    } elseif ($os_type == 'MHS') {
                         $total_tagihan_mhs += $upah_dibayar;
                     }
                 }
@@ -211,8 +216,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 echo "<tr>
                 <td>{$no}</td>
                 <td>{$nama_display}</td>
-                <td>{$data['OS_DHK']}</td>
-                <td>{$data['golongan']}</td>
+                <td>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
+                <td>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
                 <td>{$data['nama_sub_department']}</td>
                 <td>{$info['jam_kerja']}</td>
                 <td>{$data['r_jam_masuk']}</td>

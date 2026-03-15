@@ -18,6 +18,8 @@ $sql = "
 SELECT 
     K.no_absen,
     K.nama_karyawan, 
+    O.OS_DHK as label_os,
+    G.golongan as label_gol,
     K.OS_DHK,
     K.golongan,
     D.nama_departmen,
@@ -40,6 +42,8 @@ LEFT JOIN tb_realisasi R ON RD.id_realisasi = R.id_realisasi
 LEFT JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
 LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
 LEFT JOIN ms_departmen D ON RKD.id_departmen = D.id_departmen
+LEFT JOIN ms_os_dhk O ON K.id_os_dhk = O.id_os_dhk
+LEFT JOIN ms_golongan G ON K.id_golongan = G.id_golongan
 WHERE R.id_realisasi = '$id'
 ORDER BY D.nama_departmen, K.nama_karyawan ASC
 ";
@@ -112,8 +116,8 @@ while($row = $result->fetch_assoc()){
         <td>'".$row['no_absen']."</td>
         <td>".$row['nama_karyawan']."</td>
         <td>".$row['nama_departmen']."</td>
-        <td style='text-align:center;'>".$row['golongan']."</td>
-        <td style='text-align:center;'>".$row['OS_DHK']."</td>
+        <td style='text-align:center;'>".($row['label_gol'] ?: $row['golongan'])."</td>
+        <td style='text-align:center;'>".($row['label_os'] ?: $row['OS_DHK'])."</td>
         <td style='text-align:center;'>".$row['tgl_realisasi']."</td>
         <td style='text-align:center;'>".$row['ra_masuk']."</td>
         <td style='text-align:center;'>".$row['ra_keluar']."</td>

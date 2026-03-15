@@ -21,7 +21,7 @@ if (isset($_POST['simpan'])) {
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
         status_kawin, jenis_kelamin, no_ktp, no_bpjs, alamat_ktp, alamat_tinggal, 
-        status_karyawan, tgl_aktif, foto, id_sub_department, OS_DHK, golongan, id_jadwal
+        status_karyawan, tgl_aktif, foto, id_sub_department, id_os_dhk, id_golongan, id_jadwal
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
         '$statuskawin', '$jeniskelamin', '$noktp', '$nobpjs', '$alamatktp', '$alamattinggal',
@@ -167,24 +167,30 @@ if (isset($_POST['simpan'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">OS / DHK <span class="text-red-500">*</span></label>
-                            <select name="tos" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                                <option value="">- Pilih -</option>
-                                <option value="OS">OS</option>
-                                <option value="DHK">DHK</option>
-                                <option value="WJS">WJS</option>
-                                <option value="RKA">RKA</option>
-                                <option value="MHS">MHS</option>
+                            <select name="tos" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="os_dhk" required>
+                                <option value=""></option>
+                                <option value="add_new" class="font-bold text-indigo-600">+ Tambah Baru...</option>
+                                <?php
+                                $q_os = $koneksi->query("SELECT * FROM ms_os_dhk");
+                                while($d = $q_os->fetch_assoc()) {
+                                    echo "<option value='".$d['id_os_dhk']."'>".$d['OS_DHK']."</option>";
+                                }
+                                ?>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Golongan</label>
                             <div class="max-w-xs">
-                                <select name="tgolongan" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <option value="">- Pilih -</option>
-                                    <option value="Harian">Harian</option>
-                                    <option value="Bulanan">Bulanan</option>
-                                    <option value="Mingguan">Mingguan</option>
+                                <select name="tgolongan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="golongan">
+                                    <option value=""></option>
+                                    <option value="add_new" class="font-bold text-indigo-600">+ Tambah Baru...</option>
+                                    <?php
+                                    $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
+                                    while($d = $q_gol->fetch_assoc()) {
+                                        echo "<option value='".$d['id_golongan']."'>".$d['golongan']."</option>";
+                                    }
+                                    ?>
                                 </select>
                             </div>
                         </div>

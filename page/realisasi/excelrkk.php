@@ -83,6 +83,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
     A.*, 
     B.no_absen, 
     B.nama_karyawan, 
+    O.OS_DHK as label_os,
+    G.golongan as label_gol,
     B.OS_DHK, 
     B.golongan, 
     D.nama_departmen, 
@@ -96,6 +98,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
     JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
     JOIN ms_departmen D ON B.id_departmen = D.id_departmen
     LEFT JOIN ms_sub_department S ON B.id_sub_department = S.id_sub_department
+    LEFT JOIN ms_os_dhk O ON B.id_os_dhk = O.id_os_dhk
+    LEFT JOIN ms_golongan G ON B.id_golongan = G.id_golongan
     LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
     /* JOIN ke tabel tb_rkk_detail agar bisa akses field upah */
     LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
@@ -169,8 +173,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                         <td>{$nama_display}</td>
                         <td>{$data['nama_departmen']}</td>
                         <td>{$data['nama_sub_department']}</td>
-                        <td>{$data['OS_DHK']}</td>
-                        <td>{$data['golongan']}</td>
+                        <td>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
+                        <td>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
                         <td>{$data['r_jam_masuk']}</td>
                         <td>{$data['r_jam_keluar']}</td>
                         <td>{$data['r_istirahat_keluar']}</td>

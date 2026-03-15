@@ -81,11 +81,15 @@ if (!function_exists('rupiah')) {
                 $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
                 $d_denda = $q_denda->fetch_assoc();
                 $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
-                $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
+                $globalDendaIstirahatKeluar = $d_denda['denda_istirahat_keluar'] ?? 0;
+                $globalDendaIstirahatMasuk = $d_denda['denda_istirahat_masuk'] ?? 0;
+                $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
+                $globalDendaTidakLengkap = $d_denda['denda_tidak_lengkap'] ?? 0;
 
-                $sql = "SELECT r.*, j.shift_masuk, j.shift_keluar, j.shift_istirahat_masuk, j.shift_istirahat_keluar 
+                $sql = "SELECT r.*, j.jam_masuk, j.jam_keluar, j.istirahat_masuk, j.istirahat_keluar, rd.status_rkk
                         FROM tb_realisasi_detail r
                         LEFT JOIN tb_jadwal j ON r.id_jadwal = j.id_jadwal
+                        LEFT JOIN tb_rkk_detail rd ON r.id_rkk_detail = rd.id_rkk_detail
                         WHERE r.id_karyawan = '$id'
                         AND r.tgl_realisasi_detail BETWEEN '$ttgl11' AND '$ttgl22'
                         ORDER BY r.tgl_realisasi_detail ASC";
@@ -116,6 +120,8 @@ if (!function_exists('rupiah')) {
                                 <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Masuk/Pulang</th>
                                 <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Pot. Telat</th>
                                 <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Pot. Istirahat</th>
+                                <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Pot. Pulang</th>
+                                <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Pot. Tidak Absen</th>
                                 <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Pot. Lain</th>
                                 <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest">Lembur</th>
                                 <th class="py-4 px-3 text-[11px] font-bold text-gray-500 uppercase tracking-widest text-right">Total Net</th>
@@ -125,23 +131,49 @@ if (!function_exists('rupiah')) {
                                 <?php
                                 if ($result && $result->num_rows > 0) {
                                     while ($row = $result->fetch_assoc()) {
-                                        // Logika Pelanggaran Dinamis
+                                        // Logika Pelanggaran Dinamis (Sync with realisasi/kelola.php)
                                         $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
                                         $isLateBreak = (!empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && !empty($row['istirahat_masuk']) && $row['istirahat_masuk'] != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($row['istirahat_masuk']));
+                                        $isEarlyOut = (!empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && !empty($row['jam_keluar']) && $row['jam_keluar'] != '00:00:00' && strtotime($row['ra_keluar']) < strtotime($row['jam_keluar']));
+                                        
+                                        // Incomplete Logs
+                                        $hasIncompleteMain = (
+                                            (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && (empty($row['ra_keluar']) || $row['ra_keluar'] == '00:00:00')) ||
+                                            ((empty($row['ra_masuk']) || $row['ra_masuk'] == '00:00:00') && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00')
+                                        );
+                                        $isRestExpected = (!empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00');
+                                        $hasIncompleteBreak = ($isRestExpected && (
+                                            (empty($row['ra_istirahat_keluar']) || $row['ra_istirahat_keluar'] == '00:00:00') ||
+                                            (empty($row['ra_istirahat_masuk']) || $row['ra_istirahat_masuk'] == '00:00:00')
+                                        ));
 
-                                        $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-                                        $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+                                        $isEarlyBreak = (!empty($row['ra_istirahat_keluar']) && $row['ra_istirahat_keluar'] != '00:00:00' && !empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00' && strtotime($row['ra_istirahat_keluar']) < strtotime($row['istirahat_keluar']));
 
-                                        $total = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $row['r_potongan_lainnya']);
+                                        // Skip Denda if wage is 0 or status is "Digantikan"
+                                        if ($row['r_upah'] == 0 || $row['status_rkk'] == 'Digantikan') {
+                                            $potTelatValue = 0;
+                                            $potIstirahatValue = 0;
+                                            $potPulangValue = 0;
+                                            $potTidakLengkapValue = 0;
+                                        } else {
+                                            $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+                                            $potIstirahatValue = ($isEarlyBreak ? $globalDendaIstirahatKeluar : 0) + ($isLateBreak ? $globalDendaIstirahatMasuk : 0);
+                                            $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+                                            $potTidakLengkapValue = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
+                                        }
+
+                                        $total = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $potTidakLengkapValue + $row['r_potongan_lainnya']);
                                         ?>
                                         <tr class="hover:bg-blue-50/30 transition-colors">
-                                            <td data-label="Tanggal" class="py-4 px-3 text-sm font-bold text-gray-900"><?= $row['tgl_realisasi_detail'] ?></td>
+                                            <td data-label="Tanggal" class="py-4 px-3 text-sm font-bold text-gray-900"><?= date('d/m/Y', strtotime($row['tgl_realisasi_detail'])) ?></td>
                                             <td data-label="Upah Pokok" class="py-4 px-3 text-sm font-medium text-gray-700"><?= rupiah($row['r_upah']) ?></td>
                                             <td data-label="Jam Kerja" class="py-4 px-3 text-sm text-gray-600">
                                                 <span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold"><?= $row['ra_masuk'] ?> - <?= $row['ra_keluar'] ?></span>
                                             </td>
                                             <td data-label="Pot. Telat" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potTelatValue) ?></td>
                                             <td data-label="Pot. Istirahat" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potIstirahatValue) ?></td>
+                                            <td data-label="Pot. Pulang" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potPulangValue) ?></td>
+                                            <td data-label="Pot. Tidak Absen" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potTidakLengkapValue) ?></td>
                                             <td data-label="Pot. Lain" class="py-4 px-3 text-sm font-bold text-orange-600"><?= rupiah($row['r_potongan_lainnya']) ?></td>
                                             <td data-label="Lembur" class="py-4 px-3 text-sm font-bold text-emerald-600"><?= rupiah($row['lembur']) ?></td>
                                             <td data-label="Total Net" class="py-4 px-3 text-[15px] font-extrabold text-blue-700 text-right"><?= rupiah($total) ?></td>

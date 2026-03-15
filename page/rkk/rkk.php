@@ -4,7 +4,7 @@
 $is_authorized = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin master");
 
 // 2.hak Propose/Un-Propose (HRD & Admin Master)
-$can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik");
+$can_propose = (strtolower($_SESSION['role']) == "admin hr" || strtolower($_SESSION['role']) == "kepala pabrik" || strtolower($_SESSION['role']) == "admin master");
 
 $where_rkk = (strtolower($_SESSION['role']) == 'owner') ? " WHERE A.status_rkk > 0 " : "";
 $tampil = $koneksi->query("SELECT A.*, 
@@ -385,7 +385,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                                             </button>
                                         <?php endif; ?>
 
-                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && strtolower($_SESSION['role']) == "owner")) : ?>
+                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && $is_authorized)) : ?>
                                             <button type="button" 
                                                 class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors btn-action-rkk"
                                                 data-id="<?= $data['id_rkk']; ?>"

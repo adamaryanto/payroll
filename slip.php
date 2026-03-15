@@ -32,10 +32,11 @@ function rupiah($angka){
 }
 
 // Ambil denda global
-$q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
-$d_denda = $q_denda->fetch_assoc();
 $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
-$globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
+$globalDendaIstirahatKeluar = $d_denda['denda_istirahat_keluar'] ?? 0;
+$globalDendaIstirahatMasuk = $d_denda['denda_istirahat_masuk'] ?? 0;
+$globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
+$globalDendaTidakLengkap = $d_denda['denda_tidak_lengkap'] ?? 0;
 
 // Query join lengkap
 $sql = "SELECT
@@ -57,12 +58,14 @@ $sql = "SELECT
     jd.jam_masuk,
     jd.jam_keluar,
     jd.istirahat_masuk,
-    jd.istirahat_keluar
+    jd.istirahat_keluar,
+    rd.status_rkk
 FROM tb_realisasi_detail r
 JOIN ms_karyawan k ON r.id_karyawan = k.id_karyawan
 JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
 JOIN ms_departmen d ON k.id_departmen = d.id_departmen
 LEFT JOIN tb_jadwal jd ON r.id_jadwal = jd.id_jadwal
+LEFT JOIN tb_rkk_detail rd ON r.id_rkk_detail = rd.id_rkk_detail
 WHERE r.id_karyawan = '$id_karyawan'
   AND r.tgl_realisasi_detail BETWEEN '$tanggal_mulai' AND '$tanggal_akhir'
 ORDER BY r.tgl_realisasi_detail ASC;
@@ -100,6 +103,8 @@ echo '
     <th>Jam Pulang</th>
     <th>Pot Telat</th>
     <th>Pot Istirahat</th>
+    <th>Pot Pulang</th>
+    <th>Pot Tidak Absen</th>
     <th>Pot Lainnya</th>
     <th>Lembur</th>
     <th>Total</th>
@@ -115,22 +120,49 @@ if($result->num_rows > 0) {
 }
 $no=1;
 while($row = $result->fetch_assoc()){
-    // Logika Pelanggaran Dinamis
+    // Logika Pelanggaran Dinamis (Sync with realisasi/kelola.php)
     $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
     $isLateBreak = (!empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && !empty($row['istirahat_masuk']) && $row['istirahat_masuk'] != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($row['istirahat_masuk']));
-    $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-    $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
+    $isEarlyOut = (!empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && !empty($row['jam_keluar']) && $row['jam_keluar'] != '00:00:00' && strtotime($row['ra_keluar']) < strtotime($row['jam_keluar']));
 
-    $totalRow = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $row['r_potongan_lainnya']);
+    // Incomplete Logs
+    $hasIncompleteMain = (
+        (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && (empty($row['ra_keluar']) || $row['ra_keluar'] == '00:00:00')) ||
+        ((empty($row['ra_masuk']) || $row['ra_masuk'] == '00:00:00') && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00')
+    );
+    $isRestExpected = (!empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00');
+    $hasIncompleteBreak = ($isRestExpected && (
+        (empty($row['ra_istirahat_keluar']) || $row['ra_istirahat_keluar'] == '00:00:00') ||
+        (empty($row['ra_istirahat_masuk']) || $row['ra_istirahat_masuk'] == '00:00:00')
+    ));
+
+    $isEarlyBreak = (!empty($row['ra_istirahat_keluar']) && $row['ra_istirahat_keluar'] != '00:00:00' && !empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00' && strtotime($row['ra_istirahat_keluar']) < strtotime($row['istirahat_keluar']));
+
+    // Skip Denda if wage is 0 or status is "Digantikan"
+    if ($row['r_upah'] == 0 || $row['status_rkk'] == 'Digantikan') {
+        $potTelatValue = 0;
+        $potIstirahatValue = 0;
+        $potPulangValue = 0;
+        $potTidakLengkapValue = 0;
+    } else {
+        $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+        $potIstirahatValue = ($isEarlyBreak ? $globalDendaIstirahatKeluar : 0) + ($isLateBreak ? $globalDendaIstirahatMasuk : 0);
+        $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+        $potTidakLengkapValue = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
+    }
+
+    $totalRow = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $potTidakLengkapValue + $row['r_potongan_lainnya']);
 
     echo "
     <tr>
-     <td>".$row['tgl_realisasi_detail']."</td>
+     <td>".date('d/m/Y', strtotime($row['tgl_realisasi_detail']))."</td>
         <td>".rupiah($row['r_upah'])."</td>
          <td>".$row['ra_masuk']."</td>
         <td>".$row['ra_keluar']."</td>
          <td>".rupiah($potTelatValue)."</td>
         <td>".rupiah($potIstirahatValue)."</td>
+        <td>".rupiah($potPulangValue)."</td>
+        <td>".rupiah($potTidakLengkapValue)."</td>
         <td>".rupiah($row['r_potongan_lainnya'])."</td>
          <td>".rupiah($row['lembur'])."</td>
          <td>".rupiah($totalRow)."</td>

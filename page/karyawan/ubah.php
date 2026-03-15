@@ -14,12 +14,11 @@ if (isset($_GET['id'])) {
     $nobpjs = $data['no_bpjs'];
     $tempatlahir = $data['tempat_lahir'];
     $tgllahir = $data['tgl_lahir'];
-    $agama = $data['agama'];
-    $statuskawin = $data['status_kawin'];
-    $jeniskelamin = $data['jenis_kelamin'];
     $noktp = $data['no_ktp'];
-    $os = $data['OS_DHK'];
+    $idos = $data['id_os_dhk'];
+    $idgolongan = $data['id_golongan'];
     $golongan = $data['golongan'];
+    $os = $data['OS_DHK'];
     $alamatktp = $data['alamat_ktp'];
     $alamattinggal = $data['alamat_tinggal'];
     $statuskaryawan = $data['status_karyawan'];
@@ -65,8 +64,8 @@ if (isset($_POST['update'])) {
         alamat_ktp = '$talamatktp',
         alamat_tinggal = '$talamattinggal',
         tgl_aktif = '$ttanggalbergabung',
-        OS_DHK = '$tos',
-        golongan = '$tgolongan',
+        id_os_dhk = '$tos',
+        id_golongan = '$tgolongan',
         status_karyawan = '$tstatuskaryawan'
         WHERE id_karyawan = '$tid'
     ");
@@ -209,13 +208,14 @@ if (isset($_POST['update'])) {
 
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">OS / DHK <span class="text-red-500">*</span></label>
-                            <select name="tos" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                                <option value="">- Pilih -</option>
+                            <select name="tos" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="os_dhk" required>
+                                <option value=""></option>
+                                <option value="add_new" class="font-bold text-indigo-600">+ Tambah Baru...</option>
                                 <?php
-                                $os_list = ['OS', 'DHK', 'WJS'];
-                                foreach ($os_list as $o) {
-                                    $sel = ($o == $os) ? 'selected' : '';
-                                    echo "<option value='$o' $sel>$o</option>";
+                                $q_os = $koneksi->query("SELECT * FROM ms_os_dhk");
+                                while($d = $q_os->fetch_assoc()) {
+                                    $sel = ($d['id_os_dhk'] == $idos || $d['OS_DHK'] == $os) ? 'selected' : '';
+                                    echo "<option value='".$d['id_os_dhk']."' $sel>".$d['OS_DHK']."</option>";
                                 }
                                 ?>
                             </select>
@@ -224,13 +224,14 @@ if (isset($_POST['update'])) {
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Golongan</label>
                             <div>
-                                <select name="tgolongan" class="w-full select2 px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
-                                    <option value="">- Pilih -</option>
+                                <select name="tgolongan" class="w-full select2-manage px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none" data-placeholder="- Pilih -" data-delete-route="golongan">
+                                    <option value=""></option>
+                                    <option value="add_new" class="font-bold text-indigo-600">+ Tambah Baru...</option>
                                     <?php
-                                    $gols = ['Harian', 'Bulanan', 'Mingguan'];
-                                    foreach ($gols as $g) {
-                                        $sel = ($g == $golongan) ? 'selected' : '';
-                                        echo "<option value='$g' $sel>$g</option>";
+                                    $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
+                                    while($d = $q_gol->fetch_assoc()) {
+                                        $sel = ($d['id_golongan'] == $idgolongan || $d['golongan'] == $golongan) ? 'selected' : '';
+                                        echo "<option value='".$d['id_golongan']."' $sel>".$d['golongan']."</option>";
                                     }
                                     ?>
                                 </select>

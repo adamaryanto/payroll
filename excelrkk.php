@@ -35,7 +35,11 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
 $sql = "
 SELECT 
-    K.nama_karyawan, K.OS_DHK,K.golongan,
+    K.nama_karyawan, 
+    O.OS_DHK as label_os,
+    G.golongan as label_gol,
+    K.OS_DHK,
+    K.golongan,
     JB.jabatan,
     D.nama_departmen,
     R.jam_kerja,
@@ -56,6 +60,8 @@ LEFT JOIN tb_jadwal JD ON RD.id_jadwal = JD.id_jadwal
 LEFT JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
 LEFT JOIN ms_departmen D ON K.id_departmen = D.id_departmen
 LEFT JOIN ms_jabatan JB ON K.id_jabatan = JB.id_jabatan
+LEFT JOIN ms_os_dhk O ON K.id_os_dhk = O.id_os_dhk
+LEFT JOIN ms_golongan G ON K.id_golongan = G.id_golongan
 WHERE R.id_rkk = '$id'
 ORDER BY D.nama_departmen, K.nama_karyawan ASC
 ";
@@ -131,8 +137,8 @@ while ($row = $result->fetch_assoc()) {
         <td>" . $row['nama_karyawan'] . (!empty($row['menggantikan']) ? " (Menggantikan " . $row['menggantikan'] . ")" : (!empty($row['digantikan_oleh']) ? " (Digantikan oleh " . $row['digantikan_oleh'] . ")" : "")) . "</td>
         <td>" . $row['jabatan'] . "</td>
         <td>" . $row['nama_departmen'] . "</td>
-        <td align='center'>" . $row['OS_DHK'] . "</td>
-        <td align='center'>" . $row['golongan'] . "</td>
+        <td align='center'>" . ($row['label_os'] ?: $row['OS_DHK']) . "</td>
+        <td align='center'>" . ($row['label_gol'] ?: $row['golongan']) . "</td>
         <td align='center'>" . $row['jam_kerja'] . "</td>
         <td align='center'>" . $row['jam_masuk'] . "</td>
         <td align='center'>" . $row['jam_keluar'] . "</td>
@@ -152,15 +158,16 @@ while ($row = $result->fetch_assoc()) {
     $total_akhir += $upah_bersih;
     
     // Track Outsourcing categories
-    if ($row['OS_DHK'] == 'OS') {
+    $os_type = $row['label_os'] ?: $row['OS_DHK'];
+    if ($os_type == 'OS') {
         $total_tagihan_os += $upah_bersih;
-    } elseif ($row['OS_DHK'] == 'DHK') {
+    } elseif ($os_type == 'DHK') {
         $total_tagihan_dhk += $upah_bersih;
-    } elseif ($row['OS_DHK'] == 'WJS') {
+    } elseif ($os_type == 'WJS') {
         $total_tagihan_wjs += $upah_bersih;
-    } elseif ($row['OS_DHK'] == 'RKA') {
+    } elseif ($os_type == 'RKA') {
         $total_tagihan_rka += $upah_bersih;
-    } elseif ($row['OS_DHK'] == 'MHS') {
+    } elseif ($os_type == 'MHS') {
         $total_tagihan_mhs += $upah_bersih;
     }
     

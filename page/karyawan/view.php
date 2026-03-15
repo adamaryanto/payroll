@@ -3,11 +3,13 @@
 
 if (isset($_GET['id'])) {
     $idu = $_GET['id'];
-    $tampil = $koneksi->query("SELECT k.*, d.nama_departmen, s.nama_sub_department, j.jabatan 
+    $tampil = $koneksi->query("SELECT k.*, d.nama_departmen, s.nama_sub_department, j.jabatan, o.OS_DHK as label_os, g.golongan as label_gol 
                                FROM ms_karyawan k
                                LEFT JOIN ms_departmen d ON k.id_departmen = d.id_departmen
                                LEFT JOIN ms_sub_department s ON k.id_sub_department = s.id_sub_department
                                LEFT JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
+                               LEFT JOIN ms_os_dhk o ON k.id_os_dhk = o.id_os_dhk
+                               LEFT JOIN ms_golongan g ON k.id_golongan = g.id_golongan
                                WHERE k.id_karyawan = '$idu'");
     $data = $tampil->fetch_assoc();
     $idkaryawan = $data['id_karyawan'];
@@ -19,8 +21,8 @@ if (isset($_GET['id'])) {
     $tempatlahir = $data['tempat_lahir'];
     $tgllahir = $data['tgl_lahir'];
     $agama = $data['agama'];
-    $tos = $data['OS_DHK'];
-    $golongan = $data['golongan'];
+    $tos = $data['label_os'] ?: $data['OS_DHK'];
+    $golongan = $data['label_gol'] ?: $data['golongan'];
     $statuskawin = $data['status_kawin'];
     $jeniskelamin = $data['jenis_kelamin'];
     $noktp = $data['no_ktp'];

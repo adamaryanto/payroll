@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 4.7.4
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Mar 08, 2026 at 06:51 AM
--- Server version: 8.0.30
--- PHP Version: 8.2.28
+-- Host: 127.0.0.1
+-- Generation Time: 04 Jan 2026 pada 02.07
+-- Versi Server: 10.1.30-MariaDB
+-- PHP Version: 5.6.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -24,18 +25,18 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `app_user`
+-- Struktur dari tabel `app_user`
 --
 
 CREATE TABLE `app_user` (
-  `id_login` int NOT NULL,
-  `id_user` int NOT NULL,
+  `id_login` int(11) NOT NULL,
+  `id_user` int(11) NOT NULL,
   `nama_user` varchar(100) NOT NULL,
   `tgl` varchar(30) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `app_user`
+-- Dumping data untuk tabel `app_user`
 --
 
 INSERT INTO `app_user` (`id_login`, `id_user`, `nama_user`, `tgl`) VALUES
@@ -67,16 +68,74 @@ INSERT INTO `app_user` (`id_login`, `id_user`, `nama_user`, `tgl`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_action`
+-- Struktur dari tabel `ms_account`
+--
+
+CREATE TABLE `ms_account` (
+  `id_account` int(10) NOT NULL,
+  `account_no` varchar(30) NOT NULL,
+  `id_account_category` int(10) NOT NULL,
+  `account_name` varchar(100) NOT NULL,
+  `account_kode` varchar(10) NOT NULL,
+  `account_type` varchar(10) NOT NULL,
+  `account_lod` int(5) NOT NULL,
+  `account_rek` varchar(30) NOT NULL,
+  `account_status` varchar(3) NOT NULL,
+  `id_currency` int(10) NOT NULL,
+  `account_bank` varchar(100) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_account`
+--
+
+INSERT INTO `ms_account` (`id_account`, `account_no`, `id_account_category`, `account_name`, `account_kode`, `account_type`, `account_lod`, `account_rek`, `account_status`, `id_currency`, `account_bank`, `id_perusahaan`) VALUES
+(1, '100.001', 1, 'Bank Mandiri 1234567891', 'MD1', 'Other', 2, '123456789', 'Y', 1, 'Mandiri IDR', 1),
+(2, '100.002', 1, 'Bank Mandiri USD 987654321', 'MU1', 'Other', 1, ' 987654321', 'Y', 1, 'Mandiri USD', 1),
+(3, '100.003', 1, 'Bank BCA 123456789', 'MBA1', 'Other', 1, ' 987654321', 'Y', 1, 'BCA', 1),
+(4, '600.001', 4, 'Beban Listrik', '-', 'Other', 2, '-', 'Y', 1, '-', 1),
+(5, '600.002', 4, 'Beban Sewa', '-', 'Other', 1, '-', 'Y', 1, '-', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_account_category`
+--
+
+CREATE TABLE `ms_account_category` (
+  `id_account_category` int(10) NOT NULL,
+  `account_category` varchar(10) NOT NULL,
+  `category_debet` int(3) NOT NULL,
+  `category_credit` int(3) NOT NULL,
+  `abbr_account_category` varchar(3) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_account_category`
+--
+
+INSERT INTO `ms_account_category` (`id_account_category`, `account_category`, `category_debet`, `category_credit`, `abbr_account_category`, `id_perusahaan`) VALUES
+(1, 'AKTIVA', 1, -1, 'AK', 1),
+(2, 'PASIVA', -1, 1, 'PS', 1),
+(3, 'MODAL', -1, 1, 'MD', 1),
+(4, 'BIAYA', 1, -1, 'BY', 1),
+(5, 'PENDAPATAN', -1, 1, 'PD', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_action`
 --
 
 CREATE TABLE `ms_action` (
-  `id_action` int NOT NULL,
+  `id_action` int(10) NOT NULL,
   `app_action` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_action`
+-- Dumping data untuk tabel `ms_action`
 --
 
 INSERT INTO `ms_action` (`id_action`, `app_action`) VALUES
@@ -90,17 +149,61 @@ INSERT INTO `ms_action` (`id_action`, `app_action`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_departmen`
+-- Struktur dari tabel `ms_bank`
+--
+
+CREATE TABLE `ms_bank` (
+  `bank_id` int(10) NOT NULL,
+  `bank_nama` varchar(100) NOT NULL,
+  `bank_mata_uang` varchar(100) NOT NULL,
+  `bank_status` enum('Y','N','','') NOT NULL DEFAULT 'Y',
+  `id_perusahaan` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_bank`
+--
+
+INSERT INTO `ms_bank` (`bank_id`, `bank_nama`, `bank_mata_uang`, `bank_status`, `id_perusahaan`) VALUES
+(1, 'Mandiri', 'IDR', 'Y', 1),
+(2, 'BNi', 'IDR', 'Y', 1),
+(3, 'Mandiri', 'USD', 'Y', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_currency`
+--
+
+CREATE TABLE `ms_currency` (
+  `id_currency` int(10) NOT NULL,
+  `currency` varchar(10) NOT NULL,
+  `kurs` double(10,2) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_currency`
+--
+
+INSERT INTO `ms_currency` (`id_currency`, `currency`, `kurs`, `id_perusahaan`) VALUES
+(1, 'IDR', 15000.00, 1),
+(3, 'SGD', 17000.00, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_departmen`
 --
 
 CREATE TABLE `ms_departmen` (
-  `id_departmen` int NOT NULL,
-  `id_perusahaan` int NOT NULL,
+  `id_departmen` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
   `nama_departmen` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_departmen`
+-- Dumping data untuk tabel `ms_departmen`
 --
 
 INSERT INTO `ms_departmen` (`id_departmen`, `id_perusahaan`, `nama_departmen`) VALUES
@@ -112,17 +215,17 @@ INSERT INTO `ms_departmen` (`id_departmen`, `id_perusahaan`, `nama_departmen`) V
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_jabatan`
+-- Struktur dari tabel `ms_jabatan`
 --
 
 CREATE TABLE `ms_jabatan` (
-  `id_jabatan` int NOT NULL,
-  `id_perusahaan` int NOT NULL,
+  `id_jabatan` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
   `jabatan` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_jabatan`
+-- Dumping data untuk tabel `ms_jabatan`
 --
 
 INSERT INTO `ms_jabatan` (`id_jabatan`, `id_perusahaan`, `jabatan`) VALUES
@@ -132,14 +235,75 @@ INSERT INTO `ms_jabatan` (`id_jabatan`, `id_perusahaan`, `jabatan`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_karyawan`
+-- Struktur dari tabel `ms_jasa`
+--
+
+CREATE TABLE `ms_jasa` (
+  `id_jasa` int(11) NOT NULL,
+  `nama_jasa` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_jasa`
+--
+
+INSERT INTO `ms_jasa` (`id_jasa`, `nama_jasa`) VALUES
+(1, 'Bonle'),
+(2, 'Bonless2');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_os_dhk`
+--
+
+CREATE TABLE `ms_os_dhk` (
+  `id_os_dhk` int(11) NOT NULL,
+  `OS_DHK` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `ms_os_dhk`
+--
+
+INSERT INTO `ms_os_dhk` (`id_os_dhk`, `OS_DHK`) VALUES
+(1, 'OS'),
+(2, 'DHK'),
+(3, 'WJS'),
+(4, 'RKA'),
+(5, 'MHS');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_golongan`
+--
+
+CREATE TABLE `ms_golongan` (
+  `id_golongan` int(11) NOT NULL,
+  `golongan` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data untuk tabel `ms_golongan`
+--
+
+INSERT INTO `ms_golongan` (`id_golongan`, `golongan`) VALUES
+(1, 'Harian'),
+(2, 'Bulanan'),
+(3, 'Mingguan');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_karyawan`
 --
 
 CREATE TABLE `ms_karyawan` (
-  `id_karyawan` int NOT NULL,
-  `id_departmen` int NOT NULL,
-  `id_jabatan` int NOT NULL,
-  `no_absen` int NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `id_departmen` int(10) NOT NULL,
+  `id_jabatan` int(10) NOT NULL,
+  `no_absen` int(10) NOT NULL,
   `nama_karyawan` varchar(255) NOT NULL,
   `tempat_lahir` varchar(255) NOT NULL,
   `tgl_lahir` date DEFAULT NULL,
@@ -147,72 +311,118 @@ CREATE TABLE `ms_karyawan` (
   `status_kawin` enum('Kawin','Belum Kawin','Janda','Duda') DEFAULT NULL,
   `jenis_kelamin` enum('Laki-laki','Perempuan') DEFAULT NULL,
   `no_ktp` varchar(20) NOT NULL,
+  `no_sim` varchar(20) NOT NULL,
   `alamat_ktp` varchar(255) NOT NULL,
   `alamat_tinggal` varchar(255) NOT NULL,
   `status_karyawan` enum('Aktif','Non Aktif') DEFAULT NULL,
   `tgl_aktif` date DEFAULT NULL,
   `tgl_nonaktif` date DEFAULT NULL,
   `foto` varchar(255) NOT NULL,
-  `id_jadwal` int NOT NULL,
-  `id_sub_department` int NOT NULL,
+  `no_npwp` varchar(20) NOT NULL,
+  `no_bpjs` varchar(20) NOT NULL,
+  `upah_harian` int(10) NOT NULL,
+  `upah_mingguan` int(10) NOT NULL,
+  `upah_bulanan` int(10) NOT NULL,
+  `id_jadwal` int(10) NOT NULL,
+  `id_sub_department` int(10) NOT NULL,
   `OS_DHK` varchar(50) NOT NULL,
   `golongan` varchar(50) NOT NULL,
-  `no_bpjs` varchar(50) DEFAULT NULL
+  `id_os_dhk` int(11) DEFAULT '0',
+  `id_golongan` int(11) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_karyawan`
+-- Dumping data untuk tabel `ms_karyawan`
 --
 
-INSERT INTO `ms_karyawan` (`id_karyawan`, `id_departmen`, `id_jabatan`, `no_absen`, `nama_karyawan`, `tempat_lahir`, `tgl_lahir`, `agama`, `status_kawin`, `jenis_kelamin`, `no_ktp`, `alamat_ktp`, `alamat_tinggal`, `status_karyawan`, `tgl_aktif`, `tgl_nonaktif`, `foto`, `id_jadwal`, `id_sub_department`, `OS_DHK`, `golongan`) VALUES
-(2, 3, 2, 19, 'Nofiardi', 'Jkfd', '2024-04-20', 'Islam', 'Belum Kawin', 'Laki-laki', '21313', 'kewtw', 'asda', 'Aktif', '2024-04-30', NULL, '', 2, 1, 'WJS', 'Harian'),
-(3, 3, 1, 62, 'Mikha', 'Kotabumi', '2024-04-29', 'Islam', 'Belum Kawin', 'Laki-laki', '123123132312', 'Jakarta', 'Tangerang', 'Aktif', '2024-04-30', NULL, '', 1, 0, '', ''),
-(4, 4, 0, 22, 'Riki Maulana', 'Jakarta palembang', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2024-10-10', NULL, '', 1, 0, '', ''),
-(5, 3, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', 1, 0, '', ''),
-(6, 0, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', 1, 0, '', ''),
-(7, 2, 1, 49, 'Mahmudin', 'Jakarta', '1992-09-03', 'Islam', 'Belum Kawin', 'Laki-laki', '222222222', 'dd', 'fdf', 'Aktif', '2023-10-01', NULL, '', 1, 1, '', ''),
-(8, 2, 1, 55, 'Bekti', 'Kebumen', '1988-10-03', 'Islam', 'Belum Kawin', 'Laki-laki', '13', 'Rancabango', 'Rejeg', 'Aktif', '2024-10-06', NULL, '', 0, 0, '', ''),
-(9, 2, 0, 16, 'Ammar', 'Tangerang', '2024-09-15', 'Islam', 'Belum Kawin', 'Laki-laki', '3173', 'Rancabango', 'Kapuk', 'Aktif', '2024-12-12', NULL, '', 1, 0, '', ''),
-(10, 2, 0, 33, 'Arhan', 'Jakarta', '1989-02-01', 'Islam', 'Belum Kawin', 'Laki-laki', '1211', 'Rancabango', 'Rajeg', 'Aktif', '2024-01-01', NULL, '', 1, 1, '', ''),
-(11, 2, 0, 123, 'xxx', '', '0000-00-00', 'Islam', 'Belum Kawin', 'Laki-laki', '', '', '', 'Aktif', '0000-00-00', NULL, '', 1, 1, '', '');
+INSERT INTO `ms_karyawan` (`id_karyawan`, `id_departmen`, `id_jabatan`, `no_absen`, `nama_karyawan`, `tempat_lahir`, `tgl_lahir`, `agama`, `status_kawin`, `jenis_kelamin`, `no_ktp`, `no_sim`, `alamat_ktp`, `alamat_tinggal`, `status_karyawan`, `tgl_aktif`, `tgl_nonaktif`, `foto`, `no_npwp`, `no_bpjs`, `upah_harian`, `upah_mingguan`, `upah_bulanan`, `id_jadwal`, `id_sub_department`, `OS_DHK`, `golongan`, `id_os_dhk`, `id_golongan`) VALUES
+(2, 3, 2, 19, 'Nofiardi', 'Jkfd', '2024-04-20', 'Islam', 'Belum Kawin', 'Laki-laki', '21313', '234242', 'kewtw', 'asda', 'Aktif', '2024-04-30', NULL, '', '2', '1', 100000, 0, 0, 2, 1, 'WJS', 'Harian', 3, 1),
+(3, 3, 1, 62, 'Mikha', 'Kotabumi', '2024-04-29', 'Islam', 'Belum Kawin', 'Laki-laki', '123123132312', '12312131', 'Jakarta', 'Tangerang', 'Aktif', '2024-04-30', NULL, '', '09871', '12341', 0, 0, 0, 1, 0, '', '', 0, 0),
+(4, 4, 0, 22, 'Riki Maulana', 'Jakarta palembang', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', '09871', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2024-10-10', NULL, '', '12121', '3333', 0, 0, 0, 1, 0, '', '', 0, 0),
+(5, 3, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', '09871', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', '1212111', '33331', 0, 0, 0, 1, 0, '', '', 0, 0),
+(6, 0, 0, 211, 'Riki1', 'Jakarta1', '1999-04-03', 'Kristen Katolik', 'Belum Kawin', 'Laki-laki', '31731', '09871', 'Kapuk Lamat KTP1', 'Alamat Tinggal1', 'Aktif', '2023-10-10', NULL, '', '1212', '33331', 0, 0, 0, 1, 0, '', '', 0, 0),
+(7, 2, 1, 49, 'Mahmudin', 'Jakarta', '1992-09-03', 'Islam', 'Belum Kawin', 'Laki-laki', '222222222', '3333333', 'dd', 'fdf', 'Aktif', '2023-10-01', NULL, '', '333', '33', 500000, 0, 0, 1, 1, '', '', 0, 0),
+(8, 2, 1, 55, 'Bekti', 'Kebumen', '1988-10-03', 'Islam', 'Belum Kawin', 'Laki-laki', '13', '1241241', 'Rancabango', 'Rejeg', 'Aktif', '2024-10-06', NULL, '', '213132', '123121', 0, 0, 0, 0, 0, '', '', 0, 0),
+(9, 2, 0, 16, 'Ammar', 'Tangerang', '2024-09-15', 'Islam', 'Belum Kawin', 'Laki-laki', '3173', '1231', 'Rancabango', 'Kapuk', 'Aktif', '2024-12-12', NULL, '', '1234', '1234', 100000, 1000000, 10000000, 1, 0, '', '', 0, 0),
+(10, 2, 0, 33, 'Arhan', 'Jakarta', '1989-02-01', 'Islam', 'Belum Kawin', 'Laki-laki', '1211', '32', 'Rancabango', 'Rajeg', 'Aktif', '2024-01-01', NULL, '', '123', '1231', 100000, 2000000, 3000000, 1, 1, '', '', 0, 0),
+(11, 2, 0, 123, 'xxx', '', '0000-00-00', 'Islam', 'Belum Kawin', 'Laki-laki', '', '', '', '', 'Aktif', '0000-00-00', NULL, '', '', '', 0, 0, 0, 1, 1, '', '', 0, 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_login`
+-- Struktur dari tabel `ms_keluarga`
+--
+
+CREATE TABLE `ms_keluarga` (
+  `id_keluarga` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `hubungan_keluarga` varchar(255) NOT NULL,
+  `l_p` enum('Laki-laki','Perempuan') DEFAULT NULL,
+  `tgl_lahirkeluarga` date DEFAULT NULL,
+  `pendidikan_terakhir` varchar(255) NOT NULL,
+  `pekerjaan` varchar(255) NOT NULL,
+  `keterangan` text
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_lampiran`
+--
+
+CREATE TABLE `ms_lampiran` (
+  `id_lampiran` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `tgl_lampiran` date DEFAULT NULL,
+  `lampiran` varchar(255) NOT NULL,
+  `path_lampiran` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `ms_lampiran`
+--
+
+INSERT INTO `ms_lampiran` (`id_lampiran`, `id_karyawan`, `tgl_lampiran`, `lampiran`, `path_lampiran`) VALUES
+(1, 1, '2024-05-19', 'PROPOSAL MAULID NABI 2023.pdf', 'LAMPIRAN/1-2024-05-19-04-38-16-PROPOSAL MAULID NABI 2023.pdf'),
+(2, 1, '2024-05-19', 'printperson1.pdf', 'LAMPIRAN/1-2024-05-19-04-47-04-printperson1.pdf'),
+(3, 3, '2024-07-28', 'Ijazah.pdf', 'LAMPIRAN/3-2024-07-28-14-21-26-Ijazah.pdf');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_login`
 --
 
 CREATE TABLE `ms_login` (
-  `id_login` int NOT NULL,
-  `id_perusahaan` int NOT NULL,
-  `username` varchar(225) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('Kepala Pabrik','Admin HR','Admin Master','Owner') DEFAULT NULL
+  `id_login` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
+  `user_login` varchar(225) NOT NULL,
+  `lg_password` varchar(255) NOT NULL,
+  `level` enum('sa','admin','user','OWNER') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_login`
+-- Dumping data untuk tabel `ms_login`
 --
 
-INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `username`, `password`, `role`) VALUES
-(1, 1, 'admin', '123', 'Admin HR'),
-(2, 1, 'kepalapabrik', '123', 'Kepala Pabrik'),
-(3, 1, 'owner', '123', 'Owner'),
-(4, 1, 'adminmaster', '123', 'Admin Master');
+INSERT INTO `ms_login` (`id_login`, `id_perusahaan`, `user_login`, `lg_password`, `level`) VALUES
+(1, 1, 'admin', '123', 'sa'),
+(2, 1, 'mahmudin', '123', 'sa'),
+(3, 1, 'owner', '123', 'OWNER');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_menu`
+-- Struktur dari tabel `ms_menu`
 --
 
 CREATE TABLE `ms_menu` (
-  `id_menu` int NOT NULL,
+  `id_menu` int(10) NOT NULL,
   `app_menu` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_menu`
+-- Dumping data untuk tabel `ms_menu`
 --
 
 INSERT INTO `ms_menu` (`id_menu`, `app_menu`) VALUES
@@ -221,11 +431,46 @@ INSERT INTO `ms_menu` (`id_menu`, `app_menu`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_perusahaan`
+-- Struktur dari tabel `ms_pelatihan`
+--
+
+CREATE TABLE `ms_pelatihan` (
+  `id_pelatihan` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `lama_pelatihan` varchar(255) NOT NULL,
+  `tahun_pelatihan` date DEFAULT NULL,
+  `bidang_pelatihan` varchar(255) NOT NULL,
+  `penyelenggara` varchar(255) NOT NULL,
+  `sertifikat` varchar(255) NOT NULL,
+  `path_sertifikat` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_pendidikan`
+--
+
+CREATE TABLE `ms_pendidikan` (
+  `id_pendidikan` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `dari_tahun` date DEFAULT NULL,
+  `sampai_tahun` date DEFAULT NULL,
+  `tingkat` varchar(255) NOT NULL,
+  `nama_sekolah` varchar(255) NOT NULL,
+  `alamat_sekolah` varchar(255) NOT NULL,
+  `jurusan` varchar(255) NOT NULL,
+  `nilai_akhir` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `ms_perusahaan`
 --
 
 CREATE TABLE `ms_perusahaan` (
-  `id_perusahaan` int NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
   `nib` varchar(50) NOT NULL,
   `nama_perusahaan` varchar(255) NOT NULL,
   `alamat_perusahaan` varchar(255) NOT NULL,
@@ -235,7 +480,7 @@ CREATE TABLE `ms_perusahaan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_perusahaan`
+-- Dumping data untuk tabel `ms_perusahaan`
 --
 
 INSERT INTO `ms_perusahaan` (`id_perusahaan`, `nib`, `nama_perusahaan`, `alamat_perusahaan`, `telepon_perusahaan`, `email_perusahaan`, `direktur`) VALUES
@@ -244,16 +489,16 @@ INSERT INTO `ms_perusahaan` (`id_perusahaan`, `nib`, `nama_perusahaan`, `alamat_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_status`
+-- Struktur dari tabel `ms_status`
 --
 
 CREATE TABLE `ms_status` (
-  `id_status` int NOT NULL,
+  `id_status` int(10) NOT NULL,
   `app_status` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_status`
+-- Dumping data untuk tabel `ms_status`
 --
 
 INSERT INTO `ms_status` (`id_status`, `app_status`) VALUES
@@ -264,17 +509,17 @@ INSERT INTO `ms_status` (`id_status`, `app_status`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_sub_department`
+-- Struktur dari tabel `ms_sub_department`
 --
 
 CREATE TABLE `ms_sub_department` (
-  `id_sub_department` int NOT NULL,
-  `id_perusahaan` int NOT NULL,
+  `id_sub_department` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
   `nama_sub_department` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `ms_sub_department`
+-- Dumping data untuk tabel `ms_sub_department`
 --
 
 INSERT INTO `ms_sub_department` (`id_sub_department`, `id_perusahaan`, `nama_sub_department`) VALUES
@@ -283,42 +528,21 @@ INSERT INTO `ms_sub_department` (`id_sub_department`, `id_perusahaan`, `nama_sub
 -- --------------------------------------------------------
 
 --
--- Table structure for table `ms_upah`
---
-
-CREATE TABLE `ms_upah` (
-  `id_upah` int NOT NULL,
-  `id_golongan` int NOT NULL DEFAULT '0',
-  `upah_harian` int NOT NULL DEFAULT '0',
-  `upah_mingguan` int NOT NULL DEFAULT '0',
-  `upah_bulanan` int NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `ms_upah`
---
-
-INSERT INTO `ms_upah` (`id_upah`, `id_golongan`, `upah_harian`, `upah_mingguan`, `upah_bulanan`) VALUES
-(1, 0, 123, 23, 123);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tb_alfa`
+-- Struktur dari tabel `tb_alfa`
 --
 
 CREATE TABLE `tb_alfa` (
-  `id_alfa` int NOT NULL,
-  `id_karyawan` int NOT NULL,
+  `id_alfa` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
   `tgl_pengajuan_alfa` date NOT NULL,
   `tgl_awal_alfa` date NOT NULL,
   `tgl_akhir_alfa` date NOT NULL,
-  `lama` int NOT NULL,
+  `lama` int(10) NOT NULL,
   `keterangan_alfa` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_alfa`
+-- Dumping data untuk tabel `tb_alfa`
 --
 
 INSERT INTO `tb_alfa` (`id_alfa`, `id_karyawan`, `tgl_pengajuan_alfa`, `tgl_awal_alfa`, `tgl_akhir_alfa`, `lama`, `keterangan_alfa`) VALUES
@@ -327,21 +551,21 @@ INSERT INTO `tb_alfa` (`id_alfa`, `id_karyawan`, `tgl_pengajuan_alfa`, `tgl_awal
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_cuti`
+-- Struktur dari tabel `tb_cuti`
 --
 
 CREATE TABLE `tb_cuti` (
-  `id_cuti` int NOT NULL,
-  `id_karyawan` int NOT NULL,
+  `id_cuti` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
   `tgl_pengajuan_cuti` date NOT NULL,
   `tgl_awal_cuti` date NOT NULL,
   `tgl_akhir_cuti` date NOT NULL,
-  `lama` int NOT NULL,
+  `lama` int(10) NOT NULL,
   `keterangan_cuti` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_cuti`
+-- Dumping data untuk tabel `tb_cuti`
 --
 
 INSERT INTO `tb_cuti` (`id_cuti`, `id_karyawan`, `tgl_pengajuan_cuti`, `tgl_awal_cuti`, `tgl_akhir_cuti`, `lama`, `keterangan_cuti`) VALUES
@@ -351,42 +575,43 @@ INSERT INTO `tb_cuti` (`id_cuti`, `id_karyawan`, `tgl_pengajuan_cuti`, `tgl_awal
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_denda`
+-- Struktur dari tabel `tb_denda`
 --
 
 CREATE TABLE `tb_denda` (
-  `id_denda` int NOT NULL,
-  `denda_masuk` int NOT NULL,
-  `denda_istirahat_keluar` int NOT NULL DEFAULT '0',
-  `denda_istirahat_masuk` int NOT NULL,
-  `denda_pulang` int NOT NULL DEFAULT '0',
-  `denda_tidak_lengkap` int NOT NULL DEFAULT '0'
+  `id_denda` int(10) NOT NULL,
+  `denda_masuk` int(10) NOT NULL,
+  `denda_istirahat` int(10) NOT NULL,
+  `denda_istirahat_keluar` decimal(15,2) DEFAULT '0.00',
+  `denda_istirahat_masuk` decimal(15,2) DEFAULT '0.00',
+  `denda_pulang` decimal(15,2) DEFAULT '0.00',
+  `denda_tidak_lengkap` decimal(15,2) DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_denda`
+-- Dumping data untuk tabel `tb_denda`
 --
 
-INSERT INTO `tb_denda` (`id_denda`, `denda_masuk`, `denda_istirahat_keluar`, `denda_istirahat_masuk`, `denda_pulang`, `denda_tidak_lengkap`) VALUES
-(1, 30000, 0, 20000, 0, 0);
+INSERT INTO `tb_denda` (`id_denda`, `denda_masuk`, `denda_istirahat`, `denda_istirahat_keluar`, `denda_istirahat_masuk`, `denda_pulang`, `denda_tidak_lengkap`) VALUES
+(1, 30000, 20000, 0.00, 0.00, 0.00, 0.00);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_hasil_external`
+-- Struktur dari tabel `tb_hasil_external`
 --
 
 CREATE TABLE `tb_hasil_external` (
-  `id_external` int NOT NULL,
-  `id_jasa` int NOT NULL,
+  `id_external` int(10) NOT NULL,
+  `id_jasa` int(10) NOT NULL,
   `tgl` date NOT NULL,
-  `hasil` int NOT NULL,
-  `biaya` int NOT NULL,
-  `total_biaya` int NOT NULL
+  `hasil` int(10) NOT NULL,
+  `biaya` int(10) NOT NULL,
+  `total_biaya` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_hasil_external`
+-- Dumping data untuk tabel `tb_hasil_external`
 --
 
 INSERT INTO `tb_hasil_external` (`id_external`, `id_jasa`, `tgl`, `hasil`, `biaya`, `total_biaya`) VALUES
@@ -396,23 +621,23 @@ INSERT INTO `tb_hasil_external` (`id_external`, `id_jasa`, `tgl`, `hasil`, `biay
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_hasil_produksi`
+-- Struktur dari tabel `tb_hasil_produksi`
 --
 
 CREATE TABLE `tb_hasil_produksi` (
-  `id_hasil_produksi` int NOT NULL,
-  `id_karyawan` int NOT NULL,
+  `id_hasil_produksi` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
   `tgl` date NOT NULL,
-  `target` int NOT NULL,
-  `hasil` int NOT NULL,
-  `upah` int NOT NULL,
-  `potongan` int NOT NULL,
-  `lembur` int NOT NULL,
-  `id_jadwal` int NOT NULL
+  `target` int(10) NOT NULL,
+  `hasil` int(10) NOT NULL,
+  `upah` int(10) NOT NULL,
+  `potongan` int(10) NOT NULL,
+  `lembur` int(10) NOT NULL,
+  `id_jadwal` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_hasil_produksi`
+-- Dumping data untuk tabel `tb_hasil_produksi`
 --
 
 INSERT INTO `tb_hasil_produksi` (`id_hasil_produksi`, `id_karyawan`, `tgl`, `target`, `hasil`, `upah`, `potongan`, `lembur`, `id_jadwal`) VALUES
@@ -425,12 +650,12 @@ INSERT INTO `tb_hasil_produksi` (`id_hasil_produksi`, `id_karyawan`, `tgl`, `tar
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_ijin`
+-- Struktur dari tabel `tb_ijin`
 --
 
 CREATE TABLE `tb_ijin` (
-  `id_ijin` int NOT NULL,
-  `id_karyawan` int NOT NULL,
+  `id_ijin` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
   `tgl_pengajuan_ijin` date NOT NULL,
   `tgl_ijin` date NOT NULL,
   `waktu_awal` varchar(255) NOT NULL,
@@ -440,7 +665,7 @@ CREATE TABLE `tb_ijin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_ijin`
+-- Dumping data untuk tabel `tb_ijin`
 --
 
 INSERT INTO `tb_ijin` (`id_ijin`, `id_karyawan`, `tgl_pengajuan_ijin`, `tgl_ijin`, `waktu_awal`, `waktu_akhir`, `keterangan`, `jenis_ijin`) VALUES
@@ -449,11 +674,11 @@ INSERT INTO `tb_ijin` (`id_ijin`, `id_karyawan`, `tgl_pengajuan_ijin`, `tgl_ijin
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_jadwal`
+-- Struktur dari tabel `tb_jadwal`
 --
 
 CREATE TABLE `tb_jadwal` (
-  `id_jadwal` int NOT NULL,
+  `id_jadwal` int(10) NOT NULL,
   `keterangan` varchar(255) NOT NULL,
   `jam_masuk` varchar(20) NOT NULL,
   `jam_keluar` varchar(20) NOT NULL,
@@ -462,7 +687,7 @@ CREATE TABLE `tb_jadwal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_jadwal`
+-- Dumping data untuk tabel `tb_jadwal`
 --
 
 INSERT INTO `tb_jadwal` (`id_jadwal`, `keterangan`, `jam_masuk`, `jam_keluar`, `istirahat_masuk`, `istirahat_keluar`) VALUES
@@ -472,12 +697,12 @@ INSERT INTO `tb_jadwal` (`id_jadwal`, `keterangan`, `jam_masuk`, `jam_keluar`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_mesin`
+-- Struktur dari tabel `tb_mesin`
 --
 
 CREATE TABLE `tb_mesin` (
-  `id_mesin` int NOT NULL,
-  `no_mesin` int NOT NULL,
+  `id_mesin` int(10) NOT NULL,
+  `no_mesin` int(10) NOT NULL,
   `nama_mesin` varchar(50) NOT NULL,
   `ip_mesin` varchar(20) NOT NULL,
   `comm_key` varchar(20) NOT NULL,
@@ -485,7 +710,7 @@ CREATE TABLE `tb_mesin` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_mesin`
+-- Dumping data untuk tabel `tb_mesin`
 --
 
 INSERT INTO `tb_mesin` (`id_mesin`, `no_mesin`, `nama_mesin`, `ip_mesin`, `comm_key`, `port`) VALUES
@@ -494,96 +719,96 @@ INSERT INTO `tb_mesin` (`id_mesin`, `no_mesin`, `nama_mesin`, `ip_mesin`, `comm_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_realisasi`
+-- Struktur dari tabel `tb_realisasi`
 --
 
 CREATE TABLE `tb_realisasi` (
-  `id_realisasi` int NOT NULL,
-  `id_rkk` int NOT NULL,
-  `keterangan` text,
+  `id_realisasi` int(10) NOT NULL,
+  `id_rkk` int(10) NOT NULL,
+  `keterangan` text NOT NULL,
   `tgl_realisasi` date NOT NULL,
   `detail_realisasi` varchar(20) NOT NULL,
-  `jam_kerja` int NOT NULL,
-  `status_realisasi` enum('pending','approve') NOT NULL DEFAULT 'pending',
-  `tgl_status` date DEFAULT NULL
+  `jam_kerja` int(10) NOT NULL,
+  `status_realisasi` int(10) NOT NULL,
+  `tgl_status` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_realisasi`
+-- Dumping data untuk tabel `tb_realisasi`
 --
 
 INSERT INTO `tb_realisasi` (`id_realisasi`, `id_rkk`, `keterangan`, `tgl_realisasi`, `detail_realisasi`, `jam_kerja`, `status_realisasi`, `tgl_status`) VALUES
-(9, 1, 'realisasi1', '2025-11-25', '2025-11-25 06:45:16', 8, 'approve', '2025-11-29'),
-(10, 5, '', '2025-11-12', '2025-11-29 05:56:48', 8, 'pending', '0000-00-00'),
-(11, 6, '', '2025-11-01', '2025-12-01 06:57:44', 8, 'pending', '0000-00-00');
+(9, 1, 'realisasi1', '2025-11-25', '2025-11-25 06:45:16', 8, 1, '2025-11-29'),
+(10, 5, '', '2025-11-12', '2025-11-29 05:56:48', 8, 0, '0000-00-00'),
+(11, 6, '', '2025-11-01', '2025-12-01 06:57:44', 8, 0, '0000-00-00');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_realisasi_detail`
+-- Struktur dari tabel `tb_realisasi_detail`
 --
 
 CREATE TABLE `tb_realisasi_detail` (
-  `id_realisasi_detail` int NOT NULL,
-  `id_realisasi` int NOT NULL,
-  `id_rkk_detail` int NOT NULL,
-  `id_rkk` int NOT NULL,
-  `id_karyawan` int NOT NULL,
-  `r_upah` int NOT NULL,
-  `r_potongan_lainnya` int NOT NULL DEFAULT '0',
-  `r_potongan_pulang` int NOT NULL DEFAULT '0',
-  `r_potongan_tidak_lengkap` int NOT NULL DEFAULT '0',
+  `id_realisasi_detail` int(10) NOT NULL,
+  `id_realisasi` int(10) NOT NULL,
+  `id_rkk_detail` int(10) NOT NULL,
+  `id_rkk` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `r_upah` int(10) NOT NULL,
+  `r_potongan_telat` int(10) NOT NULL,
+  `r_potongan_istirahat` int(10) NOT NULL,
+  `r_potongan_lainnya` int(10) NOT NULL,
   `r_jam_masuk` varchar(20) NOT NULL,
   `r_jam_keluar` varchar(20) NOT NULL,
   `r_istirahat_masuk` varchar(20) NOT NULL,
   `r_istirahat_keluar` varchar(20) NOT NULL,
-  `r_status` int NOT NULL DEFAULT '0',
-  `r_update` varchar(20) NOT NULL DEFAULT '',
-  `ra_masuk` varchar(20) NOT NULL DEFAULT '',
-  `ra_keluar` varchar(20) NOT NULL DEFAULT '',
-  `ra_istirahat_masuk` varchar(20) NOT NULL DEFAULT '',
-  `ra_istirahat_keluar` varchar(20) NOT NULL DEFAULT '',
-  `id_jadwal` int NOT NULL,
-  `status_realisasi_detail` int NOT NULL DEFAULT '0',
-  `hasil_kerja` varchar(255) NOT NULL DEFAULT '',
-  `lembur` int NOT NULL DEFAULT '0',
+  `r_status` int(10) NOT NULL,
+  `r_update` varchar(20) NOT NULL,
+  `ra_masuk` varchar(20) NOT NULL,
+  `ra_keluar` varchar(20) NOT NULL,
+  `ra_istirahat_masuk` varchar(20) NOT NULL,
+  `ra_istirahat_keluar` varchar(20) NOT NULL,
+  `id_jadwal` int(10) NOT NULL,
+  `status_realisasi_detail` int(10) NOT NULL,
+  `hasil_kerja` varchar(255) NOT NULL,
+  `lembur` int(10) NOT NULL,
   `tgl_realisasi_detail` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_realisasi_detail`
+-- Dumping data untuk tabel `tb_realisasi_detail`
 --
 
-INSERT INTO `tb_realisasi_detail` (`id_realisasi_detail`, `id_realisasi`, `id_rkk_detail`, `id_rkk`, `id_karyawan`, `r_upah`, `r_potongan_lainnya`, `r_jam_masuk`, `r_jam_keluar`, `r_istirahat_masuk`, `r_istirahat_keluar`, `r_status`, `r_update`, `ra_masuk`, `ra_keluar`, `ra_istirahat_masuk`, `ra_istirahat_keluar`, `id_jadwal`, `status_realisasi_detail`, `hasil_kerja`, `lembur`, `tgl_realisasi_detail`) VALUES
-(29, 9, 206, 1, 2, 150000, 1000, '07:00', '17:00', '13:00', '12:00', 0, '2025-11-29 05:27:37', '06:54', '17:00', '13:02', '12:00', 1, 1, '', 0, '2025-11-01'),
-(30, 9, 207, 1, 7, 500000, 0, '07:00', '15:00', '13:00', '12:00', 0, '', '', '', '', '', 1, 0, '', 0, '2025-11-01'),
-(31, 9, 208, 1, 3, 300000, 0, '', '', '', '', 0, '2025-11-29 04:47:43', '06:57', '18:49', '13:00', '12:00', 1, 0, '', 0, '2025-11-01'),
-(32, 9, 216, 1, 8, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
-(33, 9, 217, 1, 9, 100000, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
-(34, 10, 218, 5, 2, 100000, 0, '07:00', '17:00', '13:00', '12:00', 0, '2025-11-29 09:24:15', '07:13', '12:00', '19:00', '08:00', 1, 1, 'dsfd', 0, '2025-11-01'),
-(35, 10, 219, 5, 3, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
-(36, 11, 222, 6, 2, 100000, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
-(37, 11, 223, 6, 3, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
-(38, 11, 224, 6, 4, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01');
+INSERT INTO `tb_realisasi_detail` (`id_realisasi_detail`, `id_realisasi`, `id_rkk_detail`, `id_rkk`, `id_karyawan`, `r_upah`, `r_potongan_telat`, `r_potongan_istirahat`, `r_potongan_lainnya`, `r_jam_masuk`, `r_jam_keluar`, `r_istirahat_masuk`, `r_istirahat_keluar`, `r_status`, `r_update`, `ra_masuk`, `ra_keluar`, `ra_istirahat_masuk`, `ra_istirahat_keluar`, `id_jadwal`, `status_realisasi_detail`, `hasil_kerja`, `lembur`, `tgl_realisasi_detail`) VALUES
+(29, 9, 206, 1, 2, 150000, 30000, 20000, 1000, '07:00', '17:00', '13:00', '12:00', 0, '2025-11-29 05:27:37', '06:54', '17:00', '13:02', '12:00', 1, 1, '', 0, '2025-11-01'),
+(30, 9, 207, 1, 7, 500000, 0, 0, 0, '07:00', '15:00', '13:00', '12:00', 0, '', '', '', '', '', 1, 0, '', 0, '2025-11-01'),
+(31, 9, 208, 1, 3, 300000, 0, 0, 0, '', '', '', '', 0, '2025-11-29 04:47:43', '06:57', '18:49', '13:00', '12:00', 1, 0, '', 0, '2025-11-01'),
+(32, 9, 216, 1, 8, 0, 0, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
+(33, 9, 217, 1, 9, 100000, 0, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
+(34, 10, 218, 5, 2, 100000, 20000, 0, 0, '07:00', '17:00', '13:00', '12:00', 0, '2025-11-29 09:24:15', '07:13', '12:00', '19:00', '08:00', 1, 1, 'dsfd', 0, '2025-11-01'),
+(35, 10, 219, 5, 3, 0, 0, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
+(36, 11, 222, 6, 2, 100000, 0, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
+(37, 11, 223, 6, 3, 0, 0, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01'),
+(38, 11, 224, 6, 4, 0, 0, 0, 0, '', '', '', '', 0, '', '', '', '', '', 0, 0, '', 0, '2025-11-01');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_record`
+-- Struktur dari tabel `tb_record`
 --
 
 CREATE TABLE `tb_record` (
-  `id_record` int NOT NULL,
+  `id_record` int(10) NOT NULL,
   `data` varchar(100) NOT NULL,
-  `userid` int NOT NULL,
+  `userid` int(10) NOT NULL,
   `tgl` date NOT NULL,
-  `verifikasi` int NOT NULL,
-  `status` int NOT NULL,
+  `verifikasi` int(4) NOT NULL,
+  `status` int(4) NOT NULL,
   `detail_waktu` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_record`
+-- Dumping data untuk tabel `tb_record`
 --
 
 INSERT INTO `tb_record` (`id_record`, `data`, `userid`, `tgl`, `verifikasi`, `status`, `detail_waktu`) VALUES
@@ -4931,21 +5156,21 @@ INSERT INTO `tb_record` (`id_record`, `data`, `userid`, `tgl`, `verifikasi`, `st
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_rkk`
+-- Struktur dari tabel `tb_rkk`
 --
 
 CREATE TABLE `tb_rkk` (
-  `id_rkk` int NOT NULL,
+  `id_rkk` int(10) NOT NULL,
   `keterangan` text NOT NULL,
   `tgl_rkk` date NOT NULL,
   `detail_rkk` varchar(20) NOT NULL,
-  `jam_kerja` int NOT NULL,
-  `status_rkk` int NOT NULL,
+  `jam_kerja` int(10) NOT NULL,
+  `status_rkk` int(2) NOT NULL,
   `tgl_status` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_rkk`
+-- Dumping data untuk tabel `tb_rkk`
 --
 
 INSERT INTO `tb_rkk` (`id_rkk`, `keterangan`, `tgl_rkk`, `detail_rkk`, `jam_kerja`, `status_rkk`, `tgl_status`) VALUES
@@ -4959,56 +5184,58 @@ INSERT INTO `tb_rkk` (`id_rkk`, `keterangan`, `tgl_rkk`, `detail_rkk`, `jam_kerj
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_rkk_detail`
+-- Struktur dari tabel `tb_rkk_detail`
 --
 
 CREATE TABLE `tb_rkk_detail` (
-  `id_rkk_detail` int NOT NULL,
-  `id_rkk` int NOT NULL DEFAULT '0',
-  `id_karyawan` int NOT NULL,
-  `upah` int NOT NULL,
-  `id_departmen` int DEFAULT NULL,
-  `id_sub_department` int DEFAULT NULL,
+  `id_rkk_detail` int(10) NOT NULL,
+  `id_rkk` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
+  `upah` int(10) NOT NULL,
   `status_rkk` enum('Hadir','Tidak Hadir','Digantikan','Pengganti') NOT NULL,
-  `id_jadwal` int NOT NULL,
-  `potongan_telat` int NOT NULL,
-  `potongan_istirahat` int NOT NULL,
-  `potongan_lainnya` int NOT NULL,
+  `id_jadwal` int(10) NOT NULL,
+  `potongan_telat` int(10) NOT NULL,
+  `potongan_istirahat` int(10) NOT NULL,
+  `potongan_lainnya` int(10) NOT NULL,
+  `jam_masuk` varchar(20) NOT NULL,
+  `jam_keluar` varchar(20) NOT NULL,
+  `istirahat_masuk` varchar(20) NOT NULL,
+  `istirahat_keluar` varchar(20) NOT NULL,
   `tgl_updt` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_rkk_detail`
+-- Dumping data untuk tabel `tb_rkk_detail`
 --
 
-INSERT INTO `tb_rkk_detail` (`id_rkk_detail`, `id_rkk`, `id_karyawan`, `upah`, `id_departmen`, `id_sub_department`, `status_rkk`, `id_jadwal`, `potongan_telat`, `potongan_istirahat`, `potongan_lainnya`, `tgl_updt`) VALUES
-(206, 1, 2, 100000, NULL, NULL, 'Hadir', 1, 20000, 10000, 20000, '2025-11-22 01:20:34'),
-(207, 1, 7, 500000, NULL, NULL, 'Hadir', 1, 20000, 10000, 20000, '2025-11-22 01:23:28'),
-(208, 1, 3, 0, NULL, NULL, 'Digantikan', 0, 0, 0, 0, ''),
-(216, 1, 8, 0, NULL, NULL, 'Hadir', 0, 0, 0, 0, ''),
-(217, 1, 9, 100000, NULL, NULL, 'Hadir', 0, 0, 0, 0, ''),
-(218, 5, 2, 100000, NULL, NULL, 'Hadir', 1, 20000, 30000, 0, '2025-11-29 05:50:20'),
-(219, 5, 3, 0, NULL, NULL, 'Hadir', 0, 0, 0, 0, ''),
-(221, 4, 2, 100000, NULL, NULL, 'Hadir', 2, 2000, 1000, 5000, '2026-01-04 01:08:13'),
-(222, 6, 2, 100000, NULL, NULL, 'Hadir', 0, 0, 0, 0, ''),
-(223, 6, 3, 0, NULL, NULL, 'Hadir', 0, 0, 0, 0, ''),
-(224, 6, 4, 0, NULL, NULL, 'Hadir', 0, 0, 0, 0, '');
+INSERT INTO `tb_rkk_detail` (`id_rkk_detail`, `id_rkk`, `id_karyawan`, `upah`, `status_rkk`, `id_jadwal`, `potongan_telat`, `potongan_istirahat`, `potongan_lainnya`, `jam_masuk`, `jam_keluar`, `istirahat_masuk`, `istirahat_keluar`, `tgl_updt`) VALUES
+(206, 1, 2, 100000, 'Hadir', 1, 20000, 10000, 20000, '07:00', '17:00', '13:00', '12:00', '2025-11-22 01:20:34'),
+(207, 1, 7, 500000, 'Hadir', 1, 20000, 10000, 20000, '07:00', '15:00', '13:00', '12:00', '2025-11-22 01:23:28'),
+(208, 1, 3, 0, 'Digantikan', 0, 0, 0, 0, '', '', '', '', ''),
+(216, 1, 8, 0, 'Hadir', 0, 0, 0, 0, '', '', '', '', ''),
+(217, 1, 9, 100000, 'Hadir', 0, 0, 0, 0, '', '', '', '', ''),
+(218, 5, 2, 100000, 'Hadir', 1, 20000, 30000, 0, '07:00', '17:00', '13:00', '12:00', '2025-11-29 05:50:20'),
+(219, 5, 3, 0, 'Hadir', 0, 0, 0, 0, '', '', '', '', ''),
+(221, 4, 2, 100000, 'Hadir', 2, 2000, 1000, 5000, '15:00', '23:00', '19:00', '18:00', '2026-01-04 01:08:13'),
+(222, 6, 2, 100000, 'Hadir', 0, 0, 0, 0, '', '', '', '', ''),
+(223, 6, 3, 0, 'Hadir', 0, 0, 0, 0, '', '', '', '', ''),
+(224, 6, 4, 0, 'Hadir', 0, 0, 0, 0, '', '', '', '', '');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_rkk_update`
+-- Struktur dari tabel `tb_rkk_update`
 --
 
 CREATE TABLE `tb_rkk_update` (
-  `id_rkk_update` int NOT NULL,
-  `id_rkk_detail` int NOT NULL,
-  `id_karyawan` int NOT NULL,
+  `id_rkk_update` int(10) NOT NULL,
+  `id_rkk_detail` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
   `status` enum('Digantikan','Pengganti','','') NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_rkk_update`
+-- Dumping data untuk tabel `tb_rkk_update`
 --
 
 INSERT INTO `tb_rkk_update` (`id_rkk_update`, `id_rkk_detail`, `id_karyawan`, `status`) VALUES
@@ -5020,21 +5247,21 @@ INSERT INTO `tb_rkk_update` (`id_rkk_update`, `id_rkk_detail`, `id_karyawan`, `s
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_sia`
+-- Struktur dari tabel `tb_sia`
 --
 
 CREATE TABLE `tb_sia` (
-  `id_sia` int NOT NULL,
-  `id_karyawan` int NOT NULL,
+  `id_sia` int(10) NOT NULL,
+  `id_karyawan` int(10) NOT NULL,
   `tgl_pengajuan` date NOT NULL,
   `tgl_awal` date NOT NULL,
   `tgl_akhir` date NOT NULL,
-  `lama` int NOT NULL,
+  `lama` int(10) NOT NULL,
   `keterangan` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_sia`
+-- Dumping data untuk tabel `tb_sia`
 --
 
 INSERT INTO `tb_sia` (`id_sia`, `id_karyawan`, `tgl_pengajuan`, `tgl_awal`, `tgl_akhir`, `lama`, `keterangan`) VALUES
@@ -5044,22 +5271,22 @@ INSERT INTO `tb_sia` (`id_sia`, `id_karyawan`, `tgl_pengajuan`, `tgl_awal`, `tgl
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tb_transaksi`
+-- Struktur dari tabel `tb_transaksi`
 --
 
 CREATE TABLE `tb_transaksi` (
-  `id_transaksi` int NOT NULL,
-  `no_transaksi` int NOT NULL,
-  `id_user` int NOT NULL,
-  `id_menu` int NOT NULL,
-  `id_perusahaan` int NOT NULL,
+  `id_transaksi` int(10) NOT NULL,
+  `no_transaksi` int(10) NOT NULL,
+  `id_user` int(10) NOT NULL,
+  `id_menu` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
   `tgl` date NOT NULL,
   `tgl_detail` varchar(100) NOT NULL,
-  `id_action` int NOT NULL
+  `id_action` int(10) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `tb_transaksi`
+-- Dumping data untuk tabel `tb_transaksi`
 --
 
 INSERT INTO `tb_transaksi` (`id_transaksi`, `no_transaksi`, `id_user`, `id_menu`, `id_perusahaan`, `tgl`, `tgl_detail`, `id_action`) VALUES
@@ -5068,18 +5295,136 @@ INSERT INTO `tb_transaksi` (`id_transaksi`, `no_transaksi`, `id_user`, `id_menu`
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Struktur dari tabel `tr_memo`
+--
+
+CREATE TABLE `tr_memo` (
+  `id_mm` int(10) NOT NULL,
+  `mm_no` varchar(15) NOT NULL,
+  `tgl_mm` date NOT NULL,
+  `mm_status` varchar(10) NOT NULL,
+  `mm_total_debet` float NOT NULL,
+  `mm_total_kredit` float NOT NULL,
+  `mm_balance` float NOT NULL,
+  `mm_kurs` float NOT NULL,
+  `mm_currency` int(10) NOT NULL,
+  `mm_user` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
+  `tgl_mm_detail` varchar(30) NOT NULL,
+  `mm_keterangan` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `tr_memo`
+--
+
+INSERT INTO `tr_memo` (`id_mm`, `mm_no`, `tgl_mm`, `mm_status`, `mm_total_debet`, `mm_total_kredit`, `mm_balance`, `mm_kurs`, `mm_currency`, `mm_user`, `id_perusahaan`, `tgl_mm_detail`, `mm_keterangan`) VALUES
+(3, 'Memo 0002', '2025-09-21', 'Y', 50000000, 50000000, 0, 0, 1, 2, 1, '2025-09-21 03:22:39', 'PEmabayaran Gaji Karyawan'),
+(4, 'MM0010', '2025-09-27', 'Y', 2500000, 2500000, 0, 0, 1, 2, 1, '2025-09-27 01:52:01', 'Pembayaran Listrik Periode September'),
+(5, 'MM009', '2025-09-01', 'Y', 2400000, 2400000, 0, 0, 1, 2, 1, '2025-09-27 02:04:44', 'Pembayaran Listrik Periode Agustus ');
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tr_memo_detail`
+--
+
+CREATE TABLE `tr_memo_detail` (
+  `md_id` int(10) NOT NULL,
+  `id_mm` int(10) NOT NULL,
+  `md_idx` int(10) NOT NULL,
+  `id_account` int(10) NOT NULL,
+  `md_desc` varchar(255) NOT NULL,
+  `md_flag` varchar(3) NOT NULL,
+  `md_amount` float NOT NULL,
+  `md_amount_origin` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `tr_memo_detail`
+--
+
+INSERT INTO `tr_memo_detail` (`md_id`, `id_mm`, `md_idx`, `id_account`, `md_desc`, `md_flag`, `md_amount`, `md_amount_origin`) VALUES
+(17, 3, 1, 1, 'Pembayaran Gaji Karyawan', 'C', 50000000, 0),
+(18, 3, 2, 5, 'Pembayaran Gaji Karyawan', 'D', 50000000, 0),
+(19, 4, 1, 4, 'Pembayaran Listrik September', 'D', 2500000, 0),
+(20, 4, 2, 1, 'Pembayaran Listrik September', 'C', 2500000, 0),
+(22, 5, 1, 4, 'Pembayaran Listrik Periode Agustus', 'D', 2400000, 0),
+(23, 5, 2, 1, 'Pembayaran Listrik Periode Agustus', 'C', 2400000, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tr_memo_detail_temp`
+--
+
+CREATE TABLE `tr_memo_detail_temp` (
+  `no_temp` int(10) NOT NULL,
+  `idx` int(10) NOT NULL,
+  `id_account` int(10) NOT NULL,
+  `md_desc` varchar(255) NOT NULL,
+  `md_flag` varchar(3) NOT NULL,
+  `md_amount` float NOT NULL,
+  `md_amount_origin` float NOT NULL,
+  `md_user` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tr_req_payment`
+--
+
+CREATE TABLE `tr_req_payment` (
+  `req_id` int(10) NOT NULL,
+  `req_no` varchar(20) NOT NULL,
+  `req_tgl` date NOT NULL,
+  `req_tgl_detail` varchar(50) NOT NULL,
+  `req_description` text NOT NULL,
+  `req_status` varchar(50) NOT NULL,
+  `req_total` float NOT NULL,
+  `req_user` int(10) NOT NULL,
+  `id_perusahaan` int(10) NOT NULL,
+  `id_status` int(10) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data untuk tabel `tr_req_payment`
+--
+
+INSERT INTO `tr_req_payment` (`req_id`, `req_no`, `req_tgl`, `req_tgl_detail`, `req_description`, `req_status`, `req_total`, `req_user`, `id_perusahaan`, `id_status`) VALUES
+(1, '002', '2025-11-02', '2025-11-02 08:55:55', 'Pembayaran Listrik', '', 0, 1, 1, 0),
+(2, '003', '2025-11-09', '2025-11-09 02:00:24', 'Pembayaran sewa', '', 0, 2, 1, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `tr_req_payment_detail`
+--
+
+CREATE TABLE `tr_req_payment_detail` (
+  `reqdetail_id` int(11) NOT NULL,
+  `req_id` int(11) NOT NULL,
+  `reqdetail_description` text NOT NULL,
+  `reqdetail_amount` float NOT NULL,
+  `remarks` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `users`
 --
 
 CREATE TABLE `users` (
-  `id` int NOT NULL,
+  `id` int(10) NOT NULL,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
   `age` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
--- Dumping data for table `users`
+-- Dumping data untuk tabel `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `email`, `age`) VALUES
@@ -5113,10 +5458,47 @@ ALTER TABLE `app_user`
   ADD PRIMARY KEY (`id_login`);
 
 --
+-- Indexes for table `ms_os_dhk`
+--
+ALTER TABLE `ms_os_dhk`
+  ADD PRIMARY KEY (`id_os_dhk`);
+
+--
+-- Indexes for table `ms_golongan`
+--
+ALTER TABLE `ms_golongan`
+  ADD PRIMARY KEY (`id_golongan`);
+
+--
+-- Indexes for table `ms_account`
+--
+ALTER TABLE `ms_account`
+  ADD PRIMARY KEY (`id_account`);
+
+--
+-- Indexes for table `ms_account_category`
+--
+ALTER TABLE `ms_account_category`
+  ADD PRIMARY KEY (`id_account_category`);
+
+--
 -- Indexes for table `ms_action`
 --
 ALTER TABLE `ms_action`
   ADD PRIMARY KEY (`id_action`);
+
+--
+-- Indexes for table `ms_bank`
+--
+ALTER TABLE `ms_bank`
+  ADD PRIMARY KEY (`bank_id`);
+
+--
+-- Indexes for table `ms_currency`
+--
+ALTER TABLE `ms_currency`
+  ADD PRIMARY KEY (`id_currency`),
+  ADD UNIQUE KEY `currency` (`currency`);
 
 --
 -- Indexes for table `ms_departmen`
@@ -5131,10 +5513,28 @@ ALTER TABLE `ms_jabatan`
   ADD PRIMARY KEY (`id_jabatan`);
 
 --
+-- Indexes for table `ms_jasa`
+--
+ALTER TABLE `ms_jasa`
+  ADD PRIMARY KEY (`id_jasa`);
+
+--
 -- Indexes for table `ms_karyawan`
 --
 ALTER TABLE `ms_karyawan`
   ADD PRIMARY KEY (`id_karyawan`);
+
+--
+-- Indexes for table `ms_keluarga`
+--
+ALTER TABLE `ms_keluarga`
+  ADD PRIMARY KEY (`id_keluarga`);
+
+--
+-- Indexes for table `ms_lampiran`
+--
+ALTER TABLE `ms_lampiran`
+  ADD PRIMARY KEY (`id_lampiran`);
 
 --
 -- Indexes for table `ms_login`
@@ -5147,6 +5547,18 @@ ALTER TABLE `ms_login`
 --
 ALTER TABLE `ms_menu`
   ADD PRIMARY KEY (`id_menu`);
+
+--
+-- Indexes for table `ms_pelatihan`
+--
+ALTER TABLE `ms_pelatihan`
+  ADD PRIMARY KEY (`id_pelatihan`);
+
+--
+-- Indexes for table `ms_pendidikan`
+--
+ALTER TABLE `ms_pendidikan`
+  ADD PRIMARY KEY (`id_pendidikan`);
 
 --
 -- Indexes for table `ms_perusahaan`
@@ -5165,12 +5577,6 @@ ALTER TABLE `ms_status`
 --
 ALTER TABLE `ms_sub_department`
   ADD PRIMARY KEY (`id_sub_department`);
-
---
--- Indexes for table `ms_upah`
---
-ALTER TABLE `ms_upah`
-  ADD PRIMARY KEY (`id_upah`);
 
 --
 -- Indexes for table `tb_alfa`
@@ -5269,6 +5675,36 @@ ALTER TABLE `tb_transaksi`
   ADD PRIMARY KEY (`id_transaksi`);
 
 --
+-- Indexes for table `tr_memo`
+--
+ALTER TABLE `tr_memo`
+  ADD PRIMARY KEY (`id_mm`);
+
+--
+-- Indexes for table `tr_memo_detail`
+--
+ALTER TABLE `tr_memo_detail`
+  ADD PRIMARY KEY (`md_id`);
+
+--
+-- Indexes for table `tr_memo_detail_temp`
+--
+ALTER TABLE `tr_memo_detail_temp`
+  ADD PRIMARY KEY (`no_temp`);
+
+--
+-- Indexes for table `tr_req_payment`
+--
+ALTER TABLE `tr_req_payment`
+  ADD PRIMARY KEY (`req_id`);
+
+--
+-- Indexes for table `tr_req_payment_detail`
+--
+ALTER TABLE `tr_req_payment_detail`
+  ADD PRIMARY KEY (`reqdetail_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -5282,199 +5718,254 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `app_user`
 --
 ALTER TABLE `app_user`
-  MODIFY `id_login` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_login` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT for table `ms_os_dhk`
+--
+ALTER TABLE `ms_os_dhk`
+  MODIFY `id_os_dhk` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `ms_golongan`
+--
+ALTER TABLE `ms_golongan`
+  MODIFY `id_golongan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `ms_account`
+--
+ALTER TABLE `ms_account`
+  MODIFY `id_account` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `ms_account_category`
+--
+ALTER TABLE `ms_account_category`
+  MODIFY `id_account_category` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `ms_action`
 --
 ALTER TABLE `ms_action`
-  MODIFY `id_action` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_action` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT for table `ms_bank`
+--
+ALTER TABLE `ms_bank`
+  MODIFY `bank_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `ms_currency`
+--
+ALTER TABLE `ms_currency`
+  MODIFY `id_currency` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `ms_departmen`
 --
 ALTER TABLE `ms_departmen`
-  MODIFY `id_departmen` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_departmen` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `ms_jabatan`
 --
 ALTER TABLE `ms_jabatan`
-  MODIFY `id_jabatan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_jabatan` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `ms_jasa`
+--
+ALTER TABLE `ms_jasa`
+  MODIFY `id_jasa` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `ms_karyawan`
 --
 ALTER TABLE `ms_karyawan`
-  MODIFY `id_karyawan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_karyawan` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `ms_keluarga`
+--
+ALTER TABLE `ms_keluarga`
+  MODIFY `id_keluarga` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ms_lampiran`
+--
+ALTER TABLE `ms_lampiran`
+  MODIFY `id_lampiran` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `ms_login`
 --
 ALTER TABLE `ms_login`
-  MODIFY `id_login` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_login` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `ms_menu`
 --
 ALTER TABLE `ms_menu`
-  MODIFY `id_menu` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_menu` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `ms_pelatihan`
+--
+ALTER TABLE `ms_pelatihan`
+  MODIFY `id_pelatihan` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ms_pendidikan`
+--
+ALTER TABLE `ms_pendidikan`
+  MODIFY `id_pendidikan` int(10) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `ms_perusahaan`
 --
 ALTER TABLE `ms_perusahaan`
-  MODIFY `id_perusahaan` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_perusahaan` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `ms_status`
 --
 ALTER TABLE `ms_status`
-  MODIFY `id_status` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_status` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `ms_sub_department`
 --
 ALTER TABLE `ms_sub_department`
-  MODIFY `id_sub_department` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `ms_upah`
---
-ALTER TABLE `ms_upah`
-  MODIFY `id_upah` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_sub_department` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_alfa`
 --
 ALTER TABLE `tb_alfa`
-  MODIFY `id_alfa` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_alfa` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_cuti`
 --
 ALTER TABLE `tb_cuti`
-  MODIFY `id_cuti` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_cuti` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_denda`
 --
 ALTER TABLE `tb_denda`
-  MODIFY `id_denda` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_denda` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_hasil_external`
 --
 ALTER TABLE `tb_hasil_external`
-  MODIFY `id_external` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_external` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_hasil_produksi`
 --
 ALTER TABLE `tb_hasil_produksi`
-  MODIFY `id_hasil_produksi` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_hasil_produksi` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tb_ijin`
 --
 ALTER TABLE `tb_ijin`
-  MODIFY `id_ijin` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_ijin` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_jadwal`
 --
 ALTER TABLE `tb_jadwal`
-  MODIFY `id_jadwal` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_jadwal` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_mesin`
 --
 ALTER TABLE `tb_mesin`
-  MODIFY `id_mesin` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_mesin` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `tb_realisasi`
 --
 ALTER TABLE `tb_realisasi`
-  MODIFY `id_realisasi` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_realisasi` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tb_realisasi_detail`
 --
 ALTER TABLE `tb_realisasi_detail`
-  MODIFY `id_realisasi_detail` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id_realisasi_detail` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `tb_record`
 --
 ALTER TABLE `tb_record`
-  MODIFY `id_record` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4328;
+  MODIFY `id_record` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4328;
 
 --
 -- AUTO_INCREMENT for table `tb_rkk`
 --
 ALTER TABLE `tb_rkk`
-  MODIFY `id_rkk` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_rkk` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tb_rkk_detail`
 --
 ALTER TABLE `tb_rkk_detail`
-  MODIFY `id_rkk_detail` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
+  MODIFY `id_rkk_detail` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=225;
 
 --
 -- AUTO_INCREMENT for table `tb_rkk_update`
 --
 ALTER TABLE `tb_rkk_update`
-  MODIFY `id_rkk_update` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_rkk_update` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tb_sia`
 --
 ALTER TABLE `tb_sia`
-  MODIFY `id_sia` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_sia` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `tb_transaksi`
 --
 ALTER TABLE `tb_transaksi`
-  MODIFY `id_transaksi` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_transaksi` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `tr_memo_detail`
+--
+ALTER TABLE `tr_memo_detail`
+  MODIFY `md_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `tr_memo_detail_temp`
+--
+ALTER TABLE `tr_memo_detail_temp`
+  MODIFY `no_temp` int(10) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `tr_req_payment`
+--
+ALTER TABLE `tr_req_payment`
+  MODIFY `req_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `tr_req_payment_detail`
+--
+ALTER TABLE `tr_req_payment_detail`
+  MODIFY `reqdetail_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 COMMIT;
-
---
--- Table structure for table `tb_boneless`
---
-
-CREATE TABLE `tb_boneless` (
-  `id_boneless` int NOT NULL AUTO_INCREMENT,
-  `tgl` date NOT NULL,
-  `jumlah_mobil` int NOT NULL,
-  `keterangan` text,
-  `tgl_updt` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id_boneless`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `tb_boneless_detail`
---
-
-CREATE TABLE `tb_boneless_detail` (
-  `id_boneless_detail` int NOT NULL AUTO_INCREMENT,
-  `id_boneless` int NOT NULL,
-  `nama_item` varchar(255) NOT NULL,
-  `qty` decimal(10,2) NOT NULL,
-  `harga` int NOT NULL,
-  `total` int NOT NULL,
-  PRIMARY KEY (`id_boneless_detail`),
-  KEY `id_boneless` (`id_boneless`),
-  CONSTRAINT `tb_boneless_detail_ibfk_1` FOREIGN KEY (`id_boneless`) REFERENCES `tb_boneless` (`id_boneless`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
