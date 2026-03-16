@@ -3,9 +3,14 @@ include "koneksi.php";
 
 $id = isset($_GET['id']) ? $_GET['id'] : '';
 
+// 1. Ambil data tanggal berdasarkan ID
+$queryInfo = $koneksi->query("SELECT tgl_realisasi FROM tb_realisasi WHERE id_realisasi = '$id'");
+$info = $queryInfo->fetch_assoc();
+$tanggal_raw = $info ? $info['tgl_realisasi'] : '';
+$tanggal = $tanggal_raw ? date('d-m-Y', strtotime($tanggal_raw)) : 'TanpaTanggal';
 
 header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=export_realisasi_$id.xls");
+header("Content-Disposition: attachment; filename=Laporan_Realisasi_Upah_$tanggal.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
 

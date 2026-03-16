@@ -17,11 +17,12 @@ WHERE R.id_realisasi = '$id'
 LIMIT 1
 ");
 $info = $queryInfo->fetch_assoc();
-$tanggal = $info ? $info['tgl_realisasi'] : 'TanpaTanggal';
+$tanggal_raw = $info ? $info['tgl_realisasi'] : '';
+$tanggal = $tanggal_raw ? date('d-m-Y', strtotime($tanggal_raw)) : 'TanpaTanggal';
 
 // 2. Gunakan variabel $tanggal untuk nama file
 header("Content-type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.xls");
+header("Content-Disposition: attachment; filename=Laporan_Realisasi_Upah_$tanggal.xls");
 echo "<meta charset='UTF-8'>";
 
 // Subqueries for replacement info
