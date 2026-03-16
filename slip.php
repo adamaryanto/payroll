@@ -155,7 +155,7 @@ while($row = $result->fetch_assoc()){
 
     echo "
     <tr>
-     <td style='mso-number-format:"\@";'>".date('d/m/Y', strtotime($row['tgl_realisasi_detail']))."</td>
+     <td style='mso-number-format:\@;'>".date('d/m/Y', strtotime($row['tgl_realisasi_detail']))."</td>
         <td>".rupiah($row['r_upah'])."</td>
          <td>".$row['ra_masuk']."</td>
         <td>".$row['ra_keluar']."</td>
