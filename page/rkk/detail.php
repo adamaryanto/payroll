@@ -48,10 +48,6 @@ if (isset($_GET['id'])) {
                 potongan_telat = '$tpottelat',
                 potongan_istirahat = '$tpotistirahat',
                 potongan_lainnya = '$tpotlainnya',
-                jam_masuk = '$tjammasuk',
-                jam_keluar = '$tjamkeluar',
-                istirahat_masuk = '$tistirahatmasuk',
-                istirahat_keluar = '$tistirahatkeluar',
                 tgl_updt = '$ttgl2'
                 WHERE id_rkk_detail = '$id'");
             
