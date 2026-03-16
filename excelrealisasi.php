@@ -153,7 +153,7 @@ while($row = $result->fetch_assoc()){
         <td>".$row['nama_departmen']."</td>
         <td style='text-align:center;'>".$row['label_gol']."</td>
         <td style='text-align:center;'>".$row['label_os']."</td>
-        <td style='text-align:center;'>".$row['tgl_realisasi']."</td>
+        <td style='text-align:center; mso-number-format:"\@";'>".$row['tgl_realisasi']."</td>
         <td style='text-align:center;'>".$row['ra_masuk']."</td>
         <td style='text-align:center;'>".$row['ra_keluar']."</td>
         <td style='text-align:center;'>".$row['r_jam_masuk']."</td>
