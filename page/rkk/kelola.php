@@ -45,8 +45,8 @@ if (isset($_GET['id'])) {
 FROM tb_rkk_detail A 
 LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
 LEFT JOIN tb_rkk C ON A.id_rkk = C.id_rkk
-LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
-LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department 
+LEFT JOIN ms_departmen D ON A.id_departmen = D.id_departmen
+LEFT JOIN ms_sub_department BB ON A.id_sub_department = BB.id_sub_department 
 LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal 
 WHERE A.id_rkk = '$idrkk'
 ");
