@@ -386,6 +386,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               theme: 'bootstrap4',
               placeholder: placeholder,
               allowClear: true,
+              tags: !!$select.data('tags'),
               templateResult: formatState,
               templateSelection: formatSelection
             });

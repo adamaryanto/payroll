@@ -159,13 +159,23 @@ if (isset($_GET['id'])) {
                         <label>NAMA</label>
                         <input type="text" value="<?= $datanamakaryawan ?>" class="form-control" readonly style="background: #f9fafb;" />
                     </div>
-                    <div class="form-group col-md-4">
+                    <div class="form-group col-md-2">
                         <label>BAGIAN</label>
-                        <select class="form-control" name="tdepartmen" <?= $disabled ?>>
-                             <option value="<?= $dataididdepartmen ?>"><?= $databagian ?></option>
+                        <select class="form-control select2-manage" name="tdepartmen" data-tags="true" <?= $disabled ?>>
+                             <option value="<?= $dataiddepartmen ?>"><?= $databagian ?></option>
                              <?php
-                             $sqldept = $koneksi->query("select * from ms_departmen");
+                             $sqldept = $koneksi->query("select * from ms_departmen order by nama_departmen asc");
                              while ($d = $sqldept->fetch_array()) { echo "<option value='$d[id_departmen]'>$d[nama_departmen]</option>"; }
+                             ?>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <label>SUB BAGIAN</label>
+                        <select class="form-control select2-manage" name="tsubdepartment" data-tags="true" <?= $disabled ?>>
+                             <option value="<?= $dataidsubdepartment ?>"><?= $datasubbagian ?></option>
+                             <?php
+                             $sqlsub = $koneksi->query("select * from ms_sub_department order by nama_sub_department asc");
+                             while ($s = $sqlsub->fetch_array()) { echo "<option value='$s[id_sub_department]'>$s[nama_sub_department]</option>"; }
                              ?>
                         </select>
                     </div>
@@ -175,10 +185,10 @@ if (isset($_GET['id'])) {
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label>SHIFT</label>
-                        <select class="form-control" name="tshift" required <?= $disabled ?>>
+                        <select class="form-control select2-manage" name="tshift" required <?= $disabled ?>>
                            <option value="<?= $dataidjadwal ?>"><?= $dataketerangan ?></option>
                            <?php
-                           $sql = $koneksi->query("select * from tb_jadwal");
+                           $sql = $koneksi->query("select * from tb_jadwal order by id_jadwal asc");
                            while ($j = $sql->fetch_array()) { echo "<option value='$j[id_jadwal]'>$j[keterangan]</option>"; }
                            ?>
                         </select>
@@ -219,10 +229,6 @@ if (isset($_GET['id'])) {
 <?php
 $ttgl2 = date("Y-m-d H:i:s");
 $tshift = @$_POST['tshift'];
-//$tjammasuk = @$_POST ['tjammasuk'];
-//$tjamkeluar = @$_POST ['tjamkeluar'];
-//$tistirahatmasuk = @$_POST ['tistirahatmasuk'];
-//$tistirahatkeluar = @$_POST ['tistirahatkeluar'];
 $tupah = @$_POST['tupah'];
 $tpottelat = @$_POST['tpottelat'];
 $tpotistirahat = @$_POST['tpotistirahat'];
@@ -239,6 +245,18 @@ if ($simpan) {
    if ($data_rkk['status_rkk'] >= 2) {
        echo "<script>alert('Gagal: RKK sudah Approved/Realized!'); window.location.href='?page=rkk&aksi=kelola&id=$dataidrkk';</script>";
        exit;
+   }
+
+   // Handle Tags (New Entries)
+   if (!empty($tdepartmen) && !is_numeric($tdepartmen)) {
+       $name_dept = $koneksi->real_escape_string($tdepartmen);
+       $koneksi->query("INSERT INTO ms_departmen (nama_departmen) VALUES ('$name_dept')");
+       $tdepartmen = $koneksi->insert_id;
+   }
+   if (!empty($tsubdepartment) && !is_numeric($tsubdepartment)) {
+       $name_sub = $koneksi->real_escape_string($tsubdepartment);
+       $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department) VALUES ('$name_sub')");
+       $tsubdepartment = $koneksi->insert_id;
    }
 
    $tampil = $koneksi->query("sELECT * from tb_jadwal WHERE id_jadwal = '$tshift' ");
@@ -266,4 +284,4 @@ if ($simpan) {
       echo "<script>alert('Data Tersimpan'); window.location.href='?page=rkk&aksi=kelola&id=$dataidrkk';</script>";
    }
 }
-?>
+?>

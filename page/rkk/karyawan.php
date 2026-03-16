@@ -38,6 +38,18 @@ if (isset($_POST['simpan_karyawan'])) {
     $id_jadwal  = $_POST['id_jadwal']; 
     $upah       = str_replace('.', '', $_POST['upah_manual']); // Strip dots for database
 
+    // Handle Tags (New Entries)
+    if (!empty($id_dept) && !is_numeric($id_dept)) {
+        $name_dept = $koneksi->real_escape_string($id_dept);
+        $koneksi->query("INSERT INTO ms_departmen (nama_departmen) VALUES ('$name_dept')");
+        $id_dept = $koneksi->insert_id;
+    }
+    if (!empty($id_sub) && !is_numeric($id_sub)) {
+        $name_sub = $koneksi->real_escape_string($id_sub);
+        $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department) VALUES ('$name_sub')");
+        $id_sub = $koneksi->insert_id;
+    }
+
     if (!empty($idkaryawan) && !empty($id_jadwal) && $idrkk > 0) {
         $cek = $koneksi->query("SELECT id_karyawan FROM tb_rkk_detail WHERE id_rkk = '$idrkk' AND id_karyawan = '$idkaryawan'");
 
@@ -144,7 +156,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Departemen <span class="text-rose-500">*</span></label>
-                        <select name="id_departmen" id="id_departmen" required class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base">
+                        <select name="id_departmen" id="id_departmen" required data-tags="true" class="select2-manage block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base">
                             <option value="">- Pilih Dept -</option>
                             <?php $list_dept->data_seek(0); while ($d = $list_dept->fetch_assoc()) { ?>
                                 <option value="<?= $d['id_departmen']; ?>"><?= $d['nama_departmen']; ?></option>
@@ -153,7 +165,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                     </div>
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Sub Bagian <span class="text-rose-500">*</span></label>
-                        <select name="id_sub_department" id="id_sub_department" required class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base">
+                        <select name="id_sub_department" id="id_sub_department" required data-tags="true" class="select2-manage block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base">
                             <option value="">- Pilih Sub -</option>
                             <?php $list_sub->data_seek(0); while ($s = $list_sub->fetch_assoc()) { ?>
                                 <option value="<?= $s['id_sub_department']; ?>"><?= $s['nama_sub_department']; ?></option>
