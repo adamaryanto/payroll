@@ -54,8 +54,8 @@ $tampil = $koneksi->query("SELECT A.*,
     ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_log
     FROM tb_realisasi A $where_real");
 
-// Logika Akses: Hanya Owner yang bisa Approve/Unapprove Realisasi
-$is_authorized = (strtolower($_SESSION['role']) == "owner");
+// Logika Akses: Owner dan Admin Master yang bisa Approve/Unapprove Realisasi
+$is_authorized = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin master");
 $level_status = (!$is_authorized) ? "hidden" : "";
 
 ?>
@@ -100,7 +100,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                         <?php
                         $no = 1;
                         while ($data = $tampil->fetch_assoc()) :
-                            if ($data['status_realisasi'] == 'approve') {
+                            if ($data['status_realisasi'] >= 2) {
                                 $row_class = "bg-slate-50/40";
                                 $status_badge = '<span class="px-2 py-1 rounded bg-emerald-100 text-emerald-800 text-[13px] font-bold tracking-wide">ACC</span>';
                             } else {
@@ -149,7 +149,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
 
                                          <!-- Approve/Unapprove: Only for Owner -->
                                          <?php if ($is_authorized) : ?>
-                                             <?php if ($data['status_realisasi'] != 'approve') : ?>
+                                             <?php if ($data['status_realisasi'] < 2) : ?>
                                                  <button type="button" 
                                                      class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
                                                      data-id="<?= $data['id_realisasi']; ?>"
@@ -170,8 +170,8 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                              <?php endif; ?>
                                          <?php endif; ?>
 
-                                        <!-- Excel: Owner always, Others only if approved -->
-                                        <?php if (strtolower($_SESSION['role']) == "owner" || $data['status_realisasi'] == 'approve') : ?>
+                                        <!-- Excel: Owner/Admin Master always, Others only if approved -->
+                                        <?php if (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin master" || $data['status_realisasi'] >= 2) : ?>
                                             <a href="page/realisasi/excelrealisasi.php?id=<?= $data['id_realisasi']; ?>"
                                                 class="px-2 py-1 text-[13px] font-bold text-purple-600 bg-purple-50 hover:bg-purple-600 hover:text-white rounded border border-purple-200 transition-colors flex justify-center items-center" title="Excel Report">
                                                 <i class="fas fa-file-excel md:mr-1"></i> <span class="ml-1 md:inline">Excel</span>
@@ -181,7 +181,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                 </td>
 
                                  <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
-                                     <?php if ($data['status_realisasi'] == 'approve') : ?>
+                                     <?php if ($data['status_realisasi'] >= 2) : ?>
                                          <div class="stamp stamp-approved">Approved</div>
                                      <?php else : ?>
                                          <div class="stamp stamp-unapproved">Unapproved</div>

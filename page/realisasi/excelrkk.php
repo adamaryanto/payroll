@@ -85,8 +85,6 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
     B.nama_karyawan, 
     O.OS_DHK as label_os,
     G.golongan as label_gol,
-    B.OS_DHK, 
-    B.golongan, 
     D.nama_departmen, 
     S.nama_sub_department, 
     A.r_upah as upah,
@@ -160,12 +158,10 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $grand_upah_total += $upah_dibayar;
                 $jml_karyawan++;
 
-                $nama_display = $data['nama_karyawan'];
-                if (!empty($data['menggantikan'])) {
-                    $nama_display .= " (Menggantikan " . $data['menggantikan'] . ")";
-                } elseif (!empty($data['digantikan_oleh'])) {
-                    $nama_display .= " (Digantikan oleh " . $data['digantikan_oleh'] . ")";
-                }
+                $nama_display = $data['nama_karyawan'] . 
+                    (!empty($data['menggantikan']) ? " (Menggantikan " . $data['menggantikan'] . ")" : "") . 
+                    (!empty($data['menggantikan']) && !empty($data['digantikan_oleh']) ? " &" : "") . 
+                    (!empty($data['digantikan_oleh']) ? " (Digantikan oleh " . $data['digantikan_oleh'] . ")" : "");
 
                 echo "<tr>
                         <td>{$no}</td>
@@ -173,8 +169,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                         <td>{$nama_display}</td>
                         <td>{$data['nama_departmen']}</td>
                         <td>{$data['nama_sub_department']}</td>
-                        <td>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
-                        <td>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
+                        <td>" . $data['label_os'] . "</td>
+                        <td>" . $data['label_gol'] . "</td>
                         <td>{$data['r_jam_masuk']}</td>
                         <td>{$data['r_jam_keluar']}</td>
                         <td>{$data['r_istirahat_keluar']}</td>

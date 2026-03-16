@@ -57,13 +57,20 @@ if (isset($_GET['id'])) {
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="fas fa-user-tag text-gray-400"></i>
                         </div>
-                        <select name="trole" class="block w-full pl-10 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl appearance-none bg-gray-50 font-medium cursor-pointer" required>
+                        <?php 
+                        $is_self = ($_SESSION['iduser'] == $idu);
+                        $can_edit_role = (strtolower($_SESSION['role']) == 'owner' || strtolower($_SESSION['role']) == 'admin master');
+                        $disable_role = ($is_self && strtolower($_SESSION['role']) != 'owner');
+                        ?>
+                        <select name="trole" <?php echo $disable_role ? 'disabled' : ''; ?> class="block w-full pl-10 pr-10 py-3 text-base border-gray-300 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 sm:text-sm rounded-xl appearance-none bg-gray-50 font-medium cursor-pointer" required>
                             <option value="Owner" <?php if($data['role'] == 'Owner') echo 'selected'; ?>>Owner</option>
                             <option value="Admin HR" <?php if($data['role'] == 'Admin HR') echo 'selected'; ?>>Admin HR</option>
                             <option value="Kepala Pabrik" <?php if($data['role'] == 'Kepala Pabrik') echo 'selected'; ?>>Kepala Pabrik</option>
                             <option value="Admin Master" <?php if($data['role'] == 'Admin Master') echo 'selected'; ?>>Admin Master</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                        <?php if ($disable_role): ?>
+                            <input type="hidden" name="trole" value="<?php echo $data['role']; ?>">
+                        <?php endif; ?>
                             <i class="fas fa-chevron-down text-xs"></i>
                         </div>
                     </div>

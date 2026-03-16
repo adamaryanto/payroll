@@ -4,8 +4,8 @@
   $jmlkaryawan = $datadetail['jmlkaryawan'];
 
 // Rencana Upah Terbaru
-$where_rkk = (strtolower($role) == 'owner') ? " WHERE status_rkk > 0 " : "";
-$rkk_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk) as jml, (SELECT SUM(upah) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk) as ttl FROM tb_rkk A $where_rkk ORDER BY tgl_rkk DESC, id_rkk DESC LIMIT 1");
+$where_rkk = (strtolower($role) == 'owner' || strtolower($role) == 'admin master') ? "" : " WHERE status_rkk > 0 ";
+$rkk_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml, (SELECT SUM(upah) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as ttl FROM tb_rkk A $where_rkk ORDER BY tgl_rkk DESC, id_rkk DESC LIMIT 1");
 $rkk_d = $rkk_q->fetch_assoc();
 if($rkk_d) {
     $rkk_terbaru = $rkk_d['ttl'] ?? 0;
@@ -19,7 +19,7 @@ if($rkk_d) {
 }
 
 // Realisasi Upah Terbaru
-$where_real = (strtolower($role) == 'owner') ? " WHERE status_realisasi != 'pending' " : "";
+$where_real = (strtolower($role) == 'owner' || strtolower($role) == 'admin master') ? "" : " WHERE status_realisasi > 0 ";
 $real_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_realisasi_detail) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as jml, (SELECT SUM(r_upah) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as ttl FROM tb_realisasi A $where_real ORDER BY tgl_realisasi DESC, id_realisasi DESC LIMIT 1");
 $real_d = $real_q->fetch_assoc();
 if($real_d) {
@@ -102,30 +102,44 @@ if($real_d) {
                   <i class="fas fa-print mr-1 sm:mr-2"></i> Cetak
               </a>
               
-              <?php if($rkk_status == "0") { ?>
-                  <?php if (strtolower($role) != 'owner') { ?>
+              <?php if($rkk_status == "0") { 
+                  if (strtolower($role) == 'owner') { ?>
+                  <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
+                      <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Approve
+                  </a>
+                  <?php } elseif (strtolower($role) == 'admin master') { ?>
+                  <div class="flex flex-row gap-1.5 flex-[1.5]">
+                      <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Rencana Upah ini?');" class="px-1 py-1.5 text-amber-600 border border-amber-200 rounded-lg text-[10px] font-bold hover:bg-amber-50 transition-colors flex items-center justify-center flex-1 uppercase">
+                          <i class="fas fa-paper-plane mr-1"></i> Propose
+                      </a>
+                      <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-1 py-1.5 bg-slate-800 text-white rounded-lg text-[10px] font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-1 shadow-sm uppercase">
+                          <i class="fas fa-check-circle mr-1"></i> Approve
+                      </a>
+                  </div>
+                  <?php } else { ?>
                   <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-paper-plane mr-1 sm:mr-2"></i> Propose
                   </a>
-                  <?php } else { ?>
-                  <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
-                      <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Approve
-                  </a>
                   <?php } ?>
-              <?php } elseif($rkk_status == "1") { ?>
-                  <?php if (strtolower($role) == 'owner') { ?>
-                  <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
-                      <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Approve
-                  </a>
+              <?php } elseif($rkk_status == "1") { 
+                  if (strtolower($role) == 'owner' || strtolower($role) == 'admin master') { ?>
+                  <div class="flex flex-row gap-1.5 flex-[1.5]">
+                      <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro" onclick="return confirm('Apakah Anda yakin ingin Unpropose Rencana Upah ini?');" class="px-1 py-1.5 text-rose-600 border border-rose-200 rounded-lg text-[10px] font-bold hover:bg-rose-50 transition-colors flex items-center justify-center flex-1 uppercase">
+                          <i class="fas fa-undo mr-1"></i> Unpro
+                      </a>
+                      <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Rencana Upah ini?');" class="px-1 py-1.5 bg-slate-800 text-white rounded-lg text-[10px] font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-1 shadow-sm uppercase">
+                          <i class="fas fa-check-circle mr-1"></i> Approve
+                      </a>
+                  </div>
                   <?php } else { ?>
                    <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro" onclick="return confirm('Apakah Anda yakin ingin Unpropose Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-500 text-white rounded-lg text-sm font-bold hover:bg-rose-600 transition-colors flex items-center justify-center flex-[1.5] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-undo mr-1 sm:mr-2"></i> Unpropose
                   </a>
                   <?php } ?>
               <?php } else { 
-                  if (strtolower($role) == 'owner') { ?>
+                  if (strtolower($role) == 'owner' || strtolower($role) == 'admin master') { ?>
                    <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unapp" onclick="return confirm('Apakah Anda yakin ingin Unapprove Rencana Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.5] uppercase tracking-tighter shadow-sm">
-                      <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapp
+                      <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapprove
                   </a>
                   <?php } else { ?>
                   <div class="px-1.5 py-2 sm:px-4 bg-emerald-50 text-emerald-700 rounded-lg text-[13px] sm:text-sm font-bold flex items-center justify-center flex-[1.5] cursor-default border border-emerald-100 uppercase tracking-tighter">
@@ -171,30 +185,14 @@ if($real_d) {
                   <i class="fas fa-file-invoice-dollar mr-1 sm:mr-2"></i> Payroll
               </a>
               
-              <?php if($real_status == 'pending') { 
-                  if (strtolower($role) != 'owner') { ?>
-                  <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=pro" onclick="return confirm('Apakah Anda yakin ingin Propose Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
-                      <i class="fas fa-paper-plane mr-1 sm:mr-2"></i> Propose
-                  </a>
-                  <?php } else { ?>
+              <?php if($real_status == 0) { ?>
                   <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
                       <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Approve
                   </a>
-                  <?php } ?>
-              <?php } elseif($real_status == 'propose') { 
-                  if (strtolower($role) == 'owner') { ?>
-                  <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
-                      <i class="fas fa-check-circle mr-1 sm:mr-2 opacity-80"></i> Approve
-                  </a>
-                  <?php } else { ?>
-                  <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=unpro" onclick="return confirm('Apakah Anda yakin ingin Unpropose Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-500 text-white rounded-lg text-sm font-bold hover:bg-rose-600 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
-                      <i class="fas fa-undo mr-1 sm:mr-2"></i> Unpropose
-                  </a>
-                  <?php } ?>
-              <?php } else { 
-                  if (strtolower($role) == 'owner') { ?>
-                   <a href="?page=realisasi&aksi=unapprove&id=<?php echo $real_id; ?>" onclick="return confirm('Apakah Anda yakin ingin Unapprove Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.2] uppercase tracking-tighter shadow-sm">
-                      <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapp
+              <?php } elseif($real_status == 2) { 
+                  if (strtolower($role) == 'owner' || strtolower($role) == 'admin master') { ?>
+                   <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=unapp" onclick="return confirm('Apakah Anda yakin ingin Unapprove Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.2] uppercase tracking-tighter shadow-sm">
+                      <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapprove
                   </a>
                   <?php } else { ?>
                   <div class="px-1.5 py-2 sm:px-4 bg-emerald-50 text-emerald-700 rounded-lg text-[13px] sm:text-sm font-bold flex items-center justify-center flex-[1.2] cursor-default border border-emerald-100 uppercase tracking-tighter">

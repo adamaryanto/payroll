@@ -45,9 +45,9 @@
                                 <td data-label="No. Absen" class="text-sm font-semibold text-gray-700"><?= $datakaryawan['no_absen'] ?></td>
                                 <td data-label="Nama Karyawan">
                                     <div class="font-bold text-gray-900"><?= $datakaryawan['nama_karyawan'] ?></div>
-                                    <div class="text-xs text-gray-400 italic"><?= $datakaryawan['label_os'] ?: $datakaryawan['OS_DHK'] ?></div>
+                                    <div class="text-xs text-gray-400 italic"><?= $datakaryawan['label_os'] ?></div>
                                 </td>
-                                <td data-label="Gol" class="md:text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['label_gol'] ?: $datakaryawan['golongan'] ?></td>
+                                <td data-label="Gol" class="md:text-center text-sm font-bold text-indigo-600"><?= $datakaryawan['label_gol'] ?></td>
                                 <td data-label="Jenis Kelamin" class="md:text-center text-sm text-gray-600"><?= $datakaryawan['jenis_kelamin'] ?></td>
                                 <td data-label="Kontak & Dokumen" class="text-xs py-2">
                                     <div class="block mb-1">

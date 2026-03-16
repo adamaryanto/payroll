@@ -38,8 +38,6 @@ SELECT
     K.nama_karyawan, 
     O.OS_DHK as label_os,
     G.golongan as label_gol,
-    K.OS_DHK,
-    K.golongan,
     JB.jabatan,
     D.nama_departmen,
     R.jam_kerja,
@@ -116,11 +114,7 @@ $total_potongan_telat = 0;
 $total_potongan_istirahat = 0;
 $total_potongan_lainnya = 0;
 $total_akhir = 0;
-$total_tagihan_os = 0;
-$total_tagihan_dhk = 0;
-$total_tagihan_wjs = 0;
-$total_tagihan_rka = 0;
-$total_tagihan_mhs = 0;
+$totals_by_os = []; // Dynamic array for OS/DHK totals
 
 while ($row = $result->fetch_assoc()) {
     if (!empty($row['digantikan_oleh'])) {
@@ -134,11 +128,14 @@ while ($row = $result->fetch_assoc()) {
     echo "
     <tr>
         <td align='center'>" . $no . "</td>
-        <td>" . $row['nama_karyawan'] . (!empty($row['menggantikan']) ? " (Menggantikan " . $row['menggantikan'] . ")" : (!empty($row['digantikan_oleh']) ? " (Digantikan oleh " . $row['digantikan_oleh'] . ")" : "")) . "</td>
+        <td>" . $row['nama_karyawan'] . 
+            (!empty($row['menggantikan']) ? " (Menggantikan " . $row['menggantikan'] . ")" : "") . 
+            (!empty($row['menggantikan']) && !empty($row['digantikan_oleh']) ? " &" : "") . 
+            (!empty($row['digantikan_oleh']) ? " (Digantikan oleh " . $row['digantikan_oleh'] . ")" : "") . "</td>
         <td>" . $row['jabatan'] . "</td>
         <td>" . $row['nama_departmen'] . "</td>
-        <td align='center'>" . ($row['label_os'] ?: $row['OS_DHK']) . "</td>
-        <td align='center'>" . ($row['label_gol'] ?: $row['golongan']) . "</td>
+        <td align='center'>" . $row['label_os'] . "</td>
+        <td align='center'>" . $row['label_gol'] . "</td>
         <td align='center'>" . $row['jam_kerja'] . "</td>
         <td align='center'>" . $row['jam_masuk'] . "</td>
         <td align='center'>" . $row['jam_keluar'] . "</td>
@@ -157,19 +154,12 @@ while ($row = $result->fetch_assoc()) {
     $total_potongan_lainnya += $row['potongan_lainnya'];
     $total_akhir += $upah_bersih;
     
-    // Track Outsourcing categories
-    $os_type = $row['label_os'] ?: $row['OS_DHK'];
-    if ($os_type == 'OS') {
-        $total_tagihan_os += $upah_bersih;
-    } elseif ($os_type == 'DHK') {
-        $total_tagihan_dhk += $upah_bersih;
-    } elseif ($os_type == 'WJS') {
-        $total_tagihan_wjs += $upah_bersih;
-    } elseif ($os_type == 'RKA') {
-        $total_tagihan_rka += $upah_bersih;
-    } elseif ($os_type == 'MHS') {
-        $total_tagihan_mhs += $upah_bersih;
+    // Track Outsourcing categories dynamically
+    $os_label = $row['label_os'];
+    if (!isset($totals_by_os[$os_label])) {
+        $totals_by_os[$os_label] = 0;
     }
+    $totals_by_os[$os_label] += $upah_bersih;
     
     $no++;
 }
@@ -188,7 +178,7 @@ echo "
 </tfoot>
 </table>";
 
-// REKAP OUTSOURCING
+// REKAP OUTSOURCING (Dynamic from ms_os_dhk)
 echo "<br><br>
 <table border='1' style='border-collapse:collapse; width:600px;'>
     <thead>
@@ -196,35 +186,26 @@ echo "<br><br>
             <th colspan='3' style='height:30px; font-size:14px; text-align:center;'>REKAP OUTSOURCING CIKUPA " . date('d/m/Y', strtotime($row1['tgl_rkk'])) . "</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody>";
+
+$grand_tagihan = 0;
+$q_os = $koneksi->query("SELECT OS_DHK FROM ms_os_dhk ORDER BY id_os_dhk ASC");
+while ($d_os = $q_os->fetch_assoc()) {
+    $label = $d_os['OS_DHK'];
+    $val = $totals_by_os[$label] ?? 0;
+    $grand_tagihan += $val;
+    echo "
         <tr style='font-weight:bold;'>
-            <td style='width:300px; height:25px;'>BIAYA TAGIHAN OS</td>
+            <td style='width:300px; height:25px;'>BIAYA TAGIHAN $label</td>
             <td style='width:50px; text-align:center;'>Rp</td>
-            <td style='width:250px; text-align:right;'>" . number_format($total_tagihan_os, 0, ',', '.') . "</td>
-        </tr>
-        <tr style='font-weight:bold;'>
-            <td style='height:25px;'>BIAYA TAGIHAN DHK</td>
-            <td style='text-align:center;'>Rp</td>
-            <td style='text-align:right;'>" . number_format($total_tagihan_dhk, 0, ',', '.') . "</td>
-        </tr>
-        <tr style='font-weight:bold;'>
-            <td style='height:25px;'>BIAYA TAGIHAN WJS</td>
-            <td style='text-align:center;'>Rp</td>
-            <td style='text-align:right;'>" . number_format($total_tagihan_wjs, 0, ',', '.') . "</td>
-        </tr>
-        <tr style='font-weight:bold;'>
-            <td style='height:25px;'>BIAYA TAGIHAN RKA</td>
-            <td style='text-align:center;'>Rp</td>
-            <td style='text-align:right;'>" . number_format($total_tagihan_rka, 0, ',', '.') . "</td>
-        </tr>
-        <tr style='font-weight:bold;'>
-            <td style='height:25px;'>BIAYA TAGIHAN MHS</td>
-            <td style='text-align:center;'>Rp</td>
-            <td style='text-align:right;'>" . number_format($total_tagihan_mhs, 0, ',', '.') . "</td>
-        </tr>
+            <td style='width:250px; text-align:right;'>" . number_format($val, 0, ',', '.') . "</td>
+        </tr>";
+}
+
+echo "
         <tr style='background-color:yellow; font-weight:bold;'>
             <td style='height:30px; font-size:16px;'>Rp</td>
-            <td colspan='2' style='text-align:right; font-size:16px;'>" . number_format($total_tagihan_os + $total_tagihan_dhk + $total_tagihan_wjs + $total_tagihan_rka + $total_tagihan_mhs, 0, ',', '.') . "</td>
+            <td colspan='2' style='text-align:right; font-size:16px;'>" . number_format($grand_tagihan, 0, ',', '.') . "</td>
         </tr>
     </tbody>
 </table>";

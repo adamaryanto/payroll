@@ -21,8 +21,8 @@ if (isset($_GET['id'])) {
     $tempatlahir = $data['tempat_lahir'];
     $tgllahir = $data['tgl_lahir'];
     $agama = $data['agama'];
-    $tos = $data['label_os'] ?: $data['OS_DHK'];
-    $golongan = $data['label_gol'] ?: $data['golongan'];
+    $tos = $data['label_os'];
+    $golongan = $data['label_gol'];
     $statuskawin = $data['status_kawin'];
     $jeniskelamin = $data['jenis_kelamin'];
     $noktp = $data['no_ktp'];
@@ -32,7 +32,6 @@ if (isset($_GET['id'])) {
     $statuskaryawan = $data['status_karyawan'];
     $tglaktif = $data['tgl_aktif'];
     $tglnonaktif = $data['tgl_nonaktif'];
-    $foto = $data['foto'];
     $contsimpan = "hidden";
     $contupdate = "";
 } else {
@@ -53,7 +52,6 @@ if (isset($_GET['id'])) {
     $statuskaryawan = "";
     $tglaktif = "";
     $tglnonaktif = "";
-    $foto = "";
     $contsimpan = "";
     $contupdate = "hidden";
 }

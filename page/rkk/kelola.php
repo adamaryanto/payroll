@@ -17,8 +17,6 @@ if (isset($_GET['id'])) {
     B.nama_karyawan, 
     D.nama_departmen, 
     C.tgl_rkk, 
-    B.OS_DHK,
-    B.golongan,
     J.keterangan as nama_shift,
     J.jam_masuk,
     J.jam_keluar,

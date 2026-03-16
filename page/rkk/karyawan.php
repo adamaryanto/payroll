@@ -94,12 +94,16 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                             data-placeholder="Cari No. Absen atau Nama">
                         <option value=""></option>
                         <?php
-                        $master = $koneksi->query("SELECT * FROM ms_karyawan WHERE status_karyawan = 'Aktif' ORDER BY nama_karyawan ASC");
+                        $master = $koneksi->query("SELECT K.*, G.golongan as label_gol 
+                                                 FROM ms_karyawan K 
+                                                 LEFT JOIN ms_golongan G ON K.id_golongan = G.id_golongan 
+                                                 WHERE K.status_karyawan = 'Aktif' 
+                                                 ORDER BY K.nama_karyawan ASC");
                         while ($row = $master->fetch_assoc()) {
                             echo "<option value='" . $row['id_karyawan'] . "' 
                                     data-jk='" . $row['jenis_kelamin'] . "' 
                                     data-tgl='" . $row['tgl_aktif'] . "'
-                                    data-golongan='" . $row['golongan'] . "'
+                                    data-golongan='" . $row['label_gol'] . "'
                                     data-dept='" . ($row['id_departmen'] ?? '') . "'
                                     data-sub='" . ($row['id_sub_department'] ?? '') . "'>" . $row['no_absen'] . " | " . $row['nama_karyawan'] . "</option>";
                         }

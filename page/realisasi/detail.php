@@ -121,17 +121,34 @@ if (isset($_GET['id'])) {
     $isEarlyOut = (!empty($jamKeluarRealisasi) && !empty($datadetail['r_jam_keluar']) && strtotime($jamKeluarRealisasi) < strtotime($datadetail['r_jam_keluar']));
     $isTotalMissing = (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00');
 
-    // Logic denda: Prioritaskan data tersimpan jika sudah ada (status detail > 0), 
-    // Jika belum ada/masih draft, gunakan kalkulasi otomatis sebagai saran.
+    // Logic denda: Prioritaskan data tersimpan jika sudah ada (status detail == 1), 
+    // Jika synced (status detail == 2), gunakan kalkulasi otomatis sebagai saran.
+    // Jika belum ada/masih draft (status detail == 0), denda 0.
     if ($datadetail['status_realisasi_detail'] == 1) {
         $hasilpotonganpulang = $datadetail['r_potongan_pulang'];
         $hasilpotongantidaklengkap = $datadetail['r_potongan_tidak_lengkap'];
-    } else {
-        // Dynamic calculation for Draft or Synced
+        $hasilpotongantelat = $datadetail['r_potongan_telat'];
+        $hasilpotonganistirahatkeluar = $datadetail['r_potongan_istirahat_awal'];
+        $hasilpotonganistirahatmasuk = $datadetail['r_potongan_istirahat_telat'];
+    } elseif ($datadetail['status_realisasi_detail'] == 2) {
+        // Dynamic calculation for Synced
         $hasilpotonganpulang = ($isEarlyOut && !$isTotalMissing && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaPulang : 0;
         
         // Always apply incomplete log penalty if any part of a pair is missing
         $hasilpotongantidaklengkap = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
+    } else {
+        // Before Sync
+        // Penalties are calculated dynamically if the admin has manually input data before syncing
+        $hasilpotonganpulang = ($isEarlyOut && !$isTotalMissing && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaPulang : 0;
+        
+        // Always apply incomplete log penalty if any part of a pair is missing AND it's not totally missing 
+        // (because we don't want to apply 'Tidak Lengkap' for a completely empty row before sync)
+        $hasilpotongantidaklengkap = (!$isTotalMissing && ($hasIncompleteMain || $hasIncompleteBreak)) ? $globalDendaTidakLengkap : 0;
+
+        // Always apply lateness penalty if a valid log exists
+        $hasilpotongantelat = ($isLate && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaMasuk : 0;
+        $hasilpotonganistirahatkeluar = ($isEarlyBreak && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaIstirahatKeluar : 0;
+        $hasilpotonganistirahatmasuk = ($isLateBreak && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaIstirahatMasuk : 0;
     }
 
     // Logika Upah Pokok: Jika Absen Masuk kosong maka Upah jadi 0
@@ -259,19 +276,19 @@ if (!function_exists('rupiah')) {
                             ?>
                         </select>
                     </div>
-                    <div class="form-group col-md-2"> <label>ABSEN MASUK</label> <input type="time" name="tjammasuk" value="<?= $datadetail['ra_masuk'] ?>" class="form-control"> </div>
-                    <div class="form-group col-md-2"> <label>ABSEN KELUAR</label> <input type="time" name="tjamkeluar" value="<?= $datadetail['ra_keluar'] ?>" class="form-control"> </div>
-                    <div class="form-group col-md-2"> <label>ISTIRAHAT MASUK</label> <input type="time" name="tistirahatmasuk" value="<?= $datadetail['ra_istirahat_masuk'] ?>" class="form-control"> </div>
-                    <div class="form-group col-md-2"> <label>ISTIRAHAT KELUAR</label> <input type="time" name="tistirahatkeluar" value="<?= $datadetail['ra_istirahat_keluar'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ABSEN MASUK</label> <input type="time" name="tjammasuk" value="<?= (empty($datadetail['ra_masuk']) || $datadetail['ra_masuk'] == '00:00:00') ? '' : $datadetail['ra_masuk'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ABSEN KELUAR</label> <input type="time" name="tjamkeluar" value="<?= (empty($datadetail['ra_keluar']) || $datadetail['ra_keluar'] == '00:00:00') ? '' : $datadetail['ra_keluar'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ISTIRAHAT MASUK</label> <input type="time" name="tistirahatmasuk" value="<?= (empty($datadetail['ra_istirahat_masuk']) || $datadetail['ra_istirahat_masuk'] == '00:00:00') ? '' : $datadetail['ra_istirahat_masuk'] ?>" class="form-control"> </div>
+                    <div class="form-group col-md-2"> <label>ISTIRAHAT KELUAR</label> <input type="time" name="tistirahatkeluar" value="<?= (empty($datadetail['ra_istirahat_keluar']) || $datadetail['ra_istirahat_keluar'] == '00:00:00') ? '' : $datadetail['ra_istirahat_keluar'] ?>" class="form-control"> </div>
                 </div>
 
                 <div class="row">
                     <div class="form-group col-md-2"> <label>UPAH (POKOK)</label> <input type="number" name="tupah" value="<?= $upahPokokTampil ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. IST (AWAL)</label> <input type="number" name="tpotistirahatkeluar" value="<?= $hasilpotonganistirahatkeluar ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. IST (TELAT)</label> <input type="number" name="tpotistirahatmasuk" value="<?= $hasilpotonganistirahatmasuk ?>" class="form-control" disabled style="background: #f1f5f9;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. PULANG AWAL</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control" readonly style="background: #f1f5f9;"> </div>
-                    <div class="form-group col-md-2"> <label>POT. ABSEN TIDAK LENGKAP</label> <input type="number" name="tpotlog" value="<?= $hasilpotongantidaklengkap ?>" class="form-control" readonly style="background: #f1f5f9;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. TELAT</label> <input type="number" name="tpottelat" value="<?= $hasilpotongantelat ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. IST (AWAL)</label> <input type="number" name="tpotistirahatkeluar" value="<?= $hasilpotonganistirahatkeluar ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. IST (TELAT)</label> <input type="number" name="tpotistirahatmasuk" value="<?= $hasilpotonganistirahatmasuk ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. PULANG AWAL</label> <input type="number" name="tpotpulang" value="<?= $hasilpotonganpulang ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
+                    <div class="form-group col-md-2"> <label>POT. ABSEN TIDAK LENGKAP</label> <input type="number" name="tpotlog" value="<?= $hasilpotongantidaklengkap ?>" class="form-control" readonly style="background: #f9fafb;"> </div>
                 </div>
 
                 <div class="row">
@@ -311,6 +328,9 @@ if (isset($_POST['simpan'])) {
     $tupah = $_POST['tupah'];
     $tshift = $_POST['tshift'];
     $tpotlainnya = $_POST['tpotlainnya'];
+    $tpottelat = $_POST['tpottelat'] ?? 0;
+    $tpotistirahatawal = $_POST['tpotistirahatkeluar'] ?? 0;
+    $tpotistirahattelat = $_POST['tpotistirahatmasuk'] ?? 0;
     $tpotpulang = $_POST['tpotpulang'] ?? 0;
     $tpotlog = $_POST['tpotlog'] ?? 0;
     $tjammasuk = $_POST['tjammasuk'];
@@ -334,6 +354,9 @@ if (isset($_POST['simpan'])) {
         r_upah = '$tupah', 
         id_jadwal = '$tshift',
         r_potongan_lainnya = '$tpotlainnya',
+        r_potongan_telat = '$tpottelat',
+        r_potongan_istirahat_awal = '$tpotistirahatawal',
+        r_potongan_istirahat_telat = '$tpotistirahattelat',
         r_potongan_pulang = '$tpotpulang',
         r_potongan_tidak_lengkap = '$tpotlog',
         ra_masuk = '$tjammasuk',

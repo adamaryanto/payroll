@@ -110,7 +110,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 </p>
               </li>
               <li class="user-footer bg-light flex justify-between p-3">
-                <a href="?page=user&aksi=ubahpass" class="btn btn-default btn-flat rounded">Change Password</a>
+                <a href="?page=user&aksi=ubah&id=<?php echo $_SESSION['iduser']; ?>" class="btn btn-default btn-flat rounded">Edit Profile</a>
                 <a href="logout.php" class="btn btn-default btn-flat rounded">Sign out</a>
               </li>
             </ul>
@@ -263,14 +263,14 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "tambah") { include "page/os_dhk/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/os_dhk/ubah.php"; }
                   } else if ($page == 'user') {
-                    if (strtolower($role) == 'admin hr' && $aksi != 'ubahpass') {
+                    $id_edit = $_GET['id'] ?? '';
+                    if (strtolower($role) == 'admin hr' && $id_edit != $_SESSION['iduser']) {
                       echo "<script>alert('Anda tidak memiliki akses ke halaman ini!'); window.location.href='index.php';</script>";
                     } else {
                       if ($aksi == "") { include "page/user/user.php"; } 
                       elseif ($aksi == "hapus") { include "page/user/hapus.php"; } 
                       elseif ($aksi == "tambah") { include "page/user/tambah.php"; } 
                       elseif ($aksi == "ubah") { include "page/user/ubah.php"; } 
-                      elseif ($aksi == "ubahpass") { include "page/user/ubahpass.php"; }
                     }
                   } else if ($page == 'upah') {
                     if ($aksi == "") { include "page/upah/upah.php"; } 

@@ -21,11 +21,11 @@ if (isset($_POST['simpan'])) {
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
         status_kawin, jenis_kelamin, no_ktp, no_bpjs, alamat_ktp, alamat_tinggal, 
-        status_karyawan, tgl_aktif, foto, id_sub_department, id_os_dhk, id_golongan, id_jadwal
+        status_karyawan, tgl_aktif, id_sub_department, id_os_dhk, id_golongan, id_jadwal
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
         '$statuskawin', '$jeniskelamin', '$noktp', '$nobpjs', '$alamatktp', '$alamattinggal',
-        'Aktif', '$tanggalbergabung', '', '$subdept', '$os', '$golongan', '0'
+        'Aktif', '$tanggalbergabung', '$subdept', '$os', '$golongan', '0'
     )");
 
     if ($sql) {

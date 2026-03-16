@@ -17,13 +17,14 @@ if (isset($_GET['id'])) {
     $noktp = $data['no_ktp'];
     $idos = $data['id_os_dhk'];
     $idgolongan = $data['id_golongan'];
-    $golongan = $data['golongan'];
-    $os = $data['OS_DHK'];
     $alamatktp = $data['alamat_ktp'];
     $alamattinggal = $data['alamat_tinggal'];
     $statuskaryawan = $data['status_karyawan'];
     $tglaktif = $data['tgl_aktif'];
     $tglnonaktif = $data['tgl_nonaktif'];
+    $jeniskelamin = $data['jenis_kelamin'];
+    $agama = $data['agama'];
+    $statuskawin = $data['status_kawin'];
 }
 
 if (isset($_POST['update'])) {
@@ -214,7 +215,7 @@ if (isset($_POST['update'])) {
                                 <?php
                                 $q_os = $koneksi->query("SELECT * FROM ms_os_dhk");
                                 while($d = $q_os->fetch_assoc()) {
-                                    $sel = ($d['id_os_dhk'] == $idos || $d['OS_DHK'] == $os) ? 'selected' : '';
+                                    $sel = ($d['id_os_dhk'] == $idos) ? 'selected' : '';
                                     echo "<option value='".$d['id_os_dhk']."' $sel>".$d['OS_DHK']."</option>";
                                 }
                                 ?>
@@ -230,7 +231,7 @@ if (isset($_POST['update'])) {
                                     <?php
                                     $q_gol = $koneksi->query("SELECT * FROM ms_golongan");
                                     while($d = $q_gol->fetch_assoc()) {
-                                        $sel = ($d['id_golongan'] == $idgolongan || $d['golongan'] == $golongan) ? 'selected' : '';
+                                        $sel = ($d['id_golongan'] == $idgolongan) ? 'selected' : '';
                                         echo "<option value='".$d['id_golongan']."' $sel>".$d['golongan']."</option>";
                                     }
                                     ?>
