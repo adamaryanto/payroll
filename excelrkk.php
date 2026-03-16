@@ -3,8 +3,13 @@ include "koneksi.php";
 
 $id = $_GET['id'];
 
+// 1. Ambil data tanggal berdasarkan ID
+$queryInfo = $koneksi->query("SELECT tgl_rkk FROM tb_rkk WHERE id_rkk = '$id'");
+$info = $queryInfo->fetch_assoc();
+$tanggal = $info ? $info['tgl_rkk'] : 'TanpaTanggal';
+
 header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=export_rencana_$id.xls");
+header("Content-Disposition: attachment; filename=Laporan_Rencana_Upah_$tanggal.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
 function rupiah($angka)
@@ -290,4 +295,4 @@ if ($bonelessHeader) {
             </tr>
         </tbody>
     </table>";
-}
+}
