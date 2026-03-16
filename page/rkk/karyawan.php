@@ -220,8 +220,8 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
             $('#jk').val($selected.data('jk'));
             $('#tgl_aktif').val($selected.data('tgl'));
             $('#upah_manual').val(formatRupiah(finalWage));
-            $('#id_departmen').val($selected.data('dept'));
-            $('#id_sub_department').val($selected.data('sub'));
+            $('#id_departmen').val($selected.data('dept')).trigger('change');
+            $('#id_sub_department').val($selected.data('sub')).trigger('change');
         });
     });
 </script>
