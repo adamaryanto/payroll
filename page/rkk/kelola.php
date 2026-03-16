@@ -409,12 +409,11 @@ if ($datastatusrkk == 3) {
                     <?php endif; ?>
                     <?php if ($datastatusrkk < 2) : ?>
                       <button type="button" 
-                        class="text-rose-500 hover:text-rose-700 transition-colors btn-delete-detail bg-transparent border-0 p-1"
+                        class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto mb-1 btn-delete-detail"
                         data-id="<?= $idrkk; ?>"
                         data-detail-id="<?= $data['id_rkk_detail']; ?>"
-                        data-name="<?= $data['nama_karyawan']; ?>"
-                        title="Hapus">
-                        <i class="fas fa-trash-alt text-lg"></i>
+                        data-name="<?= $data['nama_karyawan']; ?>">
+                        <i class="fas fa-trash-alt mr-1"></i> Hapus
                       </button>
                     <?php endif; ?>
                   </div>
