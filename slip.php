@@ -1,44 +1,45 @@
 <?php
 include "koneksi.php";  // sesuaikan koneksi
 
-$id_karyawan = $_GET['id']; // parameter ?tgl=2025-10-30
+$id_karyawan = $_GET['id'];
 $tanggal_mulai = $_GET['ttgl1'];
 $tanggal_akhir = $_GET['ttgl2'];
-$bulanIndo = [
-    '01' => 'Januari',
-    '02' => 'Februari',
-    '03' => 'Maret',
-    '04' => 'April',
-    '05' => 'Mei',
-    '06' => 'Juni',
-    '07' => 'Juli',
-    '08' => 'Agustus',
-    '09' => 'September',
-    '10' => 'Oktober',
-    '11' => 'November',
-    '12' => 'Desember'
-];
 
+$bulanIndo = [
+    '01' => 'Januari', '02' => 'Februari', '03' => 'Maret', '04' => 'April',
+    '05' => 'Mei', '06' => 'Juni', '07' => 'Juli', '08' => 'Agustus',
+    '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
+];
 $bulan_angka = date("m", strtotime($tanggal_mulai));
 $bulan = $bulanIndo[$bulan_angka];
 
+// 1. Ambil Nama Karyawan untuk filename
+$q_kar = $koneksi->query("SELECT nama_karyawan FROM ms_karyawan WHERE id_karyawan = '$id_karyawan'");
+$d_kar = $q_kar->fetch_assoc();
+$nama_file = $d_kar ? str_replace(' ', '_', $d_kar['nama_karyawan']) : "Karyawan_$id_karyawan";
+$tgl_file = date('d-m-Y', strtotime($tanggal_mulai));
 
 header("Content-Type: application/vnd.ms-excel");
-header("Content-Disposition: attachment; filename=export_slip_$id_karyawan.xls");
+header("Content-Disposition: attachment; filename=Slip_Upah_".$nama_file."_".$tgl_file.".xls");
 header("Pragma: no-cache");
 header("Expires: 0");
+echo "<meta charset='UTF-8'>";
+
 function rupiah($angka){
     return "Rp " . number_format($angka, 0, ',', '.');
 }
 
-// Ambil denda global
+// 2. Ambil denda global
+$q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+$d_denda = $q_denda->fetch_assoc();
+
 $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
 $globalDendaIstirahatKeluar = $d_denda['denda_istirahat_keluar'] ?? 0;
 $globalDendaIstirahatMasuk = $d_denda['denda_istirahat_masuk'] ?? 0;
 $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
 $globalDendaTidakLengkap = $d_denda['denda_tidak_lengkap'] ?? 0;
 
-// Query join lengkap
+// 3. Query join lengkap (PENTING: Gunakan LEFT JOIN agar data tidak hilang jika jabatan/dept kosong)
 $sql = "SELECT
     r.tgl_realisasi_detail,
     r.r_upah,
@@ -62,14 +63,14 @@ $sql = "SELECT
     rd.status_rkk
 FROM tb_realisasi_detail r
 JOIN ms_karyawan k ON r.id_karyawan = k.id_karyawan
-JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
-JOIN ms_departmen d ON k.id_departmen = d.id_departmen
+LEFT JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
+LEFT JOIN ms_departmen d ON k.id_departmen = d.id_departmen
 LEFT JOIN tb_jadwal jd ON r.id_jadwal = jd.id_jadwal
 LEFT JOIN tb_rkk_detail rd ON r.id_rkk_detail = rd.id_rkk_detail
 WHERE r.id_karyawan = '$id_karyawan'
   AND r.tgl_realisasi_detail BETWEEN '$tanggal_mulai' AND '$tanggal_akhir'
 ORDER BY r.tgl_realisasi_detail ASC;
-
+";
 ";
 
 $result = $koneksi->query($sql);
