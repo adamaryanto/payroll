@@ -119,7 +119,20 @@ if (isset($_GET['id'])) {
     ));
     
     $isEarlyOut = (!empty($jamKeluarRealisasi) && !empty($datadetail['r_jam_keluar']) && strtotime($jamKeluarRealisasi) < strtotime($datadetail['r_jam_keluar']));
-    $isTotalMissing = (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00');
+    $has_masuk = !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00';
+    $has_keluar = !empty($jamKeluarRealisasi) && $jamKeluarRealisasi != '00:00:00';
+    $has_ist_masuk = !empty($jamIstirahatMasukRealisasi) && $jamIstirahatMasukRealisasi != '00:00:00';
+    $has_ist_keluar = !empty($jamIstirahatKeluarRealisasi) && $jamIstirahatKeluarRealisasi != '00:00:00';
+
+    $isTotalMissing = (!$has_masuk && !$has_keluar);
+    $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+    $isRestExpected = (!empty($datadetail['shift_istirahat_keluar']) && $datadetail['shift_istirahat_keluar'] != '00:00:00');
+    $hasIncompleteBreak = ($isRestExpected && ($has_ist_keluar XOR $has_ist_masuk));
+    
+    $isLate = ($has_masuk && !empty($datadetail['shift_masuk']) && strtotime($jamMasukRealisasi) > strtotime($datadetail['shift_masuk']));
+    $isEarlyOut = ($has_keluar && !empty($datadetail['shift_keluar']) && strtotime($jamKeluarRealisasi) < strtotime($datadetail['shift_keluar'])); // Assuming 'shift_keluar' is the reference for early out
+    $isLateBreak = ($has_ist_masuk && !empty($datadetail['shift_istirahat_masuk']) && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
+    $isEarlyBreak = ($has_ist_keluar && !empty($datadetail['shift_istirahat_keluar']) && strtotime($jamIstirahatKeluarRealisasi) < strtotime($datadetail['shift_istirahat_keluar']));
 
     // Logic denda: Prioritaskan data tersimpan jika sudah ada (status detail == 1), 
     // Jika synced (status detail == 2), gunakan kalkulasi otomatis sebagai saran.
@@ -130,25 +143,14 @@ if (isset($_GET['id'])) {
         $hasilpotongantelat = $datadetail['r_potongan_telat'];
         $hasilpotonganistirahatkeluar = $datadetail['r_potongan_istirahat_awal'];
         $hasilpotonganistirahatmasuk = $datadetail['r_potongan_istirahat_telat'];
-    } elseif ($datadetail['status_realisasi_detail'] == 2) {
-        // Dynamic calculation for Synced
-        $hasilpotonganpulang = ($isEarlyOut && !$isTotalMissing && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaPulang : 0;
-        
-        // Always apply incomplete log penalty if any part of a pair is missing
-        $hasilpotongantidaklengkap = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
     } else {
-        // Before Sync
-        // Penalties are calculated dynamically if the admin has manually input data before syncing
-        $hasilpotonganpulang = ($isEarlyOut && !$isTotalMissing && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaPulang : 0;
-        
-        // Always apply incomplete log penalty if any part of a pair is missing AND it's not totally missing 
-        // (because we don't want to apply 'Tidak Lengkap' for a completely empty row before sync)
+        // Status 0 (Draft) or 2 (Synced)
+        // Calculate dynamically to ensure visibility even if not yet persisted
+        $hasilpotonganpulang = ($isEarlyOut && !$isTotalMissing) ? $globalDendaPulang : 0;
         $hasilpotongantidaklengkap = (!$isTotalMissing && ($hasIncompleteMain || $hasIncompleteBreak)) ? $globalDendaTidakLengkap : 0;
-
-        // Always apply lateness penalty if a valid log exists
-        $hasilpotongantelat = ($isLate && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaMasuk : 0;
-        $hasilpotonganistirahatkeluar = ($isEarlyBreak && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaIstirahatKeluar : 0;
-        $hasilpotonganistirahatmasuk = ($isLateBreak && !empty($jamMasukRealisasi) && $jamMasukRealisasi != '00:00:00') ? $globalDendaIstirahatMasuk : 0;
+        $hasilpotongantelat = ($isLate) ? $globalDendaMasuk : 0;
+        $hasilpotonganistirahatkeluar = ($isEarlyBreak) ? $globalDendaIstirahatKeluar : 0;
+        $hasilpotonganistirahatmasuk = ($isLateBreak) ? $globalDendaIstirahatMasuk : 0;
     }
 
     // Logika Upah Pokok: Jika Absen Masuk kosong maka Upah jadi 0

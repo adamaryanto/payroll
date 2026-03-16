@@ -172,6 +172,31 @@ if ($cleanup) {
     exit;
 }
 
+$save_all_denda = @$_POST['save_all_denda'];
+if ($save_all_denda) {
+    $count = bulkSavePenalties($koneksi, $idrealisasi);
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: "success",
+                title: "Berhasil",
+                text: "Berhasil menyimpan denda untuk ' . $count . ' karyawan ke database.",
+                confirmButtonColor: "#2563eb",
+                confirmButtonText: "OK"
+            }).then((result) => {
+                window.location.href = "?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
+            });
+        </script>
+    </body>
+    </html>';
+    exit;
+}
+
 
 if (!function_exists('rupiah')) {
     function rupiah($angka)
@@ -186,28 +211,39 @@ if (!function_exists('rupiah')) {
  * Specifically for a given id_realisasi
  */
 function syncRealisasiData($koneksi, $id_realisasi) {
-    // 1. Get the realization date
+    // 1. Get the realization date and global denda
     $query_real = $koneksi->query("SELECT tgl_realisasi FROM tb_realisasi WHERE id_realisasi = '$id_realisasi'");
     $data_real = $query_real->fetch_assoc();
     if (!$data_real) return 0;
     $tgl_real = $data_real['tgl_realisasi'];
 
+    $query_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+    $denda = $query_denda->fetch_assoc();
+    $gd_masuk = $denda['denda_masuk'] ?? 0;
+    $gd_istirahat_awal = $denda['denda_istirahat_keluar'] ?? 0;
+    $gd_istirahat_telat = $denda['denda_istirahat_masuk'] ?? 0;
+    $gd_pulang = $denda['denda_pulang'] ?? 0;
+    $gd_tidak_lengkap = $denda['denda_tidak_lengkap'] ?? 0;
+
     // 2. Get all employees in this realization
-    $query_details = $koneksi->query("SELECT RD.id_realisasi_detail, K.no_absen 
+    $query_details = $koneksi->query("SELECT RD.id_realisasi_detail, K.no_absen, RD.id_jadwal, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar
                                       FROM tb_realisasi_detail RD
-                                      JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
-                                      JOIN ms_karyawan K ON RKD.id_karyawan = K.id_karyawan
+                                      JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
+                                      LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
                                       WHERE RD.id_realisasi = '$id_realisasi'");
     
     $count = 0;
     while ($row = $query_details->fetch_assoc()) {
         $id_rd = $row['id_realisasi_detail'];
         $no_absen = $row['no_absen'];
+        $s_masuk = $row['jam_masuk'];
+        $s_keluar = $row['jam_keluar'];
+        $s_ist_masuk = $row['istirahat_masuk'];
+        $s_ist_keluar = $row['istirahat_keluar'];
 
         if (empty($no_absen)) continue;
 
-        // 3. Query records from tb_record for this employee on this date
-        // Status: 0=Masuk, 1=Keluar, 2=Istirahat Keluar, 3=Istirahat Masuk
+        // 3. Query records from tb_record
         $query_logs = $koneksi->query("SELECT 
             (SELECT TIME_FORMAT(detail_waktu, '%H:%i:%s') FROM tb_record WHERE userid = '$no_absen' AND DATE(tgl) = '$tgl_real' AND status = 0 ORDER BY detail_waktu ASC LIMIT 1) AS log_masuk,
             (SELECT TIME_FORMAT(detail_waktu, '%H:%i:%s') FROM tb_record WHERE userid = '$no_absen' AND DATE(tgl) = '$tgl_real' AND status = 1 ORDER BY detail_waktu DESC LIMIT 1) AS log_keluar,
@@ -217,18 +253,155 @@ function syncRealisasiData($koneksi, $id_realisasi) {
 
         $logs = $query_logs->fetch_assoc();
         
-        $ra_masuk = $logs['log_masuk'] ?? '00:00:00';
-        $ra_keluar = $logs['log_keluar'] ?? '00:00:00';
-        $ra_ist_keluar = $logs['log_ist_keluar'] ?? '00:00:00';
-        $ra_ist_masuk = $logs['log_ist_masuk'] ?? '00:00:00';
+        $ra_masuk = $logs['log_masuk'] ? "'" . $logs['log_masuk'] . "'" : 'NULL';
+        $ra_keluar = $logs['log_keluar'] ? "'" . $logs['log_keluar'] . "'" : 'NULL';
+        $ra_ist_keluar = $logs['log_ist_keluar'] ? "'" . $logs['log_ist_keluar'] . "'" : 'NULL';
+        $ra_ist_masuk = $logs['log_ist_masuk'] ? "'" . $logs['log_ist_masuk'] . "'" : 'NULL';
+
+        // 4. Calculate Penalties (using check for empty/null)
+        $p_telat = 0;
+        $p_pulang = 0;
+        $p_ist_awal = 0;
+        $p_ist_telat = 0;
+        $p_tidak_lengkap = 0;
+
+        $has_masuk = !empty($logs['log_masuk']);
+        $has_keluar = !empty($logs['log_keluar']);
+        $has_ist_keluar = !empty($logs['log_ist_keluar']);
+        $has_ist_masuk = !empty($logs['log_ist_masuk']);
+
+        $is_total_missing = (!$has_masuk && !$has_keluar);
+
+        if (!$is_total_missing) {
+            // Late Entrance
+            if ($has_masuk && $s_masuk != '00:00:00' && strtotime($logs['log_masuk']) > strtotime($s_masuk)) {
+                $p_telat = $gd_masuk;
+            }
+            // Early Departure
+            if ($has_keluar && $s_keluar != '00:00:00' && strtotime($logs['log_keluar']) < strtotime($s_keluar)) {
+                $p_pulang = $gd_pulang;
+            }
+            // Early Break
+            if ($has_ist_keluar && $s_ist_keluar != '00:00:00' && strtotime($logs['log_ist_keluar']) < strtotime($s_ist_keluar)) {
+                $p_ist_awal = $gd_istirahat_awal;
+            }
+            // Late Break Return
+            if ($has_ist_masuk && $s_ist_masuk != '00:00:00' && strtotime($logs['log_ist_masuk']) > strtotime($s_ist_masuk)) {
+                $p_ist_telat = $gd_istirahat_telat;
+            }
+
+            // Incomplete Log (Missing any expected punch)
+            $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+            $isRestExpected = ($s_ist_keluar != '00:00:00');
+            $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
+            
+            if ($hasIncompleteMain || $hasIncompleteBreak) {
+                $p_tidak_lengkap = $gd_tidak_lengkap;
+            }
+        }
+
+        // 5. Update the detail record
+        $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
+            ra_masuk = $ra_masuk,
+            ra_keluar = $ra_keluar,
+            ra_istirahat_masuk = $ra_ist_masuk,
+            ra_istirahat_keluar = $ra_ist_keluar,
+            r_potongan_telat = '$p_telat',
+            r_potongan_pulang = '$p_pulang',
+            r_potongan_istirahat_awal = '$p_ist_awal',
+            r_potongan_istirahat_telat = '$p_ist_telat',
+            r_potongan_tidak_lengkap = '$p_tidak_lengkap',
+            r_update = NOW(),
+            status_realisasi_detail = 2
+            WHERE id_realisasi_detail = '$id_rd'");
+        
+        if ($update) $count++;
+    }
+
+    return $count;
+}
+
+/**
+ * Function to calculate and save penalties for all current logs in realization
+ * without re-syncing from machine logs.
+ */
+function bulkSavePenalties($koneksi, $id_realisasi) {
+    // 1. Get global denda
+    $query_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+    $denda = $query_denda->fetch_assoc();
+    $gd_masuk = $denda['denda_masuk'] ?? 0;
+    $gd_istirahat_awal = $denda['denda_istirahat_keluar'] ?? 0;
+    $gd_istirahat_telat = $denda['denda_istirahat_masuk'] ?? 0;
+    $gd_pulang = $denda['denda_pulang'] ?? 0;
+    $gd_tidak_lengkap = $denda['denda_tidak_lengkap'] ?? 0;
+
+    // 2. Get all details for this realization
+    $query_details = $koneksi->query("SELECT RD.*, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar
+                                      FROM tb_realisasi_detail RD
+                                      LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
+                                      WHERE RD.id_realisasi = '$id_realisasi'");
+    
+    $count = 0;
+    while ($row = $query_details->fetch_assoc()) {
+        $id_rd = $row['id_realisasi_detail'];
+        $has_masuk = !empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00';
+        $has_keluar = !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00';
+        $has_ist_masuk = !empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00';
+        $has_ist_keluar = !empty($row['ra_istirahat_keluar']) && $row['ra_istirahat_keluar'] != '00:00:00';
+        
+        $s_masuk = $row['jam_masuk'] ?? '00:00:00';
+        $s_keluar = $row['jam_keluar'] ?? '00:00:00';
+        $s_ist_masuk = $row['istirahat_masuk'] ?? '00:00:00';
+        $s_ist_keluar = $row['istirahat_keluar'] ?? '00:00:00';
+
+        // skip if status is 1 (already manually saved) unless we want to overwrite? 
+        // usually bulk save is for pending/synced ones.
+        if ($row['status_realisasi_detail'] == 1) continue;
+
+        // 3. Calculate Penalties
+        $p_telat = 0;
+        $p_pulang = 0;
+        $p_ist_awal = 0;
+        $p_ist_telat = 0;
+        $p_tidak_lengkap = 0;
+
+        $is_total_missing = (!$has_masuk && !$has_keluar);
+
+        if (!$is_total_missing) {
+            // Late Entrance
+            if ($has_masuk && $s_masuk != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($s_masuk)) {
+                $p_telat = $gd_masuk;
+            }
+            // Early Departure
+            if ($has_keluar && $s_keluar != '00:00:00' && strtotime($row['ra_keluar']) < strtotime($s_keluar)) {
+                $p_pulang = $gd_pulang;
+            }
+            // Early Break
+            if ($has_ist_keluar && $s_ist_keluar != '00:00:00' && strtotime($row['ra_istirahat_keluar']) < strtotime($s_ist_keluar)) {
+                $p_ist_awal = $gd_istirahat_awal;
+            }
+            // Late Break Return
+            if ($has_ist_masuk && $s_ist_masuk != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($s_ist_masuk)) {
+                $p_ist_telat = $gd_istirahat_telat;
+            }
+
+            // Incomplete Log (Missing any expected punch)
+            $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+            $isRestExpected = ($s_ist_keluar != '00:00:00');
+            $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
+            
+            if ($hasIncompleteMain || $hasIncompleteBreak) {
+                $p_tidak_lengkap = $gd_tidak_lengkap;
+            }
+        }
 
         // 4. Update the detail record
         $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
-            ra_masuk = '$ra_masuk',
-            ra_keluar = '$ra_keluar',
-            ra_istirahat_masuk = '$ra_ist_masuk',
-            ra_istirahat_keluar = '$ra_ist_keluar',
-            r_update = NOW(),
+            r_potongan_telat = '$p_telat',
+            r_potongan_pulang = '$p_pulang',
+            r_potongan_istirahat_awal = '$p_ist_awal',
+            r_potongan_istirahat_telat = '$p_ist_telat',
+            r_potongan_tidak_lengkap = '$p_tidak_lengkap',
             status_realisasi_detail = 2
             WHERE id_realisasi_detail = '$id_rd'");
         
@@ -301,7 +474,11 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                         <button type="button" id="btn-cleanup" class="btn btn-warning bg-amber-500 hover:bg-amber-600 border-none px-6 py-2 ml-2 text-white">
                             <i class="fas fa-sync-alt mr-1.5"></i> Tarik Data
                         </button>
+                        <button type="button" id="btn-save-denda" class="btn btn-info bg-cyan-500 hover:bg-cyan-600 border-none px-6 py-2 ml-2 text-white" title="Simpan semua hitungan denda saat ini secara permanen ke database">
+                            <i class="fas fa-money-check-alt mr-1.5"></i> Simpan Semua Denda
+                        </button>
                         <input type="hidden" name="cleanup" id="cleanup-input" value="">
+                        <input type="hidden" name="save_all_denda" id="save-denda-input" value="">
                     </div>
                 </form>
 
@@ -368,45 +545,38 @@ function syncRealisasiData($koneksi, $id_realisasi) {
                                         (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00')
                                     ));
                                     
-                                    $isEarlyOut = (!empty($data['ra_keluar']) && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-                                    $isTotalMissing = (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00');
-                                    $isLate = (!empty($data['ra_masuk']) && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
-                                    $isLateBreak = (!empty($data['ra_istirahat_masuk']) && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
+                                     $has_masuk = !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00';
+                                     $has_keluar = !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00';
+                                     $has_ist_masuk = !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00';
+                                     $has_ist_keluar = !empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00';
 
-                                    $isEarlyBreak = (!empty($data['ra_istirahat_keluar']) && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
+                                     $isTotalMissing = (!$has_masuk && !$has_keluar);
+                                     $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+                                     $isRestExpected = (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00');
+                                     $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
+                                     
+                                     $isLate = ($has_masuk && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
+                                     $isEarlyOut = ($has_keluar && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
+                                     $isLateBreak = ($has_ist_masuk && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
+                                     $isEarlyBreak = ($has_ist_keluar && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
 
                                      // Denda logic
                                      if ($data['status_realisasi_detail'] == 1) {
-                                         // Data is already saved manually
-                                         $potPulangValue = $data['r_potongan_pulang'];
-                                         $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
+                                         // Data is already saved manually (1)
                                          $potTelatValue = $data['r_potongan_telat'];
                                          $potIstirahatKeluarValue = $data['r_potongan_istirahat_awal'];
                                          $potIstirahatMasukValue = $data['r_potongan_istirahat_telat'];
+                                         $potPulangValue = $data['r_potongan_pulang'];
+                                         $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
                                          $potLainnyaValue = $data['r_potongan_lainnya'];
-                                     } elseif ($data['status_realisasi_detail'] == 2) {
-                                         // Synced from machine (not yet saved to detail)
-                                         // Penalties are applied if logs are NOT empty or are incomplete
-                                         $potPulangValue = ($isEarlyOut && !$isTotalMissing && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaPulang : 0;
-                                         
-                                         // Always apply incomplete log penalty if any part of a pair is missing
-                                         $potTidakLengkapValue = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
-                                         
-                                         // Always apply lateness penalty if a valid log exists
-                                         $potTelatValue = ($isLate && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaMasuk : 0;
                                      } else {
-                                         // Status 0: Before Sync
-                                         // Penalties are calculated dynamically if the admin has manually input data before syncing
-                                         $potPulangValue = ($isEarlyOut && !$isTotalMissing && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaPulang : 0;
-                                         
-                                         // Always apply incomplete log penalty if any part of a pair is missing AND it's not totally missing 
-                                         // (because we don't want to apply 'Tidak Lengkap' for a completely empty row before sync)
+                                         // Status 0 (Draft) or 2 (Synced)
+                                         // Calculate dynamically to ensure visibility even if not yet persisted or if logs changed
+                                         $potPulangValue = ($isEarlyOut && !$isTotalMissing) ? $globalDendaPulang : 0;
                                          $potTidakLengkapValue = (!$isTotalMissing && ($hasIncompleteMain || $hasIncompleteBreak)) ? $globalDendaTidakLengkap : 0;
-                                         
-                                         // Always apply lateness penalty if a valid log exists
-                                         $potTelatValue = ($isLate && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaMasuk : 0;
-                                         $potIstirahatKeluarValue = ($isEarlyBreak && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaIstirahatKeluar : 0;
-                                         $potIstirahatMasukValue = ($isLateBreak && !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $globalDendaIstirahatMasuk : 0;
+                                         $potTelatValue = ($isLate) ? $globalDendaMasuk : 0;
+                                         $potIstirahatKeluarValue = ($isEarlyBreak) ? $globalDendaIstirahatKeluar : 0;
+                                         $potIstirahatMasukValue = ($isLateBreak) ? $globalDendaIstirahatMasuk : 0;
                                          $potLainnyaValue = $data['r_potongan_lainnya'];
                                      }
 
@@ -1048,6 +1218,26 @@ function syncRealisasiData($koneksi, $id_realisasi) {
             }).then((result) => {
                 if (result.isConfirmed) {
                     $('#cleanup-input').val('Cleanup');
+                    $(this).closest('form').submit();
+                }
+            });
+        });
+
+        // SweetAlert Save All Denda Confirmation
+        $('#btn-save-denda').on('click', function() {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Simpan semua denda secara permanen (jam kosong = tanpa potongan)?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#06b6d4', // Cyan
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Simpan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#save-denda-input').val('Save All');
                     $(this).closest('form').submit();
                 }
             });

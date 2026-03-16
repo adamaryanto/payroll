@@ -63,7 +63,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
         $d_denda = $q_denda->fetch_assoc();
         $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
-        $globalDendaIstirahat = $d_denda['denda_istirahat'] ?? 0;
+        $globalDendaIstirahatAwal = $d_denda['denda_istirahat_keluar'] ?? 0;
+        $globalDendaIstirahatTelat = $d_denda['denda_istirahat_masuk'] ?? 0;
         $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
         $globalDendaTidakLengkap = $d_denda['denda_tidak_lengkap'] ?? 0;
         ?>
@@ -138,32 +139,40 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 
                 $isEarlyOut = (!empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00' && !empty($data['r_jam_keluar']) && $data['r_jam_keluar'] != '00:00:00' && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
 
-                $hasIncompleteMain = (
-                    (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00')) ||
-                    ((empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00')
-                );
-                $hasIncompleteBreak = (
-                    (!empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00' && (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00')) ||
-                    ((empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') && !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00')
-                );
-                $isTotalMissing = (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00');
+                $has_masuk = !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00';
+                $has_keluar = !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00';
+                $has_ist_masuk = !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00';
+                $has_ist_keluar = !empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00';
+
+                $isTotalMissing = (!$has_masuk && !$has_keluar);
+                $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+                $isRestExpected = (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00');
+                $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
                 $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $data['status_rkk'] != 'Tidak Hadir'));
 
-                $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-                $potIstirahatValue = $isLateBreak ? $globalDendaIstirahat : 0;
-                
-                // Gunakan denda tersimpan jika sudah di-approve/simpan, jika tidak pakai kalkulasi dinamis
-                if ($data['status_realisasi_detail'] > 0) {
+                $isLate = ($has_masuk && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
+                $isEarlyOut = ($has_keluar && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
+                $isLateBreak = ($has_ist_masuk && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
+                $isEarlyBreak = ($has_ist_keluar && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
+
+                if ($data['status_realisasi_detail'] == 1) {
+                    // Use stored values for Saved records
+                    $potTelatValue = $data['r_potongan_telat'];
+                    $potIstirahatAwal = $data['r_potongan_istirahat_awal'];
+                    $potIstirahatTelat = $data['r_potongan_istirahat_telat'];
                     $potPulangValue = $data['r_potongan_pulang'];
                     $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
                 } else {
-                    $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+                    // Status 0 (Draft) or 2 (Synced)
+                    // Calculate dynamically to ensure consistency with UI
+                    $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+                    $potIstirahatAwal = $isEarlyBreak ? $globalDendaIstirahatAwal : 0;
+                    $potIstirahatTelat = $isLateBreak ? $globalDendaIstirahatTelat : 0;
+                    $potPulangValue = ($isEarlyOut && !$isTotalMissing) ? $globalDendaPulang : 0;
                     $potTidakLengkapValue = $isIncompleteLog ? $globalDendaTidakLengkap : 0;
                 }
 
-                $potExtraValue = $potPulangValue + $potTidakLengkapValue;
-
-                $potongan = $potTelatValue + $potIstirahatValue + $data['r_potongan_lainnya'] + $potExtraValue;
+                $potongan = $potTelatValue + $potIstirahatAwal + $potIstirahatTelat + $data['r_potongan_lainnya'] + $potPulangValue + $potTidakLengkapValue;
 
                 $lembur = $data['lembur'] ?? 0;
 
