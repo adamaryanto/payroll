@@ -46,7 +46,8 @@ if (isset($_POST['simpan_karyawan'])) {
     }
     if (!empty($id_sub) && !is_numeric($id_sub)) {
         $name_sub = $koneksi->real_escape_string($id_sub);
-        $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department) VALUES ('$name_sub')");
+        $dept_id_val = is_numeric($id_dept) ? $id_dept : 0;
+        $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department, id_departmen) VALUES ('$name_sub', '$dept_id_val')");
         $id_sub = $koneksi->insert_id;
     }
 
@@ -182,7 +183,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                         <a href="?page=rkk&aksi=kelola&id=<?= $idrkk; ?>" class="flex justify-center items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition">
                             Batal
                         </a>
-                        <button type="submit" name="simpan_karyawan" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-0.5">
+                        <button type="submit" name="simpan_karyawan" value="1" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-0.5">
                             <i class="fas fa-save mr-2"></i> Simpan ke Daftar
                         </button>
                     </div>
