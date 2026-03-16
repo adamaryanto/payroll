@@ -69,8 +69,7 @@ LEFT JOIN tb_jadwal jd ON r.id_jadwal = jd.id_jadwal
 LEFT JOIN tb_rkk_detail rd ON r.id_rkk_detail = rd.id_rkk_detail
 WHERE r.id_karyawan = '$id_karyawan'
   AND r.tgl_realisasi_detail BETWEEN '$tanggal_mulai' AND '$tanggal_akhir'
-ORDER BY r.tgl_realisasi_detail ASC;
-";
+ORDER BY r.tgl_realisasi_detail ASC
 ";
 
 $result = $koneksi->query($sql);
