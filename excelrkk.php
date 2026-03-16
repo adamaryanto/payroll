@@ -62,7 +62,7 @@ FROM tb_rkk_detail RD
 LEFT JOIN tb_rkk R ON RD.id_rkk = R.id_rkk
 LEFT JOIN tb_jadwal JD ON RD.id_jadwal = JD.id_jadwal
 LEFT JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
-LEFT JOIN ms_departmen D ON K.id_departmen = D.id_departmen
+LEFT JOIN ms_departmen D ON RD.id_departmen = D.id_departmen
 LEFT JOIN ms_jabatan JB ON K.id_jabatan = JB.id_jabatan
 LEFT JOIN ms_os_dhk O ON K.id_os_dhk = O.id_os_dhk
 LEFT JOIN ms_golongan G ON K.id_golongan = G.id_golongan

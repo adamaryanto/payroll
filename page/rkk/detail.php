@@ -6,13 +6,13 @@ if (isset($_GET['id'])) {
 
    $tampildetail = $koneksi->query("
    SELECT A.*, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar, J.keterangan as nama_shift, B.nama_karyawan, B.no_absen,
-   B.id_departmen, B.id_sub_department, BD.nama_departmen, BC.nama_sub_department, B.jenis_kelamin,
+   BD.nama_departmen, BC.nama_sub_department, B.jenis_kelamin,
    R.keterangan as keterangan_rkk, R.tgl_rkk, R.detail_rkk, R.jam_kerja, R.status_rkk
    FROM tb_rkk_detail A
    LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
    LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
-   LEFT JOIN ms_departmen BD ON B.id_departmen = BD.id_departmen
-   LEFT JOIN ms_sub_department BC ON B.id_sub_department = BC.id_sub_department
+   LEFT JOIN ms_departmen BD ON A.id_departmen = BD.id_departmen
+   LEFT JOIN ms_sub_department BC ON A.id_sub_department = BC.id_sub_department
    LEFT JOIN tb_rkk R ON A.id_rkk = R.id_rkk
    WHERE A.id_rkk_detail = '$id' ");
 

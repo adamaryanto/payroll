@@ -119,14 +119,14 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $subquery_digantikan_oleh as digantikan_oleh
             FROM tb_realisasi_detail A 
             JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
-            JOIN ms_departmen D ON B.id_departmen = D.id_departmen
-            LEFT JOIN ms_sub_department S ON B.id_sub_department = S.id_sub_department
+            LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
+            JOIN ms_departmen D ON RD.id_departmen = D.id_departmen
+            LEFT JOIN ms_sub_department S ON RD.id_sub_department = S.id_sub_department
             LEFT JOIN ms_os_dhk O ON B.id_os_dhk = O.id_os_dhk
             LEFT JOIN ms_golongan G ON B.id_golongan = G.id_golongan
-            LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
             LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
             WHERE A.id_realisasi = '$id' 
-            AND B.id_departmen = '$id_dept'");
+            AND RD.id_departmen = '$id_dept'");
 
             $no = 1;
             $total = 0;
