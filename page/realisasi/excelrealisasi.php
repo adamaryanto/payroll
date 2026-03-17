@@ -19,6 +19,7 @@ LIMIT 1
 $info = $queryInfo->fetch_assoc();
 $tanggal_raw = $info ? $info['tgl_realisasi'] : '';
 $tanggal = $tanggal_raw ? date('d-m-Y', strtotime($tanggal_raw)) : 'TanpaTanggal';
+$tanggal_sql = $tanggal_raw ? date('Y-m-d', strtotime($tanggal_raw)) : '';
 
 // 2. Gunakan variabel $tanggal untuk nama file
 header("Content-type: application/vnd.ms-excel");
@@ -278,7 +279,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
 <?php
 // 3. Ambil data Boneless untuk tanggal yang sama
-$queryBoneless = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal'");
+$queryBoneless = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal_sql'");
 $bonelessHeader = $queryBoneless->fetch_assoc();
 
 if ($bonelessHeader) {
