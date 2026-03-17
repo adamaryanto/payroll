@@ -122,7 +122,13 @@ if ($datastatusrealisasi >= 2) {
 $simpan = @$_POST['simpan'];
 if ($simpan) {
     $tketerangan = @$_POST['tketerangan'];
+    
+    // 1. Update Keterangan
     $sql = $koneksi->query("UPDATE tb_realisasi SET keterangan = '$tketerangan' WHERE id_realisasi = '$idrealisasi'");
+    
+    // 2. Bulk Save Penalties (Calculate & Persist)
+    $count_denda = bulkSavePenalties($koneksi, $idrealisasi);
+
     if ($sql) {
         echo '<!DOCTYPE html>
         <html>
@@ -134,7 +140,7 @@ if ($simpan) {
                 Swal.fire({
                     icon: "success",
                     title: "Berhasil",
-                    text: "Data Tersimpan",
+                    text: "Keterangan tersimpan dan denda untuk ' . $count_denda . ' karyawan telah dikalkulasi.",
                     confirmButtonColor: "#2563eb",
                     confirmButtonText: "OK"
                 }).then((result) => {
@@ -161,31 +167,6 @@ if ($cleanup) {
                 icon: "success",
                 title: "Berhasil",
                 text: "Berhasil menarik ' . $count . ' data dari record mesin.",
-                confirmButtonColor: "#2563eb",
-                confirmButtonText: "OK"
-            }).then((result) => {
-                window.location.href = "?page=realisasi&aksi=kelola&id=' . $idrealisasi . '";
-            });
-        </script>
-    </body>
-    </html>';
-    exit;
-}
-
-$save_all_denda = @$_POST['save_all_denda'];
-if ($save_all_denda) {
-    $count = bulkSavePenalties($koneksi, $idrealisasi);
-    echo '<!DOCTYPE html>
-    <html>
-    <head>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    </head>
-    <body>
-        <script>
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil",
-                text: "Berhasil menyimpan denda untuk ' . $count . ' karyawan ke database.",
                 confirmButtonColor: "#2563eb",
                 confirmButtonText: "OK"
             }).then((result) => {
@@ -468,17 +449,14 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                     </div>
 
                     <div class="p-4 md:px-5 bg-white border-t border-gray-200" <?php echo $status; ?>>
-                        <button type="submit" name="simpan" value="Simpan" class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none px-6 py-2">
-                            <i class="fas fa-save mr-1.5"></i> Simpan Ket.
+                        <button type="button" id="btn-save-all" class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none px-6 py-2">
+                            <i class="fas fa-save mr-1.5"></i> Simpan Semua
                         </button>
                         <button type="button" id="btn-cleanup" class="btn btn-warning bg-amber-500 hover:bg-amber-600 border-none px-6 py-2 ml-2 text-white">
                             <i class="fas fa-sync-alt mr-1.5"></i> Tarik Data
                         </button>
-                        <button type="button" id="btn-save-denda" class="btn btn-info bg-cyan-500 hover:bg-cyan-600 border-none px-6 py-2 ml-2 text-white" title="Simpan semua hitungan denda saat ini secara permanen ke database">
-                            <i class="fas fa-money-check-alt mr-1.5"></i> Simpan Semua Denda
-                        </button>
+                        <input type="hidden" name="simpan" id="simpan-input" value="">
                         <input type="hidden" name="cleanup" id="cleanup-input" value="">
-                        <input type="hidden" name="save_all_denda" id="save-denda-input" value="">
                     </div>
                 </form>
 
@@ -1223,21 +1201,21 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
             });
         });
 
-        // SweetAlert Save All Denda Confirmation
-        $('#btn-save-denda').on('click', function() {
+        // SweetAlert Simpan Semua (Keterangan + Denda) Confirmation
+        $('#btn-save-all').on('click', function() {
             Swal.fire({
-                title: 'Konfirmasi',
-                text: 'Simpan semua denda secara permanen (jam kosong = tanpa potongan)?',
+                title: 'Simpan Semua?',
+                text: 'Sistem akan menyimpan keterangan dan menghitung denda untuk semua karyawan berdasarkan log saat ini.',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonColor: '#06b6d4', // Cyan
+                confirmButtonColor: '#2563eb',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: 'Ya, Simpan',
+                confirmButtonText: 'Ya, Simpan Semua',
                 cancelButtonText: 'Batal',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    $('#save-denda-input').val('Save All');
+                    $('#simpan-input').val('Simpan');
                     $(this).closest('form').submit();
                 }
             });
