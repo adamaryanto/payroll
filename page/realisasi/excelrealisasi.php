@@ -89,20 +89,20 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
             // 3. Header Kolom
             echo "<tr>
-            <th style='background:#e5e7eb;'>No</th>
-            <th style='background:#e5e7eb;'>Nama Sesuai KTP</th>
-            <th style='background:#e5e7eb;'>OS/DHK</th>
-            <th style='background:#e5e7eb;'>Golongan</th>
-            <th style='background:#e5e7eb;'>Posisi</th>
-            <th style='background:#e5e7eb;'>Jam Kerja</th>
-            <th style='background:#e5e7eb;'>Jam Masuk</th>
-            <th style='background:#e5e7eb;'>Istirahat</th>
-            <th style='background:#e5e7eb;'>Jam Pulang</th>
-            <th style='background:#e5e7eb;'>Hasil Kerja</th>
-            <th style='background:#e5e7eb;'>Upah</th>
-            <th style='background:#e5e7eb;'>Potongan</th>
-            <th style='background:#e5e7eb;'>Lembur</th>
-            <th style='background:#e5e7eb;'>Upah Dibayar</th>
+            <th style='background:#e5e7eb; text-align:center;'>No</th>
+            <th style='background:#e5e7eb; text-align:center;'>Nama Sesuai KTP</th>
+            <th style='background:#e5e7eb; text-align:center;'>OS/DHK</th>
+            <th style='background:#e5e7eb; text-align:center;'>Golongan</th>
+            <th style='background:#e5e7eb; text-align:center;'>Posisi</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Kerja</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Masuk</th>
+            <th style='background:#e5e7eb; text-align:center;'>Istirahat</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Pulang</th>
+            <th style='background:#e5e7eb; text-align:center;'>Hasil Kerja</th>
+            <th style='background:#e5e7eb; text-align:center;'>Upah</th>
+            <th style='background:#e5e7eb; text-align:center;'>Potongan</th>
+            <th style='background:#e5e7eb; text-align:center;'>Lembur</th>
+            <th style='background:#e5e7eb; text-align:center;'>Upah Dibayar</th>
                   </tr>";
 
             // 4. Ambil data karyawan di departemen ini saja
@@ -209,16 +209,16 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                     (!empty($data['digantikan_oleh']) ? " (Digantikan oleh " . $data['digantikan_oleh'] . ")" : "");
 
                 echo "<tr>
-                <td>{$no}</td>
-                <td>{$nama_display}</td>
-                <td>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
-                <td>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
-                <td>{$data['nama_sub_department']}</td>
-                <td>{$info['jam_kerja']}</td>
-                <td>{$data['r_jam_masuk']}</td>
-                <td>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
-                <td>{$data['r_jam_keluar']}</td>
-                <td>{$data['hasil_kerja']}</td>
+                <td style='text-align:center;'>{$no}</td>
+                <td style='text-align:left;'>{$nama_display}</td>
+                <td style='text-align:center;'>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
+                <td style='text-align:center;'>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
+                <td style='text-align:center;'>{$data['nama_sub_department']}</td>
+                <td style='text-align:center;'>{$info['jam_kerja']}</td>
+                <td style='text-align:center;'>{$data['r_jam_masuk']}</td>
+                <td style='text-align:center;'>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
+                <td style='text-align:center;'>{$data['r_jam_keluar']}</td>
+                <td style='text-align:center;'>{$data['hasil_kerja']}</td>
                 <td style='text-align:right'>{$data['upah']}</td>
                 <td style='text-align:right'>$potongan</td>
                 <td style='text-align:right'>$lembur</td>
