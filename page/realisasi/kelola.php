@@ -234,10 +234,10 @@ function syncRealisasiData($koneksi, $id_realisasi) {
 
         $logs = $query_logs->fetch_assoc();
         
-        $ra_masuk = $logs['log_masuk'] ? "'" . $logs['log_masuk'] . "'" : 'NULL';
-        $ra_keluar = $logs['log_keluar'] ? "'" . $logs['log_keluar'] . "'" : 'NULL';
-        $ra_ist_keluar = $logs['log_ist_keluar'] ? "'" . $logs['log_ist_keluar'] . "'" : 'NULL';
-        $ra_ist_masuk = $logs['log_ist_masuk'] ? "'" . $logs['log_ist_masuk'] . "'" : 'NULL';
+        $ra_masuk = $logs['log_masuk'] ? "'" . $logs['log_masuk'] . "'" : "'00:00:00'";
+        $ra_keluar = $logs['log_keluar'] ? "'" . $logs['log_keluar'] . "'" : "'00:00:00'";
+        $ra_ist_keluar = $logs['log_ist_keluar'] ? "'" . $logs['log_ist_keluar'] . "'" : "'00:00:00'";
+        $ra_ist_masuk = $logs['log_ist_masuk'] ? "'" . $logs['log_ist_masuk'] . "'" : "'00:00:00'";
 
         // 4. Calculate Penalties (using check for empty/null)
         $p_telat = 0;
