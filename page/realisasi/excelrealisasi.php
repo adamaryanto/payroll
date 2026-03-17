@@ -75,8 +75,12 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         $grand_total = 0;
         $grand_karyawan = 0;
         $totals_by_os = []; // Dynamic array for OS/DHK totals
-        // 1. Ambil list departemen terlebih dahulu
-        $sqlDept = $koneksi->query("SELECT * FROM ms_departmen");
+        // 1. Ambil list departemen yang hanya ada di realisasi ini (agar tabel tidak kosong/penuh)
+        $sqlDept = $koneksi->query("SELECT DISTINCT D.* FROM ms_departmen D 
+                                     JOIN tb_rkk_detail RD ON D.id_departmen = RD.id_departmen
+                                     JOIN tb_realisasi_detail AD ON RD.id_rkk_detail = AD.id_rkk_detail
+                                     WHERE AD.id_realisasi = '$id'
+                                     ORDER BY D.id_departmen ASC");
         while ($dept = $sqlDept->fetch_assoc()) {
             $id_dept = $dept['id_departmen'];
 
