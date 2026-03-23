@@ -124,37 +124,32 @@ $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
 echo "
 <table border='1'>
     <tr>
-        <th colspan='21' style='text-align:center; background-color:#f8f9fa; font-size:16px; height:60px; vertical-align:middle;'>
+        <th colspan="20" style="text-align:center; background-color:#f8f9fa; font-size:16px;">
             LAPORAN REALISASI ABSENSI & UPAH TANGGAL: $tglRealisasi
-            " . ($status_realisasi >= 2 ? 
-                "<span class='stamp stamp-approved' style='margin-left:20px; border:4px solid #059669; color:#059669; padding:5px 15px; border-radius:10px;'>APPROVED</span>" : 
-                "<span class='stamp stamp-unapproved' style='margin-left:20px; border:4px solid #dc2626; color:#dc2626; padding:5px 15px; border-radius:10px;'>UNAPPROVED</span>") . "
         </th>
     </tr>
-    <tr style='background-color:#5F9EA0; color:white;'>
+    <tr style="background-color:#5F9EA0; color:white;">
         <th>No.</th>
         <th>NIK</th>
         <th>Nama Karyawan</th>
         <th>Bagian</th>
         <th>Golongan</th>
         <th>OS/DHK</th>
-        <th>Tgl</th>
+        <th>Absen Masuk (Raw)</th>
+        <th>Absen Keluar (Raw)</th>
         <th>Jam Masuk (R)</th>
-        <th>Pulang (R)</th>
-        <th>Absen Masuk</th>
-        <th>Istirahat Keluar</th>
-        <th>Istirahat Masuk</th>
-        <th>Absen Pulang</th>
-        <th>Lembur</th>
+        <th>Istirahat (R)</th>
+        <th>Jam Pulang (R)</th>
+        <th>Hasil Kerja</th>
         <th>Upah</th>
         <th>Pot. Telat</th>
-        <th>Pot. Istirahat (Awal)</th>
-        <th>Pot. Istirahat (Telat)</th>
+        <th>Pot. Ist. Awal</th>
+        <th>Pot. Ist. Telat</th>
         <th>Pot. Pulang</th>
         <th>Pot. Tidak Lengkap</th>
         <th>Pot. Lainnya</th>
+        <th>Lembur</th>
         <th>Upah Dibayar</th>
-        <th>Hasil Kerja/Ket</th>
     </tr>
 ";
 
