@@ -209,7 +209,8 @@ if ($datastatusrkk == 3) {
                         class="px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors text-center w-full md:w-auto mb-1">
                         <i class="fas fa-eye mr-1"></i> Detail
                       </a>
-                    <?php endif; ?>
+                    
+                      <?php endif; ?>
                     <?php if ($datastatusrkk < 2) : ?>
                       <button type="button"
                         class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto mb-1 btn-delete-detail"

@@ -182,7 +182,8 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Shift Kerja <span class="text-rose-500">*</span></label>
-                        <select name="id_jadwal" required class="block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 outline-none text-sm sm:text-base">
+                        <select name="id_jadwal" id="id_jadwal" required
+                            class="select2-manage block w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 transition outline-none font-medium text-sm sm:text-base">
                             <option value="">- Pilih Shift -</option>
                             <?php $list_jadwal->data_seek(0);
                             while ($j = $list_jadwal->fetch_assoc()) { ?>
