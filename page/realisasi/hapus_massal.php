@@ -1,12 +1,9 @@
 <?php
 $role_user = strtolower($_SESSION['role'] ?? '');
 
-// Gunakan huruf kecil semua untuk pembanding karena sudah di-strtolower
 $is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik");
 
 if (!$is_authorized_delete) {
-    // Tampilkan Alert lalu redirect tanpa menggunakan exit di sini agar HTML di bawah ter-load
-    // Atau gunakan echo HTML lengkap agar script swal bisa jalan
     echo "<!DOCTYPE html><html><head>
           <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
           </head><body>
@@ -24,7 +21,6 @@ if (!$is_authorized_delete) {
           </script></body></html>";
     exit;
 }
-
 
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
