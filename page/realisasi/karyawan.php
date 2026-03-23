@@ -1,285 +1,220 @@
 <?php
-// karyawan.php - Modern Responsive Version
-$idrkk = $_GET['id'] ?? '';
+// 1. Ambil ID Realisasi
+$idrealisasi = !empty($_REQUEST['id']) ? intval($_REQUEST['id']) : (!empty($_POST['id_real_hidden']) ? intval($_POST['id_real_hidden']) : 0);
+
+if ($idrealisasi <= 0) {
+    echo "<script>alert('ID Realisasi tidak valid!'); window.location.href='?page=realisasi';</script>";
+    exit;
+}
+
+// Check status realisasi
+$cek_real = $koneksi->query("SELECT status_realisasi, id_rkk FROM tb_realisasi WHERE id_realisasi = '$idrealisasi'");
+$data_real = $cek_real->fetch_assoc();
+if ($data_real['status_realisasi'] >= 2) {
+    echo "<script>alert('Tidak bisa menambah karyawan karena status Realisasi sudah Selesai/Approved!'); window.location.href='?page=realisasi&aksi=kelola&id=$idrealisasi';</script>";
+    exit;
+}
+$idrkk_ref = $data_real['id_rkk'];
+
+// 2. Logika Simpan
+if (isset($_POST['simpan_karyawan'])) {
+    $id_real_fix = intval($_POST['id_real_hidden']);
+    $nama_manual = $koneksi->real_escape_string($_POST['nama_karyawan_manual']);
+    $upah        = str_replace('.', '', $_POST['upah_manual']);
+    $id_dept     = $_POST['id_departmen'];
+    $id_sub      = $_POST['id_sub_department'];
+    $id_jadwal   = $_POST['id_jadwal'];
+
+    // Handle Tags untuk Dept & Sub (agar bisa input manual jika tidak ada di list)
+    if (!empty($id_dept) && !is_numeric($id_dept)) {
+        $name_dept = $koneksi->real_escape_string($id_dept);
+        $koneksi->query("INSERT INTO ms_departmen (nama_departmen) VALUES ('$name_dept')");
+        $id_dept = $koneksi->insert_id;
+    }
+    if (!empty($id_sub) && !is_numeric($id_sub)) {
+        $name_sub = $koneksi->real_escape_string($id_sub);
+        $dept_id_val = is_numeric($id_dept) ? $id_dept : 0;
+        $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department, id_departmen) VALUES ('$name_sub', '$dept_id_val')");
+        $id_sub = $koneksi->insert_id;
+    }
+
+    if (!empty($nama_manual) && !empty($id_jadwal) && $id_real_fix > 0) {
+        
+        // Simpan ke detail
+        // status_realisasi_detail = 1 (Manual/Saved)
+        $query = "INSERT INTO tb_realisasi_detail 
+                  (id_realisasi, id_rkk, id_karyawan, nama_karyawan_manual, r_upah, id_departmen, id_sub_department, id_jadwal, status_realisasi_detail, tgl_updt) 
+                  VALUES 
+                  ($id_real_fix, '$idrkk_ref', 0, '$nama_manual', '$upah', '$id_dept', '$id_sub', '$id_jadwal', 1, NOW())";
+
+        if ($koneksi->query($query)) {
+            echo "<script>alert('Karyawan Manual Berhasil Ditambahkan'); window.location.href = '?page=realisasi&aksi=kelola&id=$id_real_fix';</script>";
+            exit;
+        } else {
+            echo "Error: " . $koneksi->error;
+        }
+    }
+}
+
+// 3. Ambil data master untuk dropdown
+$list_dept   = $koneksi->query("SELECT * FROM ms_departmen ORDER BY nama_departmen ASC");
+$list_sub    = $koneksi->query("SELECT * FROM ms_sub_department ORDER BY nama_sub_department ASC");
+$list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC");
+
+// Default Upah Global
+$q_upah = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
+$global_upah = $q_upah->fetch_assoc();
+$default_upah = $global_upah['upah_harian'] ?? 0;
 ?>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-10">
-    <div class="bg-white shadow-xl border border-gray-200 rounded-2xl overflow-hidden">
-        
-        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 md:px-8 py-4 md:py-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-xl md:text-2xl font-extrabold text-white m-0 tracking-tight flex items-center">
-                        <i class="fas fa-users mr-3"></i>
-                        Data Karyawan Aktif
-                    </h3>
-                    <p class="text-blue-100 text-xs md:text-sm mt-1">Daftar seluruh karyawan yang terdaftar dalam sistem</p>
+<!-- UI Form (Tailwind) -->
+
+<div class="container-fluid px-3 mt-8 mb-10">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-6 md:px-10">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+                        <i class="fas fa-user-plus text-white text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-black text-white m-0">Tambah Karyawan Manual</h2>
+                        <p class="text-blue-100 text-sm mt-1">Input karyawan yang tidak terdaftar di database utama</p>
+                    </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="p-3 md:p-6">
-            <div class="table-responsive">
-                <table class="w-full text-left border-separate border-spacing-y-2 table-modern" id="dataTables-example">
-                    <thead>
-                        <tr class="text-gray-500 uppercase text-[11px] tracking-wider font-bold">
-                            <th hidden>ID Karyawan</th>
-                            <th class="px-4 py-3 border-b border-gray-100">No. Absen</th>
-                            <th class="px-4 py-3 border-b border-gray-100">Nama Lengkap</th>
-                            <th class="px-4 py-3 border-b border-gray-100">Bagian / Dept</th>
-                            <th class="px-4 py-3 border-b border-gray-100">Gender</th>
-                            <th class="px-4 py-3 border-b border-gray-100 uppercase">Tgl Aktif</th>
-                            <th class="px-4 py-3 border-b border-gray-100 text-center">Opsi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm">
-                        <?php
-                        $tampil = $koneksi->query("SELECT ms_karyawan.* , ms_departmen.nama_departmen 
-                                                 FROM ms_karyawan 
-                                                 LEFT JOIN ms_departmen on ms_karyawan.id_departmen = ms_departmen.id_departmen 
-                                                 WHERE ms_karyawan.status_karyawan = 'Aktif'");
-                        while ($datakaryawan = $tampil->fetch_assoc()) :
-                            $id = $datakaryawan['id_karyawan'];
-                        ?>
-                        <tr class="bg-white hover:bg-blue-50 transition-all duration-200 shadow-sm border border-gray-100 rounded-xl">
-                            <td hidden><input type="text" name="tidkaryawan[]" value="<?= $id ?>"/></td>
-                            <td data-label="No. Absen" class="px-4 py-4 font-bold text-blue-600 italic">
-                                #<?= $datakaryawan['no_absen'] ?>
-                            </td>
-                            <td data-label="Nama" class="px-4 py-4 font-bold text-gray-800 uppercase">
-                                <?= $datakaryawan['nama_karyawan'] ?>
-                            </td>
-                            <td data-label="Bagian" class="px-4 py-4">
-                                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-semibold">
-                                    <?= $datakaryawan['nama_departmen'] ?>
-                                </span>
-                            </td>
-                            <td data-label="Gender" class="px-4 py-4 text-gray-600">
-                                <?= $datakaryawan['jenis_kelamin'] ?>
-                            </td>
-                            <td data-label="Tgl Aktif" class="px-4 py-4 text-gray-600">
-                                <?= date('d M Y', strtotime($datakaryawan['tgl_aktif'])) ?>
-                            </td>
-                            <td data-label="Aksi" class="px-4 py-4 md:text-center mt-2 md:mt-0">
-                                <a href="?page=realisasi&aksi=slip&id=<?= $id ?>" 
-                                   class="inline-flex items-center justify-center w-full md:w-auto px-6 py-3 md:py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-[11px] font-bold rounded-xl shadow-md transition transform hover:-translate-y-0.5 uppercase tracking-wider">
-                                    <i class="fas fa-file-invoice-dollar mr-2"></i> Slip Gaji
-                                </a>
-                            </td>
-                        </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
+
+            <form method="POST">
+                <input type="hidden" name="id_real_hidden" value="<?= $idrealisasi; ?>">
+                <div class="p-6 md:p-10">
+                    
+                    <!-- Nama & Upah -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap Karyawan <span class="text-rose-500">*</span></label>
+                            <input type="text" name="nama_karyawan_manual" required autofocus
+                                placeholder="Masukkan Nama Lengkap..."
+                                class="block w-full px-4 py-3.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-medium text-gray-900 shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Upah Harian <span class="text-rose-500">*</span></label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <span class="text-gray-400 font-bold group-focus-within:text-blue-600 transition-colors">Rp</span>
+                                </div>
+                                <input type="text" name="upah_manual" id="upah_manual" required 
+                                    value="<?= number_format($default_upah, 0, ',', '.') ?>"
+                                    class="block w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all font-black text-blue-700 shadow-sm" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-dashed border-gray-200 my-8"></div>
+
+                    <!-- Penempatan -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Shift Kerja <span class="text-rose-500">*</span></label>
+                            <select name="id_jadwal" required class="select2-karyawan block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none shadow-sm">
+                                <option value="">- Pilih Shift -</option>
+                                <?php while ($j = $list_jadwal->fetch_assoc()) : ?>
+                                    <option value="<?= $j['id_jadwal']; ?>"><?= $j['keterangan'] ?> (<?= $j['jam_masuk'] ?> - <?= $j['jam_keluar'] ?>)</option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Departemen <span class="text-rose-500">*</span></label>
+                            <select name="id_departmen" required data-tags="true" class="select2-karyawan block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none shadow-sm">
+                                <option value="">- Pilih Dept -</option>
+                                <?php while ($d = $list_dept->fetch_assoc()) : ?>
+                                    <option value="<?= $d['id_departmen']; ?>"><?= $d['nama_departmen']; ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Sub Bagian <span class="text-rose-500">*</span></label>
+                            <select name="id_sub_department" required data-tags="true" class="select2-karyawan block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none shadow-sm">
+                                <option value="">- Pilih Sub -</option>
+                                <?php while ($s = $list_sub->fetch_assoc()) : ?>
+                                    <option value="<?= $s['id_sub_department']; ?>"><?= $s['nama_sub_department']; ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Footer Action -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-100">
+                        <div class="text-xs text-gray-500 italic order-2 sm:order-1 flex items-center">
+                            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                            Karyawan ini akan langsung ditambahkan ke daftar realisasi.
+                        </div>
+                        <div class="flex gap-3 w-full sm:w-auto order-1 sm:order-2">
+                            <a href="?page=realisasi&aksi=kelola&id=<?= $idrealisasi; ?>" 
+                                class="flex-1 sm:flex-none justify-center items-center px-8 py-3.5 border border-gray-200 text-sm font-bold rounded-2xl text-gray-600 bg-gray-50 hover:bg-gray-100 hover:text-gray-800 transition-all text-center no-underline">
+                                Batal
+                            </a>
+                            <button type="submit" name="simpan_karyawan" value="1" 
+                                class="flex-1 sm:flex-none inline-flex items-center justify-center px-10 py-3.5 border border-transparent text-sm font-bold rounded-2xl shadow-lg shadow-blue-200 text-white bg-blue-600 hover:bg-blue-700 active:scale-95 transition-all transform">
+                                <i class="fas fa-save mr-2"></i> Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
-<style>
-   /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
-    .dataTables_wrapper {
-        display: block !important;
-    }
-
-    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
-    .dataTables_wrapper::before,
-    .dataTables_wrapper::after {
-        display: none !important;
-    }
-
-    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
-    #dataTables-example_wrapper .row:first-child {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        margin-bottom: 20px !important;
-        width: 100% !important;
-    }
-
-    /* 4. Styling Tampil _MENU_ (Kiri) */
-    .dataTables_length {
-        display: flex !important;
-        align-items: center !important;
-    }
-
-    .dataTables_length label {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        margin: 0 !important;
-    }
-
-    .dataTables_length select {
-        padding: 5px 10px !important;
-        border: 1px solid #e0e6ed !important;
-        border-radius: 8px !important;
-    }
-
-    /* 5. Styling Cari: (Kanan) */
-    .dataTables_filter {
-        text-align: right !important;
-        display: flex !important;
-        justify-content: flex-end !important;
-    }
-
-    .dataTables_filter label {
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        margin: 0 !important;
-    }
-
-    .dataTables_filter input {
-        padding: 6px 12px !important;
-        border: 1px solid #e0e6ed !important;
-        border-radius: 8px !important;
-        width: 200px !important;
-    }
-
-    /* --- STYLING PAGINATE (PREV/NEXT) --- */
-    .dataTables_wrapper .dataTables_paginate {
-        display: flex !important;
-        justify-content: flex-end !important;
-        align-items: center !important;
-        gap: 4px !important;
-        padding-top: 15px !important;
-    }
-
-    .dataTables_paginate .paginate_button {
-        border: 1px solid #e2e8f0 !important;
-        background: white !important;
-        border-radius: 6px !important;
-        padding: 5px 12px !important;
-        color: #475569 !important;
-        font-weight: 500 !important;
-        cursor: pointer !important;
-        transition: all 0.2s !important;
-    }
-
-    .dataTables_paginate .paginate_button:hover {
-        background: #f8fafc !important;
-        color: #2563eb !important;
-        border-color: #cbd5e1 !important;
-    }
-
-    h3{
-        color: #2563eb !important;
-    }
-
-    .dataTables_paginate .paginate_button.current {
-        background: #2563eb !important;
-        border-color: #2563eb !important;
-        color: white !important;
-    }
-
-    .dataTables_paginate .paginate_button.disabled {
-        background: #f1f5f9 !important;
-        color: #94a3b8 !important;
-        cursor: not-allowed !important;
-    }
-
-    /* --- STYLING INFO --- */
-    .dataTables_wrapper .dataTables_info {
-        padding-top: 20px !important;
-        color: #64748b !important;
-        font-size: 13px !important;
-    }
-
-    /* =========================================
-       KHUSUS TAMPILAN MOBILE DIPERBAIKI DI SINI
-       ========================================= */
-    @media screen and (max-width: 768px) {
-        .table-responsive {
-            padding: 12px !important;
-            border: none !important;
-        }
-        
-        #dataTables-example_wrapper .row:first-child {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 15px;
-        }
-        .dataTables_filter, .dataTables_length {
-            width: 100% !important;
-            justify-content: flex-start !important;
-        }
-        .dataTables_filter input {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-        .dataTables_paginate {
-            justify-content: center !important;
-            flex-wrap: wrap;
-        }
-
-        .table-modern thead {
-            display: none !important;
-        }
-
-        .table-modern tbody tr {
-            display: block;
-            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            background-color: #fff;
-        }
-
-        .table-modern tbody td {
-            display: flex;
-            flex-direction: column; /* Label di atas, data di bawah (stacking) */
-            align-items: flex-start;
-            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
-            border: none !important;
-            border-bottom: 1px dashed #e2e8f0 !important;
-            text-align: left !important;
-        }
-        .table-modern tbody td:first-child {
-            padding-top: 0 !important;
-        }
-        .table-modern tbody td:last-child {
-            border-bottom: none !important;
-            padding-bottom: 0 !important;
-        }
-
-        .table-modern tbody td:before {
-            content: attr(data-label);
-            font-weight: 700;
-            color: #64748b;
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px; /* Memberi jarak ke datanya */
-            display: block;
-            width: 100%;
-        }
-    }
-</style>
-
 <script>
-   $(document).ready(function() {
-        $('#dataTables-example').DataTable({
-            pageLength: 25,
-            autoWidth: false,
-            responsive: false,
-            lengthMenu: [
-                [10, 25, 50, -1],
-                [10, 25, 50, "Semua"]
-            ],
-            language: {
-                search: "Cari Data:",
-                searchPlaceholder: "Ketik pencarian...",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
-                paginate: {
-                    previous: "Prev",
-                    next: "Next"
-                }
-            }
-        });
-        
-        $('.dataTables_filter').addClass('mb-3');
-        $('.dataTables_length').addClass('mb-3');
+$(document).ready(function() {
+    $('.select2-karyawan').select2({
+        width: '100%',
+        dropdownAutoWidth: true,
+        containerCssClass: 'modern-select2'
     });
+
+    // Format Rupiah Input
+    $('#upah_manual').on('keyup', function(){
+        let value = $(this).val().replace(/[^0-9]/g, '');
+        if (value !== '') {
+            $(this).val(new Intl.NumberFormat('id-ID').format(value));
+        } else {
+            $(this).val('0');
+        }
+    });
+});
 </script>
+
+<style>
+/* Modern Select2 Styling */
+.modern-select2.select2-container--default .select2-selection--single {
+    height: 52px !important;
+    padding: 10px 16px !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    transition: all 0.2s !important;
+}
+.modern-select2.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: normal !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: #1e293b !important;
+}
+.modern-select2.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 50px !important;
+}
+.select2-dropdown {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
+}
+.select2-results__option {
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+}
+.select2-results__option--highlighted {
+    background-color: #2563eb !important;
+}
+</style>

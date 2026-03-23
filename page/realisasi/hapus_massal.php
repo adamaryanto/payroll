@@ -1,6 +1,6 @@
 <?php
 $role_user = strtolower($_SESSION['role'] ?? '');
-$is_authorized_delete = ($role_user == "Admin Master" || $role_user == "Kepala Pabrik");
+$is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik" || $role_user == "owner");
 
 if (!$is_authorized_delete) {
     echo "<script>

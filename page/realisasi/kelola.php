@@ -419,6 +419,9 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                     </h3>
 
                     <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <a href="?page=realisasi&aksi=karyawan&id=<?= $idrealisasi; ?>" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[14px] md:text-base font-bold py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+                            <i class="fas fa-user-plus mr-1.5"></i> Tambah Karyawan
+                        </a>
                         <a href="?page=realisasi" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
                             <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                         </a>
