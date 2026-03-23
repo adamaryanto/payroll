@@ -259,7 +259,7 @@ $port = $data['port'];
 							<tbody class="divide-y divide-gray-100">
 								<?php
 								$buffer = "";
-								$Connect = fsockopen($IP, $port, $errno, $errstr, 1);
+								$Connect = @fsockopen($IP, $port, $errno, $errstr, 1);
 
 								if ($Connect) {
 									$soap_request = "<GetAttLog><ArgComKey xsi:type=\"xsd:integer\">" . $Key . "</ArgComKey><Arg><PIN xsi:type=\"xsd:integer\">All</PIN></Arg></GetAttLog>";
