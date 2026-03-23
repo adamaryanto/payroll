@@ -1,20 +1,30 @@
 <?php
 $role_user = strtolower($_SESSION['role'] ?? '');
-$is_authorized_delete = ($role_user == "Admin Master" || $role_user == "Kepala Pabrik");
+
+// Gunakan huruf kecil semua untuk pembanding karena sudah di-strtolower
+$is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik");
 
 if (!$is_authorized_delete) {
-    echo "<script>
-        Swal.fire({
-            title: 'Akses Ditolak!',
-            text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
-            icon: 'error',
-            confirmButtonColor: '#3b82f6'
-        }).then(() => {
-            window.location.href='?page=realisasi';
-        });
-    </script>";
+    // Tampilkan Alert lalu redirect tanpa menggunakan exit di sini agar HTML di bawah ter-load
+    // Atau gunakan echo HTML lengkap agar script swal bisa jalan
+    echo "<!DOCTYPE html><html><head>
+          <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+          </head><body>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Akses Ditolak!',
+                    text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
+                    icon: 'error',
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    window.location.href='?page=realisasi';
+                });
+            });
+          </script></body></html>";
     exit;
 }
+
 
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
