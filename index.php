@@ -154,8 +154,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                 </ul>
               </li>
               <?php } ?>
-              </li>
-              <?php } ?>
 
               <li class="nav-item">
                 <a href="?page=rkk" class="nav-link">
