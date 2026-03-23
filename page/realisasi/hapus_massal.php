@@ -1,4 +1,21 @@
 <?php
+$role_user = strtolower($_SESSION['role'] ?? '');
+$is_authorized_delete = ($role_user == "Admin Master" || $role_user == "Kepala Pabrik");
+
+if (!$is_authorized_delete) {
+    echo "<script>
+        Swal.fire({
+            title: 'Akses Ditolak!',
+            text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
+            icon: 'error',
+            confirmButtonColor: '#3b82f6'
+        }).then(() => {
+            window.location.href='?page=realisasi';
+        });
+    </script>";
+    exit;
+}
+
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
     if (!empty($_POST['id_realisasi_pilih'])) {
@@ -31,7 +48,11 @@ if (isset($_POST['proses_hapus'])) {
 
 // Query Tampil Data Realisasi
 $tampil = $koneksi->query("SELECT A.*, 
-    (SELECT COUNT(id_realisasi_detail) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi AND status_realisasi != 'Digantikan') as jml
+    (SELECT COUNT(RD.id_realisasi_detail) 
+     FROM tb_realisasi_detail RD 
+     JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
+     WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan'
+    ) as jml
     FROM tb_realisasi A ORDER BY A.tgl_realisasi DESC");
 ?>
 

@@ -1,4 +1,21 @@
 <?php
+$role_user = strtolower($_SESSION['role'] ?? '');
+$is_authorized_delete = ($role_user == "Admin Master" || $role_user == "Kepala Pabrik");
+
+if (!$is_authorized_delete) {
+    echo "<script>
+        Swal.fire({
+            title: 'Akses Ditolak!',
+            text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
+            icon: 'error',
+            confirmButtonColor: '#3b82f6'
+        }).then(() => {
+            window.location.href='?page=realisasi';
+        });
+    </script>";
+    exit;
+}
+
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
     if (!empty($_POST['id_rkk_pilih'])) {
