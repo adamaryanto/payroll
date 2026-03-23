@@ -73,7 +73,7 @@ ORDER BY D.nama_departmen, K.nama_karyawan ASC
 $result = $koneksi->query($sql);
 $row1 = $result->fetch_assoc();
 echo "
-<table> <tr><td colspan= '15'  style='text-align:center;'>Realisasi Absensi Karyawan Tanggal " . date('d/m/Y', strtotime($row1['tgl_rkk'])) . "</td></tr>
+<table> <tr><td colspan= '15'  style='text-align:center;'>Rencana Upah Karyawan Tanggal " . date('d/m/Y', strtotime($row1['tgl_rkk'])) . "</td></tr>
 
 <tr><td colspan= '15'  style='text-align:center;'>JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
 

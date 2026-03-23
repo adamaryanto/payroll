@@ -10,6 +10,7 @@ if (isset($_GET['id'])) {
                            B.jam_kerja, 
                            C.keterangan as shift, 
                            C.jam_masuk as shift_masuk,
+                           C.jam_keluar as shift_keluar,
                            C.istirahat_masuk as shift_istirahat_masuk,
                            C.istirahat_keluar as shift_istirahat_keluar,
                            BB.no_absen, 
@@ -98,13 +99,13 @@ if (isset($_GET['id'])) {
     $jamIstirahatMasukRealisasi = !empty($datadetail['ra_istirahat_masuk']) ? $datadetail['ra_istirahat_masuk'] : ($datadetailabsen['istirahat_masuk'] ?? '');
 
     // Logika Perhitungan Potongan Otomatis (Sesuai realisasi kelola)
-    $isLate = (!empty($jamMasukRealisasi) && !empty($datadetail['shift_masuk']) && strtotime($jamMasukRealisasi) > strtotime($datadetail['shift_masuk']));
+    $isLate = (!empty($jamMasukRealisasi) && !empty($datadetail['shift_masuk']) && $datadetail['shift_masuk'] != '00:00:00' && strtotime($jamMasukRealisasi) > strtotime($datadetail['shift_masuk']));
     $hasilpotongantelat = $isLate ? $globalDendaMasuk : 0;
 
-    $isLateBreak = (!empty($jamIstirahatMasukRealisasi) && !empty($datadetail['shift_istirahat_masuk']) && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
+    $isLateBreak = (!empty($jamIstirahatMasukRealisasi) && !empty($datadetail['shift_istirahat_masuk']) && $datadetail['shift_istirahat_masuk'] != '00:00:00' && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
     $hasilpotonganistirahatmasuk = $isLateBreak ? $globalDendaIstirahatMasuk : 0;
 
-    $isEarlyBreak = (!empty($jamIstirahatKeluarRealisasi) && !empty($datadetail['shift_istirahat_keluar']) && strtotime($jamIstirahatKeluarRealisasi) < strtotime($datadetail['shift_istirahat_keluar']));
+    $isEarlyBreak = (!empty($jamIstirahatKeluarRealisasi) && !empty($datadetail['shift_istirahat_keluar']) && $datadetail['shift_istirahat_keluar'] != '00:00:00' && strtotime($jamIstirahatKeluarRealisasi) < strtotime($datadetail['shift_istirahat_keluar']));
     $hasilpotonganistirahatkeluar = $isEarlyBreak ? $globalDendaIstirahatKeluar : 0;
 
     // Logic Incomplete Log
@@ -129,10 +130,10 @@ if (isset($_GET['id'])) {
     $isRestExpected = (!empty($datadetail['shift_istirahat_keluar']) && $datadetail['shift_istirahat_keluar'] != '00:00:00');
     $hasIncompleteBreak = ($isRestExpected && ($has_ist_keluar XOR $has_ist_masuk));
     
-    $isLate = ($has_masuk && !empty($datadetail['shift_masuk']) && strtotime($jamMasukRealisasi) > strtotime($datadetail['shift_masuk']));
-    $isEarlyOut = ($has_keluar && !empty($datadetail['shift_keluar']) && strtotime($jamKeluarRealisasi) < strtotime($datadetail['shift_keluar'])); // Assuming 'shift_keluar' is the reference for early out
-    $isLateBreak = ($has_ist_masuk && !empty($datadetail['shift_istirahat_masuk']) && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
-    $isEarlyBreak = ($has_ist_keluar && !empty($datadetail['shift_istirahat_keluar']) && strtotime($jamIstirahatKeluarRealisasi) < strtotime($datadetail['shift_istirahat_keluar']));
+    $isLate = ($has_masuk && !empty($datadetail['shift_masuk']) && $datadetail['shift_masuk'] != '00:00:00' && strtotime($jamMasukRealisasi) > strtotime($datadetail['shift_masuk']));
+    $isEarlyOut = ($has_keluar && !empty($datadetail['shift_keluar']) && $datadetail['shift_keluar'] != '00:00:00' && strtotime($jamKeluarRealisasi) < strtotime($datadetail['shift_keluar'])); 
+    $isLateBreak = ($has_ist_masuk && !empty($datadetail['shift_istirahat_masuk']) && $datadetail['shift_istirahat_masuk'] != '00:00:00' && strtotime($jamIstirahatMasukRealisasi) > strtotime($datadetail['shift_istirahat_masuk']));
+    $isEarlyBreak = ($has_ist_keluar && !empty($datadetail['shift_istirahat_keluar']) && $datadetail['shift_istirahat_keluar'] != '00:00:00' && strtotime($jamIstirahatKeluarRealisasi) < strtotime($datadetail['shift_istirahat_keluar']));
 
     // Logic denda: Prioritaskan data tersimpan jika sudah ada (status detail == 1), 
     // Jika synced (status detail == 2), gunakan kalkulasi otomatis sebagai saran.
@@ -153,15 +154,39 @@ if (isset($_GET['id'])) {
         $hasilpotonganistirahatmasuk = ($isLateBreak) ? $globalDendaIstirahatMasuk : 0;
     }
 
-    // Logika Upah Pokok: Jika Absen Masuk kosong maka Upah jadi 0
-    // Gunakan r_upah jika sudah ada, atau upah_master sebagai fallback
+    // Logic Status Kehadiran (Refined)
+    $isTotalMissing = (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00') && (empty($jamKeluarRealisasi) || $jamKeluarRealisasi == '00:00:00');
+    $attendanceStatus = 'HADIR';
+    $statusBadgeClass = 'bg-green-100 text-green-800';
+
+    if ($isTotalMissing) {
+        if ($datadetail['status_realisasi_detail'] == 0) {
+            // User wants "HADIR" for draft even if empty
+            $attendanceStatus = 'HADIR';
+            $statusBadgeClass = 'bg-green-100 text-green-800';
+        } else {
+            $attendanceStatus = 'TIDAK HADIR';
+            $statusBadgeClass = 'bg-red-100 text-red-800';
+        }
+    }
+
+    // Logika Upah Pokok
     $upahPokokAsli = ($datadetail['r_upah'] > 0) ? $datadetail['r_upah'] : $datadetail['upah_master'];
     $upahPokokTampil = $upahPokokAsli;
     
-    // Check if truly present (must have Masuk log) - only if already synced
-    if ($datadetail['status_realisasi_detail'] > 0 && (empty($jamMasukRealisasi) || $jamMasukRealisasi == '00:00:00')) {
+    // Wage zeroed for TOTAL MISSING after sync
+    if ($attendanceStatus == 'TIDAK HADIR') {
         $upahPokokTampil = 0;
-        $tlembur = 0; // Lembur also zero if not present
+        $tlembur = 0;
+    }
+
+    // Additional Safeguard for Draft (Status 0): Force zero penalties
+    if ($datadetail['status_realisasi_detail'] == 0) {
+        $hasilpotongantelat = 0;
+        $hasilpotonganistirahatkeluar = 0;
+        $hasilpotonganistirahatmasuk = 0;
+        $hasilpotonganpulang = 0;
+        $hasilpotongantidaklengkap = 0;
     }
 }
 
@@ -264,7 +289,12 @@ if (!function_exists('rupiah')) {
                     </div>
                 </div>
 
-                <div class="section-divider text-danger">Input Realisasi Absensi & Upah</div>
+                <div class="section-divider text-danger">
+                    Input Realisasi Absensi & Upah
+                    <span id="attendance-badge" class="ml-4 px-3 py-1 rounded-full text-[12px] font-bold <?= $statusBadgeClass ?>">
+                        STATUS: <?= $attendanceStatus ?>
+                    </span>
+                </div>
                 <div class="row">
                     <div class="form-group col-md-3">
                         <label>SHIFT REALISASI</label>
@@ -352,15 +382,76 @@ if (isset($_POST['simpan'])) {
         }
     }
 
+    // 1. Ambil Pengaturan Denda Global
+    $qGDenda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
+    $dGDenda = $qGDenda->fetch_assoc();
+    $gd_masuk = $dGDenda['denda_masuk'] ?? 0;
+    $gd_istirahat_awal = $dGDenda['denda_istirahat_keluar'] ?? 0;
+    $gd_istirahat_telat = $dGDenda['denda_istirahat_masuk'] ?? 0;
+    $gd_pulang = $dGDenda['denda_pulang'] ?? 0;
+    $gd_tidak_lengkap = $dGDenda['denda_tidak_lengkap'] ?? 0;
+
+    // 2. Ambil data jadwal untuk snapshot & kalkulasi
+    $qJadwal = $koneksi->query("SELECT * FROM tb_jadwal WHERE id_jadwal = '$tshift'");
+    $dJadwal = $qJadwal->fetch_assoc();
+    $s_masuk = $dJadwal['jam_masuk'] ?? '00:00:00';
+    $s_keluar = $dJadwal['jam_keluar'] ?? '00:00:00';
+    $s_ist_masuk = $dJadwal['istirahat_masuk'] ?? '00:00:00';
+    $s_ist_keluar = $dJadwal['istirahat_keluar'] ?? '00:00:00';
+
+    // 3. Rekalkulasi Denda Server-Side (Agar tidak stale dari form readonly)
+    $p_telat = 0;
+    $p_pulang = 0;
+    $p_ist_awal = 0;
+    $p_ist_telat = 0;
+    $p_tidak_lengkap = 0;
+
+    $has_masuk = !empty($tjammasuk) && $tjammasuk != '00:00:00';
+    $has_keluar = !empty($tjamkeluar) && $tjamkeluar != '00:00:00';
+    $has_ist_masuk = !empty($tistirahatmasuk) && $tistirahatmasuk != '00:00:00';
+    $has_ist_keluar = !empty($tistirahatkeluar) && $tistirahatkeluar != '00:00:00';
+
+    if ($has_masuk || $has_keluar) {
+        // Late Entrance
+        if ($has_masuk && $s_masuk != '00:00:00' && strtotime($tjammasuk) > strtotime($s_masuk)) {
+            $p_telat = $gd_masuk;
+        }
+        // Early Departure
+        if ($has_keluar && $s_keluar != '00:00:00' && strtotime($tjamkeluar) < strtotime($s_keluar)) {
+            $p_pulang = $gd_pulang;
+        }
+        // Early Break
+        if ($has_ist_keluar && $s_ist_keluar != '00:00:00' && strtotime($tistirahatkeluar) < strtotime($s_ist_keluar)) {
+            $p_ist_awal = $gd_istirahat_awal;
+        }
+        // Late Break Return
+        if ($has_ist_masuk && $s_ist_masuk != '00:00:00' && strtotime($tistirahatmasuk) > strtotime($s_ist_masuk)) {
+            $p_ist_telat = $gd_istirahat_telat;
+        }
+
+        // Incomplete Log
+        $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+        $isRestExpected = ($s_ist_keluar != '00:00:00');
+        $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
+        
+        if ($hasIncompleteMain || $hasIncompleteBreak) {
+            $p_tidak_lengkap = $gd_tidak_lengkap;
+        }
+    }
+
     $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
         r_upah = '$tupah', 
         id_jadwal = '$tshift',
+        r_jam_masuk = '$s_masuk',
+        r_jam_keluar = '$s_keluar',
+        r_istirahat_masuk = '$s_ist_masuk',
+        r_istirahat_keluar = '$s_ist_keluar',
         r_potongan_lainnya = '$tpotlainnya',
-        r_potongan_telat = '$tpottelat',
-        r_potongan_istirahat_awal = '$tpotistirahatawal',
-        r_potongan_istirahat_telat = '$tpotistirahattelat',
-        r_potongan_pulang = '$tpotpulang',
-        r_potongan_tidak_lengkap = '$tpotlog',
+        r_potongan_telat = '$p_telat',
+        r_potongan_istirahat_awal = '$p_ist_awal',
+        r_potongan_istirahat_telat = '$p_ist_telat',
+        r_potongan_pulang = '$p_pulang',
+        r_potongan_tidak_lengkap = '$p_tidak_lengkap',
         ra_masuk = '$tjammasuk',
         ra_keluar = '$tjamkeluar',
         ra_istirahat_masuk = '$tistirahatmasuk',
@@ -395,3 +486,128 @@ if (isset($_POST['simpan'])) {
     }
 }
 ?>
+
+<!-- Dynamic Recalculation Script -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // 1. Data Jadwal & Denda Global dari PHP
+    const shiftData = {
+        <?php 
+        $sqlJ = $koneksi->query("SELECT * FROM tb_jadwal");
+        while ($j = $sqlJ->fetch_assoc()) {
+            echo "'".$j['id_jadwal']."': {
+                masuk: '".$j['jam_masuk']."',
+                keluar: '".$j['jam_keluar']."',
+                ist_masuk: '".$j['istirahat_masuk']."',
+                ist_keluar: '".$j['istirahat_keluar']."'
+            },";
+        }
+        ?>
+    };
+
+    const dendaGlobal = {
+        masuk: <?= (int)($gd_masuk ?? 0) ?>,
+        istAwal: <?= (int)($gd_istirahat_awal ?? 0) ?>,
+        istTelat: <?= (int)($gd_istirahat_telat ?? 0) ?>,
+        pulang: <?= (int)($gd_pulang ?? 0) ?>,
+        tidakLengkap: <?= (int)($gd_tidak_lengkap ?? 0) ?>
+    };
+
+    const upahMaster = <?= (int)($datadetail['upah_master'] ?? 0) ?>;
+
+    function timeToSeconds(time) {
+        if (!time || time === '00:00:00') return 0;
+        const parts = time.split(':');
+        return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + (parseInt(parts[2]) || 0);
+    }
+
+    function calculate() {
+        const shiftId = $('[name="tshift"]').val();
+        const jamMasuk = $('[name="tjammasuk"]').val();
+        const jamKeluar = $('[name="tjamkeluar"]').val();
+        const istMasuk = $('[name="tistirahatmasuk"]').val();
+        const istKeluar = $('[name="tistirahatkeluar"]').val();
+        const lembur = parseInt($('[name="tlembur"]').val()) || 0;
+        const potLain = parseInt($('[name="tpotlainnya"]').val()) || 0;
+        const recordStatus = <?= $datadetail['status_realisasi_detail'] ?>;
+
+        let pTelat = 0, pPulang = 0, pIstAwal = 0, pIstTelat = 0, pTidakLengkap = 0;
+        let finalUpahPokok = upahMaster;
+
+        const shift = shiftData[shiftId];
+        const hasMasuk = (jamMasuk && jamMasuk !== '00:00:00');
+        const hasKeluar = (jamKeluar && jamKeluar !== '00:00:00');
+        const hasIstMasuk = (istMasuk && istMasuk !== '00:00:00');
+        const hasIstKeluar = (istKeluar && istKeluar !== '00:00:00');
+        const isTotalMissing = (!hasMasuk && !hasKeluar);
+
+        let attStatus = 'HADIR';
+        let badgeClass = 'bg-green-100 text-green-800';
+
+        if (isTotalMissing) {
+            if (recordStatus == 0) {
+                attStatus = 'HADIR';
+                badgeClass = 'bg-green-100 text-green-800';
+            } else {
+                attStatus = 'TIDAK HADIR';
+                badgeClass = 'bg-red-100 text-red-800';
+            }
+        }
+
+        // Update Header Badge
+        $('#attendance-badge').text('STATUS: ' + attStatus).attr('class', 'ml-4 px-3 py-1 rounded-full text-[12px] font-bold ' + badgeClass);
+
+        // Special case for Draft (Status 0): Dynamic penalties ONLY shown if jam is filled manually
+        if (recordStatus == 0) {
+            if (isTotalMissing) {
+                pTelat = 0; pPulang = 0; pIstAwal = 0; pIstTelat = 0; pTidakLengkap = 0;
+                finalUpahPokok = upahMaster;
+            } else {
+                // Manual input in draft - show what will happen
+                if (shift) {
+                    if (hasMasuk && shift.masuk !== '00:00:00' && timeToSeconds(jamMasuk) > timeToSeconds(shift.masuk)) pTelat = dendaGlobal.masuk;
+                    if (hasKeluar && shift.keluar !== '00:00:00' && timeToSeconds(jamKeluar) < timeToSeconds(shift.keluar)) pPulang = dendaGlobal.pulang;
+                    if (hasIstKeluar && shift.ist_keluar !== '00:00:00' && timeToSeconds(istKeluar) < timeToSeconds(shift.ist_keluar)) pIstAwal = dendaGlobal.istAwal;
+                    if (hasIstMasuk && shift.ist_masuk !== '00:00:00' && timeToSeconds(istMasuk) > timeToSeconds(shift.ist_masuk)) pIstTelat = dendaGlobal.istTelat;
+                    const hasIncompleteMain = (!hasMasuk || !hasKeluar);
+                    const isRestExpected = (shift.ist_keluar !== '00:00:00');
+                    const hasIncompleteBreak = (isRestExpected && (!hasIstMasuk || !hasIstKeluar));
+                    if (hasIncompleteMain || hasIncompleteBreak) pTidakLengkap = dendaGlobal.tidakLengkap;
+                }
+            }
+        } else if (attStatus !== 'HADIR') { // This means TIDAK HADIR after sync
+            finalUpahPokok = 0;
+            pTelat = 0; pPulang = 0; pIstAwal = 0; pIstTelat = 0; pTidakLengkap = 0;
+        } else {
+            // Normal calculation for HADIR (Status > 0)
+            if (shift) {
+                if (hasMasuk && shift.masuk !== '00:00:00' && timeToSeconds(jamMasuk) > timeToSeconds(shift.masuk)) pTelat = dendaGlobal.masuk;
+                if (hasKeluar && shift.keluar !== '00:00:00' && timeToSeconds(jamKeluar) < timeToSeconds(shift.keluar)) pPulang = dendaGlobal.pulang;
+                if (hasIstKeluar && shift.ist_keluar !== '00:00:00' && timeToSeconds(istKeluar) < timeToSeconds(shift.ist_keluar)) pIstAwal = dendaGlobal.istAwal;
+                if (hasIstMasuk && shift.ist_masuk !== '00:00:00' && timeToSeconds(istMasuk) > timeToSeconds(shift.ist_masuk)) pIstTelat = dendaGlobal.istTelat;
+                const hasIncompleteMain = (!hasMasuk || !hasKeluar);
+                const isRestExpected = (shift.ist_keluar !== '00:00:00');
+                const hasIncompleteBreak = (isRestExpected && (!hasIstMasuk || !hasIstKeluar));
+                if (hasIncompleteMain || hasIncompleteBreak) pTidakLengkap = dendaGlobal.tidakLengkap;
+            }
+        }
+
+
+        // Update fields
+        $('[name="tupah"]').val(finalUpahPokok);
+        $('[name="tpottelat"]').val(pTelat);
+        $('[name="tpotistirahatkeluar"]').val(pIstAwal);
+        $('[name="tpotistirahatmasuk"]').val(pIstTelat);
+        $('[name="tpotpulang"]').val(pPulang);
+        $('[name="tpotlog"]').val(pTidakLengkap);
+
+        const total = finalUpahPokok + lembur - pTelat - pIstAwal - pIstTelat - pPulang - pTidakLengkap - potLain;
+        // Use PHP's rupiah format or similar in JS
+        const totalFmt = "Rp " + total.toLocaleString('id-ID');
+        $('[style*="background: #eff6ff"]').val(totalFmt);
+    }
+
+    $('[name="tshift"], [name="tjammasuk"], [name="tjamkeluar"], [name="tistirahatmasuk"], [name="tistirahatkeluar"], [name="tlembur"], [name="tpotlainnya"]').on('change input', calculate);
+});
+</script>

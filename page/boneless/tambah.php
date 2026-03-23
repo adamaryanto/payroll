@@ -99,6 +99,12 @@ $default_items = [
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Jumlah Mobil (Potong)</label>
                                 <input type="number" name="jumlah_mobil" class="form-control h-[42px]" placeholder="0" required>
                             </div>
+                            <div class="col-md-4 form-group">
+                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Biaya / Mobil</label>
+                                <div class="h-[42px] flex items-center px-3 bg-blue-50 border border-blue-200 rounded-lg font-bold text-blue-600 shadow-sm" id="costPerUnitHeader">
+                                    Rp 0
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mt-4 md:mt-6">
@@ -141,7 +147,10 @@ $default_items = [
                                     </tbody>
                                     <tfoot>
                                         <tr class="bg-gray-50 font-bold border-t-2 border-indigo-100">
-                                            <td colspan="4" class="text-right py-4 uppercase text-xs md:text-sm tracking-wider text-gray-600">Grand Total Boneless</td>
+                                            <td colspan="4" class="text-right py-4 uppercase text-xs md:text-sm tracking-wider text-gray-600">
+                                                Grand Total Boneless <br>
+                                                <span class="text-[11px] text-indigo-500 normal-case font-bold">Biaya per Mobil: <span id="costPerUnitDisplay">Rp 0</span></span>
+                                            </td>
                                             <td colspan="2" class="md:text-right text-center py-4 text-xl md:text-lg text-indigo-700 font-extrabold" id="grandTotalDisplay">Rp 0</td>
                                         </tr>
                                     </tfoot>
@@ -269,7 +278,24 @@ $default_items = [
             });
 
             grandTotalDisplay.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+            
+            // Hitung Biaya per Mobil
+            const jmlMobil = parseFloat(document.querySelector('input[name="jumlah_mobil"]').value) || 0;
+            const costPerUnitDisplay = document.getElementById('costPerUnitDisplay');
+            const costPerUnitHeader = document.getElementById('costPerUnitHeader');
+            if (jmlMobil > 0) {
+                const cpu = Math.round(grandTotal / jmlMobil);
+                const formatted = 'Rp ' + cpu.toLocaleString('id-ID');
+                costPerUnitDisplay.innerText = formatted;
+                costPerUnitHeader.innerText = formatted;
+            } else {
+                costPerUnitDisplay.innerText = 'Rp 0';
+                costPerUnitHeader.innerText = 'Rp 0';
+            }
         }
+
+        // Trigger calculate saat jumlah mobil berubah
+        document.querySelector('input[name="jumlah_mobil"]').addEventListener('input', calculate);
 
         tableBody.addEventListener('input', function(e) {
             if (e.target.classList.contains('qty-input') || e.target.classList.contains('harga-input')) {

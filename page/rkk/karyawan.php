@@ -64,11 +64,36 @@ if (isset($_POST['simpan_karyawan'])) {
                  '0', '0', '0', NOW())");
 
             if ($insert) {
-                echo "<script>alert('Karyawan Berhasil Ditambahkan'); window.location.href = '?page=rkk&aksi=kelola&id=$idrkk';</script>";
+                echo '<!DOCTYPE html>
+                <html>
+                <head>
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                </head>
+                <body>
+                    <script>
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasil",
+                            text: "Karyawan Berhasil Ditambahkan",
+                            confirmButtonColor: "#2563eb",
+                            confirmButtonText: "Sip!"
+                        }).then((result) => {
+                            window.location.href="?page=rkk&aksi=karyawan&id=' . $idrkk . '";
+                        });
+                    </script>
+                </body>
+                </html>';
                 exit;
             }
         } else {
-            echo "<script>alert('Karyawan ini sudah ada!');</script>";
+            echo '<script>
+                Swal.fire({
+                    icon: "warning",
+                    title: "Perhatian",
+                    text: "Karyawan ini sudah ada di daftar!",
+                    confirmButtonColor: "#2563eb"
+                });
+            </script>';
         }
     }
 }

@@ -119,6 +119,7 @@ if($result->num_rows > 0) {
     $result->data_seek(0);
 }
 $no=1;
+$totalKeseluruhan = 0;
 while($row = $result->fetch_assoc()){
     // Logika Pelanggaran Dinamis (Sync with realisasi/kelola.php)
     $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
@@ -177,8 +178,17 @@ while($row = $result->fetch_assoc()){
     </tr>
     ";
 
+    $totalKeseluruhan += $totalRow;
     $no++;
 }
+
+// Tambahkan Baris Subtotal
+echo "
+<tr style='font-weight:bold; background-color:#f8f9fa;'>
+    <td colspan='10' style='text-align:right; height:30px; vertical-align:middle;'>SUBTOTAL GAJI</td>
+    <td style='text-align:right; vertical-align:middle; background-color:#e0f2fe; color:#1e40af;'>" . rupiah($totalKeseluruhan) . "</td>
+    <td colspan='3'></td>
+</tr>";
 
 echo "</table>";
 ?>

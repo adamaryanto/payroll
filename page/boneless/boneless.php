@@ -31,6 +31,7 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase">No</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-center">Tanggal</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-center">Jumlah Mobil</th>
+                            <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-right">Biaya / Mobil</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-right">Total Biaya Boneless</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase">Keterangan</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-center">Aksi</th>
@@ -49,6 +50,10 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                                        <?= $data['jumlah_mobil'] ?> Unit
                                    </span>
                                 </td>
+                                <?php 
+                                    $biaya_per_mobil = ($data['jumlah_mobil'] > 0) ? ($data['grand_total'] / $data['jumlah_mobil']) : 0; 
+                                ?>
+                                <td data-label="Biaya / Mobil" class="py-3 px-4 text-sm font-semibold text-gray-700 md:text-right">Rp <?= number_format($biaya_per_mobil, 0, ',', '.') ?></td>
                                 <td data-label="Total Biaya Boneless" class="py-3 px-4 text-sm font-bold text-blue-600 md:text-right">Rp <?= number_format($data['grand_total'], 0, ',', '.') ?></td>
                                 <td data-label="Keterangan" class="py-3 px-4 text-sm text-gray-600 italic"><?= htmlspecialchars($data['keterangan']) ?: '-' ?></td>
                                 

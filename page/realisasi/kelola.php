@@ -48,6 +48,7 @@ if (isset($_GET['id'])) {
         RD.status_rkk,
         RD.upah as upah_rkk,
         J.jam_masuk as shift_masuk,
+        J.jam_keluar as shift_keluar,
         J.istirahat_masuk as shift_istirahat_masuk,
         J.istirahat_keluar as shift_istirahat_keluar,
         (SELECT K3.nama_karyawan 
@@ -207,7 +208,7 @@ function syncRealisasiData($koneksi, $id_realisasi) {
     $gd_tidak_lengkap = $denda['denda_tidak_lengkap'] ?? 0;
 
     // 2. Get all employees in this realization
-    $query_details = $koneksi->query("SELECT RD.id_realisasi_detail, K.no_absen, RD.id_jadwal, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar
+    $query_details = $koneksi->query("SELECT RD.id_realisasi_detail, K.no_absen, RD.id_jadwal, J.jam_masuk as s_masuk, J.jam_keluar as s_keluar, J.istirahat_masuk as s_ist_masuk, J.istirahat_keluar as s_ist_keluar
                                       FROM tb_realisasi_detail RD
                                       JOIN ms_karyawan K ON RD.id_karyawan = K.id_karyawan
                                       LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
@@ -217,10 +218,10 @@ function syncRealisasiData($koneksi, $id_realisasi) {
     while ($row = $query_details->fetch_assoc()) {
         $id_rd = $row['id_realisasi_detail'];
         $no_absen = $row['no_absen'];
-        $s_masuk = $row['jam_masuk'];
-        $s_keluar = $row['jam_keluar'];
-        $s_ist_masuk = $row['istirahat_masuk'];
-        $s_ist_keluar = $row['istirahat_keluar'];
+        $s_masuk = $row['s_masuk'] ?? '00:00:00';
+        $s_keluar = $row['s_keluar'] ?? '00:00:00';
+        $s_ist_masuk = $row['s_ist_masuk'] ?? '00:00:00';
+        $s_ist_keluar = $row['s_ist_keluar'] ?? '00:00:00';
 
         if (empty($no_absen)) continue;
 
@@ -283,6 +284,10 @@ function syncRealisasiData($koneksi, $id_realisasi) {
 
         // 5. Update the detail record
         $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
+            r_jam_masuk = '$s_masuk',
+            r_jam_keluar = '$s_keluar',
+            r_istirahat_masuk = '$s_ist_masuk',
+            r_istirahat_keluar = '$s_ist_keluar',
             ra_masuk = $ra_masuk,
             ra_keluar = $ra_keluar,
             ra_istirahat_masuk = $ra_ist_masuk,
@@ -317,7 +322,7 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
     $gd_tidak_lengkap = $denda['denda_tidak_lengkap'] ?? 0;
 
     // 2. Get all details for this realization
-    $query_details = $koneksi->query("SELECT RD.*, J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar
+    $query_details = $koneksi->query("SELECT RD.*, J.jam_masuk as s_masuk, J.jam_keluar as s_keluar, J.istirahat_masuk as s_ist_masuk, J.istirahat_keluar as s_ist_keluar
                                       FROM tb_realisasi_detail RD
                                       LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
                                       WHERE RD.id_realisasi = '$id_realisasi'");
@@ -330,10 +335,10 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
         $has_ist_masuk = !empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00';
         $has_ist_keluar = !empty($row['ra_istirahat_keluar']) && $row['ra_istirahat_keluar'] != '00:00:00';
         
-        $s_masuk = $row['jam_masuk'] ?? '00:00:00';
-        $s_keluar = $row['jam_keluar'] ?? '00:00:00';
-        $s_ist_masuk = $row['istirahat_masuk'] ?? '00:00:00';
-        $s_ist_keluar = $row['istirahat_keluar'] ?? '00:00:00';
+        $s_masuk = $row['s_masuk'] ?? '00:00:00';
+        $s_keluar = $row['s_keluar'] ?? '00:00:00';
+        $s_ist_masuk = $row['s_ist_masuk'] ?? '00:00:00';
+        $s_ist_keluar = $row['s_ist_keluar'] ?? '00:00:00';
 
         // skip if status is 1 (already manually saved) unless we want to overwrite? 
         // usually bulk save is for pending/synced ones.
@@ -378,6 +383,10 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
 
         // 4. Update the detail record
         $update = $koneksi->query("UPDATE tb_realisasi_detail SET 
+            r_jam_masuk = '$s_masuk',
+            r_jam_keluar = '$s_keluar',
+            r_istirahat_masuk = '$s_ist_masuk',
+            r_istirahat_keluar = '$s_ist_keluar',
             r_potongan_telat = '$p_telat',
             r_potongan_pulang = '$p_pulang',
             r_potongan_istirahat_awal = '$p_ist_awal',
@@ -512,31 +521,37 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                     // Highlight if status is 'Tidak Hadir' or (already synced AND data is fully missing)
                                     $rowClass = ($data['status_rkk'] == 'Tidak Hadir' || ($isFullMissing && $data['status_realisasi_detail'] > 0)) ? 'bg-red-custom' : '';
 
-                                    // Logic Incomplete Log (One sided or missing break)
-                                    $hasIncompleteMain = (
-                                        (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00')) ||
-                                        ((empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') && !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00')
-                                    );
-                                    $isRestExpected = (!empty($data['shift_istirahat_keluar']) && $data['shift_istirahat_keluar'] != '00:00:00');
-                                    $hasIncompleteBreak = ($isRestExpected && (
-                                        (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ||
-                                        (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00')
-                                    ));
+
                                     
                                      $has_masuk = !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00';
                                      $has_keluar = !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00';
                                      $has_ist_masuk = !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00';
                                      $has_ist_keluar = !empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00';
 
+                                     $isLate = ($has_masuk && !empty($data['shift_masuk']) && $data['shift_masuk'] != '00:00:00' && strtotime($data['ra_masuk']) > strtotime($data['shift_masuk']));
+                                     $isEarlyOut = ($has_keluar && !empty($data['shift_keluar']) && $data['shift_keluar'] != '00:00:00' && strtotime($data['ra_keluar']) < strtotime($data['shift_keluar']));
+                                     $isLateBreak = ($has_ist_masuk && !empty($data['shift_istirahat_masuk']) && $data['shift_istirahat_masuk'] != '00:00:00' && strtotime($data['ra_istirahat_masuk']) > strtotime($data['shift_istirahat_masuk']));
+                                     $isEarlyBreak = ($has_ist_keluar && !empty($data['shift_istirahat_keluar']) && $data['shift_istirahat_keluar'] != '00:00:00' && strtotime($data['ra_istirahat_keluar']) < strtotime($data['shift_istirahat_keluar']));
+
                                      $isTotalMissing = (!$has_masuk && !$has_keluar);
                                      $hasIncompleteMain = ($has_masuk XOR $has_keluar);
-                                     $isRestExpected = (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00');
+                                     $isRestExpected = (!empty($data['shift_istirahat_keluar']) && $data['shift_istirahat_keluar'] != '00:00:00');
                                      $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
-                                     
-                                     $isLate = ($has_masuk && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
-                                     $isEarlyOut = ($has_keluar && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-                                     $isLateBreak = ($has_ist_masuk && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
-                                     $isEarlyBreak = ($has_ist_keluar && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
+
+                                     // Logic Status Kehadiran (Refined)
+                                     if ($data['status_realisasi_detail'] == 0) {
+                                         $attendanceStatus = 'HADIR'; // User wants "Hadir" for draft even if empty
+                                         $statusBadgeClass = 'bg-green-100 text-green-800';
+                                     } else {
+                                         if ($isTotalMissing) {
+                                             $attendanceStatus = 'TIDAK HADIR';
+                                             $statusBadgeClass = 'bg-red-100 text-red-800';
+                                         } else {
+                                             $attendanceStatus = 'HADIR';
+                                             $statusBadgeClass = 'bg-green-100 text-green-800';
+                                         }
+                                     }
+
 
                                      // Denda logic
                                      if ($data['status_realisasi_detail'] == 1) {
@@ -549,7 +564,7 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                          $potLainnyaValue = $data['r_potongan_lainnya'];
                                      } else {
                                          // Status 0 (Draft) or 2 (Synced)
-                                         // Calculate dynamically to ensure visibility even if not yet persisted or if logs changed
+                                         // Calculate dynamically based on real-time shift data
                                          $potPulangValue = ($isEarlyOut && !$isTotalMissing) ? $globalDendaPulang : 0;
                                          $potTidakLengkapValue = (!$isTotalMissing && ($hasIncompleteMain || $hasIncompleteBreak)) ? $globalDendaTidakLengkap : 0;
                                          $potTelatValue = ($isLate) ? $globalDendaMasuk : 0;
@@ -562,39 +577,28 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                     $finalUpah = $data['upahkaryawan'];
                                     $finalLembur = $data['lembur'];
 
-                                    if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir' || ($data['status_realisasi_detail'] > 0 && (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00'))) {
-                                        $finalUpah = 0;
-                                        $finalLembur = 0;
-                                        
-                                        // Still zero out most penalties if it's a Total Missing log or explicitly marked absent
-                                        if (empty($data['digantikan_oleh']) && $data['status_rkk'] != 'Tidak Hadir') {
-                                            // Special case: Incomplete log while syncing (one side missing)
-                                            // We ONLY zero out if BOTH are missing. 
-                                            // If one is present, we keep the potTidakLengkapValue (Calculated above)
-                                            if ($isTotalMissing) {
-                                                $potTelatValue = 0;
-                                                $potIstirahatValue = 0;
-                                                $potPulangValue = 0;
-                                                $potTidakLengkapValue = 0;
-                                                $potLainnyaValue = 0;
-                                            } else {
-                                                // It's incomplete. 
-                                                $potTelatValue = 0;
-                                                $potIstirahatKeluarValue = 0;
-                                                $potIstirahatMasukValue = 0;
-                                                $potPulangValue = 0;
-                                                // Keep $potTidakLengkapValue from line 328
-                                            }
-                                        } else {
-                                            // Replaced or marked Tidak Hadir explicitly
-                                            $potTelatValue = 0;
-                                             $potIstirahatKeluarValue = 0;
-                                             $potIstirahatMasukValue = 0;
-                                             $potPulangValue = 0;
-                                             $potTidakLengkapValue = 0;
-                                             $potLainnyaValue = 0;
-                                        }
-                                    }
+                                     if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir' || $attendanceStatus == 'TIDAK HADIR') {
+                                         $finalUpah = 0;
+                                         $finalLembur = 0;
+                                         
+                                         // If officially absent or total missing after sync, clear all penalties except possibly manual ones (but user wants clean 0)
+                                         $potTelatValue = 0;
+                                         $potIstirahatKeluarValue = 0;
+                                         $potIstirahatMasukValue = 0;
+                                         $potPulangValue = 0;
+                                         $potTidakLengkapValue = 0;
+                                         $potLainnyaValue = 0;
+                                     }
+                                     
+                                     // Additional Safeguard: Before sync (Status 0), ALL penalties must be 0
+                                     if ($data['status_realisasi_detail'] == 0) {
+                                         $potTelatValue = 0;
+                                         $potIstirahatKeluarValue = 0;
+                                         $potIstirahatMasukValue = 0;
+                                         $potPulangValue = 0;
+                                         $potTidakLengkapValue = 0;
+                                         $potLainnyaValue = 0;
+                                     }
 
                                     $upah_setelah_potongan = $finalUpah + $finalLembur - $potTelatValue - $potIstirahatKeluarValue - $potIstirahatMasukValue - $potLainnyaValue - $potPulangValue - $potTidakLengkapValue;
                                 ?>
@@ -609,13 +613,13 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                                 <?php if (!empty($data['digantikan_oleh'])) echo " <span class='text-red-600 font-bold'>(Digantikan oleh " . $data['digantikan_oleh'] . ")</span>"; ?>
                                             </strong>
 
-                                            <div class="mt-1">
-                                                <?php if ($data['status_rkk'] == 'Hadir') : ?>
-                                                    <?php if ($data['status_realisasi_detail'] > 0 && (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00')) : ?>
-                                                        <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir (Sync)</span>
-                                                    <?php else : ?>
-                                                        <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
-                                                    <?php endif; ?>
+                                             <div class="mt-1">
+                                                 <?php if ($data['status_rkk'] == 'Hadir') : ?>
+                                                     <?php if ($attendanceStatus == 'TIDAK HADIR') : ?>
+                                                         <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir (Sync)</span>
+                                                     <?php else : ?>
+                                                         <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
+                                                     <?php endif; ?>
                                                 <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
                                                     <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir</span>
                                                 <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
@@ -629,10 +633,10 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                         <td data-label="Sub Bagian"><?php echo $data['nama_sub_department']; ?></td>
                                         <td data-label="OS/DHK"><?php echo $data['label_os'] ?: $data['OS_DHK']; ?></td>
                                         <td data-label="Golongan"><?php echo $data['label_gol'] ?: $data['golongan']; ?></td>
-                                        <td data-label="Jam Masuk" class="<?php echo (empty($data['r_jam_masuk']) || $data['r_jam_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_masuk']; ?></td>
-                                        <td data-label="Jam Pulang" class="<?php echo (empty($data['r_jam_keluar']) || $data['r_jam_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_jam_keluar']; ?></td>
-                                        <td data-label="Istirahat Keluar" class="<?php echo (empty($data['r_istirahat_keluar']) || $data['r_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_keluar']; ?></td>
-                                        <td data-label="Istirahat Masuk" class="<?php echo (empty($data['r_istirahat_masuk']) || $data['r_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['r_istirahat_masuk']; ?></td>
+                                        <td data-label="Jam Masuk" class="<?php echo (empty($data['shift_masuk']) || $data['shift_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['shift_masuk']; ?></td>
+                                        <td data-label="Jam Pulang" class="<?php echo (empty($data['shift_keluar']) || $data['shift_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['shift_keluar']; ?></td>
+                                        <td data-label="Istirahat Keluar" class="<?php echo (empty($data['shift_istirahat_keluar']) || $data['shift_istirahat_keluar'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['shift_istirahat_keluar']; ?></td>
+                                        <td data-label="Istirahat Masuk" class="<?php echo (empty($data['shift_istirahat_masuk']) || $data['shift_istirahat_masuk'] == '00:00:00') ? 'bg-red-custom' : ''; ?>"><?php echo $data['shift_istirahat_masuk']; ?></td>
                                         <td data-label="Absen Masuk" class="<?php 
                                             echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00' || $isLate) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo (empty($data['ra_masuk']) || $data['ra_masuk'] == '00:00:00') ? '' : $data['ra_masuk']; ?></td>
@@ -640,10 +644,10 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                             echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? 'bg-red-custom' : ($isEarlyOut || $potLainnyaValue > 0 || $potTidakLengkapValue > 0 ? 'bg-yellow-custom' : ''); 
                                         ?>"><?php echo (empty($data['ra_keluar']) || $data['ra_keluar'] == '00:00:00') ? '' : $data['ra_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Keluar" class="<?php 
-                                            echo (((empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') && (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00')) || $isEarlyBreak) ? 'bg-red-custom' : ''; 
+                                            echo (((empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') && (!empty($data['shift_istirahat_keluar']) && $data['shift_istirahat_keluar'] != '00:00:00')) || $isEarlyBreak) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo (empty($data['ra_istirahat_keluar']) || $data['ra_istirahat_keluar'] == '00:00:00') ? '' : $data['ra_istirahat_keluar']; ?></td>
                                         <td data-label="Absen Istirahat Masuk" class="<?php 
-                                            echo (((empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00') && (!empty($data['r_istirahat_masuk']) && $data['r_istirahat_masuk'] != '00:00:00')) || $isLateBreak) ? 'bg-red-custom' : ''; 
+                                            echo (((empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00') && (!empty($data['shift_istirahat_masuk']) && $data['shift_istirahat_masuk'] != '00:00:00')) || $isLateBreak) ? 'bg-red-custom' : ''; 
                                         ?>"><?php echo (empty($data['ra_istirahat_masuk']) || $data['ra_istirahat_masuk'] == '00:00:00') ? '' : $data['ra_istirahat_masuk']; ?></td>
 
                                         <td data-label="Upah Pokok" class="text-right">
