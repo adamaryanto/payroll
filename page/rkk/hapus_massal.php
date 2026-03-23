@@ -1,66 +1,76 @@
 <?php
 $role_user = strtolower($_SESSION['role'] ?? '');
+<<<<<<< HEAD
 $is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik" || $role_user == "owner");
+=======
+
+$is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik");
+>>>>>>> 43a4431db6a129d7341a2315221a22cb73c18a09
 
 if (!$is_authorized_delete) {
-    echo "<script>
-        Swal.fire({
-            title: 'Akses Ditolak!',
-            text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
-            icon: 'error',
-            confirmButtonColor: '#3b82f6'
-        }).then(() => {
-            window.location.href='?page=rkk';
-        });
-    </script>";
+    echo "<!DOCTYPE html><html><head>
+          <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+          </head><body>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Akses Ditolak!',
+                    text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
+                    icon: 'error',
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    window.location.href='?page=rkk';
+                });
+            });
+          </script></body></html>";
     exit;
 }
 
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
-    if (!empty($_POST['id_rkk_pilih'])) {
-        $ids = $_POST['id_rkk_pilih'];
-        $count = 0;
+if (!empty($_POST['id_rkk_pilih'])) {
+$ids = $_POST['id_rkk_pilih'];
+$count = 0;
 
-        foreach ($ids as $id) {
-            $id = intval($id);
-            // 1. Hapus Detail (karyawan) terlebih dahulu karena relasi FK
-            $koneksi->query("DELETE FROM tb_rkk_detail WHERE id_rkk = $id");
-            // 2. Hapus Data Utama
-            if ($koneksi->query("DELETE FROM tb_rkk WHERE id_rkk = $id")) {
-                $count++;
-            }
-        }
-        echo "<script>
-            setTimeout(function() {
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: '$count data telah dihapus secara permanen.',
-                    icon: 'success',
-                    confirmButtonColor: '#e11d48'
-                }).then(() => {
-                    window.location.href='?page=rkk&aksi=hapus_massal';
-                });
-            }, 100);
-        </script>";
-    } else {
-        echo "<script>
-            setTimeout(function() {
-                Swal.fire({
-                    title: 'Pilih Data!',
-                    text: 'Silakan centang data yang ingin dihapus terlebih dahulu.',
-                    icon: 'warning',
-                    confirmButtonColor: '#e11d48'
-                });
-            }, 100);
-        </script>";
-    }
+foreach ($ids as $id) {
+$id = intval($id);
+// 1. Hapus Detail (karyawan) terlebih dahulu karena relasi FK
+$koneksi->query("DELETE FROM tb_rkk_detail WHERE id_rkk = $id");
+// 2. Hapus Data Utama
+if ($koneksi->query("DELETE FROM tb_rkk WHERE id_rkk = $id")) {
+$count++;
+}
+}
+echo "<script>
+    setTimeout(function() {
+        Swal.fire({
+            title: 'Berhasil!',
+            text: '$count data telah dihapus secara permanen.',
+            icon: 'success',
+            confirmButtonColor: '#e11d48'
+        }).then(() => {
+            window.location.href = '?page=rkk&aksi=hapus_massal';
+        });
+    }, 100);
+</script>";
+} else {
+echo "<script>
+    setTimeout(function() {
+        Swal.fire({
+            title: 'Pilih Data!',
+            text: 'Silakan centang data yang ingin dihapus terlebih dahulu.',
+            icon: 'warning',
+            confirmButtonColor: '#e11d48'
+        });
+    }, 100);
+</script>";
+}
 }
 
 // Query Tampil Data
-$tampil = $koneksi->query("SELECT A.*, 
-    (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml
-    FROM tb_rkk A ORDER BY A.tgl_rkk DESC");
+$tampil = $koneksi->query("SELECT A.*,
+(SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml
+FROM tb_rkk A ORDER BY A.tgl_rkk DESC");
 ?>
 
 <div class="container-fluid px-3 mt-4 mb-4">

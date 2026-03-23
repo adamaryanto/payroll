@@ -1,20 +1,31 @@
 <?php
 $role_user = strtolower($_SESSION['role'] ?? '');
+<<<<<<< HEAD
 $is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik" || $role_user == "owner");
+=======
+
+$is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik");
+>>>>>>> 43a4431db6a129d7341a2315221a22cb73c18a09
 
 if (!$is_authorized_delete) {
-    echo "<script>
-        Swal.fire({
-            title: 'Akses Ditolak!',
-            text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
-            icon: 'error',
-            confirmButtonColor: '#3b82f6'
-        }).then(() => {
-            window.location.href='?page=realisasi';
-        });
-    </script>";
+    echo "<!DOCTYPE html><html><head>
+          <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+          </head><body>
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Akses Ditolak!',
+                    text: 'Anda tidak memiliki izin untuk mengakses halaman Hapus Massal.',
+                    icon: 'error',
+                    confirmButtonColor: '#3b82f6'
+                }).then(() => {
+                    window.location.href='?page=realisasi';
+                });
+            });
+          </script></body></html>";
     exit;
 }
+
 
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
