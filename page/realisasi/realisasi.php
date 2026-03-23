@@ -75,9 +75,6 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                 <a href="?page=realisasi&aksi=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
-                <a href="?page=realisasi&aksi=hapus_massal" class="flex-1 md:flex-none justify-center inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
-                    <i class="fas fa-trash mr-1.5"></i> Hapus Masal
-                </a>
             </div>
         </div>
 
