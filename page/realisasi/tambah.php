@@ -44,7 +44,9 @@ $data_tgl = $tampil_tgl->fetch_assoc();
 $tglreal = $data_tgl['tgl_realisasi'];
 
     $sql =  $koneksi->query("insert into tb_realisasi_detail (
-            id_realisasi, id_rkk_detail, id_rkk, id_karyawan, r_upah, 
+            id_realisasi, id_rkk_detail, id_rkk, id_karyawan, 
+            nama_karyawan_manual, id_departmen, id_sub_department,
+            r_upah, 
             r_jam_masuk, r_jam_keluar, r_istirahat_masuk, r_istirahat_keluar, 
             id_jadwal, r_potongan_telat, r_potongan_istirahat_awal, 
             r_potongan_istirahat_telat, r_potongan_lainnya, r_potongan_pulang, 
@@ -52,7 +54,9 @@ $tglreal = $data_tgl['tgl_realisasi'];
             ra_istirahat_masuk, ra_istirahat_keluar, status_realisasi_detail, 
             hasil_kerja, lembur, tgl_realisasi_detail
         ) 
-        select '$iddetail', A.id_rkk_detail, A.id_rkk, A.id_karyawan, A.upah, 
+        select '$iddetail', A.id_rkk_detail, A.id_rkk, A.id_karyawan, 
+               A.nama_karyawan_manual, A.id_departmen, A.id_sub_department,
+               A.upah, 
                COALESCE(B.jam_masuk, '00:00:00'), 
                COALESCE(B.jam_keluar, '00:00:00'), 
                COALESCE(B.istirahat_masuk, '00:00:00'), 

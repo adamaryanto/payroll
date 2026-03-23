@@ -41,10 +41,10 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
 $sql = "
 SELECT 
-    K.nama_karyawan, 
+    IF(RD.id_karyawan = 0, RD.nama_karyawan_manual, K.nama_karyawan) as nama_karyawan, 
     O.OS_DHK as label_os,
     G.golongan as label_gol,
-    JB.jabatan,
+    COALESCE(JB.jabatan, 'Harian') as jabatan,
     D.nama_departmen,
     R.jam_kerja,
     JD.jam_masuk,
@@ -67,7 +67,7 @@ LEFT JOIN ms_jabatan JB ON K.id_jabatan = JB.id_jabatan
 LEFT JOIN ms_os_dhk O ON K.id_os_dhk = O.id_os_dhk
 LEFT JOIN ms_golongan G ON K.id_golongan = G.id_golongan
 WHERE R.id_rkk = '$id'
-ORDER BY D.nama_departmen, K.nama_karyawan ASC
+ORDER BY D.nama_departmen, nama_karyawan ASC
 ";
 
 $result = $koneksi->query($sql);

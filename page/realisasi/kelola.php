@@ -38,10 +38,13 @@ if (isset($_GET['id'])) {
     $tampil = $koneksi->query("SELECT 
         A.*, 
         A.r_upah as upahkaryawan, 
-        B.no_absen, 
-        BB.nama_sub_department, 
-        B.nama_karyawan, 
-        D.nama_departmen, 
+        -- Jika id_karyawan 0, tampilkan '-', jika tidak tampilkan no_absen asli
+        IF(A.id_karyawan = 0, '-', B.no_absen) as no_absen_tampil, 
+        -- Jika id_karyawan 0, ambil dari kolom manual, jika tidak ambil dari master
+        IF(A.id_karyawan = 0, A.nama_karyawan_manual, B.nama_karyawan) as nama_tampil,
+        -- Prioritaskan departmen dari detail (penting untuk manual employee)
+        COALESCE(D.nama_departmen, D_Manual.nama_departmen) as nama_departmen,
+        COALESCE(BB.nama_sub_department, BB_Manual.nama_sub_department) as nama_sub_department,
         C.tgl_realisasi, 
         O.OS_DHK as label_os,
         G.golongan as label_gol,
@@ -72,8 +75,12 @@ if (isset($_GET['id'])) {
         FROM tb_realisasi_detail A 
         LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
         LEFT JOIN tb_realisasi C ON A.id_realisasi = C.id_realisasi
+        -- Join ke master departmen dari karyawan master
         LEFT JOIN ms_departmen D ON B.id_departmen = D.id_departmen
         LEFT JOIN ms_sub_department BB ON B.id_sub_department = BB.id_sub_department
+        -- Join ke master departmen dari kolom manual di detail (untuk manual employee)
+        LEFT JOIN ms_departmen D_Manual ON A.id_departmen = D_Manual.id_departmen
+        LEFT JOIN ms_sub_department BB_Manual ON A.id_sub_department = BB_Manual.id_sub_department
         LEFT JOIN ms_os_dhk O ON B.id_os_dhk = O.id_os_dhk
         LEFT JOIN ms_golongan G ON B.id_golongan = G.id_golongan
         LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
@@ -604,10 +611,10 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                                 ?>
                                     <tr class="<?php echo $rowClass; ?>">
                                         <td data-label="No"><?php echo $no; ?></td>
-                                        <td data-label="No Absen"><?php echo $data['no_absen']; ?></td>
+                                        <td data-label="No Absen"><?php echo $data['no_absen_tampil']; ?></td>
                                         <td data-label="Nama Karyawan">
                                             <strong>
-                                                <?php echo $data['nama_karyawan']; ?>
+                                                <?php echo $data['nama_tampil']; ?>
                                                 <?php if (!empty($data['menggantikan'])) echo " <span class='text-blue-600 font-bold'>(Menggantikan " . $data['menggantikan'] . ")</span>"; ?>
                                                 <?php if (!empty($data['menggantikan']) && !empty($data['digantikan_oleh'])) echo " &"; ?>
                                                 <?php if (!empty($data['digantikan_oleh'])) echo " <span class='text-red-600 font-bold'>(Digantikan oleh " . $data['digantikan_oleh'] . ")</span>"; ?>
