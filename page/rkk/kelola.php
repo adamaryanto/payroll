@@ -12,18 +12,21 @@ if (isset($_GET['id'])) {
 
   $tampil = $koneksi->query("SELECT 
     A.*, 
-    B.no_absen, 
+    -- Jika id_karyawan 0, tampilkan '-', jika tidak tampilkan no_absen asli
+    IF(A.id_karyawan = 0, '-', B.no_absen) as no_absen_tampil, 
+    -- Jika id_karyawan 0, ambil dari kolom manual, jika tidak ambil dari master
+    IF(A.id_karyawan = 0, A.nama_karyawan_manual, B.nama_karyawan) as nama_tampil,
     BB.nama_sub_department, 
-    B.nama_karyawan, 
     D.nama_departmen, 
     C.tgl_rkk, 
     J.keterangan as nama_shift,
     J.jam_masuk,
     J.jam_keluar,
-    case when A.status_rkk = 'Digantikan' then 0 else A.upah end as upahkaryawan, 
+    CASE WHEN A.status_rkk = 'Digantikan' THEN 0 ELSE A.upah END as upahkaryawan, 
     A.potongan_telat, 
     A.potongan_istirahat, 
     A.potongan_lainnya,
+    -- Subquery untuk pengganti tetap menggunakan logika ID (asumsi pengganti harus dari database)
     (SELECT K3.nama_karyawan 
      FROM tb_rkk_update U1 
      JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
@@ -77,6 +80,156 @@ if ($datastatusrkk == 3) {
 }
 
 ?>
+
+<div class="container-fluid px-3 mt-4 mb-4">
+  <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
+    <div class="border-b border-gray-200 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
+
+      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <a href="?page=rkk" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+          <i class="fas fa-arrow-left mr-1.5"></i> Kembali
+        </a>
+        <?php if ($_SESSION['role'] == "owner") : ?>
+          <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
+            <button type="button"
+              class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
+              data-id="<?= $idrkk; ?>"
+              data-action="app"
+              data-text="Approve Rencana Kerja ini?">
+              <i class="fas fa-check-circle mr-1.5"></i> Approve
+            </button>
+          <?php elseif ($datastatusrkk == 2 || $datastatusrkk == 3) : ?>
+            <button type="button"
+              class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
+              data-id="<?= $idrkk; ?>"
+              data-action="unapp"
+              data-text="Batalkan Approve Rencana Kerja ini?">
+              <i class="fas fa-times-circle mr-1.5"></i> Un-Approve
+            </button>
+          <?php endif; ?>
+        <?php endif; ?>
+
+        <?php if ($datastatusrkk < 2) : ?>
+          <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
+            <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
+          </a>
+        <?php endif; ?>
+      </div>
+    </div>
+
+    <div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
+      <div class="row">
+        <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
+          <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
+          <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
+        </div>
+        <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
+          <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
+          <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
+        </div>
+        <div class="col-md-4 col-sm-12">
+          <label class="font-bold text-gray-700 text-sm">Jam Kerja:</label>
+          <input type="text" value="<?= $datajamkerja; ?> Jam" readonly class="form-control text-base py-2" />
+        </div>
+      </div>
+    </div>
+
+    <div class="p-0">
+      <div class="table-responsive px-3 md:px-4 py-4">
+        <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
+          <thead class="bg-gray-100 border-b border-gray-300">
+            <tr>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">No</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Karyawan</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Penempatan</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Shift</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Jam</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Upah</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Potongan</th>
+              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $no = 1;
+            while ($data = $tampil->fetch_assoc()) : ?>
+              <tr>
+                <td data-label="No"><?= $no++ ?></td>
+                <td data-label="Karyawan">
+                  <span class="text-base font-bold text-gray-900"><?= $data['nama_tampil'] ?></span><br>
+                  <span class="text-sm text-gray-500"><?= $data['no_absen_tampil'] ?></span>
+
+                  <?php if (!empty($data['menggantikan'])) : ?>
+                    <div class="text-xs text-blue-600 font-bold italic mt-1">
+                      <i class="fas fa-exchange-alt mr-1"></i> Menggantikan <?= $data['menggantikan'] ?>
+                    </div>
+                  <?php endif; ?>
+
+                  <?php if (!empty($data['digantikan_oleh'])) : ?>
+                    <div class="text-xs text-red-600 font-bold italic mt-1">
+                      <i class="fas fa-user-times mr-1"></i> Digantikan oleh <?= $data['digantikan_oleh'] ?>
+                    </div>
+                  <?php endif; ?>
+
+                  <div class="mt-2">
+                    <?php if ($data['status_rkk'] == 'Hadir') : ?>
+                      <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded-full">Hadir</span>
+                    <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
+                      <span class="bg-rose-100 text-rose-800 text-xs font-bold px-2 py-1 rounded-full">Tidak Hadir</span>
+                    <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
+                      <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full">Digantikan</span>
+                    <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
+                      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">Pengganti</span>
+                    <?php endif; ?>
+                  </div>
+                </td>
+                <td data-label="Penempatan">
+                  <span class="text-base font-medium"><?= $data['nama_departmen'] ?></span><br>
+                  <span class="text-sm text-gray-600"><?= $data['nama_sub_department'] ?></span>
+                </td>
+                <td data-label="Shift"><span class="badge bg-gray-200 text-gray-800 px-2 py-1 text-sm rounded"><?= $data['nama_shift'] ?></span></td>
+                <td data-label="Jam"><span class="text-sm font-medium"><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></span></td>
+                <td data-label="Upah"><span class="text-base font-semibold text-emerald-600">Rp <?= number_format($data['upahkaryawan'], 0, ',', '.') ?></span></td>
+                <td data-label="Potongan" class="text-sm leading-relaxed text-amber-700">
+                  <div>Telat: Rp <?= number_format($data['potongan_telat'], 0, ',', '.') ?></div>
+                  <div>Istirahat: Rp <?= number_format($data['potongan_istirahat'], 0, ',', '.') ?></div>
+                  <div>Lain: Rp <?= number_format($data['potongan_lainnya'], 0, ',', '.') ?></div>
+                </td>
+                <td data-label="Aksi">
+                  <div class="aksi-buttons md:flex md:flex-col justify-center items-center">
+                    <?php if ($data['status_rkk'] != 'Digantikan' && $datastatusrkk < 2) : ?>
+                      <a href="?page=rkk&aksi=karyawanupdate&id=<?= $data['id_rkk_detail']; ?>"
+                        class="px-3 py-2 text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors text-center w-full md:w-auto mb-1">
+                        <i class="fas fa-sync-alt mr-1"></i> Ganti
+                      </a>
+                    <?php endif; ?>
+                    <?php if (strtolower($_SESSION['role']) != 'admin hr') : ?>
+                      <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
+                        class="px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors text-center w-full md:w-auto mb-1">
+                        <i class="fas fa-eye mr-1"></i> Detail
+                      </a>
+                    <?php endif; ?>
+                    <?php if ($datastatusrkk < 2) : ?>
+                      <button type="button"
+                        class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto mb-1 btn-delete-detail"
+                        data-id="<?= $idrkk; ?>"
+                        data-detail-id="<?= $data['id_rkk_detail']; ?>"
+                        data-name="<?= $data['nama_tampil']; ?>">
+                        <i class="fas fa-trash-alt mr-1"></i> Hapus
+                      </button>
+                    <?php endif; ?>
+                  </div>
+                </td>
+              </tr>
+            <?php endwhile; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <style>
   /* Card Styling */
   .panel-primary {
@@ -276,155 +429,6 @@ if ($datastatusrkk == 3) {
   }
 </style>
 
-<div class="container-fluid px-3 mt-4 mb-4">
-  <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
-    <div class="border-b border-gray-200 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-      <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-info-circle mr-2"></i> Daftar Rencana Kerja</h3>
-
-      <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-        <a href="?page=rkk" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
-          <i class="fas fa-arrow-left mr-1.5"></i> Kembali
-        </a>
-        <?php if ($_SESSION['role'] == "owner") : ?>
-          <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
-            <button type="button" 
-              class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
-              data-id="<?= $idrkk; ?>"
-              data-action="app"
-              data-text="Approve Rencana Kerja ini?">
-              <i class="fas fa-check-circle mr-1.5"></i> Approve
-            </button>
-          <?php elseif ($datastatusrkk == 2 || $datastatusrkk == 3) : ?>
-            <button type="button" 
-              class="inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
-              data-id="<?= $idrkk; ?>"
-              data-action="unapp"
-              data-text="Batalkan Approve Rencana Kerja ini?">
-              <i class="fas fa-times-circle mr-1.5"></i> Un-Approve
-            </button>
-          <?php endif; ?>
-        <?php endif; ?>
-
-        <?php if ($datastatusrkk < 2) : ?>
-          <a href="?page=rkk&aksi=karyawan&id=<?= $idrkk; ?>" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
-            <i class="fas fa-user-plus mr-1.5"></i> Tetapkan Karyawan
-          </a>
-        <?php endif; ?>
-      </div>
-    </div>
-
-    <div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
-      <div class="row">
-        <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-          <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
-          <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
-        </div>
-        <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-          <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
-          <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
-        </div>
-        <div class="col-md-4 col-sm-12">
-          <label class="font-bold text-gray-700 text-sm">Jam Kerja:</label>
-          <input type="text" value="<?= $datajamkerja; ?> Jam" readonly class="form-control text-base py-2" />
-        </div>
-      </div>
-    </div>
-
-    <div class="p-0">
-      <div class="table-responsive px-3 md:px-4 py-4">
-        <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
-          <thead class="bg-gray-100 border-b border-gray-300">
-            <tr>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">No</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Karyawan</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Penempatan</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Shift</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Jam</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Upah</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Potongan</th>
-              <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php
-            $no = 1;
-            while ($data = $tampil->fetch_assoc()) : ?>
-              <tr>
-                <td data-label="No"><?= $no++ ?></td>
-                <td data-label="Karyawan">
-                  <span class="text-base font-bold text-gray-900"><?= $data['nama_karyawan'] ?></span><br>
-                  <span class="text-sm text-gray-500"><?= $data['no_absen'] ?></span>
-
-                  <?php if (!empty($data['menggantikan'])) : ?>
-                    <div class="text-xs text-blue-600 font-bold italic mt-1">
-                      <i class="fas fa-exchange-alt mr-1"></i> Menggantikan <?= $data['menggantikan'] ?>
-                    </div>
-                  <?php endif; ?>
-
-                  <?php if (!empty($data['digantikan_oleh'])) : ?>
-                    <div class="text-xs text-red-600 font-bold italic mt-1">
-                      <i class="fas fa-user-times mr-1"></i> Digantikan oleh <?= $data['digantikan_oleh'] ?>
-                    </div>
-                  <?php endif; ?>
-
-                  <div class="mt-2">
-                    <?php if ($data['status_rkk'] == 'Hadir') : ?>
-                      <span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-1 rounded-full">Hadir</span>
-                    <?php elseif ($data['status_rkk'] == 'Tidak Hadir') : ?>
-                      <span class="bg-rose-100 text-rose-800 text-xs font-bold px-2 py-1 rounded-full">Tidak Hadir</span>
-                    <?php elseif ($data['status_rkk'] == 'Digantikan') : ?>
-                      <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full">Digantikan</span>
-                    <?php elseif ($data['status_rkk'] == 'Pengganti') : ?>
-                      <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded-full">Pengganti</span>
-                    <?php endif; ?>
-                  </div>
-                </td>
-                <td data-label="Penempatan">
-                  <span class="text-base font-medium"><?= $data['nama_departmen'] ?></span><br>
-                  <span class="text-sm text-gray-600"><?= $data['nama_sub_department'] ?></span>
-                </td>
-                <td data-label="Shift"><span class="badge bg-gray-200 text-gray-800 px-2 py-1 text-sm rounded"><?= $data['nama_shift'] ?></span></td>
-                <td data-label="Jam"><span class="text-sm font-medium"><?= $data['jam_masuk'] ?> - <?= $data['jam_keluar'] ?></span></td>
-                <td data-label="Upah"><span class="text-base font-semibold text-emerald-600">Rp <?= number_format($data['upahkaryawan'], 0, ',', '.') ?></span></td>
-                <td data-label="Potongan" class="text-sm leading-relaxed text-amber-700">
-                  <div>Telat: Rp <?= number_format($data['potongan_telat'], 0, ',', '.') ?></div>
-                  <div>Istirahat: Rp <?= number_format($data['potongan_istirahat'], 0, ',', '.') ?></div>
-                  <div>Lain: Rp <?= number_format($data['potongan_lainnya'], 0, ',', '.') ?></div>
-                </td>
-                <td data-label="Aksi">
-                  <div class="aksi-buttons md:flex md:flex-col justify-center items-center">
-                    <?php if ($data['status_rkk'] != 'Digantikan' && $datastatusrkk < 2) : ?>
-                      <a href="?page=rkk&aksi=karyawanupdate&id=<?= $data['id_rkk_detail']; ?>"
-                        class="px-3 py-2 text-sm font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors text-center w-full md:w-auto mb-1">
-                        <i class="fas fa-sync-alt mr-1"></i> Ganti
-                      </a>
-                    <?php endif; ?>
-                    <?php if (strtolower($_SESSION['role']) != 'admin hr') : ?>
-                      <a href="?page=rkk&aksi=detail&id=<?= $data['id_rkk_detail']; ?>"
-                        class="px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors text-center w-full md:w-auto mb-1">
-                        <i class="fas fa-eye mr-1"></i> Detail
-                      </a>
-                    <?php endif; ?>
-                    <?php if ($datastatusrkk < 2) : ?>
-                      <button type="button" 
-                        class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto mb-1 btn-delete-detail"
-                        data-id="<?= $idrkk; ?>"
-                        data-detail-id="<?= $data['id_rkk_detail']; ?>"
-                        data-name="<?= $data['nama_karyawan']; ?>">
-                        <i class="fas fa-trash-alt mr-1"></i> Hapus
-                      </button>
-                    <?php endif; ?>
-                  </div>
-                </td>
-              </tr>
-            <?php endwhile; ?>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
   $(document).ready(function() {
@@ -455,7 +459,7 @@ if ($datastatusrkk == 3) {
       const id = $(this).data('id');
       const action = $(this).data('action');
       const text = $(this).data('text');
-      
+
       Swal.fire({
         title: 'Konfirmasi',
         text: text,
@@ -478,7 +482,7 @@ if ($datastatusrkk == 3) {
       const id = $(this).data('id');
       const detailId = $(this).data('detail-id');
       const name = $(this).data('name');
-      
+
       Swal.fire({
         title: 'Apakah anda yakin?',
         text: "Data rencana kerja untuk " + name + " akan dihapus!",
