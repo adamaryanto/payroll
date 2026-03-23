@@ -1,11 +1,6 @@
 <?php
 $role_user = strtolower($_SESSION['role'] ?? '');
-<<<<<<< HEAD
 $is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik" || $role_user == "owner");
-=======
-
-$is_authorized_delete = ($role_user == "admin master" || $role_user == "kepala pabrik");
->>>>>>> 43a4431db6a129d7341a2315221a22cb73c18a09
 
 if (!$is_authorized_delete) {
     echo "<!DOCTYPE html><html><head>
