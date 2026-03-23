@@ -151,10 +151,9 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <li class="nav-item"><a href="?page=upah" class="nav-link"><i class="fas fa-money-bill-wave nav-icon"></i><p>Master Upah</p></a></li>
                   <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="far fa-clock nav-icon"></i><p>Jadwal</p></a></li>
                   <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><p>Denda</p></a></li>
-                  <li class="nav-header" style="background-color: transparent !important; padding: 5px 15px !important; color: #rose-500 !important; font-size: 10px !important;">ACTION</li>
-                  <li class="nav-item"><a href="?page=rkk&aksi=hapus_massal" class="nav-link text-rose-600 font-semibold"><i class="fas fa-trash-alt nav-icon text-rose-500"></i><p>Hapus Rencana</p></a></li>
-                  <li class="nav-item"><a href="?page=realisasi&aksi=hapus_massal" class="nav-link text-rose-600 font-semibold"><i class="fas fa-trash-alt nav-icon text-rose-500"></i><p>Hapus Realisasi</p></a></li>
                 </ul>
+              </li>
+              <?php } ?>
               </li>
               <?php } ?>
 
