@@ -22,6 +22,7 @@ if (!$is_authorized_delete) {
     exit;
 }
 
+
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
     if (!empty($_POST['id_realisasi_pilih'])) {
