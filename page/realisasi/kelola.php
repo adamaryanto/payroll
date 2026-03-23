@@ -430,17 +430,13 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                         <div class="mb-6">
                             <div class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-3 border-l-4 border-blue-600 pl-2">Rencana Upah</div>
                             <div class="row">
-                                <div class="col-md-3 mb-3 md:mb-0">
+                                <div class="col-md-4 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Tanggal</label>
                                     <input readonly type="text" value="<?php echo date('d/m/Y', strtotime($datatglrkk)); ?>" class="form-control text-base py-2" />
                                 </div>
-                                <div class="col-md-6 mb-3 md:mb-0">
+                                <div class="col-md-8 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Keterangan</label>
                                     <input readonly type="text" value="<?php echo $dataketeranganrkk; ?>" class="form-control text-base py-2" />
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="font-bold text-gray-700 text-sm">Jam Kerja</label>
-                                    <input readonly type="text" value="<?php echo $datajamkerjarkk; ?> Jam" class="form-control text-base py-2" />
                                 </div>
                             </div>
                         </div>
@@ -448,17 +444,13 @@ function bulkSavePenalties($koneksi, $id_realisasi) {
                         <div>
                             <div class="text-sm font-bold text-emerald-600 uppercase tracking-wider mb-3 border-l-4 border-emerald-600 pl-2">Realisasi Upah</div>
                             <div class="row">
-                                <div class="col-md-3 mb-3 md:mb-0">
+                                <div class="col-md-4 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Tanggal</label>
                                     <input readonly type="text" name="ttgl1" value="<?php echo date('d/m/Y', strtotime($datatglrealisasi)); ?>" class="form-control text-base py-2" />
                                 </div>
-                                <div class="col-md-6 mb-3 md:mb-0">
+                                <div class="col-md-8 mb-3 md:mb-0">
                                     <label class="font-bold text-gray-700 text-sm">Keterangan</label>
                                     <input type="text" name="tketerangan" value="<?php echo $dataketerangan; ?>" placeholder="Masukkan keterangan..." class="form-control text-base py-2" autocomplete="off" />
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="font-bold text-gray-700 text-sm">Jam Kerja</label>
-                                    <input readonly type="number" name="tjamkerja" value="<?php echo $datajamkerja; ?>" class="form-control text-base py-2" />
                                 </div>
                             </div>
                         </div>
