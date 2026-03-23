@@ -10,7 +10,7 @@ if (!$is_authorized_delete) {
             icon: 'error',
             confirmButtonColor: '#3b82f6'
         }).then(() => {
-            window.location.href='?page=realisasi';
+            window.location.href='?page=rkk';
         });
     </script>";
     exit;
