@@ -4,15 +4,41 @@ include "koneksi.php";
 $id = isset($_GET['id']) ? $_GET['id'] : '';
 
 // 1. Ambil data tanggal berdasarkan ID
-$queryInfo = $koneksi->query("SELECT tgl_realisasi FROM tb_realisasi WHERE id_realisasi = '$id'");
+$queryInfo = $koneksi->query("SELECT tgl_realisasi, status_realisasi FROM tb_realisasi WHERE id_realisasi = '$id'");
 $info = $queryInfo->fetch_assoc();
 $tanggal_raw = $info ? $info['tgl_realisasi'] : '';
+$status_realisasi = $info['status_realisasi'] ?? 0;
 $tanggal = $tanggal_raw ? date('d-m-Y', strtotime($tanggal_raw)) : 'TanpaTanggal';
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Laporan_Realisasi_Upah_$tanggal.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
+?>
+<style>
+    .stamp {
+        display: inline-block;
+        padding: 5px 15px;
+        border: 4px solid;
+        border-radius: 10px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 16px;
+        color: #dc2626;
+        border-color: #dc2626;
+        margin: 10px;
+    }
+    .stamp-approved {
+        color: #059669;
+        border-color: #059669;
+    }
+    .stamp-unapproved {
+        color: #dc2626;
+        border-color: #dc2626;
+    }
+</style>
+<?php
 
 // Subqueries for replacement info
 $subquery_menggantikan = "(SELECT K3.nama_karyawan 
@@ -94,7 +120,12 @@ $globalDendaIstirahat = $dataDenda['denda_istirahat'] ?? 0;
 echo "
 <table border='1'>
     <tr>
-        <th colspan='21' style='text-align:center; background-color:#f8f9fa; font-size:16px;'>LAPORAN REALISASI ABSENSI & UPAH TANGGAL: $tglRealisasi</th>
+        <th colspan='21' style='text-align:center; background-color:#f8f9fa; font-size:16px; height:60px; vertical-align:middle;'>
+            LAPORAN REALISASI ABSENSI & UPAH TANGGAL: $tglRealisasi
+            " . ($status_realisasi >= 2 ? 
+                "<span class='stamp stamp-approved' style='margin-left:20px; border:4px solid #059669; color:#059669; padding:5px 15px; border-radius:10px;'>APPROVED</span>" : 
+                "<span class='stamp stamp-unapproved' style='margin-left:20px; border:4px solid #dc2626; color:#dc2626; padding:5px 15px; border-radius:10px;'>UNAPPROVED</span>") . "
+        </th>
     </tr>
     <tr style='background-color:#5F9EA0; color:white;'>
         <th>No.</th>

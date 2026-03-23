@@ -9,7 +9,8 @@ SELECT
 R.tgl_realisasi,
 R.jam_kerja,
 J.jam_masuk,
-J.jam_keluar
+J.jam_keluar,
+R.status_realisasi
 FROM tb_realisasi R
 LEFT JOIN tb_realisasi_detail RD ON R.id_realisasi = RD.id_realisasi
 LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
@@ -18,6 +19,7 @@ LIMIT 1
 ");
 $info = $queryInfo->fetch_assoc();
 $tanggal_raw = $info ? $info['tgl_realisasi'] : '';
+$status_realisasi = $info['status_realisasi'] ?? 0;
 $tanggal = $tanggal_raw ? date('d-m-Y', strtotime($tanggal_raw)) : 'TanpaTanggal';
 $tanggal_sql = $tanggal_raw ? date('Y-m-d', strtotime($tanggal_raw)) : '';
 
@@ -47,11 +49,43 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
          AND U4.status = 'Pengganti' 
          LIMIT 1)";
 ?>
+<style>
+    .stamp {
+        display: inline-block;
+        padding: 5px 15px;
+        border: 4px solid;
+        border-radius: 10px;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 16px;
+        /* Note: Rotate might not work in some Excel versions when importing HTML, 
+           but color and border usually do. */
+        color: #dc2626;
+        border-color: #dc2626;
+        margin: 10px;
+    }
+    .stamp-approved {
+        color: #059669;
+        border-color: #059669;
+    }
+    .stamp-unapproved {
+        color: #dc2626;
+        border-color: #dc2626;
+    }
+</style>
 
 <table border="1" style="border-collapse:collapse;">
     <thead>
         <tr>
-            <th colspan="14" style="text-align:center; font-size:20px; font-weight:bold;">LAPORAN RENCANA UPAH</th>
+            <th colspan="14" style="text-align:center; font-size:20px; font-weight:bold; height:60px; vertical-align:middle;">
+                LAPORAN REALISASI UPAH
+                <?php if ($status_realisasi >= 2): ?>
+                    <span class="stamp stamp-approved" style="margin-left:20px; border:4px solid #059669; color:#059669; padding:5px 15px; border-radius:10px;">APPROVED</span>
+                <?php else: ?>
+                    <span class="stamp stamp-unapproved" style="margin-left:20px; border:4px solid #dc2626; color:#dc2626; padding:5px 15px; border-radius:10px;">UNAPPROVED</span>
+                <?php endif; ?>
+            </th>
         </tr>
         <tr>
             <th colspan="14" style="text-align:center; font-size:16px;">
@@ -112,8 +146,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             // 4. Ambil data karyawan di departemen ini saja
             $tampil = $koneksi->query("SELECT 
             A.*, 
-            B.no_absen, 
-            B.nama_karyawan, 
+            IF(A.id_karyawan = 0, '-', B.no_absen) as no_absen,
+            IF(A.id_karyawan = 0, A.nama_karyawan_manual, B.nama_karyawan) as nama_karyawan, 
             O.OS_DHK as label_os,
             G.golongan as label_gol,
             D.nama_departmen, 
@@ -124,9 +158,9 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $subquery_menggantikan as menggantikan,
             $subquery_digantikan_oleh as digantikan_oleh
             FROM tb_realisasi_detail A 
-            JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
+            LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
             LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
-            JOIN ms_departmen D ON RD.id_departmen = D.id_departmen
+            LEFT JOIN ms_departmen D ON RD.id_departmen = D.id_departmen
             LEFT JOIN ms_sub_department S ON RD.id_sub_department = S.id_sub_department
             LEFT JOIN ms_os_dhk O ON B.id_os_dhk = O.id_os_dhk
             LEFT JOIN ms_golongan G ON B.id_golongan = G.id_golongan
