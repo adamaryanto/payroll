@@ -258,6 +258,7 @@ $port = $data['port'];
 							</thead>
 							<tbody class="divide-y divide-gray-100">
 								<?php
+								$buffer = "";
 								$Connect = fsockopen($IP, $port, $errno, $errstr, 1);
 
 								if ($Connect) {
@@ -275,7 +276,8 @@ $port = $data['port'];
 									echo "<p class='text-center py-4 text-red-500 font-bold'>Koneksi Gagal ke Mesin!</p>";
 								}
 
-								include("parse.php");
+								// Gunakan __DIR__ agar include selalu benar kemanapun file ini dipanggil
+								include(__DIR__ . "/parse.php");
 								$buffer = Parse_Data($buffer, "<GetAttLogResponse>", "</GetAttLogResponse>");
 								$buffer = explode("\r\n", $buffer);
 
