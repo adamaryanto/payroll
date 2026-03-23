@@ -75,6 +75,9 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                 <a href="?page=realisasi&aksi=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors">
                     <i class="fas fa-plus mr-1.5"></i> Tambah Data
                 </a>
+                <a href="?page=realisasi&aksi=hapus_massal" class="flex-1 md:flex-none justify-center inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
+                    <i class="fas fa-trash mr-1.5"></i> Hapus Masal
+                </a>
             </div>
         </div>
 
@@ -83,18 +86,18 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                 <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-8">No</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Telat</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Istirahat</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Denda Pulang Awal">Denda Pulang</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Denda Absensi Tidak Lengkap">Denda Tidak Absen</th>
-                               <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Lainnya</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
-                             <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-8">No</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Tanggal</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle">Keterangan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Jumlah Karyawan</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right">Total Upah</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Telat">Telat</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Istirahat">Istirahat</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Denda Pulang Awal">Denda Pulang</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Denda Absensi Tidak Lengkap">Denda Tidak Absen</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-right" title="Potongan Lainnya">Lainnya</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center w-32">Aksi</th>
+                            <th class="py-2 px-2 text-[13px] font-bold text-gray-700 uppercase align-middle text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -121,7 +124,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                     <span class="md:hidden font-bold">Total: </span><?= $data['jml'] ?> <span class="md:hidden">Orang</span>
                                 </td>
 
-                                 <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
+                                <td data-label="Total Upah" class="py-2 md:py-2.5 px-2 md:text-right text-[15px] font-bold text-gray-900 align-middle whitespace-nowrap">
                                     Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?>
                                 </td>
                                 <td data-label="Telat" class="py-2 md:py-2.5 px-2 md:text-right text-[14px] md:text-[15px] font-medium text-rose-600 align-middle whitespace-nowrap">
@@ -141,35 +144,35 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                 </td>
 
                                 <td data-label="Aksi" class="py-2 md:py-2.5 px-2 align-middle md:text-center mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
-                                    <div class="action-btn-group md:justify-center">
+                                    <div class="action-btn-group flex flex-wrap gap-2 md:justify-center lg:justify-center">
                                         <!-- Detail: Always visible -->
                                         <a href="?page=realisasi&aksi=kelola&id=<?= $data['id_realisasi']; ?>"
                                             class="px-2 py-1 text-[13px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-200 transition-colors flex justify-center items-center" title="Detail">
                                             <i class="fas fa-eye md:mr-1"></i> <span class="ml-1 md:inline">Detail</span>
                                         </a>
 
-                                         <!-- Approve/Unapprove: Only for Owner -->
-                                         <?php if ($is_authorized) : ?>
-                                             <?php if ($data['status_realisasi'] < 2) : ?>
-                                                 <button type="button" 
-                                                     class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
-                                                     data-id="<?= $data['id_realisasi']; ?>"
-                                                     data-action="accept"
-                                                     data-text="Apakah Anda yakin ingin Approve data ini?"
-                                                     title="Approve">
-                                                     <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
-                                                 </button>
-                                             <?php else : ?>
-                                                 <button type="button" 
-                                                     class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
-                                                     data-id="<?= $data['id_realisasi']; ?>"
-                                                     data-action="unapprove"
-                                                     data-text="Apakah Anda yakin ingin Unapprove data ini?"
-                                                     title="Unapprove">
-                                                     <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Un-Approve</span>
-                                                 </button>
-                                             <?php endif; ?>
-                                         <?php endif; ?>
+                                        <!-- Approve/Unapprove: Only for Owner -->
+                                        <?php if ($is_authorized) : ?>
+                                            <?php if ($data['status_realisasi'] < 2) : ?>
+                                                <button type="button"
+                                                    class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-emerald-600 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-200 transition-colors flex justify-center items-center"
+                                                    data-id="<?= $data['id_realisasi']; ?>"
+                                                    data-action="accept"
+                                                    data-text="Apakah Anda yakin ingin Approve data ini?"
+                                                    title="Approve">
+                                                    <i class="fas fa-check md:mr-1"></i> <span class="ml-1 md:inline">Approve</span>
+                                                </button>
+                                            <?php else : ?>
+                                                <button type="button"
+                                                    class="btn-action-realisasi px-2 py-1 text-[13px] font-bold text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-200 transition-colors flex justify-center items-center"
+                                                    data-id="<?= $data['id_realisasi']; ?>"
+                                                    data-action="unapprove"
+                                                    data-text="Apakah Anda yakin ingin Unapprove data ini?"
+                                                    title="Unapprove">
+                                                    <i class="fas fa-undo md:mr-1"></i> <span class="ml-1 md:inline">Un-Approve</span>
+                                                </button>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
 
                                         <!-- Excel: Owner/Admin Master always, Others only if approved -->
                                         <?php if (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin master" || $data['status_realisasi'] >= 2) : ?>
@@ -181,13 +184,13 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                                     </div>
                                 </td>
 
-                                 <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
-                                     <?php if ($data['status_realisasi'] >= 2) : ?>
-                                         <div class="stamp stamp-approved">Approved</div>
-                                     <?php else : ?>
-                                         <div class="stamp stamp-unapproved">Unapproved</div>
-                                     <?php endif; ?>
-                                 </td>
+                                <td data-label="Status" class="py-2 md:py-2.5 px-2 align-middle md:text-center">
+                                    <?php if ($data['status_realisasi'] >= 2) : ?>
+                                        <div class="stamp stamp-approved">Approved</div>
+                                    <?php else : ?>
+                                        <div class="stamp stamp-unapproved">Unapproved</div>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php $no++;
                         endwhile; ?>
@@ -199,7 +202,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
 </div>
 
 <style>
-     /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
         display: block !important;
     }
@@ -311,20 +314,24 @@ $level_status = (!$is_authorized) ? "hidden" : "";
         .table-responsive {
             padding: 12px !important;
         }
-        
+
         #dataTables-example_wrapper .row:first-child {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 15px;
         }
-        .dataTables_filter, .dataTables_length {
+
+        .dataTables_filter,
+        .dataTables_length {
             width: 100% !important;
             justify-content: flex-start !important;
         }
+
         .dataTables_filter input {
             width: 100% !important;
             max-width: 100% !important;
         }
+
         .dataTables_paginate {
             justify-content: center !important;
             flex-wrap: wrap;
@@ -336,25 +343,31 @@ $level_status = (!$is_authorized) ? "hidden" : "";
 
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
+            margin-bottom: 1.5rem;
+            /* Jarak antar kotak dilebarkan */
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            padding: 16px;
+            /* Jarak padding ke dalam kotak dilebarkan */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             background-color: #fff;
         }
 
         .table-modern tbody td {
             display: flex;
-            flex-direction: column; /* Label di atas, data di bawah (stacking) */
+            flex-direction: column;
+            /* Label di atas, data di bawah (stacking) */
             align-items: flex-start;
-            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
+            padding: 10px 0 !important;
+            /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
             border-bottom: 1px dashed #e2e8f0 !important;
         }
+
         .table-modern tbody td:first-child {
             padding-top: 0 !important;
         }
+
         .table-modern tbody td:last-child {
             border-bottom: none !important;
             padding-bottom: 0 !important;
@@ -367,7 +380,8 @@ $level_status = (!$is_authorized) ? "hidden" : "";
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
-            margin-bottom: 6px; /* Memberi jarak ke datanya */
+            margin-bottom: 6px;
+            /* Memberi jarak ke datanya */
             display: block;
             width: 100%;
         }
@@ -382,15 +396,19 @@ $level_status = (!$is_authorized) ? "hidden" : "";
             padding-top: 5px;
             justify-content: flex-start;
         }
-        .action-btn-group > a, .action-btn-group > div {
+
+        .action-btn-group>a,
+        .action-btn-group>div {
             flex: 0 0 auto;
         }
+
         .action-btn-group a {
             padding: 8px 12px !important;
             width: auto;
         }
 
     }
+
     /* --- STYLING STEMPEL (STAMP) --- */
     .stamp {
         display: inline-block;
@@ -407,19 +425,23 @@ $level_status = (!$is_authorized) ? "hidden" : "";
         user-select: none;
         margin: 10px;
     }
+
     .stamp-approved {
         color: #059669;
         border-color: #059669;
         box-shadow: 0 0 0 2px #059669;
     }
+
     .stamp-unapproved {
         color: #dc2626;
         border-color: #dc2626;
         box-shadow: 0 0 0 2px #dc2626;
     }
+
     @media screen and (max-width: 768px) {
         .stamp {
-            transform: rotate(-12deg); /* Tetap miring sedikit di mobile */
+            transform: rotate(-12deg);
+            /* Tetap miring sedikit di mobile */
             margin: 15px 0;
             font-size: 14px;
             padding: 4px 12px;
@@ -457,7 +479,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
             const id = $(this).data('id');
             const action = $(this).data('action');
             const text = $(this).data('text');
-            
+
             let confirmButtonColor = '#059669'; // Emerald for accept
             if (action === 'unapprove') confirmButtonColor = '#e11d48'; // Rose for unapprove
 
@@ -481,7 +503,7 @@ $level_status = (!$is_authorized) ? "hidden" : "";
                 }
             });
         });
-        
+
         // Dihapus style .css('float') bawaan agar tidak bentrok dengan flexbox pada mobile
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');
