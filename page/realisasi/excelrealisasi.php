@@ -239,13 +239,13 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $no++;
             }
             echo "<tr>
-            <td colspan='14' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
+            <td colspan='20' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
             TOTAL UPAH ($jml_karyawan Karyawan) | Rp " . number_format($total, 0, ",", ".") . "
             </td>
             </tr>";
 
             // pemisah antar departemen
-            echo "<tr><td colspan='14' style='height:20px;'></td></tr>";
+            echo "<tr><td colspan='20' style='height:20px;'></td></tr>";
         }
         echo "<tr>
         <td colspan='20' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
