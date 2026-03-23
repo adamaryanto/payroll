@@ -178,7 +178,6 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 </div>
 
                 <div class="border-t border-dashed border-gray-200 my-8"></div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
                     <div>
                         <label class="block text-sm font-bold text-gray-700 mb-2">Shift Kerja <span class="text-rose-500">*</span></label>
