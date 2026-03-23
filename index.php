@@ -316,6 +316,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "payrollrkk") { include "page/rkk/payrollrkk.php"; } 
                     elseif ($aksi == "kelola") { include "page/rkk/kelola.php"; } 
                     elseif ($aksi == "hapusdetail") { include "page/rkk/hapus.php"; } 
+                    elseif ($aksi == "hapus_massal") { include "page/rkk/hapus_massal.php"; } 
                     elseif ($aksi == "detail") { include "page/rkk/detail.php"; } 
                     elseif ($aksi == "accept") { include "page/rkk/app.php"; }
                   } else if ($page == 'siac') {

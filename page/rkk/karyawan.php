@@ -42,7 +42,7 @@ if (isset($_POST['simpan_karyawan'])) {
     $nama_manual = !empty($_POST['nama_karyawan_manual']) ? $koneksi->real_escape_string($_POST['nama_karyawan_manual']) : NULL;
     $idkaryawan  = !empty($_POST['id_karyawan']) ? $_POST['id_karyawan'] : 0;
 
-    // 2. Handle Tags untuk Dept & Sub (Sesuai kode Anda)
+    // 2. Handle Tags untuk Dept & Sub
     if (!empty($id_dept) && !is_numeric($id_dept)) {
         $name_dept = $koneksi->real_escape_string($id_dept);
         $koneksi->query("INSERT INTO ms_departmen (nama_departmen) VALUES ('$name_dept')");
@@ -70,7 +70,6 @@ if (isset($_POST['simpan_karyawan'])) {
         }
 
         if ($boleh_simpan) {
-            // Gunakan Prepared Statement atau format Query yang benar untuk NULL
             $val_manual = ($nama_manual == NULL) ? "NULL" : "'$nama_manual'";
 
             $query = "INSERT INTO tb_rkk_detail 
@@ -227,57 +226,6 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 </div>
             </div>
         </form>
-
-        <script>
-            document.getElementById('toggle_manual').addEventListener('change', function() {
-                const isManual = this.checked;
-                const containerSelect = document.getElementById('container_select');
-                const containerManual = document.getElementById('container_manual');
-                const selectEl = document.getElementById('search_karyawan');
-                const inputManual = document.getElementById('nama_karyawan_manual');
-
-                // Field pendukung yang biasanya otomatis
-                const autoFields = ['jk', 'tgl_aktif', 'upah_manual'];
-
-                if (isManual) {
-                    containerSelect.classList.add('hidden');
-                    containerManual.classList.remove('hidden');
-
-                    // Atur required
-                    selectEl.removeAttribute('required');
-                    inputManual.setAttribute('required', 'required');
-
-                    // Reset dan aktifkan field yang tadinya readonly agar bisa diisi manual
-                    autoFields.forEach(id => {
-                        const el = document.getElementById(id);
-                        el.value = '';
-                        el.readOnly = false;
-                        el.classList.remove('bg-gray-100', 'cursor-not-allowed');
-                        el.classList.add('bg-white');
-                    });
-
-                    // Reset Select2 value jika ada
-                    if ($(selectEl).data('select2')) {
-                        $(selectEl).val(null).trigger('change');
-                    }
-                } else {
-                    containerSelect.classList.remove('hidden');
-                    containerManual.classList.add('hidden');
-
-                    // Atur required
-                    selectEl.setAttribute('required', 'required');
-                    inputManual.removeAttribute('required');
-
-                    // Kembalikan field ke mode readonly
-                    autoFields.forEach(id => {
-                        const el = document.getElementById(id);
-                        el.readOnly = true;
-                        el.classList.add('bg-gray-100', 'cursor-not-allowed');
-                        el.classList.remove('bg-white');
-                    });
-                }
-            });
-        </script>
     </div>
 </div>
 
@@ -328,5 +276,54 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 }
             }, 50);
         });
+    });
+</script>
+<script>
+    document.getElementById('toggle_manual').addEventListener('change', function() {
+        const isManual = this.checked;
+        const containerSelect = document.getElementById('container_select');
+        const containerManual = document.getElementById('container_manual');
+        const selectEl = document.getElementById('search_karyawan');
+        const inputManual = document.getElementById('nama_karyawan_manual');
+
+        const autoFields = ['jk', 'tgl_aktif', 'upah_manual'];
+
+        if (isManual) {
+            containerSelect.classList.add('hidden');
+            containerManual.classList.remove('hidden');
+
+            // Atur required
+            selectEl.removeAttribute('required');
+            inputManual.setAttribute('required', 'required');
+
+            // Reset dan aktifkan field yang tadinya readonly agar bisa diisi manual
+            autoFields.forEach(id => {
+                const el = document.getElementById(id);
+                el.value = '';
+                el.readOnly = false;
+                el.classList.remove('bg-gray-100', 'cursor-not-allowed');
+                el.classList.add('bg-white');
+            });
+
+            // Reset Select2 value jika ada
+            if ($(selectEl).data('select2')) {
+                $(selectEl).val(null).trigger('change');
+            }
+        } else {
+            containerSelect.classList.remove('hidden');
+            containerManual.classList.add('hidden');
+
+            // Atur required
+            selectEl.setAttribute('required', 'required');
+            inputManual.removeAttribute('required');
+
+            // Kembalikan field ke mode readonly
+            autoFields.forEach(id => {
+                const el = document.getElementById(id);
+                el.readOnly = true;
+                el.classList.add('bg-gray-100', 'cursor-not-allowed');
+                el.classList.remove('bg-white');
+            });
+        }
     });
 </script>

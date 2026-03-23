@@ -24,6 +24,148 @@ if (strtolower($_SESSION['role']) == "owner") {
 }
 
 ?>
+
+<div class="container-fluid px-3 mt-4 mb-4">
+    <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
+
+        <div class="border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center bg-white gap-4">
+            <div>
+                <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
+            </div>
+            <div class="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
+                <a href="?page=boneless&ref=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
+                    <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
+                </a>
+                <a href="?page=rkk&aksi=tambah" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
+                    <i class="fas fa-plus mr-1.5"></i> Tambah Data
+                </a>
+                <a href="?page=rkk&aksi=hapus_massal" class="flex-1 md:flex-none justify-center inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
+                    <i class="fas fa-trash mr-1.5"></i> Hapus Masal
+                </a>
+            </div>
+        </div>
+
+        <div class="p-0">
+            <div class="table-responsive px-3 md:px-4 py-4">
+                <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
+                    <thead class="bg-gray-100 border-b border-gray-300">
+                        <tr>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">No</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Tanggal</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Keterangan</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Jumlah Karyawan</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Aksi Data</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Otorisasi</th>
+                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php
+                        $no = 1;
+                        while ($data = $tampil->fetch_assoc()) :
+                            $status_color = ($data['status_rkk'] == "3") ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800";
+                        ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td data-label="No" class="py-3 px-2 text-center text-base md:text-[15px] font-bold md:font-normal"><?= $no++ ?></td>
+                                <td data-label="Tanggal" class="py-3 px-2 text-base md:text-[15px] font-bold text-gray-900"><?= date('d/m/Y', strtotime($data['tgl_rkk'])) ?></td>
+                                <td data-label="Keterangan" class="py-3 px-2 text-base md:text-[14px] text-gray-700"><?= $data['keterangan'] ?></td>
+                                <td data-label="Jumlah Karyawan" class="py-3 px-2 md:text-center text-base md:text-[15px]">
+                                    <span class="font-bold text-blue-700"><?= $data['jml'] ?> Orang</span><br>
+                                    <span class="text-emerald-600 font-semibold text-sm">Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></span>
+                                </td>
+
+                                <td data-label="Aksi Data" class="py-3 px-2 align-middle">
+                                    <div class="action-btn-group md:justify-center">
+                                        <a href="?page=rkk&aksi=kelola&id=<?= $data['id_rkk']; ?>"
+                                            class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
+                                            <i class="fas fa-eye mr-1"></i> Detail
+                                        </a>
+                                        <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>"
+                                            class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors">
+                                            <i class="fa fa-print mr-1"></i> Cetak
+                                        </a>
+                                        <?php if (strtolower($_SESSION['role']) == "owner" && $data['status_rkk'] < 2) : ?>
+                                            <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
+                                                <i class="fas fa-user-plus mr-1.5"></i> Tetapkan
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if ($data['status_rkk'] == '2') : ?>
+                                            <button type="button"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded border border-indigo-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="realisasi"
+                                                data-text="Buat Realisasi untuk data ini?">
+                                                <i class="fas fa-check-circle mr-1"></i> Realisasi
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+
+                                <td data-label="Otorisasi" class="py-3 px-2 align-middle">
+                                    <div class="action-btn-group md:justify-center">
+                                        <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
+                                            <button type="button"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="pro"
+                                                data-jml="<?= $data['jml']; ?>"
+                                                data-boneless="<?= $data['jml_boneless']; ?>"
+                                                data-text="Propose data ini?">
+                                                <i class="fas fa-paper-plane mr-1"></i> Propose
+                                            </button>
+                                        <?php endif; ?>
+
+                                        <?php if ($data['status_rkk'] == '1' && $can_propose) : ?>
+                                            <button type="button"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-gray-700 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="unpro"
+                                                data-text="Tarik kembali data (Un-propose)?">
+                                                <i class="fas fa-undo mr-1"></i> Un-Propose
+                                            </button>
+                                        <?php endif; ?>
+
+                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && $is_authorized)) : ?>
+                                            <button type="button"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="app"
+                                                data-jml="<?= $data['jml']; ?>"
+                                                data-boneless="<?= $data['jml_boneless']; ?>"
+                                                data-text="Approve data ini?">
+                                                <i class="fas fa-check mr-1"></i> Approve
+                                            </button>
+                                        <?php endif; ?>
+
+                                        <?php if (($data['status_rkk'] == '2' || $data['status_rkk'] == '3') && $is_authorized) : ?>
+                                            <button type="button"
+                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors btn-action-rkk"
+                                                data-id="<?= $data['id_rkk']; ?>"
+                                                data-action="unapp"
+                                                data-text="Batalkan Approve data ini?">
+                                                <i class="fas fa-times mr-1"></i> Un-Approve
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+
+                                <td data-label="Status" class="py-3 px-2 text-center align-middle">
+                                    <?php if ($data['status_rkk'] >= 2) : ?>
+                                        <div class="stamp stamp-approved">Approved</div>
+                                    <?php else : ?>
+                                        <div class="stamp stamp-unapproved">Unapproved</div>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
     /* Card Styling */
     .panel-primary {
@@ -38,7 +180,8 @@ if (strtolower($_SESSION['role']) == "owner") {
         background-color: #f8f9fa;
         color: #333;
         text-transform: uppercase;
-        font-size: 13px; /* Diperbesar */
+        font-size: 13px;
+        /* Diperbesar */
         letter-spacing: 0.5px;
         border-bottom: 2px solid #dee2e6 !important;
         vertical-align: middle;
@@ -46,7 +189,8 @@ if (strtolower($_SESSION['role']) == "owner") {
 
     .table tbody td {
         vertical-align: middle !important;
-        font-size: 14px; /* Diperbesar */
+        font-size: 14px;
+        /* Diperbesar */
     }
 
     .table-hover tbody tr:hover {
@@ -54,7 +198,7 @@ if (strtolower($_SESSION['role']) == "owner") {
         transition: 0.3s;
     }
 
-     /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
         display: block !important;
     }
@@ -140,7 +284,7 @@ if (strtolower($_SESSION['role']) == "owner") {
         border-color: #cbd5e1 !important;
     }
 
-    h3{
+    h3 {
         color: #2563eb !important;
     }
 
@@ -170,20 +314,24 @@ if (strtolower($_SESSION['role']) == "owner") {
         .table-responsive {
             padding: 12px !important;
         }
-        
+
         #dataTables-example_wrapper .row:first-child {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 15px;
         }
-        .dataTables_filter, .dataTables_length {
+
+        .dataTables_filter,
+        .dataTables_length {
             width: 100% !important;
             justify-content: flex-start !important;
         }
+
         .dataTables_filter input {
             width: 100% !important;
             max-width: 100% !important;
         }
+
         .dataTables_paginate {
             justify-content: center !important;
             flex-wrap: wrap;
@@ -195,26 +343,32 @@ if (strtolower($_SESSION['role']) == "owner") {
 
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
+            margin-bottom: 1.5rem;
+            /* Jarak antar kotak dilebarkan */
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            padding: 16px;
+            /* Jarak padding ke dalam kotak dilebarkan */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             background-color: #fff;
         }
 
         .table-modern tbody td {
             display: flex;
-            flex-direction: column; /* Label di atas, data di bawah (stacking) */
+            flex-direction: column;
+            /* Label di atas, data di bawah (stacking) */
             align-items: flex-start;
-            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
+            padding: 10px 0 !important;
+            /* Jarak atas-bawah per baris dilebarkan */
             text-align: left !important;
             border: none !important;
             border-bottom: 1px dashed #e2e8f0 !important;
         }
+
         .table-modern tbody td:first-child {
             padding-top: 0 !important;
         }
+
         .table-modern tbody td:last-child {
             border-bottom: none !important;
             padding-bottom: 0 !important;
@@ -227,7 +381,8 @@ if (strtolower($_SESSION['role']) == "owner") {
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
-            margin-bottom: 6px; /* Memberi jarak ke datanya */
+            margin-bottom: 6px;
+            /* Memberi jarak ke datanya */
             display: block;
             width: 100%;
         }
@@ -242,15 +397,19 @@ if (strtolower($_SESSION['role']) == "owner") {
             padding-top: 5px;
             justify-content: flex-start;
         }
-        .action-btn-group > a, .action-btn-group > div {
+
+        .action-btn-group>a,
+        .action-btn-group>div {
             flex: 0 0 auto;
         }
+
         .action-btn-group a {
             padding: 8px 12px !important;
             width: auto;
         }
 
     }
+
     /* --- STYLING STEMPEL (STAMP) --- */
     .stamp {
         display: inline-block;
@@ -267,16 +426,19 @@ if (strtolower($_SESSION['role']) == "owner") {
         user-select: none;
         margin: 10px;
     }
+
     .stamp-approved {
         color: #059669;
         border-color: #059669;
         box-shadow: 0 0 0 2px #059669;
     }
+
     .stamp-unapproved {
         color: #dc2626;
         border-color: #dc2626;
         box-shadow: 0 0 0 2px #dc2626;
     }
+
     @media screen and (max-width: 768px) {
         .stamp {
             transform: rotate(0deg);
@@ -286,144 +448,6 @@ if (strtolower($_SESSION['role']) == "owner") {
         }
     }
 </style>
-
-<div class="container-fluid px-3 mt-4 mb-4">
-    <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
-
-        <div class="border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center bg-white gap-4">
-            <div>
-                <h3 class="text-xl font-bold text-blue-600 m-0"><i class="fas fa-list-alt mr-2"></i>List Rencana Upah</h3>
-            </div>
-            <div class="flex flex-wrap md:flex-nowrap gap-2 w-full md:w-auto">
-                <a href="?page=boneless&ref=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-amber-500 hover:bg-amber-600 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
-                    <i class="fas fa-drumstick-bite mr-1.5"></i> Boneless
-                </a>
-                <a href="?page=rkk&aksi=tambah" class="flex-1 md:flex-none justify-center inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
-                    <i class="fas fa-plus mr-1.5"></i> Tambah Data
-                </a>
-            </div>
-        </div>
-
-        <div class="p-0">
-            <div class="table-responsive px-3 md:px-4 py-4">
-                <table class="w-full text-left border-collapse table-modern" id="dataTables-example">
-                    <thead class="bg-gray-100 border-b border-gray-300">
-                        <tr>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">No</th>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Tanggal</th>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase">Keterangan</th>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Jumlah Karyawan</th>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Aksi Data</th>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Otorisasi</th>
-                            <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <?php
-                        $no = 1;
-                        while ($data = $tampil->fetch_assoc()) :
-                            $status_color = ($data['status_rkk'] == "3") ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800";
-                        ?>
-                            <tr class="hover:bg-gray-50 transition-colors">
-                                <td data-label="No" class="py-3 px-2 text-center text-base md:text-[15px] font-bold md:font-normal"><?= $no++ ?></td>
-                                <td data-label="Tanggal" class="py-3 px-2 text-base md:text-[15px] font-bold text-gray-900"><?= date('d/m/Y', strtotime($data['tgl_rkk'])) ?></td>
-                                <td data-label="Keterangan" class="py-3 px-2 text-base md:text-[14px] text-gray-700"><?= $data['keterangan'] ?></td>
-                                <td data-label="Jumlah Karyawan" class="py-3 px-2 md:text-center text-base md:text-[15px]">
-                                    <span class="font-bold text-blue-700"><?= $data['jml'] ?> Orang</span><br>
-                                    <span class="text-emerald-600 font-semibold text-sm">Rp <?= number_format($data['ttl'] ?? 0, 0, ',', '.') ?></span>
-                                </td>
-                                
-                                <td data-label="Aksi Data" class="py-3 px-2 align-middle">
-                                    <div class="action-btn-group md:justify-center">
-                                        <a href="?page=rkk&aksi=kelola&id=<?= $data['id_rkk']; ?>"
-                                            class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
-                                            <i class="fas fa-eye mr-1"></i> Detail
-                                        </a>
-                                        <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>"
-                                            class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors">
-                                            <i class="fa fa-print mr-1"></i> Cetak
-                                        </a>
-                                        <?php if (strtolower($_SESSION['role']) == "owner" && $data['status_rkk'] < 2) : ?>
-                                            <a href="?page=rkk&aksi=karyawan&id=<?= $data['id_rkk']; ?>"
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors">
-                                                <i class="fas fa-user-plus mr-1.5"></i> Tetapkan
-                                            </a>
-                                        <?php endif; ?>
-                                        <?php if ($data['status_rkk'] == '2') : ?>
-                                            <button type="button" 
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 rounded border border-indigo-300 transition-colors btn-action-rkk"
-                                                data-id="<?= $data['id_rkk']; ?>"
-                                                data-action="realisasi"
-                                                data-text="Buat Realisasi untuk data ini?">
-                                                <i class="fas fa-check-circle mr-1"></i> Realisasi
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                                
-                                <td data-label="Otorisasi" class="py-3 px-2 align-middle">
-                                    <div class="action-btn-group md:justify-center">
-                                        <?php if ($data['status_rkk'] == '0' && $can_propose) : ?>
-                                            <button type="button" 
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded border border-amber-300 transition-colors btn-action-rkk"
-                                                data-id="<?= $data['id_rkk']; ?>"
-                                                data-action="pro"
-                                                data-jml="<?= $data['jml']; ?>"
-                                                data-boneless="<?= $data['jml_boneless']; ?>"
-                                                data-text="Propose data ini?">
-                                                <i class="fas fa-paper-plane mr-1"></i> Propose
-                                            </button>
-                                        <?php endif; ?>
-
-                                        <?php if ($data['status_rkk'] == '1' && $can_propose) : ?>
-                                            <button type="button" 
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-gray-700 bg-gray-50 hover:bg-gray-600 hover:text-white rounded border border-gray-300 transition-colors btn-action-rkk"
-                                                data-id="<?= $data['id_rkk']; ?>"
-                                                data-action="unpro"
-                                                data-text="Tarik kembali data (Un-propose)?">
-                                                <i class="fas fa-undo mr-1"></i> Un-Propose
-                                            </button>
-                                        <?php endif; ?>
-
-                                        <?php if (($data['status_rkk'] == '1' && $is_authorized) || ($data['status_rkk'] == '0' && $is_authorized)) : ?>
-                                            <button type="button" 
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors btn-action-rkk"
-                                                data-id="<?= $data['id_rkk']; ?>"
-                                                data-action="app"
-                                                data-jml="<?= $data['jml']; ?>"
-                                                data-boneless="<?= $data['jml_boneless']; ?>"
-                                                data-text="Approve data ini?">
-                                                <i class="fas fa-check mr-1"></i> Approve
-                                            </button>
-                                        <?php endif; ?>
-
-                                        <?php if (($data['status_rkk'] == '2' || $data['status_rkk'] == '3') && $is_authorized) : ?>
-                                            <button type="button" 
-                                                class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors btn-action-rkk"
-                                                data-id="<?= $data['id_rkk']; ?>"
-                                                data-action="unapp"
-                                                data-text="Batalkan Approve data ini?">
-                                                <i class="fas fa-times mr-1"></i> Un-Approve
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-
-                                <td data-label="Status" class="py-3 px-2 text-center align-middle">
-                                    <?php if ($data['status_rkk'] >= 2) : ?>
-                                        <div class="stamp stamp-approved">Approved</div>
-                                    <?php else : ?>
-                                        <div class="stamp stamp-unapproved">Unapproved</div>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -447,7 +471,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                 }
             }
         });
-        
+
         // SweetAlert Action Confirmation - Using delegation for DataTables compatibility
         $(document).on('click', '.btn-action-rkk', function() {
             const id = $(this).data('id');
@@ -455,7 +479,7 @@ if (strtolower($_SESSION['role']) == "owner") {
             const text = $(this).data('text');
             const jml = $(this).data('jml');
             const boneless = $(this).data('boneless');
-            
+
             // Validasi Data Sebelum Propose/Approve
             if (action === 'pro' || action === 'app') {
                 if (jml == 0) {
@@ -467,7 +491,7 @@ if (strtolower($_SESSION['role']) == "owner") {
                     });
                     return;
                 }
-                
+
                 if ((action === 'pro' || action === 'app') && boneless == 0) {
                     Swal.fire({
                         icon: 'error',
