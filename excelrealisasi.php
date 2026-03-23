@@ -18,16 +18,20 @@ header("Expires: 0");
 <style>
     .stamp {
         display: inline-block;
-        padding: 5px 15px;
-        border: 4px solid;
+        padding: 5px 20px;
+        border: 8px double;
         border-radius: 10px;
         font-family: 'Courier New', Courier, monospace;
         font-weight: 900;
         text-transform: uppercase;
-        font-size: 16px;
-        color: #dc2626;
-        border-color: #dc2626;
-        margin: 10px;
+        font-size: 24px;
+        margin: 20px;
+        opacity: 0.8;
+        /* For Browser */
+        transform: rotate(-10deg);
+        -webkit-transform: rotate(-10deg);
+        /* For Excel */
+        mso-rotate: 10;
     }
     .stamp-approved {
         color: #059669;
@@ -184,14 +188,12 @@ while($row = $result->fetch_assoc()){
         <td>".$row['nama_departmen']."</td>
         <td style='text-align:center;'>".$row['label_gol']."</td>
         <td style='text-align:center;'>".$row['label_os']."</td>
-        <td style='text-align:center; mso-number-format:\@; font-size: 8pt; white-space: nowrap;'>".$row['tgl_realisasi']."</td>
         <td style='text-align:center;'>".$row['ra_masuk']."</td>
         <td style='text-align:center;'>".$row['ra_keluar']."</td>
         <td style='text-align:center;'>".$row['r_jam_masuk']."</td>
-        <td style='text-align:center;'>".$row['r_istirahat_keluar']."</td>
-        <td style='text-align:center;'>".$row['r_istirahat_masuk']."</td>
+        <td style='text-align:center;'>".$row['r_istirahat_keluar']." / ".$row['r_istirahat_masuk']."</td>
         <td style='text-align:center;'>".$row['r_jam_keluar']."</td>
-        <td style='text-align:right;'>".number_format($row['lembur'], 0, ',', '.')."</td>
+        <td>".$row['hasil_kerja']."</td>
         <td style='text-align:right;'>".number_format($row['r_upah'], 0, ',', '.')."</td>
         <td style='text-align:right; color:red;'>".number_format($potTelatValue, 0, ',', '.')."</td>
         <td style='text-align:right; color:red;'>".number_format($potIstirahatAwalValue, 0, ',', '.')."</td>
@@ -199,8 +201,8 @@ while($row = $result->fetch_assoc()){
         <td style='text-align:right; color:red;'>".number_format($potPulangValue, 0, ',', '.')."</td>
         <td style='text-align:right; color:red;'>".number_format($potTidakLengkapValue, 0, ',', '.')."</td>
         <td style='text-align:right; color:red;'>".number_format($row['r_potongan_lainnya'], 0, ',', '.')."</td>
+        <td style='text-align:right;'>".number_format($row['lembur'], 0, ',', '.')."</td>
         <td style='text-align:right; font-weight:bold;'>".number_format($upah_bersih, 0, ',', '.')."</td>
-        <td>".$row['hasil_kerja']."</td>
     </tr>
     ";
 
@@ -210,10 +212,27 @@ while($row = $result->fetch_assoc()){
 // Baris Total di Bawah
 echo "
     <tr style='background-color:#f1f5f9; font-weight:bold;'>
-        <td colspan='21' style='text-align:right; padding:10px;'>TOTAL UPAH DIBAYAR:</td>
+        <td colspan='20' style='text-align:right; padding:10px;'>TOTAL UPAH DIBAYAR:</td>
         <td style='text-align:right;'>".number_format($grand_total_dibayar, 0, ',', '.')."</td>
-        <td></td>
     </tr>
 </table>
+
+<?php
+// Stampel di Kiri Bawah
+if ($status_realisasi >= 2) {
+    echo "<br><div class='stamp stamp-approved'>APPROVED</div>";
+} else {
+    echo "<br><div class='stamp stamp-unapproved'>UNAPPROVED</div>";
+}
+?>
+
+<?php
+// Stampel di Kiri Bawah
+if ($status_realisasi >= 2) {
+    echo "<br><div class='stamp stamp-approved'>APPROVED</div>";
+} else {
+    echo "<br><div class='stamp stamp-unapproved'>UNAPPROVED</div>";
+}
+?>
 ";
 ?>

@@ -49,49 +49,18 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
          AND U4.status = 'Pengganti' 
          LIMIT 1)";
 ?>
-<style>
-    .stamp {
-        display: inline-block;
-        padding: 5px 15px;
-        border: 4px solid;
-        border-radius: 10px;
-        font-family: 'Courier New', Courier, monospace;
-        font-weight: 900;
-        text-transform: uppercase;
-        font-size: 16px;
-        /* Note: Rotate might not work in some Excel versions when importing HTML, 
-           but color and border usually do. */
-        color: #dc2626;
-        border-color: #dc2626;
-        margin: 10px;
-    }
-    .stamp-approved {
-        color: #059669;
-        border-color: #059669;
-    }
-    .stamp-unapproved {
-        color: #dc2626;
-        border-color: #dc2626;
-    }
-</style>
 
 <table border="1" style="border-collapse:collapse;">
     <thead>
         <tr>
-            <th colspan="14" style="text-align:center; font-size:20px; font-weight:bold; height:60px; vertical-align:middle;">
+            <th colspan="20" style="text-align:center; font-size:20px; font-weight:bold;">
                 LAPORAN REALISASI UPAH
-                <?php if ($status_realisasi >= 2): ?>
-                    <span class="stamp stamp-approved" style="margin-left:20px; border:4px solid #059669; color:#059669; padding:5px 15px; border-radius:10px;">APPROVED</span>
-                <?php else: ?>
-                    <span class="stamp stamp-unapproved" style="margin-left:20px; border:4px solid #dc2626; color:#dc2626; padding:5px 15px; border-radius:10px;">UNAPPROVED</span>
-                <?php endif; ?>
             </th>
         </tr>
         <tr>
-            <th colspan="14" style="text-align:center; font-size:16px;">
+            <th colspan="20" style="text-align:center; font-size:16px;">
                 Tanggal Realisasi: <?php echo $info['tgl_realisasi'] ? date('d/m/Y', strtotime($info['tgl_realisasi'])) : '-'; ?> |
-                Jam Kerja: <?php echo $info['jam_kerja'] ?? '-'; ?> |
-                <?php echo $info['jam_masuk'] . " / " . $info['jam_keluar']; ?></td>
+                <?php echo $info['jam_masuk'] . " / " . $info['jam_keluar']; ?>
             </th>
         </tr>
         <?php
@@ -109,7 +78,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         $grand_total = 0;
         $grand_karyawan = 0;
         $totals_by_os = []; // Dynamic array for OS/DHK totals
-        // 1. Ambil list departemen yang hanya ada di realisasi ini (agar tabel tidak kosong/penuh)
+        
+        // 1. Ambil list departemen yang hanya ada di realisasi ini
         $sqlDept = $koneksi->query("SELECT DISTINCT D.* FROM ms_departmen D 
                                      JOIN tb_rkk_detail RD ON D.id_departmen = RD.id_departmen
                                      JOIN tb_realisasi_detail AD ON RD.id_rkk_detail = AD.id_rkk_detail
@@ -118,9 +88,9 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         while ($dept = $sqlDept->fetch_assoc()) {
             $id_dept = $dept['id_departmen'];
 
-            // 2. Tampilkan Header Departemen (Wrapping/Merge)
+            // 2. Tampilkan Header Departemen
             echo "<tr>
-                    <td colspan='14' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
+                    <td colspan='20' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
                         DEPARTEMEN: " . strtoupper($dept['nama_departmen']) . "
                     </td>
                   </tr>";
@@ -132,13 +102,19 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             <th style='background:#e5e7eb; text-align:center;'>OS/DHK</th>
             <th style='background:#e5e7eb; text-align:center;'>Golongan</th>
             <th style='background:#e5e7eb; text-align:center;'>Posisi</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Kerja</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Masuk</th>
-            <th style='background:#e5e7eb; text-align:center;'>Istirahat</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Pulang</th>
+            <th style='background:#e5e7eb; text-align:center;'>Absen Masuk</th>
+            <th style='background:#e5e7eb; text-align:center;'>Absen Keluar</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Masuk (R)</th>
+            <th style='background:#e5e7eb; text-align:center;'>Istirahat (R)</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Pulang (R)</th>
             <th style='background:#e5e7eb; text-align:center;'>Hasil Kerja</th>
             <th style='background:#e5e7eb; text-align:center;'>Upah</th>
-            <th style='background:#e5e7eb; text-align:center;'>Potongan</th>
+            <th style='background:#e5e7eb; text-align:center;'>Pot. Telat</th>
+            <th style='background:#e5e7eb; text-align:center;'>Pot. Ist. Awal</th>
+            <th style='background:#e5e7eb; text-align:center;'>Pot. Ist. Telat</th>
+            <th style='background:#e5e7eb; text-align:center;'>Pot. Pulang</th>
+            <th style='background:#e5e7eb; text-align:center;'>Pot. Tidak Lengkap</th>
+            <th style='background:#e5e7eb; text-align:center;'>Pot. Lainnya</th>
             <th style='background:#e5e7eb; text-align:center;'>Lembur</th>
             <th style='background:#e5e7eb; text-align:center;'>Upah Dibayar</th>
                   </tr>";
@@ -172,12 +148,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $total = 0;
             $jml_karyawan = 0;
             while ($data = $tampil->fetch_assoc()) {
-                // Logika Pelanggaran Dinamis (Gunakan r_jam_masuk dan r_jam_keluar Realisasi sebagai patokan)
-                $isLate = (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00' && !empty($data['r_jam_masuk']) && $data['r_jam_masuk'] != '00:00:00' && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
-                $isLateBreak = (!empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00' && !empty($data['r_istirahat_masuk']) && $data['r_istirahat_masuk'] != '00:00:00' && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
-                
-                $isEarlyOut = (!empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00' && !empty($data['r_jam_keluar']) && $data['r_jam_keluar'] != '00:00:00' && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-
+                // Logika Pelanggaran Dinamis
                 $has_masuk = !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00';
                 $has_keluar = !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00';
                 $has_ist_masuk = !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00';
@@ -195,15 +166,12 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $isEarlyBreak = ($has_ist_keluar && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
 
                 if ($data['status_realisasi_detail'] == 1) {
-                    // Use stored values for Saved records
                     $potTelatValue = $data['r_potongan_telat'];
                     $potIstirahatAwal = $data['r_potongan_istirahat_awal'];
                     $potIstirahatTelat = $data['r_potongan_istirahat_telat'];
                     $potPulangValue = $data['r_potongan_pulang'];
                     $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
                 } else {
-                    // Status 0 (Draft) or 2 (Synced)
-                    // Calculate dynamically to ensure consistency with UI
                     $potTelatValue = $isLate ? $globalDendaMasuk : 0;
                     $potIstirahatAwal = $isEarlyBreak ? $globalDendaIstirahatAwal : 0;
                     $potIstirahatTelat = $isLateBreak ? $globalDendaIstirahatTelat : 0;
@@ -252,15 +220,21 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 <td style='text-align:center;'>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
                 <td style='text-align:center;'>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
                 <td style='text-align:center;'>{$data['nama_sub_department']}</td>
-                <td style='text-align:center;'>{$info['jam_kerja']}</td>
+                <td style='text-align:center;'>{$data['ra_masuk']}</td>
+                <td style='text-align:center;'>{$data['ra_keluar']}</td>
                 <td style='text-align:center;'>{$data['r_jam_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_jam_keluar']}</td>
                 <td style='text-align:center;'>{$data['hasil_kerja']}</td>
-                <td style='text-align:right'>{$data['upah']}</td>
-                <td style='text-align:right'>$potongan</td>
-                <td style='text-align:right'>$lembur</td>
-                <td style='text-align:right'>$upah_dibayar</td>
+                <td style='text-align:right'>" . number_format($data['upah'], 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($potTelatValue, 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($potIstirahatAwal, 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($potIstirahatTelat, 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($potPulangValue, 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($potTidakLengkapValue, 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($data['r_potongan_lainnya'], 0, ',', '.') . "</td>
+                <td style='text-align:right'>" . number_format($lembur, 0, ',', '.') . "</td>
+                <td style='text-align:right; font-weight:bold;'>" . number_format($upah_dibayar, 0, ',', '.') . "</td>
                 </tr>";
                 $no++;
             }
@@ -274,16 +248,14 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             echo "<tr><td colspan='14' style='height:20px;'></td></tr>";
         }
         echo "<tr>
-        <td colspan='14' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
+        <td colspan='20' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
         GRAND TOTAL UPAH ($grand_karyawan Karyawan) | Rp " . number_format($grand_total, 0, ",", ".") . "
         </td>
         </tr>";
         ?>
     </tbody>
-
 </table>
 
-<!-- REKAP OUTSOURCING (Dynamic from ms_os_dhk) -->
 <br><br>
 <table border="1" style="border-collapse:collapse; width:600px;">
     <thead>
@@ -361,7 +333,7 @@ if ($bonelessHeader) {
             </tbody>
           </table>";
 
-    // Summary Table as per user image
+    // Summary Table
     $biaya_pabrik = $grand_total;
     $potong = $bonelessHeader['jumlah_mobil'];
     $combined_total = $biaya_pabrik + $total_boneless;
@@ -393,4 +365,29 @@ if ($bonelessHeader) {
         </tbody>
     </table>";
 }
+
+// ----------------------------------------------------
+// Stampel Miring untuk Excel menggunakan mso-rotate
+// ----------------------------------------------------
+$stamp_text = ($status_realisasi >= 2) ? "APPROVED" : "UNAPPROVED";
+$stamp_color = ($status_realisasi >= 2) ? "#059669" : "#dc2626";
+
+echo "<br><br>
+<table border='0' style='border-collapse: collapse;'>
+    <tr>
+        <td style='width: 20px;'></td> <td style='
+            mso-rotate: 15; /* Mengatur kemiringan di Excel */
+            font-family: \"Courier New\", Courier, monospace;
+            font-weight: 900;
+            font-size: 26px;
+            color: {$stamp_color};
+            text-align: center;
+            vertical-align: middle;
+            height: 100px; /* Ruang untuk teks miring agar tidak terpotong */
+            white-space: nowrap;
+        '>
+            [[ {$stamp_text} ]]
+        </td>
+    </tr>
+</table>";
 ?>
