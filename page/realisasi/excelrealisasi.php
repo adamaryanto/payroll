@@ -78,7 +78,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         $grand_total = 0;
         $grand_karyawan = 0;
         $totals_by_os = []; // Dynamic array for OS/DHK totals
-        
+
         // 1. Ambil list departemen yang hanya ada di realisasi ini
         $sqlDept = $koneksi->query("SELECT DISTINCT D.* FROM ms_departmen D 
                                      JOIN tb_rkk_detail RD ON D.id_departmen = RD.id_departmen
@@ -155,7 +155,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $has_ist_keluar = !empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00';
 
                 $isTotalMissing = (!$has_masuk && !$has_keluar);
-                $hasIncompleteMain = ($has_masuk XOR $has_keluar);
+                $hasIncompleteMain = ($has_masuk xor $has_keluar);
                 $isRestExpected = (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00');
                 $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
                 $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $data['status_rkk'] != 'Tidak Hadir'));
@@ -200,7 +200,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 if (empty($data['digantikan_oleh']) && $data['status_rkk'] != 'Tidak Hadir') {
                     $jml_karyawan++;
                     $grand_karyawan++;
-                    
+
                     // Track Outsourcing categories dynamically
                     $os_label = $data['label_os'] ?: $data['OS_DHK'];
                     if (!isset($totals_by_os[$os_label])) {
@@ -209,9 +209,9 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                     $totals_by_os[$os_label] += $upah_dibayar;
                 }
 
-                $nama_display = $data['nama_karyawan'] . 
-                    (!empty($data['menggantikan']) ? " (Menggantikan " . $data['menggantikan'] . ")" : "") . 
-                    (!empty($data['menggantikan']) && !empty($data['digantikan_oleh']) ? " &" : "") . 
+                $nama_display = $data['nama_karyawan'] .
+                    (!empty($data['menggantikan']) ? " (Menggantikan " . $data['menggantikan'] . ")" : "") .
+                    (!empty($data['menggantikan']) && !empty($data['digantikan_oleh']) ? " &" : "") .
                     (!empty($data['digantikan_oleh']) ? " (Digantikan oleh " . $data['digantikan_oleh'] . ")" : "");
 
                 echo "<tr>
@@ -226,15 +226,16 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 <td style='text-align:center;'>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_jam_keluar']}</td>
                 <td style='text-align:center;'>{$data['hasil_kerja']}</td>
-                <td style='text-align:right'>" . number_format($data['upah'], 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($potTelatValue, 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($potIstirahatAwal, 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($potIstirahatTelat, 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($potPulangValue, 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($potTidakLengkapValue, 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($data['r_potongan_lainnya'], 0, ',', '.') . "</td>
-                <td style='text-align:right'>" . number_format($lembur, 0, ',', '.') . "</td>
-                <td style='text-align:right; font-weight:bold;'>" . number_format($upah_dibayar, 0, ',', '.') . "</td>
+         <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$data['upah']}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potTelatValue}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potIstirahatAwal}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potIstirahatTelat}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potPulangValue}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potTidakLengkapValue}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$data['r_potongan_lainnya']}</td>
+    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$lembur}</td>
+    
+    <td style='text-align:right; font-weight:bold; mso-number-format:\"\#\,\#\#0\";'>{$upah_dibayar}</td>
                 </tr>";
                 $no++;
             }
@@ -271,13 +272,13 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             $label = $d_os['OS_DHK'];
             $val = $totals_by_os[$label] ?? 0;
             $grand_tagihan += $val;
-            ?>
+        ?>
             <tr style="font-weight:bold;">
                 <td style="width:300px; height:25px;">BIAYA TAGIHAN <?php echo $label; ?></td>
                 <td style="width:50px; text-align:center;">Rp</td>
                 <td style="width:250px; text-align:right;"><?php echo number_format($val, 0, ',', '.'); ?></td>
             </tr>
-            <?php
+        <?php
         }
         ?>
         <tr style="background-color:yellow; font-weight:bold;">
@@ -295,7 +296,7 @@ $bonelessHeader = $queryBoneless->fetch_assoc();
 if ($bonelessHeader) {
     $id_boneless = $bonelessHeader['id_boneless'];
     $queryBonelessDetail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
-    
+
     echo "<br><br>";
     echo "<table border='1' style='border-collapse:collapse; width:900px;'>
             <thead>
@@ -312,7 +313,7 @@ if ($bonelessHeader) {
                 </tr>
             </thead>
             <tbody>";
-    
+
     $no_b = 1;
     $total_boneless = 0;
     while ($item = $queryBonelessDetail->fetch_assoc()) {
@@ -325,7 +326,7 @@ if ($bonelessHeader) {
               </tr>";
         $no_b++;
     }
-    
+
     echo "      <tr style='font-weight:bold; background-color:#f1f5f9;'>
                     <td colspan='3' style='text-align:center;'>TOTAL BONELESS</td>
                     <td style='text-align:right;'>Rp " . number_format($total_boneless, 0, ',', '.') . "</td>
