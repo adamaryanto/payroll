@@ -53,7 +53,7 @@ $tampil = $koneksi->query("SELECT A.*,
             IF(RD.status_realisasi_detail = 1, RD.r_potongan_tidak_lengkap, IF(((RD.ra_masuk != '' AND RD.ra_masuk != '00:00:00' AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00')) OR ((RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND RD.ra_keluar != '' AND RD.ra_keluar != '00:00:00') OR (J.istirahat_keluar != '' AND J.istirahat_keluar != '00:00:00' AND ((RD.ra_istirahat_keluar = '' OR RD.ra_istirahat_keluar = '00:00:00') OR (RD.ra_istirahat_masuk = '' OR RD.ra_istirahat_masuk = '00:00:00')))), (SELECT denda_tidak_lengkap FROM tb_denda LIMIT 1), 0))
         )
     ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_log
-    FROM tb_realisasi A $where_real");
+    FROM tb_realisasi A $where_real ORDER BY A.tgl_realisasi ASC, A.id_realisasi ASC");
 
 // Logika Akses: Owner dan Admin Master yang bisa Approve/Unapprove Realisasi
 $is_authorized = (strtolower($_SESSION['role']) == "owner" || strtolower($_SESSION['role']) == "admin master");

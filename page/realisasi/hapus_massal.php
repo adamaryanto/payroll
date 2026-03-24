@@ -59,7 +59,7 @@ $tampil = $koneksi->query("SELECT A.*,
      JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
      WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan'
     ) as jml
-    FROM tb_realisasi A ORDER BY A.tgl_realisasi DESC");
+    FROM tb_realisasi A ORDER BY A.tgl_realisasi ASC, A.id_realisasi ASC");
 ?>
 
 <div class="container-fluid px-3 mt-4 mb-4">
@@ -89,7 +89,7 @@ $tampil = $koneksi->query("SELECT A.*,
                     <table class="w-full text-left border-collapse table-modern" id="dataTables-hapus">
                         <thead class="bg-gray-50 border-b border-gray-300">
                             <tr>
-                                <th class="py-3 px-2 text-center w-12">
+                                <th class="py-3 px-2 text-center w-12 no-sort">
                                     <input type="checkbox" id="select_all" class="w-4 h-4 text-blue-600 rounded cursor-pointer">
                                 </th>
                                 <th class="py-3 px-2 text-sm font-bold text-gray-700 uppercase w-16">No</th>
@@ -135,6 +135,32 @@ $tampil = $koneksi->query("SELECT A.*,
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    $(document).ready(function() {
+        $('#dataTables-hapus').DataTable({
+            pageLength: 25,
+            autoWidth: false,
+            responsive: false,
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, "Semua"]
+            ],
+            language: {
+                search: "Cari Data:",
+                searchPlaceholder: "Ketik pencarian...",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Prev",
+                    next: "Next"
+                }
+            },
+            columnDefs: [{
+                targets: 'no-sort',
+                orderable: false
+            }]
+        });
+    });
+
     function konfirmasiHapus() {
         const checked = document.querySelectorAll('.check_item:checked').length;
 
