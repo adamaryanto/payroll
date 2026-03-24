@@ -2,15 +2,6 @@
 $id = $_GET['id'] ?? '';
 $ttgl1 = date("Y-m-d");
 
-// Ambil Nama Karyawan untuk Header
-$q_karyawan = $koneksi->query("SELECT A.nama_karyawan, B.nama_departmen 
-                             FROM ms_karyawan A 
-                             LEFT JOIN ms_departmen B ON A.id_departmen = B.id_departmen 
-                             WHERE A.id_karyawan = '$id'");
-$d_karyawan = $q_karyawan->fetch_assoc();
-$namaKaryawan = $d_karyawan ? $d_karyawan['nama_karyawan'] : 'Karyawan';
-$deptKaryawan = $d_karyawan ? $d_karyawan['nama_departmen'] : '-';
-
 // Ambil ID Realisasi dari detail terakhir untuk navigasi kembali
 $q_realisasi = $koneksi->query("SELECT id_realisasi FROM tb_realisasi_detail WHERE id_karyawan = '$id' ORDER BY id_realisasi_detail DESC LIMIT 1");
 $d_realisasi = $q_realisasi->fetch_assoc();
@@ -237,6 +228,7 @@ if (!function_exists('rupiah')) {
 </div>
 
 <style>
+<<<<<<< HEAD
     /* --- 1. RESET & WRAPPER --- */
     .dataTables_wrapper {
         display: block !important;
@@ -525,10 +517,62 @@ if (!function_exists('rupiah')) {
             content: "TOTAL NET";
             color: #2563eb;
         }
+=======
+    /* Styling modern untuk select2 mengikuti input date */
+    .modern-select2-container .select2-selection--single {
+        height: 54px !important;
+        padding: 12px 16px !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 1rem !important; /* rounded-2xl */
+        background-color: white !important;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+        transition: all 0.2s !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+    
+    .modern-select2-container.select2-container--focus .select2-selection--single {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    .modern-select2-container .select2-selection__arrow {
+        height: 52px !important;
+        right: 12px !important;
+    }
+
+    .modern-select2-container .select2-selection__rendered {
+        color: #374151 !important;
+        font-weight: 700 !important;
+        padding-left: 0 !important;
+    }
+
+    .modern-select2-container .select2-search__field {
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        border: 1px solid #e5e7eb !important;
+        outline: none !important;
+    }
+    
+    .modern-select2-container .select2-search__field:focus {
+        border-color: #3b82f6 !important;
+    }
+
+    .modern-select2-container .select2-results__option {
+        padding: 10px 16px !important;
+        font-weight: 500 !important;
+    }
+
+    .modern-select2-container .select2-results__option--highlighted[aria-selected] {
+        background-color: #eff6ff !important;
+        color: #1d4ed8 !important;
+        font-weight: 700 !important;
+>>>>>>> 1bd684ca8a586ffe8be5851bd648670c1146fb2a
     }
 </style>
 
 <script>
+<<<<<<< HEAD
     $(document).ready(function() {
         $('#slipTable').DataTable({
                 pageLength: 25,
@@ -552,5 +596,29 @@ if (!function_exists('rupiah')) {
             // Perbaiki gaya input DataTables agar matching
             $('.dataTables_filter input').addClass('w-full md:w-auto px-3 py-1.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500');
         $('.dataTables_filter label').addClass('w-full md:w-auto flex flex-col md:flex-row md:items-center gap-2');
+=======
+$(document).ready(function() {
+    $('.select2-slip').select2({
+        width: '100%',
+        dropdownAutoWidth: true,
+        containerCssClass: 'modern-select2-container',
+        dropdownCssClass: 'modern-select2-container'
+>>>>>>> 1bd684ca8a586ffe8be5851bd648670c1146fb2a
     });
+});
 </script>
+
+<?php
+$ttgl11 = $_POST['ttgl1'] ?? '';
+$ttgl22 = $_POST['ttgl2'] ?? '';
+$id_karyawan_post = $_POST['id_karyawan_post'] ?? '';
+$simpan = $_POST['simpan'] ?? '';
+
+if($simpan) {
+?>
+    <script type="text/javascript">
+        window.location.href="slip.php?id=<?= $id_karyawan_post ?>&ttgl1=<?= $ttgl11 ?>&ttgl2=<?= $ttgl22 ?>";
+    </script>
+<?php
+}
+?>
