@@ -17,7 +17,8 @@ $d_realisasi = $q_realisasi->fetch_assoc();
 $idRealisasi = $d_realisasi ? $d_realisasi['id_realisasi'] : 0;
 
 if (!function_exists('rupiah')) {
-    function rupiah($angka) {
+    function rupiah($angka)
+    {
         return "Rp " . number_format($angka, 0, ',', '.');
     }
 }
@@ -25,68 +26,74 @@ if (!function_exists('rupiah')) {
 
 <div class="container-fluid px-3 md:px-6 mt-6 mb-10">
     <div class="bg-white shadow-xl rounded-2xl border border-gray-100 overflow-hidden">
-        
+
         <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 px-6 md:px-8 py-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/30 shadow-inner">
                         <i class="fas fa-file-invoice-dollar text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-xl md:text-2xl font-bold text-white m-0 tracking-tight">Preview Slip Gaji</h3>
-                        <p class="text-blue-100 text-sm font-medium opacity-90 mt-1"><?= $namaKaryawan ?> • <span class="bg-white/20 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider"><?= $deptKaryawan ?></span></p>
+                        <h3 class="text-xl md:text-2xl font-bold text-white m-0 tracking-tight">
+                            Preview Slip Gaji
+                        </h3>
+                        <p class="text-blue-100 text-sm font-medium opacity-90 mt-1">
+                            <?= $namaKaryawan ?> •
+                            <span class="bg-white/20 px-2 py-0.5 rounded text-[11px] uppercase tracking-wider">
+                                <?= $deptKaryawan ?>
+                            </span>
+                        </p>
                     </div>
                 </div>
-                <div class="flex items-center w-full md:w-auto mt-2 md:mt-0">
-                    <a href="?page=realisasi&aksi=kelola&id=<?= $idRealisasi ?>" class="w-full md:w-auto inline-flex justify-center items-center bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-5 rounded-xl border border-white/20 transition-all backdrop-blur-sm">
-                        <i class="fas fa-arrow-left mr-2"></i> Kembali
-                    </a>
-                </div>
+
+                <a href="index.php?page=realisasi&aksi=slip"
+                    class="w-40 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/20 transition-all active:scale-90"
+                    title="Kembali">
+                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                </a>
+
             </div>
         </div>
-
         <div class="p-4 md:p-8">
-            <form method="GET" class="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl mb-8">
+            <form method="GET" class="bg-blue-50/50 border border-blue-100 p-4 md:p-5 rounded-2xl mb-8">
                 <input type="hidden" name="page" value="realisasi">
                 <input type="hidden" name="aksi" value="slip">
-                
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
-                    <div class="md:col-span-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Pilih Karyawan</label>
-                        <select name="id" class="select2-manage w-full" data-placeholder="- Pilih Karyawan -" required>
-                            <option value=""></option>
-                            <?php
-                            $q_all_kar = $koneksi->query("SELECT id_karyawan, no_absen, nama_karyawan FROM ms_karyawan WHERE status_karyawan = 'Aktif' ORDER BY nama_karyawan ASC");
-                            while($kar = $q_all_kar->fetch_assoc()) {
-                                $selected = ($kar['id_karyawan'] == $id) ? 'selected' : '';
-                                echo "<option value='{$kar['id_karyawan']}' {$selected}>{$kar['no_absen']} - {$kar['nama_karyawan']}</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-                    <div class="md:col-span-3">
-                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Dari Tanggal</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
-                                <i class="fas fa-calendar-alt"></i>
-                            </span>
-                            <input type="date" name="ttgl1" required value="<?= $_GET['ttgl1'] ?? $ttgl1 ?>" 
-                                class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-gray-700 font-medium">
+                <input type="hidden" name="id" value="<?= $id ?>">
+
+                <div class="flex flex-col md:flex-row items-center gap-4">
+
+                    <div class="w-full md:flex-1 flex items-center bg-white px-4 h-[40px] rounded-xl border border-blue-100 shadow-sm">
+                        <i class="fas fa-user-circle text-blue-500 mr-3 text-lg"></i>
+                        <div class="truncate">
+                            <span class="text-sm truncate font-bold text-gray-700 leading-tight"><?= $namaKaryawan ?></span>
                         </div>
                     </div>
-                    <div class="md:col-span-3">
-                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Sampai Tanggal</label>
+
+                    <div class="w-full md:w-40">
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none text-xs">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="date" name="ttgl2" required value="<?= $_GET['ttgl2'] ?? $ttgl1 ?>" 
-                                class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-gray-700 font-medium">
+                            <input type="date" name="ttgl1" required value="<?= $_GET['ttgl1'] ?? $ttgl1 ?>"
+                                class="custom-input pl-9" title="Dari Tanggal">
                         </div>
                     </div>
-                    <div class="md:col-span-2 mt-2 md:mt-0">
-                        <button type="submit" name="cari" value="Search" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
-                            <i class="fas fa-search shadow-sm"></i>
+
+                    <div class="w-full md:w-40">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none text-xs">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                            <input type="date" name="ttgl2" required value="<?= $_GET['ttgl2'] ?? $ttgl1 ?>"
+                                class="custom-input pl-9" title="Sampai Tanggal">
+                        </div>
+                    </div>
+
+                    <div class="w-full md:w-auto">
+                        <button type="submit" name="cari" value="Search"
+                            class="h-[40px] px-6 border-0 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl shadow-md transition-all flex items-center justify-center space-x-2 w-full active:scale-95">
+                            <i class="fas fa-search"></i>
                             <span>Cari</span>
                         </button>
                     </div>
@@ -115,7 +122,7 @@ if (!function_exists('rupiah')) {
                         AND r.tgl_realisasi_detail BETWEEN '$ttgl11' AND '$ttgl22'
                         ORDER BY r.tgl_realisasi_detail ASC";
                 $result = $koneksi->query($sql);
-                ?>
+            ?>
 
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 pt-4 border-t border-gray-100">
                     <div>
@@ -124,9 +131,9 @@ if (!function_exists('rupiah')) {
                     </div>
                     <?php if ($result && $result->num_rows > 0): ?>
                         <div class="w-full md:w-auto">
-                            <a target="_blank" href="slip.php?id=<?= $id ?>&ttgl1=<?= $ttgl11 ?>&ttgl2=<?= $ttgl22 ?>" 
-                               class="w-full md:w-auto flex justify-center items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-md transition-all transform hover:-translate-y-0.5">
-                                <i class="fas fa-file-excel mr-2"></i> Download Excel
+                            <a target="_blank" href="slip.php?id=<?= $id ?>&ttgl1=<?= $ttgl11 ?>&ttgl2=<?= $ttgl22 ?>"
+                                class="w-full md:w-auto flex justify-center items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-95">
+                                <i class="fas fa-file-excel mr-2 text-base"></i> Download Excel
                             </a>
                         </div>
                     <?php endif; ?>
@@ -149,58 +156,58 @@ if (!function_exists('rupiah')) {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                                <?php
-                                if ($result && $result->num_rows > 0) {
-                                    while ($row = $result->fetch_assoc()) {
-                                        // Logika Pelanggaran Dinamis (Sync with realisasi/kelola.php)
-                                        $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
-                                        $isLateBreak = (!empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && !empty($row['istirahat_masuk']) && $row['istirahat_masuk'] != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($row['istirahat_masuk']));
-                                        $isEarlyOut = (!empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && !empty($row['jam_keluar']) && $row['jam_keluar'] != '00:00:00' && strtotime($row['ra_keluar']) < strtotime($row['jam_keluar']));
-                                        
-                                        // Incomplete Logs
-                                        $hasIncompleteMain = (
-                                            (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && (empty($row['ra_keluar']) || $row['ra_keluar'] == '00:00:00')) ||
-                                            ((empty($row['ra_masuk']) || $row['ra_masuk'] == '00:00:00') && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00')
-                                        );
-                                        $isRestExpected = (!empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00');
-                                        $hasIncompleteBreak = ($isRestExpected && (
-                                            (empty($row['ra_istirahat_keluar']) || $row['ra_istirahat_keluar'] == '00:00:00') ||
-                                            (empty($row['ra_istirahat_masuk']) || $row['ra_istirahat_masuk'] == '00:00:00')
-                                        ));
+                            <?php
+                            if ($result && $result->num_rows > 0) {
+                                while ($row = $result->fetch_assoc()) {
+                                    // Logika Pelanggaran Dinamis (Sync with realisasi/kelola.php)
+                                    $isLate = (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && !empty($row['jam_masuk']) && $row['jam_masuk'] != '00:00:00' && strtotime($row['ra_masuk']) > strtotime($row['jam_masuk']));
+                                    $isLateBreak = (!empty($row['ra_istirahat_masuk']) && $row['ra_istirahat_masuk'] != '00:00:00' && !empty($row['istirahat_masuk']) && $row['istirahat_masuk'] != '00:00:00' && strtotime($row['ra_istirahat_masuk']) > strtotime($row['istirahat_masuk']));
+                                    $isEarlyOut = (!empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00' && !empty($row['jam_keluar']) && $row['jam_keluar'] != '00:00:00' && strtotime($row['ra_keluar']) < strtotime($row['jam_keluar']));
 
-                                        $isEarlyBreak = (!empty($row['ra_istirahat_keluar']) && $row['ra_istirahat_keluar'] != '00:00:00' && !empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00' && strtotime($row['ra_istirahat_keluar']) < strtotime($row['istirahat_keluar']));
+                                    // Incomplete Logs
+                                    $hasIncompleteMain = (
+                                        (!empty($row['ra_masuk']) && $row['ra_masuk'] != '00:00:00' && (empty($row['ra_keluar']) || $row['ra_keluar'] == '00:00:00')) ||
+                                        ((empty($row['ra_masuk']) || $row['ra_masuk'] == '00:00:00') && !empty($row['ra_keluar']) && $row['ra_keluar'] != '00:00:00')
+                                    );
+                                    $isRestExpected = (!empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00');
+                                    $hasIncompleteBreak = ($isRestExpected && (
+                                        (empty($row['ra_istirahat_keluar']) || $row['ra_istirahat_keluar'] == '00:00:00') ||
+                                        (empty($row['ra_istirahat_masuk']) || $row['ra_istirahat_masuk'] == '00:00:00')
+                                    ));
 
-                                        // Skip Denda if wage is 0 or status is "Digantikan"
-                                        if ($row['r_upah'] == 0 || $row['status_rkk'] == 'Digantikan') {
-                                            $potTelatValue = 0;
-                                            $potIstirahatValue = 0;
-                                            $potPulangValue = 0;
-                                            $potTidakLengkapValue = 0;
-                                        } else {
-                                            $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-                                            $potIstirahatValue = ($isEarlyBreak ? $globalDendaIstirahatKeluar : 0) + ($isLateBreak ? $globalDendaIstirahatMasuk : 0);
-                                            $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
-                                            $potTidakLengkapValue = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
-                                        }
+                                    $isEarlyBreak = (!empty($row['ra_istirahat_keluar']) && $row['ra_istirahat_keluar'] != '00:00:00' && !empty($row['istirahat_keluar']) && $row['istirahat_keluar'] != '00:00:00' && strtotime($row['ra_istirahat_keluar']) < strtotime($row['istirahat_keluar']));
 
-                                        $total = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $potTidakLengkapValue + $row['r_potongan_lainnya']);
-                                        ?>
-                                        <tr class="hover:bg-blue-50/30 transition-colors">
-                                            <td data-label="Tanggal" class="py-4 px-3 text-sm font-bold text-gray-900"><?= date('d/m/Y', strtotime($row['tgl_realisasi_detail'])) ?></td>
-                                            <td data-label="Upah Pokok" class="py-4 px-3 text-sm font-medium text-gray-700"><?= rupiah($row['r_upah']) ?></td>
-                                            <td data-label="Jam Kerja" class="py-4 px-3 text-sm text-gray-600">
-                                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-bold"><?= $row['ra_masuk'] ?> - <?= $row['ra_keluar'] ?></span>
-                                            </td>
-                                            <td data-label="Pot. Telat" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potTelatValue) ?></td>
-                                            <td data-label="Pot. Istirahat" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potIstirahatValue) ?></td>
-                                            <td data-label="Pot. Pulang" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potPulangValue) ?></td>
-                                            <td data-label="Pot. Tidak Absen" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potTidakLengkapValue) ?></td>
-                                            <td data-label="Pot. Lain" class="py-4 px-3 text-sm font-bold text-orange-600"><?= rupiah($row['r_potongan_lainnya']) ?></td>
-                                            <td data-label="Lembur" class="py-4 px-3 text-sm font-bold text-emerald-600"><?= rupiah($row['lembur']) ?></td>
-                                            <td data-label="Total Net" class="py-4 px-3 text-[15px] font-extrabold text-blue-700 text-right"><?= rupiah($total) ?></td>
-                                        </tr>
-                                        <?php
+                                    // Skip Denda if wage is 0 or status is "Digantikan"
+                                    if ($row['r_upah'] == 0 || $row['status_rkk'] == 'Digantikan') {
+                                        $potTelatValue = 0;
+                                        $potIstirahatValue = 0;
+                                        $potPulangValue = 0;
+                                        $potTidakLengkapValue = 0;
+                                    } else {
+                                        $potTelatValue = $isLate ? $globalDendaMasuk : 0;
+                                        $potIstirahatValue = ($isEarlyBreak ? $globalDendaIstirahatKeluar : 0) + ($isLateBreak ? $globalDendaIstirahatMasuk : 0);
+                                        $potPulangValue = $isEarlyOut ? $globalDendaPulang : 0;
+                                        $potTidakLengkapValue = ($hasIncompleteMain || $hasIncompleteBreak) ? $globalDendaTidakLengkap : 0;
                                     }
+
+                                    $total = ($row['r_upah'] + $row['lembur']) - ($potTelatValue + $potIstirahatValue + $potPulangValue + $potTidakLengkapValue + $row['r_potongan_lainnya']);
+                            ?>
+                                    <tr class="hover:bg-blue-50/30 transition-colors">
+                                        <td data-label="Tanggal" class="py-4 px-3 text-sm font-bold text-gray-900"><?= date('d/m/Y', strtotime($row['tgl_realisasi_detail'])) ?></td>
+                                        <td data-label="Upah Pokok" class="py-4 px-3 text-sm font-medium text-gray-700"><?= rupiah($row['r_upah']) ?></td>
+                                        <td data-label="Jam Kerja" class="py-4 px-3 text-sm text-gray-600">
+                                            <span class="bg-gray-100 px-2 py-1 rounded text-[11px] font-bold"><?= $row['ra_masuk'] ?> - <?= $row['ra_keluar'] ?></span>
+                                        </td>
+                                        <td data-label="Pot. Telat" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potTelatValue) ?></td>
+                                        <td data-label="Pot. Istirahat" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potIstirahatValue) ?></td>
+                                        <td data-label="Pot. Pulang" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potPulangValue) ?></td>
+                                        <td data-label="Pot. Tidak Absen" class="py-4 px-3 text-sm font-bold text-rose-600"><?= rupiah($potTidakLengkapValue) ?></td>
+                                        <td data-label="Pot. Lain" class="py-4 px-3 text-sm font-bold text-orange-600"><?= rupiah($row['r_potongan_lainnya']) ?></td>
+                                        <td data-label="Lembur" class="py-4 px-3 text-sm font-bold text-emerald-600"><?= rupiah($row['lembur']) ?></td>
+                                        <td data-label="Total Net" class="py-4 px-3 text-[15px] font-extrabold text-blue-700 text-right"><?= rupiah($total) ?></td>
+                                    </tr>
+                                <?php
+                                }
                             } else {
                                 ?>
                                 <tr>
@@ -211,7 +218,7 @@ if (!function_exists('rupiah')) {
                                         </div>
                                     </td>
                                 </tr>
-                                <?php
+                            <?php
                             }
                             ?>
                         </tbody>
@@ -233,122 +240,320 @@ if (!function_exists('rupiah')) {
 </div>
 
 <style>
-    /* Styling khusus table-modern untuk slip */
-    @media screen and (max-width: 768px) {
-        .table-modern thead { display: none !important; }
-        .table-modern tbody tr {
-            display: block;
-            margin-bottom: 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px;
-            background: #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .table-modern tbody td {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0 !important;
-            border: none !important;
-            border-bottom: 1px dashed #f1f5f9 !important;
-            text-align: right !important;
-        }
-        .table-modern tbody td:last-child { 
-            border-bottom: none !important; 
-            padding-top: 12px !important;
-            margin-top: 5px;
-            background: #f8fafc;
-            border-radius: 8px;
-            padding-left: 10px !important;
-            padding-right: 10px !important;
-        }
-        .table-modern tbody td:before {
-            content: attr(data-label);
-            font-weight: 800;
-            color: #64748b;
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.5px;
-            text-align: left;
-        }
+    /* --- 1. RESET & WRAPPER --- */
+    .dataTables_wrapper {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: hidden;
+        /* Mencegah seluruh halaman geser */
     }
 
-    /* Styling Pagination & Info */
-    .dataTables_info {
+    /* Area responsive untuk tabel */
+    .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 1rem;
+    }
+
+    /* --- 2. INPUT DATE & FORM STYLING --- */
+    .custom-input {
+        width: 100%;
+        height: 40px !important;
+        padding: 0.5rem 0.75rem 0.5rem 2.75rem !important;
+        /* Padding kiri diperbesar agar teks tidak tumpuk icon */
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        outline: none;
+        font-size: 13px;
+        color: #374151;
+        transition: all 0.2s;
+    }
+
+    .custom-input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* Perbaikan Icon Date agar presisi */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        filter: invert(0.3);
+        /* Agar warna sedikit lebih kontras */
+    }
+
+    /* Container Icon di sebelah kiri input */
+    .relative span.absolute {
+        z-index: 10;
+        width: 2.5rem;
+        justify-content: center;
+    }
+
+    /* --- 3. MODERN TABLE DESIGN --- */
+    .table-modern {
+        border-collapse: collapse !important;
+        border-spacing: 0 8px !important;
+        width: 100% !important;
+        margin-bottom: 0 !important;
+    }
+
+    .table-modern thead th {
+        background-color: #f8fafc !important;
         color: #64748b !important;
-        font-size: 13px !important;
-        font-weight: 500 !important;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        padding: 12px 15px !important;
+        border: none !important;
+        white-space: nowrap;
+        /* Mencegah teks header turun ke bawah */
     }
 
-    .dataTables_paginate {
+    .table-modern tbody tr {
+        background-color: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s ease !important;
+    }
+
+    .table-modern tbody tr:hover {
+        background-color: #f1f5f9 !important;
+    }
+
+    .table-modern td {
+        padding: 12px 15px !important;
+        vertical-align: middle !important;
+        border-top: 1px solid #f1f5f9 !important;
+        border-bottom: 1px solid #f1f5f9 !important;
+        white-space: nowrap;
+        /* Mencegah kolom melebar karena teks kepanjangan */
+    }
+
+    .table-modern td:first-child {
+        border-left: 1px solid #f1f5f9 !important;
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .table-modern td:last-child {
+        border-right: 1px solid #f1f5f9 !important;
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    /* --- 4. DATATABLES UI MATCHING --- */
+    .dataTables_length label,
+    .dataTables_filter label {
+        font-size: 13px;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .dataTables_filter input {
+        margin-left: 10px !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 8px !important;
+        padding: 5px 12px !important;
+        outline: none;
+    }
+
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
+    .dataTables_wrapper {
+        display: block !important;
+    }
+
+    /* 2. Memaksa area atas (Length & Filter) menjadi satu baris sejajar */
+    .dataTables_wrapper::before,
+    .dataTables_wrapper::after {
+        display: none !important;
+    }
+
+    /* 3. Membuat container fleksibel untuk Length (kiri) dan Filter (kanan) */
+    #dataTables-example_wrapper .row:first-child {
         display: flex !important;
-        gap: 4px !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        margin-bottom: 20px !important;
+        width: 100% !important;
+    }
+
+    /* 4. Styling Tampil _MENU_ (Kiri) */
+    .dataTables_length {
+        display: flex !important;
         align-items: center !important;
     }
 
-    .dataTables_paginate .paginate_button {
-        padding: 5px 12px !important;
-        border-radius: 8px !important;
-        border: 1px solid #e2e8f0 !important;
-        background: white !important;
-        color: #475569 !important;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer !important;
-        outline: none !important;
+    .dataTables_length label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
         margin: 0 !important;
     }
 
-    .dataTables_paginate .paginate_button:hover:not(.disabled):not(.current) {
+    .dataTables_length select {
+        padding: 5px 10px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+    }
+
+    /* 5. Styling Cari: (Kanan) */
+    .dataTables_filter {
+        text-align: right !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+    }
+
+    .dataTables_filter label {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin: 0 !important;
+    }
+
+    .dataTables_filter input {
+        padding: 6px 12px !important;
+        border: 1px solid #e0e6ed !important;
+        border-radius: 8px !important;
+        width: 200px !important;
+    }
+
+    /* --- STYLING PAGINATE (PREV/NEXT) --- */
+    .dataTables_wrapper .dataTables_paginate {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        gap: 4px !important;
+        padding-top: 15px !important;
+    }
+
+    .dataTables_paginate .paginate_button {
+        border: 1px solid #e2e8f0 !important;
+        background: white !important;
+        border-radius: 6px !important;
+        padding: 5px 12px !important;
+        color: #475569 !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.2s !important;
+    }
+
+    .dataTables_paginate .paginate_button:hover {
         background: #f8fafc !important;
         color: #2563eb !important;
         border-color: #cbd5e1 !important;
-        text-decoration: none !important;
     }
 
     .dataTables_paginate .paginate_button.current {
         background: #2563eb !important;
-        color: white !important;
         border-color: #2563eb !important;
-        box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15) !important;
+        color: white !important;
     }
 
     .dataTables_paginate .paginate_button.disabled {
-        color: #94a3b8 !important;
         background: #f1f5f9 !important;
-        border-color: #e2e8f0 !important;
+        color: #94a3b8 !important;
         cursor: not-allowed !important;
     }
 
-    .dataTables_paginate .paginate_button.previous,
-    .dataTables_paginate .paginate_button.next {
-        background: #f8fafc !important;
-        font-weight: 700 !important;
-        border-color: #e2e8f0 !important;
+    /* --- STYLING INFO --- */
+    .dataTables_wrapper .dataTables_info {
+        padding-top: 20px !important;
+        color: #64748b !important;
+        font-size: 13px !important;
+    }
+
+    /* --- 5. RESPONSIVE (MOBILE) --- */
+    @media screen and (max-width: 1024px) {
+
+        /* Jika layar tablet, biarkan table bisa scroll horizontal */
+        .table-modern {
+            min-width: 900px;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .table-modern {
+            min-width: 100% !important;
+            border-spacing: 0 12px !important;
+        }
+
+        .table-modern thead {
+            display: none !important;
+        }
+
+        .table-modern tbody tr {
+            display: block;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .table-modern tbody tr:hover {
+            transform: none !important;
+        }
+
+        .table-modern tbody td {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            padding: 8px 10px !important;
+            border: none !important;
+            border-bottom: 1px dashed #f1f5f9 !important;
+            font-size: 13px !important;
+            white-space: normal;
+            /* Biarkan teks bungkus di mobile */
+        }
+
+        .table-modern tbody td:before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-size: 10px;
+            min-width: 100px;
+            text-align: left;
+        }
+
+        .table-modern tbody td:last-child {
+            background: #f0f7ff;
+            border-radius: 10px;
+            margin-top: 5px;
+            border-bottom: none !important;
+        }
+
+        .table-modern tbody td:last-child:before {
+            content: "TOTAL NET";
+            color: #2563eb;
+        }
     }
 </style>
 
 <script>
     $(document).ready(function() {
-        if ($('#slipTable').length && $('#slipTable').find('tbody tr td[colspan]').length === 0) {
-            // Kita gunakan standard DataTable tapi minimalis
-            $('#slipTable').DataTable({
-                "pageLength": 10,
-                "autoWidth": false,
-                "responsive": true,
-                "language": {
-                    "search": "Cari Baris:",
-                    "lengthMenu": "_MENU_",
-                    "info": "Menampilkan _START_ - _END_ dari _TOTAL_ data"
-                },
-                "dom": '<"flex flex-col md:flex-row justify-between items-center mb-4 gap-3"f>t<"flex flex-col md:flex-row justify-between items-center mt-4 gap-3"ip>'
-            });
-            
+        $('#slipTable').DataTable({
+                pageLength: 25,
+                autoWidth: false,
+                responsive: false,
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Semua"]
+                ],
+                language: {
+                    search: "Cari:",
+                    searchPlaceholder: "Cari data...",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ s/d _END_ dari _TOTAL_ data",
+                    paginate: {
+                        previous: "Prev",
+                        next: "Next"
+                    }
+                }
+            }),
             // Perbaiki gaya input DataTables agar matching
             $('.dataTables_filter input').addClass('w-full md:w-auto px-3 py-1.5 border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-500');
-            $('.dataTables_filter label').addClass('w-full md:w-auto flex flex-col md:flex-row md:items-center gap-2');
-        }
+        $('.dataTables_filter label').addClass('w-full md:w-auto flex flex-col md:flex-row md:items-center gap-2');
     });
 </script>
