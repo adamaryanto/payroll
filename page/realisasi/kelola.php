@@ -670,7 +670,7 @@ function bulkSavePenalties($koneksi, $id_realisasi)
                                             <div class="mt-1">
                                                 <?php if ($data['status_rkk'] == 'Hadir') : ?>
                                                     <?php if ($attendanceStatus == 'TIDAK HADIR') : ?>
-                                                        <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir (Sync)</span>
+                                                        <span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Tidak Hadir </span>
                                                     <?php else : ?>
                                                         <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Hadir</span>
                                                     <?php endif; ?>

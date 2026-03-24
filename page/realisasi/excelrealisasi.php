@@ -53,16 +53,20 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 <table border="1" style="border-collapse:collapse;">
     <thead>
         <tr>
-            <th colspan="20" style="text-align:center; font-size:20px; font-weight:bold;">
+            <th colspan="22" style="text-align:center; font-size:20px; font-weight:bold;">
                 LAPORAN REALISASI UPAH
             </th>
         </tr>
         <tr>
-            <th colspan="20" style="text-align:center; font-size:16px;">
+            <th colspan="22" style="text-align:center; font-size:16px;">
                 Tanggal Realisasi: <?php echo $info['tgl_realisasi'] ? date('d/m/Y', strtotime($info['tgl_realisasi'])) : '-'; ?> |
                 <?php echo $info['jam_masuk'] . " / " . $info['jam_keluar']; ?>
             </th>
         </tr>
+        <tr><td colspan="22" style="text-align:center;">JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
+        <tr><td colspan="22" style="text-align:center;">JIKALAU ISTIRAHAT KURANG DARI JAM 12:00 DAN MASUK SETELAH ISTIRAHAT LEBIH DARI JAM 13:00 MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
+        <tr><td colspan="22" style="text-align:center;">MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td></tr>
+        <tr><td colspan="22" style="text-align:center;">MASUK JAM 09:00-10:00 ISTIRAHAT JAM 13:00 MASUK JAM ISTIRAHAT JAM 14:00</td></tr>
         <?php
         $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
         $d_denda = $q_denda->fetch_assoc();
@@ -90,7 +94,7 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
             // 2. Tampilkan Header Departemen
             echo "<tr>
-                    <td colspan='20' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
+                    <td colspan='22' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
                         DEPARTEMEN: " . strtoupper($dept['nama_departmen']) . "
                     </td>
                   </tr>";
@@ -104,9 +108,11 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             <th style='background:#e5e7eb; text-align:center;'>Posisi</th>
             <th style='background:#e5e7eb; text-align:center;'>Absen Masuk</th>
             <th style='background:#e5e7eb; text-align:center;'>Absen Keluar</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Masuk (R)</th>
-            <th style='background:#e5e7eb; text-align:center;'>Istirahat (R)</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Pulang (R)</th>
+            <th style='background:#e5e7eb; text-align:center;'>Absen Istirahat Keluar</th>
+            <th style='background:#e5e7eb; text-align:center;'>Absen Istirahat Masuk</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Masuk</th>
+            <th style='background:#e5e7eb; text-align:center;'>Istirahat</th>
+            <th style='background:#e5e7eb; text-align:center;'>Jam Pulang</th>
             <th style='background:#e5e7eb; text-align:center;'>Hasil Kerja</th>
             <th style='background:#e5e7eb; text-align:center;'>Upah</th>
             <th style='background:#e5e7eb; text-align:center;'>Pot. Telat</th>
@@ -192,6 +198,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
                     $disp_masuk = (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $data['ra_masuk'] : '';
                 $disp_keluar = (!empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00') ? $data['ra_keluar'] : '';
+                $disp_ist_keluar = (!empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00') ? $data['ra_istirahat_keluar'] : '';
+                $disp_ist_masuk = (!empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00') ? $data['ra_istirahat_masuk'] : '';
 
             echo "<tr>
                 <td style='text-align:center;'>{$no}</td>
@@ -201,6 +209,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 <td style='text-align:center;'>{$data['nama_sub_department']}</td>
                 <td style='text-align:center;'>{$disp_masuk}</td>
                 <td style='text-align:center;'>{$disp_keluar}</td>
+                <td style='text-align:center;'>{$disp_ist_keluar}</td>
+                <td style='text-align:center;'>{$disp_ist_masuk}</td>
                 <td style='text-align:center;'>{$data['r_jam_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_jam_keluar']}</td>
@@ -219,16 +229,16 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                 $no++;
             }
             echo "<tr>
-            <td colspan='20' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
+            <td colspan='22' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
             TOTAL UPAH ($jml_karyawan Karyawan) | Rp " . number_format($total, 0, ",", ".") . "
             </td>
             </tr>";
 
             // pemisah antar departemen
-            echo "<tr><td colspan='20' style='height:20px;'></td></tr>";
+            echo "<tr><td colspan='22' style='height:20px;'></td></tr>";
         }
         echo "<tr>
-        <td colspan='20' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
+        <td colspan='22' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
         GRAND TOTAL UPAH ($grand_karyawan Karyawan) | Rp " . number_format($grand_total, 0, ",", ".") . "
         </td>
         </tr>";

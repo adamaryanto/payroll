@@ -20,7 +20,11 @@ $idrkk_ref = $data_real['id_rkk'];
 if (isset($_POST['simpan_karyawan'])) {
     $id_real_fix = intval($_POST['id_real_hidden']);
     $nama_manual = $koneksi->real_escape_string($_POST['nama_karyawan_manual']);
-    $upah        = str_replace('.', '', $_POST['upah_manual']);
+    
+    // Ambil default upah - Bergantung pada sistem global/golongan (Harian saat ini)
+    $q_upah_bg   = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
+    $d_upah_bg   = $q_upah_bg->fetch_assoc();
+    $upah        = $d_upah_bg['upah_harian'] ?? 0;
     $id_dept     = $_POST['id_departmen'];
     $id_sub      = $_POST['id_sub_department'];
     $id_os       = $_POST['id_os_dhk'] ?? 0;
@@ -123,15 +127,9 @@ $default_upah = $global_upah['upah_harian'] ?? 0;
                 <input type="hidden" name="ra_keluar" value="">
                 <div class="p-6 md:p-10">
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap Karyawan <span class="text-rose-500">*</span></label>
-                            <input type="text" name="nama_karyawan_manual" required autofocus class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none" placeholder="Nama Karyawan..." />
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Upah Harian <span class="text-rose-500">*</span></label>
-                            <input type="text" name="upah_manual" value="<?= number_format($default_upah, 0, ',', '.') ?>" class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none font-bold text-blue-700" />
-                        </div>
+                    <div class="mb-8">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap Karyawan <span class="text-rose-500">*</span></label>
+                        <input type="text" name="nama_karyawan_manual" required autofocus class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none" placeholder="Nama Karyawan..." />
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -203,15 +201,6 @@ $default_upah = $global_upah['upah_harian'] ?? 0;
             containerCssClass: 'modern-select2'
         });
 
-        // Format Rupiah Input
-        $('#upah_manual').on('keyup', function() {
-            let value = $(this).val().replace(/[^0-9]/g, '');
-            if (value !== '') {
-                $(this).val(new Intl.NumberFormat('id-ID').format(value));
-            } else {
-                $(this).val('0');
-            }
-        });
     });
 </script>
 
