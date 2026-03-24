@@ -239,7 +239,6 @@ $q_list = $koneksi->query("SELECT A.id_karyawan, A.no_absen, A.nama_karyawan, B.
     .table-modern {
         border-collapse: separate !important;
         border-spacing: 0 8px !important;
-        /* Memberi jarak antar baris */
         background: transparent !important;
     }
 

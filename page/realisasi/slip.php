@@ -29,7 +29,6 @@ if (!function_exists('rupiah')) {
 
         <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 px-6 md:px-8 py-6">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/30 shadow-inner">
                         <i class="fas fa-file-invoice-dollar text-2xl"></i>
@@ -46,13 +45,11 @@ if (!function_exists('rupiah')) {
                         </p>
                     </div>
                 </div>
-
                 <a href="index.php?page=realisasi&aksi=slip"
                     class="w-40 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/20 transition-all active:scale-90"
                     title="Kembali">
                     <i class="fas fa-arrow-left mr-2"></i>Kembali
                 </a>
-
             </div>
         </div>
         <div class="p-4 md:p-8">

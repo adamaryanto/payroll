@@ -197,7 +197,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
 
               <?php if (strtolower($role) == 'admin master') { ?>
               <li class="nav-item">
-                <a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i><p>Setting Device</p></a>
+              <a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i><p>Setting Device</p></a>
               </li>
               <?php } ?>
               <?php } ?>
