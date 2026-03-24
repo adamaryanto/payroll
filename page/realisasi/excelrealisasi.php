@@ -81,9 +81,9 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
 
         // 1. Ambil list departemen yang hanya ada di realisasi ini
         $sqlDept = $koneksi->query("SELECT DISTINCT D.* FROM ms_departmen D 
-                                     JOIN tb_rkk_detail RD ON D.id_departmen = RD.id_departmen
-                                     JOIN tb_realisasi_detail AD ON RD.id_rkk_detail = AD.id_rkk_detail
-                                     WHERE AD.id_realisasi = '$id'
+                                     JOIN tb_realisasi_detail AD ON AD.id_realisasi = '$id'
+                                     LEFT JOIN tb_rkk_detail RD ON AD.id_rkk_detail = RD.id_rkk_detail
+                                     WHERE D.id_departmen = COALESCE(NULLIF(AD.id_departmen, 0), RD.id_departmen)
                                      ORDER BY D.id_departmen ASC");
         while ($dept = $sqlDept->fetch_assoc()) {
             $id_dept = $dept['id_departmen'];
@@ -136,48 +136,24 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             FROM tb_realisasi_detail A 
             LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
             LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
-            LEFT JOIN ms_departmen D ON RD.id_departmen = D.id_departmen
-            LEFT JOIN ms_sub_department S ON RD.id_sub_department = S.id_sub_department
-            LEFT JOIN ms_os_dhk O ON B.id_os_dhk = O.id_os_dhk
-            LEFT JOIN ms_golongan G ON B.id_golongan = G.id_golongan
+            LEFT JOIN ms_departmen D ON COALESCE(NULLIF(A.id_departmen, 0), RD.id_departmen) = D.id_departmen
+            LEFT JOIN ms_sub_department S ON COALESCE(NULLIF(A.id_sub_department, 0), RD.id_sub_department) = S.id_sub_department
+            LEFT JOIN ms_os_dhk O ON COALESCE(NULLIF(A.id_os_dhk, 0), B.id_os_dhk) = O.id_os_dhk
+            LEFT JOIN ms_golongan G ON COALESCE(NULLIF(A.id_golongan, 0), B.id_golongan) = G.id_golongan
             LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
             WHERE A.id_realisasi = '$id' 
-            AND RD.id_departmen = '$id_dept'");
+            AND COALESCE(NULLIF(A.id_departmen, 0), RD.id_departmen) = '$id_dept'");
 
             $no = 1;
             $total = 0;
             $jml_karyawan = 0;
             while ($data = $tampil->fetch_assoc()) {
-                // Logika Pelanggaran Dinamis
-                $has_masuk = !empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00';
-                $has_keluar = !empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00';
-                $has_ist_masuk = !empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00';
-                $has_ist_keluar = !empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00';
-
-                $isTotalMissing = (!$has_masuk && !$has_keluar);
-                $hasIncompleteMain = ($has_masuk xor $has_keluar);
-                $isRestExpected = (!empty($data['r_istirahat_keluar']) && $data['r_istirahat_keluar'] != '00:00:00');
-                $hasIncompleteBreak = ($isRestExpected && (!$has_ist_keluar || !$has_ist_masuk));
-                $isIncompleteLog = ($hasIncompleteMain || $hasIncompleteBreak || ($isTotalMissing && $data['status_rkk'] != 'Tidak Hadir'));
-
-                $isLate = ($has_masuk && !empty($data['r_jam_masuk']) && strtotime($data['ra_masuk']) > strtotime($data['r_jam_masuk']));
-                $isEarlyOut = ($has_keluar && !empty($data['r_jam_keluar']) && strtotime($data['ra_keluar']) < strtotime($data['r_jam_keluar']));
-                $isLateBreak = ($has_ist_masuk && !empty($data['r_istirahat_masuk']) && strtotime($data['ra_istirahat_masuk']) > strtotime($data['r_istirahat_masuk']));
-                $isEarlyBreak = ($has_ist_keluar && !empty($data['r_istirahat_keluar']) && strtotime($data['ra_istirahat_keluar']) < strtotime($data['r_istirahat_keluar']));
-
-                if ($data['status_realisasi_detail'] == 1) {
-                    $potTelatValue = $data['r_potongan_telat'];
-                    $potIstirahatAwal = $data['r_potongan_istirahat_awal'];
-                    $potIstirahatTelat = $data['r_potongan_istirahat_telat'];
-                    $potPulangValue = $data['r_potongan_pulang'];
-                    $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'];
-                } else {
-                    $potTelatValue = $isLate ? $globalDendaMasuk : 0;
-                    $potIstirahatAwal = $isEarlyBreak ? $globalDendaIstirahatAwal : 0;
-                    $potIstirahatTelat = $isLateBreak ? $globalDendaIstirahatTelat : 0;
-                    $potPulangValue = ($isEarlyOut && !$isTotalMissing) ? $globalDendaPulang : 0;
-                    $potTidakLengkapValue = $isIncompleteLog ? $globalDendaTidakLengkap : 0;
-                }
+                // Ambil denda dari database langsung (sudah akurat dan mencakup log cross-midnight)
+                $potTelatValue = $data['r_potongan_telat'] ?? 0;
+                $potIstirahatAwal = $data['r_potongan_istirahat_awal'] ?? 0;
+                $potIstirahatTelat = $data['r_potongan_istirahat_telat'] ?? 0;
+                $potPulangValue = $data['r_potongan_pulang'] ?? 0;
+                $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'] ?? 0;
 
                 $potongan = $potTelatValue + $potIstirahatAwal + $potIstirahatTelat + $data['r_potongan_lainnya'] + $potPulangValue + $potTidakLengkapValue;
 
@@ -214,14 +190,17 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                     (!empty($data['menggantikan']) && !empty($data['digantikan_oleh']) ? " &" : "") .
                     (!empty($data['digantikan_oleh']) ? " (Digantikan oleh " . $data['digantikan_oleh'] . ")" : "");
 
-                echo "<tr>
+                    $disp_masuk = (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $data['ra_masuk'] : '';
+                $disp_keluar = (!empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00') ? $data['ra_keluar'] : '';
+
+            echo "<tr>
                 <td style='text-align:center;'>{$no}</td>
                 <td style='text-align:left;'>{$nama_display}</td>
                 <td style='text-align:center;'>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
                 <td style='text-align:center;'>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
                 <td style='text-align:center;'>{$data['nama_sub_department']}</td>
-                <td style='text-align:center;'>{$data['ra_masuk']}</td>
-                <td style='text-align:center;'>{$data['ra_keluar']}</td>
+                <td style='text-align:center;'>{$disp_masuk}</td>
+                <td style='text-align:center;'>{$disp_keluar}</td>
                 <td style='text-align:center;'>{$data['r_jam_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
                 <td style='text-align:center;'>{$data['r_jam_keluar']}</td>

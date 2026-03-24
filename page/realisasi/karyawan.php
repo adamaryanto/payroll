@@ -23,7 +23,11 @@ if (isset($_POST['simpan_karyawan'])) {
     $upah        = str_replace('.', '', $_POST['upah_manual']);
     $id_dept     = $_POST['id_departmen'];
     $id_sub      = $_POST['id_sub_department'];
+    $id_os       = $_POST['id_os_dhk'] ?? 0;
+    $id_gol      = $_POST['id_golongan'] ?? 0;
     $id_jadwal   = $_POST['id_jadwal'];
+    $ra_masuk    = $_POST['ra_masuk'] ?: '00:00:00';
+    $ra_keluar   = $_POST['ra_keluar'] ?: '00:00:00';
 
     // Handle Tags untuk Dept & Sub
     if (!empty($id_dept) && !is_numeric($id_dept)) {
@@ -41,6 +45,14 @@ if (isset($_POST['simpan_karyawan'])) {
     if (!empty($nama_manual) && !empty($id_jadwal) && $id_real_fix > 0) {
         $tgl_ref = $data_real['tgl_realisasi'] ?? date('Y-m-d');
 
+        // Ambil data jadwal untuk detail shift
+        $q_j_detail = $koneksi->query("SELECT * FROM tb_jadwal WHERE id_jadwal = '$id_jadwal'");
+        $d_j_detail = $q_j_detail->fetch_assoc();
+        $s_masuk    = $d_j_detail['jam_masuk'] ?? '00:00:00';
+        $s_keluar   = $d_j_detail['jam_keluar'] ?? '00:00:00';
+        $ist_masuk  = $d_j_detail['istirahat_masuk'] ?? '00:00:00';
+        $ist_keluar = $d_j_detail['istirahat_keluar'] ?? '00:00:00';
+
         // Tambahkan OS_DHK dan golongan ke query
         $query = "INSERT INTO tb_realisasi_detail 
             (id_realisasi, id_rkk, id_rkk_detail, id_karyawan, nama_karyawan_manual, 
@@ -49,16 +61,29 @@ if (isset($_POST['simpan_karyawan'])) {
              r_potongan_lainnya, r_jam_masuk, r_jam_keluar, r_istirahat_masuk, 
              r_istirahat_keluar, r_status, r_update, ra_masuk, ra_keluar, 
              ra_istirahat_masuk, ra_istirahat_keluar, hasil_kerja, lembur, 
-             tgl_realisasi_detail, r_potongan_pulang, r_potongan_tidak_lengkap) 
+             tgl_realisasi_detail, r_potongan_pulang, r_potongan_tidak_lengkap,
+             id_os_dhk, id_golongan) 
             VALUES 
             ($id_real_fix, '$idrkk_ref', 0, 0, '$nama_manual', 
              '$id_dept', '$id_sub', '$upah', '$id_jadwal', 1,
-             0, 0, 0, 0, '00:00', '00:00', '00:00', '00:00', 1, 'manual', 
-             '00:00', '00:00', '00:00', '00:00', '-', 0, 
-             '$tgl_ref', 0, 0)";
+             0, 0, 0, 0, '$s_masuk', '$s_keluar', '$ist_masuk', '$ist_keluar', 'Hadir', 'manual', 
+             '$ra_masuk', '$ra_keluar', '00:00:00', '00:00:00', '-', 0, 
+             '$tgl_ref', 0, 0, '$id_os', '$id_gol')";
 
         if ($koneksi->query($query)) {
-            echo "<script>alert('Karyawan Manual Berhasil Ditambahkan'); window.location.href = '?page=realisasi&aksi=kelola&id=$id_real_fix';</script>";
+            echo "
+            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil',
+                    text: 'Karyawan Manual Berhasil Ditambahkan',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = '?page=realisasi&aksi=karyawan&id=$id_real_fix';
+                });
+            </script>";
             exit;
         } else {
             echo "Error: " . $koneksi->error;
@@ -70,6 +95,8 @@ if (isset($_POST['simpan_karyawan'])) {
 $list_dept   = $koneksi->query("SELECT * FROM ms_departmen ORDER BY nama_departmen ASC");
 $list_sub    = $koneksi->query("SELECT * FROM ms_sub_department ORDER BY nama_sub_department ASC");
 $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC");
+$list_os     = $koneksi->query("SELECT * FROM ms_os_dhk ORDER BY OS_DHK ASC");
+$list_gol    = $koneksi->query("SELECT * FROM ms_golongan ORDER BY golongan ASC");
 $q_upah      = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
 $global_upah = $q_upah->fetch_assoc();
 $default_upah = $global_upah['upah_harian'] ?? 0;
@@ -92,6 +119,8 @@ $default_upah = $global_upah['upah_harian'] ?? 0;
 
             <form method="POST">
                 <input type="hidden" name="id_real_hidden" value="<?= $idrealisasi; ?>">
+                <input type="hidden" name="ra_masuk" value="">
+                <input type="hidden" name="ra_keluar" value="">
                 <div class="p-6 md:p-10">
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -130,6 +159,27 @@ $default_upah = $global_upah['upah_harian'] ?? 0;
                                 <option value="">- Pilih Sub -</option>
                                 <?php while ($s = $list_sub->fetch_assoc()) : ?>
                                     <option value="<?= $s['id_sub_department']; ?>"><?= $s['nama_sub_department']; ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Penyedia OS/DHK <span class="text-rose-500">*</span></label>
+                            <select name="id_os_dhk" required class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none">
+                                <option value="">- Pilih OS/DHK -</option>
+                                <?php while ($o = $list_os->fetch_assoc()) : ?>
+                                    <option value="<?= $o['id_os_dhk']; ?>"><?= $o['OS_DHK']; ?></option>
+                                <?php endwhile; ?>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Golongan <span class="text-rose-500">*</span></label>
+                            <select name="id_golongan" required class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none">
+                                <option value="">- Pilih Golongan -</option>
+                                <?php while ($g = $list_gol->fetch_assoc()) : ?>
+                                    <option value="<?= $g['id_golongan']; ?>"><?= $g['golongan']; ?></option>
                                 <?php endwhile; ?>
                             </select>
                         </div>

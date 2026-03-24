@@ -23,43 +23,43 @@ if (!$is_authorized_delete) {
 
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
-if (!empty($_POST['id_rkk_pilih'])) {
-$ids = $_POST['id_rkk_pilih'];
-$count = 0;
+    if (!empty($_POST['id_rkk_pilih'])) {
+        $ids = $_POST['id_rkk_pilih'];
+        $count = 0;
 
-foreach ($ids as $id) {
-$id = intval($id);
-// 1. Hapus Detail (karyawan) terlebih dahulu karena relasi FK
-$koneksi->query("DELETE FROM tb_rkk_detail WHERE id_rkk = $id");
-// 2. Hapus Data Utama
-if ($koneksi->query("DELETE FROM tb_rkk WHERE id_rkk = $id")) {
-$count++;
-}
-}
-echo "<script>
-    setTimeout(function() {
-        Swal.fire({
-            title: 'Berhasil!',
-            text: '$count data telah dihapus secara permanen.',
-            icon: 'success',
-            confirmButtonColor: '#e11d48'
-        }).then(() => {
-            window.location.href = '?page=rkk&aksi=hapus_massal';
-        });
-    }, 100);
-</script>";
-} else {
-echo "<script>
-    setTimeout(function() {
-        Swal.fire({
-            title: 'Pilih Data!',
-            text: 'Silakan centang data yang ingin dihapus terlebih dahulu.',
-            icon: 'warning',
-            confirmButtonColor: '#e11d48'
-        });
-    }, 100);
-</script>";
-}
+        foreach ($ids as $id) {
+            $id = intval($id);
+            // 1. Hapus Detail (karyawan) terlebih dahulu karena relasi FK
+            $koneksi->query("DELETE FROM tb_rkk_detail WHERE id_rkk = $id");
+            // 2. Hapus Data Utama
+            if ($koneksi->query("DELETE FROM tb_rkk WHERE id_rkk = $id")) {
+                $count++;
+            }
+        }
+        echo "<script>
+            setTimeout(function() {
+                Swal.fire({
+                    title: 'Berhasil!',
+                    text: '$count data telah dihapus secara permanen.',
+                    icon: 'success',
+                    confirmButtonColor: '#e11d48'
+                }).then(() => {
+                    window.location.href = '?page=rkk&aksi=hapus_massal';
+                });
+            }, 100);
+        </script>";
+    } else {
+        echo "<script>
+            setTimeout(function() {
+                Swal.fire({
+                    title: 'Pilih Data!',
+                    text: 'Silakan centang data yang ingin dihapus terlebih dahulu.',
+                    icon: 'warning',
+                    confirmButtonColor: '#e11d48'
+                });
+            }, 100);
+        </script>";
+    }
 }
 
 // Query Tampil Data
@@ -68,8 +68,67 @@ $tampil = $koneksi->query("SELECT A.*,
 FROM tb_rkk A ORDER BY A.tgl_rkk ASC, A.id_rkk ASC");
 ?>
 
+<style>
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 1.5rem;
+        padding-bottom: 1rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.375rem 0.75rem !important;
+        margin-left: 0.25rem !important;
+        border-radius: 0.375rem !important;
+        border: 1px solid #e5e7eb !important; 
+        background: #ffffff !important;
+        color: #374151 !important; 
+        cursor: pointer !important;
+        text-decoration: none !important;
+        font-size: 0.875rem !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
+        background: #f3f4f6 !important; 
+        color: #111827 !important; 
+        border-color: #d1d5db !important; 
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current, 
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #e11d48 !important; 
+        color: #ffffff !important;
+        border-color: #e11d48 !important;
+        font-weight: bold;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        background: #f9fafb !important;
+        color: #9ca3af !important;
+        border-color: #e5e7eb !important;
+        box-shadow: none !important;
+    }
+
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+        padding: 0 1rem;
+    }
+    .dataTables_wrapper .dataTables_info {
+        padding: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+</style>
+
 <div class="container-fluid px-3 mt-4 mb-4">
-    <form method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data yang dipilih? Data yang dihapus tidak bisa dikembalikan!')">
+    <form method="POST" id="formHapusMassal">
         <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
 
             <div class="border-b border-gray-200 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center bg-white gap-4">
@@ -81,9 +140,12 @@ FROM tb_rkk A ORDER BY A.tgl_rkk ASC, A.id_rkk ASC");
                     <a href="?page=rkk" class="flex-1 md:flex-none justify-center inline-flex items-center bg-gray-100 hover:bg-gray-200 text-gray-700 text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
                         <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                     </a>
-                    <button type="submit" name="proses_hapus" class="flex-1 md:flex-none justify-center border-0 inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
+                    
+                    <button type="button" onclick="konfirmasiHapus()" class="flex-1 md:flex-none justify-center border-0 inline-flex items-center bg-rose-600 hover:bg-rose-700 text-white text-[15px] font-medium py-2.5 px-5 rounded shadow-sm transition-colors">
                         <i class="fas fa-trash mr-1.5"></i> Hapus Terpilih
                     </button>
+                    
+                    <input type="hidden" name="proses_hapus" value="1">
                 </div>
             </div>
 

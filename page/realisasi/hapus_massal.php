@@ -21,7 +21,6 @@ if (!$is_authorized_delete) {
     exit;
 }
 
-
 // Proses Hapus Jika Form Disubmit
 if (isset($_POST['proses_hapus'])) {
     if (!empty($_POST['id_realisasi_pilih'])) {
@@ -61,6 +60,66 @@ $tampil = $koneksi->query("SELECT A.*,
     ) as jml
     FROM tb_realisasi A ORDER BY A.tgl_realisasi ASC, A.id_realisasi ASC");
 ?>
+
+<style>
+    .dataTables_wrapper .dataTables_paginate {
+        margin-top: 1.5rem;
+        padding-bottom: 1rem;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.375rem 0.75rem !important;
+        margin-left: 0.25rem !important;
+        border-radius: 0.375rem !important;
+        border: 1px solid #e5e7eb !important; /* border-gray-200 */
+        background: #ffffff !important;
+        color: #374151 !important; /* text-gray-700 */
+        cursor: pointer !important;
+        text-decoration: none !important;
+        font-size: 0.875rem !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover:not(.disabled) {
+        background: #f3f4f6 !important; /* bg-gray-100 */
+        color: #111827 !important; /* text-gray-900 */
+        border-color: #d1d5db !important; /* border-gray-300 */
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current, 
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+        background: #e11d48 !important; /* bg-rose-600 */
+        color: #ffffff !important;
+        border-color: #e11d48 !important;
+        font-weight: bold;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+        opacity: 0.5 !important;
+        cursor: not-allowed !important;
+        background: #f9fafb !important;
+        color: #9ca3af !important;
+        border-color: #e5e7eb !important;
+        box-shadow: none !important;
+    }
+
+    /* Memperbaiki jarak dropdown lengthMenu dan input search */
+    .dataTables_wrapper .dataTables_length, 
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 1rem;
+        padding: 0 1rem;
+    }
+    .dataTables_wrapper .dataTables_info {
+        padding: 1rem;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+</style>
 
 <div class="container-fluid px-3 mt-4 mb-4">
     <form method="POST" id="formHapusMassal">

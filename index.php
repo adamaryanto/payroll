@@ -170,7 +170,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               </li>
 
               <li class="nav-item">
-                <a href="?page=realisasi&aksi=karyawan" class="nav-link">
+                <a href="?page=realisasi&aksi=slip" class="nav-link">
                   <i class="nav-icon fas fa-file-invoice-dollar"></i>
                   <p>Cetak Slip</p>
                 </a>

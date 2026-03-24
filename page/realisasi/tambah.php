@@ -62,7 +62,7 @@ $tglreal = $data_tgl['tgl_realisasi'];
                COALESCE(B.istirahat_masuk, '00:00:00'), 
                COALESCE(B.istirahat_keluar, '00:00:00'), 
                A.id_jadwal, 0, 0, 0, 0, 0, 0, 
-               0, '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 
+               'Hadir', '', '00:00:00', '00:00:00', '00:00:00', '00:00:00', 
                0, '', 0, '$tglreal' 
         from tb_rkk_detail A
         LEFT JOIN tb_jadwal B ON A.id_jadwal = B.id_jadwal

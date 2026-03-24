@@ -1,5 +1,5 @@
 <?php
-$id = $_GET['id'];
+$id = $_GET['id'] ?? '';
 $ttgl1 = date("Y-m-d");
 
 // Ambil Nama Karyawan untuk Header
@@ -10,6 +10,11 @@ $q_karyawan = $koneksi->query("SELECT A.nama_karyawan, B.nama_departmen
 $d_karyawan = $q_karyawan->fetch_assoc();
 $namaKaryawan = $d_karyawan ? $d_karyawan['nama_karyawan'] : 'Karyawan';
 $deptKaryawan = $d_karyawan ? $d_karyawan['nama_departmen'] : '-';
+
+// Ambil ID Realisasi dari detail terakhir untuk navigasi kembali
+$q_realisasi = $koneksi->query("SELECT id_realisasi FROM tb_realisasi_detail WHERE id_karyawan = '$id' ORDER BY id_realisasi_detail DESC LIMIT 1");
+$d_realisasi = $q_realisasi->fetch_assoc();
+$idRealisasi = $d_realisasi ? $d_realisasi['id_realisasi'] : 0;
 
 if (!function_exists('rupiah')) {
     function rupiah($angka) {
@@ -33,7 +38,7 @@ if (!function_exists('rupiah')) {
                     </div>
                 </div>
                 <div class="flex items-center w-full md:w-auto mt-2 md:mt-0">
-                    <a href="?page=realisasi&aksi=karyawan" class="w-full md:w-auto inline-flex justify-center items-center bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-5 rounded-xl border border-white/20 transition-all backdrop-blur-sm">
+                    <a href="?page=realisasi&aksi=kelola&id=<?= $idRealisasi ?>" class="w-full md:w-auto inline-flex justify-center items-center bg-white/10 hover:bg-white/20 text-white text-sm font-bold py-2.5 px-5 rounded-xl border border-white/20 transition-all backdrop-blur-sm">
                         <i class="fas fa-arrow-left mr-2"></i> Kembali
                     </a>
                 </div>
@@ -41,41 +46,57 @@ if (!function_exists('rupiah')) {
         </div>
 
         <div class="p-4 md:p-8">
-            <form method="POST" enctype="multipart/form-data" class="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl mb-8">
+            <form method="GET" class="bg-blue-50/50 border border-blue-100 p-5 rounded-2xl mb-8">
+                <input type="hidden" name="page" value="realisasi">
+                <input type="hidden" name="aksi" value="slip">
+                
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-end">
                     <div class="md:col-span-4">
+                        <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Pilih Karyawan</label>
+                        <select name="id" class="select2-manage w-full" data-placeholder="- Pilih Karyawan -" required>
+                            <option value=""></option>
+                            <?php
+                            $q_all_kar = $koneksi->query("SELECT id_karyawan, no_absen, nama_karyawan FROM ms_karyawan WHERE status_karyawan = 'Aktif' ORDER BY nama_karyawan ASC");
+                            while($kar = $q_all_kar->fetch_assoc()) {
+                                $selected = ($kar['id_karyawan'] == $id) ? 'selected' : '';
+                                echo "<option value='{$kar['id_karyawan']}' {$selected}>{$kar['no_absen']} - {$kar['nama_karyawan']}</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3">
                         <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Dari Tanggal</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="date" name="ttgl1" required value="<?= $_POST['ttgl1'] ?? $ttgl1 ?>" 
+                            <input type="date" name="ttgl1" required value="<?= $_GET['ttgl1'] ?? $ttgl1 ?>" 
                                 class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-gray-700 font-medium">
                         </div>
                     </div>
-                    <div class="md:col-span-4">
+                    <div class="md:col-span-3">
                         <label class="block text-sm font-bold text-gray-700 mb-2 ml-1">Sampai Tanggal</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 pointer-events-none">
                                 <i class="fas fa-calendar-alt"></i>
                             </span>
-                            <input type="date" name="ttgl2" required value="<?= $_POST['ttgl2'] ?? $ttgl1 ?>" 
+                            <input type="date" name="ttgl2" required value="<?= $_GET['ttgl2'] ?? $ttgl1 ?>" 
                                 class="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all outline-none text-gray-700 font-medium">
                         </div>
                     </div>
-                    <div class="md:col-span-4 mt-2 md:mt-0">
-                        <button type="submit" name="simpan" value="Search" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <div class="md:col-span-2 mt-2 md:mt-0">
+                        <button type="submit" name="cari" value="Search" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
                             <i class="fas fa-search shadow-sm"></i>
-                            <span>Cari Slip Gaji</span>
+                            <span>Cari</span>
                         </button>
                     </div>
                 </div>
             </form>
 
             <?php
-            if (isset($_POST['simpan'])) {
-                $ttgl11 = $_POST['ttgl1'];
-                $ttgl22 = $_POST['ttgl2'];
+            if (isset($_GET['cari']) && $id) {
+                $ttgl11 = $_GET['ttgl1'];
+                $ttgl22 = $_GET['ttgl2'];
 
                 // Ambil denda global
                 $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");

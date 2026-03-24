@@ -118,22 +118,19 @@ if ($datastatusrkk == 3) {
       </div>
     </div>
 
-    <div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
-      <div class="row">
+<div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
+    <div class="row">
         <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-          <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
-          <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
+            <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
+            <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
         </div>
-        <div class="col-md-5 col-sm-12 mb-3 mb-md-0">
-          <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
-          <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
+        
+        <div class="col-md-9 col-sm-12 mb-3 mb-md-0">
+            <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
+            <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
         </div>
-        <div class="col-md-4 col-sm-12">
-          <label class="font-bold text-gray-700 text-sm">Jam Kerja:</label>
-          <input type="text" value="<?= $datajamkerja; ?> Jam" readonly class="form-control text-base py-2" />
-        </div>
-      </div>
     </div>
+</div>
 
     <div class="p-0">
       <div class="table-responsive px-3 md:px-4 py-4">

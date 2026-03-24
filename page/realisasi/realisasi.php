@@ -4,55 +4,32 @@ $where_real = "";
 $tampil = $koneksi->query("SELECT A.*, 
     (SELECT COUNT(RD.id_realisasi_detail) 
      FROM tb_realisasi_detail RD 
-     JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
-     WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan'
+     LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
+     WHERE RD.id_realisasi = A.id_realisasi AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')
     ) as jml,
     (SELECT SUM(
-        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan' OR (RD.status_realisasi_detail > 0 AND (RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00')),
-            0,
-            IF(RD.status_realisasi_detail > 0 AND (RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00'), 0, RD.r_upah + IFNULL(RD.lembur, 0)) - 
-            IF(RD.status_realisasi_detail = 0, 0, (
-                IF(RD.ra_masuk > J.jam_masuk AND RD.ra_masuk != '00:00:00' AND RD.ra_masuk != '' AND J.jam_masuk != '00:00:00' AND J.jam_masuk != '', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0) + 
-                IF(RD.ra_istirahat_masuk > J.istirahat_masuk AND RD.ra_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat_masuk FROM tb_denda LIMIT 1), 0) + 
-                IF(RD.ra_istirahat_keluar < J.istirahat_keluar AND RD.ra_istirahat_keluar != '00:00:00' AND RD.ra_istirahat_keluar != '' AND J.istirahat_keluar != '00:00:00' AND J.istirahat_keluar != '', (SELECT denda_istirahat_keluar FROM tb_denda LIMIT 1), 0) + 
-                IF(RD.status_realisasi_detail = 1, RD.r_potongan_pulang, IF(RD.ra_keluar < J.jam_keluar AND RD.ra_keluar != '00:00:00' AND RD.ra_keluar != '' AND J.jam_keluar != '00:00:00' AND J.jam_keluar != '', (SELECT denda_pulang FROM tb_denda LIMIT 1), 0)) +
-                IF(RD.status_realisasi_detail = 1, RD.r_potongan_tidak_lengkap, IF(((RD.ra_masuk != '' AND RD.ra_masuk != '00:00:00' AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00')) OR ((RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND RD.ra_keluar != '' AND RD.ra_keluar != '00:00:00') OR (J.istirahat_keluar != '' AND J.istirahat_keluar != '00:00:00' AND ((RD.ra_istirahat_keluar = '' OR RD.ra_istirahat_keluar = '00:00:00') OR (RD.ra_istirahat_masuk = '' OR RD.ra_istirahat_masuk = '00:00:00')))), (SELECT denda_tidak_lengkap FROM tb_denda LIMIT 1), 0)) +
-                RD.r_potongan_lainnya
-            ))
-        )
+        (IFNULL(RD.r_upah, 0) + IFNULL(RD.lembur, 0)) - 
+        (IFNULL(RD.r_potongan_telat, 0) + 
+         IFNULL(RD.r_potongan_istirahat_awal, 0) + 
+         IFNULL(RD.r_potongan_istirahat_telat, 0) + 
+         IFNULL(RD.r_potongan_pulang, 0) + 
+         IFNULL(RD.r_potongan_tidak_lengkap, 0) + 
+         IFNULL(RD.r_potongan_lainnya, 0))
     ) 
     FROM tb_realisasi_detail RD 
-    JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
-    LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
+    LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail
     WHERE RD.id_realisasi = A.id_realisasi 
-    AND RKD.status_rkk != 'Digantikan'
+    AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')
     ) as ttl, 
-    (SELECT SUM(IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan' OR RD.status_realisasi_detail = 0, 0, RD.r_potongan_lainnya)) 
+    (SELECT SUM(IFNULL(RD.r_potongan_lainnya, 0)) 
      FROM tb_realisasi_detail RD 
-     JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
-     WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan'
+     LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail 
+     WHERE RD.id_realisasi = A.id_realisasi AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')
     ) as potlainnya,
-    (SELECT SUM(
-        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan' OR RD.status_realisasi_detail = 0 OR (RD.status_realisasi_detail > 0 AND (RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00')), 0,
-            IF(RD.ra_masuk > J.jam_masuk AND RD.ra_masuk != '00:00:00' AND RD.ra_masuk != '' AND J.jam_masuk != '00:00:00' AND J.jam_masuk != '', (SELECT denda_masuk FROM tb_denda LIMIT 1), 0)
-        )
-    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_telat,
-    (SELECT SUM(
-        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan' OR RD.status_realisasi_detail = 0 OR (RD.status_realisasi_detail > 0 AND (RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00')), 0,
-            IF(RD.ra_istirahat_masuk > J.istirahat_masuk AND RD.ra_istirahat_masuk != '00:00:00' AND RD.ra_istirahat_masuk != '' AND J.istirahat_masuk != '00:00:00' AND J.istirahat_masuk != '', (SELECT denda_istirahat_masuk FROM tb_denda LIMIT 1), 0) +
-            IF(RD.ra_istirahat_keluar < J.istirahat_keluar AND RD.ra_istirahat_keluar != '00:00:00' AND RD.ra_istirahat_keluar != '' AND J.istirahat_keluar != '00:00:00' AND J.istirahat_keluar != '', (SELECT denda_istirahat_keluar FROM tb_denda LIMIT 1), 0)
-        )
-    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_istirahat,
-    (SELECT SUM(
-        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan' OR RD.status_realisasi_detail = 0 OR (RD.status_realisasi_detail > 0 AND (RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00')), 0,
-            IF(RD.status_realisasi_detail = 1, RD.r_potongan_pulang, IF(RD.ra_keluar < J.jam_keluar AND RD.ra_keluar != '00:00:00' AND RD.ra_keluar != '' AND J.jam_keluar != '00:00:00' AND J.jam_keluar != '', (SELECT denda_pulang FROM tb_denda LIMIT 1), 0))
-        )
-    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_pulang,
-    (SELECT SUM(
-        IF(RKD.status_rkk = 'Tidak Hadir' OR RKD.status_rkk = 'Digantikan' OR RD.status_realisasi_detail = 0 OR (RD.status_realisasi_detail > 0 AND (RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00')), 0,
-            IF(RD.status_realisasi_detail = 1, RD.r_potongan_tidak_lengkap, IF(((RD.ra_masuk != '' AND RD.ra_masuk != '00:00:00' AND (RD.ra_keluar = '' OR RD.ra_keluar = '00:00:00')) OR ((RD.ra_masuk = '' OR RD.ra_masuk = '00:00:00') AND RD.ra_keluar != '' AND RD.ra_keluar != '00:00:00') OR (J.istirahat_keluar != '' AND J.istirahat_keluar != '00:00:00' AND ((RD.ra_istirahat_keluar = '' OR RD.ra_istirahat_keluar = '00:00:00') OR (RD.ra_istirahat_masuk = '' OR RD.ra_istirahat_masuk = '00:00:00')))), (SELECT denda_tidak_lengkap FROM tb_denda LIMIT 1), 0))
-        )
-    ) FROM tb_realisasi_detail RD JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal WHERE RD.id_realisasi = A.id_realisasi AND RKD.status_rkk != 'Digantikan') as p_log
+    (SELECT SUM(IFNULL(RD.r_potongan_telat, 0)) FROM tb_realisasi_detail RD LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail WHERE RD.id_realisasi = A.id_realisasi AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')) as p_telat,
+    (SELECT SUM(IFNULL(RD.r_potongan_istirahat_awal, 0) + IFNULL(RD.r_potongan_istirahat_telat, 0)) FROM tb_realisasi_detail RD LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail WHERE RD.id_realisasi = A.id_realisasi AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')) as p_istirahat,
+    (SELECT SUM(IFNULL(RD.r_potongan_pulang, 0)) FROM tb_realisasi_detail RD LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail WHERE RD.id_realisasi = A.id_realisasi AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')) as p_pulang,
+    (SELECT SUM(IFNULL(RD.r_potongan_tidak_lengkap, 0)) FROM tb_realisasi_detail RD LEFT JOIN tb_rkk_detail RKD ON RD.id_rkk_detail = RKD.id_rkk_detail WHERE RD.id_realisasi = A.id_realisasi AND (RKD.id_rkk_detail IS NULL OR RKD.status_rkk != 'Digantikan')) as p_log
     FROM tb_realisasi A $where_real ORDER BY A.tgl_realisasi ASC, A.id_realisasi ASC");
 
 // Logika Akses: Owner dan Admin Master yang bisa Approve/Unapprove Realisasi
