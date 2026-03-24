@@ -170,7 +170,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
               </li>
 
               <li class="nav-item">
-                <a href="?page=realisasi&aksi=slip" class="nav-link">
+                <a href="?page=realisasi&aksi=slipk" class="nav-link">
                   <i class="nav-icon fas fa-file-invoice-dollar"></i>
                   <p>Cetak Slip</p>
                 </a>
@@ -197,7 +197,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
 
               <?php if (strtolower($role) == 'admin master') { ?>
               <li class="nav-item">
-                <a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i><p>Setting Device</p></a>
+              <a href="?page=mesin" class="nav-link"><i class="nav-icon fas fa-cog"></i><p>Setting Device</p></a>
               </li>
               <?php } ?>
               <?php } ?>
@@ -350,6 +350,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                         elseif ($aksi == "detail") { include "page/realisasi/detail.php"; } 
                         elseif ($aksi == "karyawan") { include "page/realisasi/karyawan.php"; } 
                         elseif ($aksi == "slip") { include "page/realisasi/slip.php"; }
+                        elseif ($aksi == "slipk") { include "page/realisasi/slipk.php"; }
                         elseif ($aksi == "hapus_massal") { include "page/realisasi/hapus_massal.php"; }
                     }
                   } else if ($page == 'boneless') {
