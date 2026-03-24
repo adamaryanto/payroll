@@ -65,7 +65,7 @@ echo "<script>
 // Query Tampil Data
 $tampil = $koneksi->query("SELECT A.*,
 (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml
-FROM tb_rkk A ORDER BY A.tgl_rkk DESC");
+FROM tb_rkk A ORDER BY A.tgl_rkk ASC, A.id_rkk ASC");
 ?>
 
 <div class="container-fluid px-3 mt-4 mb-4">
