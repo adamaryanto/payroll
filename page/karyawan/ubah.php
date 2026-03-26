@@ -25,6 +25,7 @@ if (isset($_GET['id'])) {
     $jeniskelamin = $data['jenis_kelamin'];
     $agama = $data['agama'];
     $statuskawin = $data['status_kawin'];
+    $upah = $data['upah'];
 }
 
 if (isset($_POST['update'])) {
@@ -45,6 +46,7 @@ if (isset($_POST['update'])) {
     $talamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
     $talamattinggal = isset($_POST['talamattinggal']) ? $koneksi->real_escape_string($_POST['talamattinggal']) : '';
     $ttanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
+    $tupah = !empty($_POST['tupah']) ? floatval(str_replace(['Rp', '.', ' '], '', $_POST['tupah'])) : 0;
 
     $tdepartmen = $koneksi->real_escape_string($_POST['tdepartmen']);
     $tsubdept = $koneksi->real_escape_string($_POST['tsubdept']);
@@ -67,7 +69,8 @@ if (isset($_POST['update'])) {
         tgl_aktif = '$ttanggalbergabung',
         id_os_dhk = '$tos',
         id_golongan = '$tgolongan',
-        status_karyawan = '$tstatuskaryawan'
+        status_karyawan = '$tstatuskaryawan',
+        upah = '$tupah'
         WHERE id_karyawan = '$tid'
     ");
 
@@ -314,10 +317,14 @@ if (isset($_POST['update'])) {
                     <h4 class="text-sm font-bold text-indigo-600 uppercase tracking-wider mb-4 flex items-center">
                         <i class="fas fa-money-bill-wave mr-2 text-lg"></i> Informasi Penggajian
                     </h4>
-                    <div class="grid grid-cols-1 md:grid-cols-1 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
                         <div class="form-group">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Bergabung</label>
                             <input type="date" name="ttanggalbergabung" value="<?= $tglaktif; ?>" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Harian Baru (Rp) <span class="text-red-500">*</span></label>
+                            <input type="text" name="tupah" id="tupah_format" value="<?= number_format($upah, 0, ',', '.'); ?>" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-indigo-700" placeholder="0">
                         </div>
                     </div>
                 </div>
@@ -354,6 +361,13 @@ if (isset($_POST['update'])) {
 
 <script>
     $(document).ready(function() {
+        $('#tupah_format').on('input', function() {
+            let val = $(this).val().replace(/[^0-9]/g, '');
+            if (val !== "") {
+                $(this).val(new Intl.NumberFormat('id-ID').format(parseInt(val)));
+            }
+        });
+
         // 1. Logika untuk Select2 Manage
         $('.select2-manage').on('change', function() {
             var $select = $(this);

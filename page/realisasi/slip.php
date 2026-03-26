@@ -6,6 +6,14 @@ $ttgl1 = date("Y-m-d");
 $q_realisasi = $koneksi->query("SELECT id_realisasi FROM tb_realisasi_detail WHERE id_karyawan = '$id' ORDER BY id_realisasi_detail DESC LIMIT 1");
 $d_realisasi = $q_realisasi->fetch_assoc();
 $idRealisasi = $d_realisasi ? $d_realisasi['id_realisasi'] : 0;
+// Ambil data karyawan & departemen untuk header
+$q_karyawan_info = $koneksi->query("SELECT A.nama_karyawan, B.nama_departmen 
+                                    FROM ms_karyawan A 
+                                    LEFT JOIN ms_departmen B ON A.id_departmen = B.id_departmen 
+                                    WHERE A.id_karyawan = '$id'");
+$d_karyawan_info = $q_karyawan_info->fetch_assoc();
+$namaKaryawan = $d_karyawan_info['nama_karyawan'] ?? 'Karyawan Tidak Ditemukan';
+$deptKaryawan = $d_karyawan_info['nama_departmen'] ?? '-';
 
 if (!function_exists('rupiah')) {
     function rupiah($angka)
@@ -36,7 +44,7 @@ if (!function_exists('rupiah')) {
                         </p>
                     </div>
                 </div>
-                <a href="index.php?page=realisasi&aksi=slip"
+                <a href="index.php?page=realisasi&aksi=slipk"
                     class="w-40 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center text-white border border-white/20 transition-all active:scale-90"
                     title="Kembali">
                     <i class="fas fa-arrow-left mr-2"></i>Kembali

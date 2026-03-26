@@ -17,15 +17,16 @@ if (isset($_POST['simpan'])) {
     $alamatktp = isset($_POST['talamatktp']) ? $koneksi->real_escape_string($_POST['talamatktp']) : '';
     $alamattinggal = isset($_POST['talamattinggal']) ? $koneksi->real_escape_string($_POST['talamattinggal']) : '';
     $tanggalbergabung = isset($_POST['ttanggalbergabung']) && $_POST['ttanggalbergabung'] !== '' ? $koneksi->real_escape_string($_POST['ttanggalbergabung']) : date('Y-m-d');
+    $upah = !empty($_POST['tupah']) ? floatval(str_replace(['Rp', '.', ' '], '', $_POST['tupah'])) : 0;
 
     $sql = $koneksi->query("INSERT INTO ms_karyawan (
         id_departmen, id_jabatan, no_absen, nama_karyawan, tempat_lahir, tgl_lahir, agama, 
         status_kawin, jenis_kelamin, no_ktp, no_bpjs, alamat_ktp, alamat_tinggal, 
-        status_karyawan, tgl_aktif, id_sub_department, id_os_dhk, id_golongan, id_jadwal
+        status_karyawan, tgl_aktif, id_sub_department, id_os_dhk, id_golongan, id_jadwal, upah
     ) VALUES (
         '$departmen', '$jabatan', '$noabsen', '$nama', '$tempatlahir', '$tanggallahir', '$agama',
         '$statuskawin', '$jeniskelamin', '$noktp', '$nobpjs', '$alamatktp', '$alamattinggal',
-        'Aktif', '$tanggalbergabung', '$subdept', '$os', '$golongan', '0'
+        'Aktif', '$tanggalbergabung', '$subdept', '$os', '$golongan', '0', '$upah'
     )");
 
     if ($sql) {
@@ -243,6 +244,11 @@ if (isset($_POST['simpan'])) {
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal Bergabung <span class="text-red-500">*</span></label>
                             <input type="date" name="ttanggalbergabung" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none">
                         </div>
+
+                        <div class="form-group">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Upah Harian (Rp) <span class="text-red-500">*</span></label>
+                            <input type="text" name="tupah" id="tupah_format" required class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 outline-none font-bold text-indigo-700" placeholder="0">
+                        </div>
                     </div>
                 </div>
 
@@ -302,6 +308,13 @@ if (isset($_POST['simpan'])) {
 
 <script>
 $(document).ready(function() {
+    $('#tupah_format').on('input', function() {
+        let val = $(this).val().replace(/[^0-9]/g, '');
+        if (val !== "") {
+            $(this).val(new Intl.NumberFormat('id-ID').format(parseInt(val)));
+        }
+    });
+
     $('.select2-manage').on('change', function() {
         var $select = $(this);
         var selectName = $select.attr('name');

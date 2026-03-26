@@ -21,10 +21,7 @@ if (isset($_POST['simpan_karyawan'])) {
     $id_real_fix = intval($_POST['id_real_hidden']);
     $nama_manual = $koneksi->real_escape_string($_POST['nama_karyawan_manual']);
     
-    // Ambil default upah - Bergantung pada sistem global/golongan (Harian saat ini)
-    $q_upah_bg   = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
-    $d_upah_bg   = $q_upah_bg->fetch_assoc();
-    $upah        = $d_upah_bg['upah_harian'] ?? 0;
+    $upah        = !empty($_POST['upah']) ? floatval(str_replace(['Rp', '.', ' '], '', $_POST['upah'])) : 0;
     $id_dept     = $_POST['id_departmen'];
     $id_sub      = $_POST['id_sub_department'];
     $id_os       = $_POST['id_os_dhk'] ?? 0;
@@ -101,9 +98,8 @@ $list_sub    = $koneksi->query("SELECT * FROM ms_sub_department ORDER BY nama_su
 $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC");
 $list_os     = $koneksi->query("SELECT * FROM ms_os_dhk ORDER BY OS_DHK ASC");
 $list_gol    = $koneksi->query("SELECT * FROM ms_golongan ORDER BY golongan ASC");
-$q_upah      = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
-$global_upah = $q_upah->fetch_assoc();
-$default_upah = $global_upah['upah_harian'] ?? 0;
+// Default upah baku (Harian standar)
+$default_upah = 115000;
 ?>
 
 <div class="container-fluid px-3 mt-8 mb-10">
@@ -127,9 +123,15 @@ $default_upah = $global_upah['upah_harian'] ?? 0;
                 <input type="hidden" name="ra_keluar" value="">
                 <div class="p-6 md:p-10">
                     
-                    <div class="mb-8">
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap Karyawan <span class="text-rose-500">*</span></label>
-                        <input type="text" name="nama_karyawan_manual" required autofocus class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none" placeholder="Nama Karyawan..." />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Nama Lengkap Karyawan <span class="text-rose-500">*</span></label>
+                            <input type="text" name="nama_karyawan_manual" id="nama_karyawan_manual" required autofocus class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none" placeholder="Nama Karyawan..." />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Upah Harian (Manual) <span class="text-rose-500">*</span></label>
+                            <input type="text" name="upah" id="upah_manual" required class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none font-bold text-blue-600" value="<?= number_format($default_upah, 0, ',', '.') ?>" />
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -195,6 +197,271 @@ $default_upah = $global_upah['upah_harian'] ?? 0;
 
 <script>
     $(document).ready(function() {
+        // Mapping Upah Smart Defaults
+        const nameToWage = {
+            "HERI KRISTANTO": 0,
+            "FEBRIANI CAHYANING PUTRI": 125000,
+            "SUCI CAHYA SARI": 125000,
+            "NURHANIFAH": 162692,
+            "WENNY DELLA NAINGGOLAN": 162692,
+            "WASPA PAYANGGA TAMA": 230769,
+            "EDI PURWANTO": 226000,
+            "ARNOLD STEVEN CHRISTOVER": 166000,
+            "BERTI WILA RILISA": 125000,
+            "TASHA ANATASIA": 161500,
+            "DENA DWI FITRIANA": 142307,
+            "STIVANY ANGELICA NAINGGOLAN": 161538,
+            "JUWARI": 162692,
+            "BUSHERI": 125000,
+            "ROMLI": 162692,
+            "JUNAEDI SP": 125000,
+            "MASRULI": 130000,
+            "JIMAN": 130000,
+            "EKO SUPARMAN": 130000,
+            "HALIMATUSYADIAH": 130000,
+            "SAFIROH JULIANTI": 130000,
+            "IPI HARWANTO": 0,
+            "DARSIM": 162692,
+            "AKBAR": 0,
+            "AMBRANI": 140000,
+            "ZAINUDIN": 0,
+            "JERRY ARLAN SAPUTRA": 0,
+            "ERYK ADAM PURWANTO": 0,
+            "AGUS AINI": 200000,
+            "FAHRUDIN": 140000,
+            "SURYA": 140000,
+            "ARMAN ASHARI": 140000,
+            "EFAUDIN": 140000,
+            "SUTRISNA": 140000,
+            "DONI RISWANDI": 140000,
+            "SABAN": 140000,
+            "HERDIN DEVIANTO": 140000,
+            "AHMAD SOPA": 80000,
+            "RIAN": 80000,
+            "ADI SETIAWAN": 80000,
+            "MUHAMMAD KHAERUL ILMI": 80000,
+            "FAIZAL LULHAK": 80000,
+            "MAMUN JAWAWI": 162692,
+            "DESINTA LARASATI": 125000,
+            "MERRY YANA": 120000,
+            "INDRA HALIM HARAHAP": 100000,
+            "BADAWIYA": 125000,
+            "ROBI MAULANA": 100000,
+            "SANDRI": 125000,
+            "DONI KHADAFI": 100000,
+            "UDIN NAYUDIN": 100000,
+            "SUPRATMAN": 100000,
+            "MUHAMAD IDRUS SIHABUDIN": 100000,
+            "AMIN ARIFIN": 153486,
+            "DIDI WAHYUDI": 125000,
+            "IMAM MARSUGI": 100000,
+            "MUHAMAD YUSUF": 100000,
+            "VITUS SUPARNO": 100000,
+            "TABRONI": 100000,
+            "ABDUL ROSID": 175000,
+            "MOHAMAD DAYAT": 175000,
+            "APRIL YADI": 125000,
+            "MAMAN SURYAMAN": 100000,
+            "ASEP HERMAWAN": 100000,
+            "SUPYANI": 100000,
+            "SUSI RATNA SARI": 125000,
+            "MUSTOPA": 100000,
+            "KHAERUL AMIN": 100000,
+            "MUHAMAD ABDUL RAHMAN": 100000,
+            "HERLI": 100000,
+            "NAJALA RIDWAN DWI KURNIAWAN": 100000,
+            "ANDRIYANSYAH": 100000,
+            "MUHAMAD HARIS SAPUTRA": 100000,
+            "RIVALDI": 100000,
+            "IKHSAN": 100000,
+            "AHMAD AWALUDIN": 161538,
+            "MARDIANTO": 161538,
+            "HENDRIK SAFRUDIN": 161538,
+            "TAUFIN RAHMAT": 100000,
+            "ABDUL ROHIM": 100000,
+            "DEDEN HIDAYAT": 100000,
+            "DENI PURWAHID": 100000,
+            "KINTAN JELITA": 100000,
+            "MUHAMAD SAHRONI": 100000,
+            "JUMHANI": 180000,
+            "JUBAEDI": 200000,
+            "IRWAN SUSENO": 125000,
+            "JAKA IRAWAN": 125000,
+            "YULIAWATI": 100000,
+            "SAHRONI": 125000,
+            "AHMAD FAUZI": 130000,
+            "APRIZON": 110000,
+            "NUR APIS": 120000,
+            "EKI ANDIKA": 135000,
+            "AGIS": 120000,
+            "GANI ASEPSO": 110000,
+            "SYARBENI MULHAM HASSAN RANGKUTI": 100000,
+            "WAWAN": 100000,
+            "YUSRI": 100000,
+            "ISROIL": 100000,
+            "KOMAR": 100000,
+            "DARMINAH": 125000,
+            "SITI SOPIAH": 125000,
+            "SAHRUL BAHRI": 100000,
+            "MAHA RANI SHABITA": 100000,
+            "SITI NUR FITRIANI": 100000,
+            "MELIYA": 100000,
+            "ECE": 100000,
+            "MUHAMAD ALFISYAHRIL": 100000,
+            "ABEL": 100000,
+            "ALFRIZA KARNIA AMANSA": 100000,
+            "LOLA": 100000,
+            "ARIFIN": 125000,
+            "TAMAMI": 125000,
+            "IPIT PATMAWATI": 100000,
+            "AI TITIN SUHARTINI": 100000,
+            "SITI SUMIYATI": 100000,
+            "FRISCA ENG RILIANI": 100000,
+            "ALI IMRON": 100000,
+            "ORMAN ES": 100000,
+            "BISONO": 100000,
+            "RAMIRAN": 100000,
+            "RONI MARTA SATRIA": 100000,
+            "EFAN FRAMTAMA": 0,
+            "MISDI": 125000,
+            "EDI SISWANTO": 125000,
+            "MULYADI": 125000,
+            "HAMDANI": 115000,
+            "AGUS RAHARJO": 115000,
+            "MAHMUDIN": 115000,
+            "MAWI": 125000,
+            "ANDRIAN": 125000,
+            "SUGENG RIYADI": 125000,
+            "MUHAMAD KHAERUL IKHSAN": 125000,
+            "FAREL": 125000,
+            "JUANDA": 115000,
+            "ROHMAN ABDUROHMAN": 115000,
+            "SADWAL": 125000,
+            "HERMAWAN": 125000,
+            "UMAEDI": 125000,
+            "IBNU": 120000,
+            "SODIKIN": 125000,
+            "MIKAWI": 125000,
+            "YAMIN": 100000,
+            "AHMADI": 100000,
+            "ANGGIANSYAH": 100000,
+            "IWAN SETIAWAN": 100000,
+            "AGUS SUWITO": 100000,
+            "ANNISA ZAHIRA": 125000,
+            "MUHAMAD AGAM MALIK": 125000,
+            "HAFIYA SHERLI PUTRI": 125000,
+            "DEDE ROSADI": 80000,
+            "SANDI FERDIANSYAH": 80000,
+            "YOGI ARITA": 100000,
+            "SUSI SUSIANTI": 100000,
+            "SAPUJI": 100000,
+            "WIWIN KURNIATI": 100000,
+            "FITRI YULIANI": 100000,
+            "DEDEH": 100000,
+            "ROHMAT": 100000,
+            "MUHAMAD MADYANI": 100000,
+            "MUHAMAD SANDAR": 100000,
+            "AHMAD LOMRI": 140000,
+            "SHADAM KHADAFI": 100000,
+            "YULI KISMONO": 140000,
+            "DEDE IRFANSYAH": 140000,
+            "SOLEMAN": 140000,
+            "EDI SUWANTORO": 0,
+            "LOUT PARLAUNGAN NASUTION": 130000,
+            "WISNU WARDANA": 211538,
+            "ABDUL MUHIT": 212,
+            "REYNALDI RAHARDIAN": 130000,
+            "ARI NUGRAHA": 100000,
+            "ALDI MAULANA": 100000,
+            "M.RUSWANDI": 100000,
+            "GUNAWAN": 100000,
+            "GALIH SYALENDRA": 100000,
+            "HENDAR SUHENDAR": 100000,
+            "ADI FIRMASNYAH": 100000,
+            "SUTISNA": 100000,
+            "MUHAMAD SOPIAN FEBRIANI": 125000,
+            "YULIYANA": 100000,
+            "TEDI SYARFELA": 100000,
+            "ARI YANTO": 100000,
+            "MERRY MERCURY": 100000,
+            "RYAN ALDRIANSYAH": 100000,
+            "SUMARNO": 100000,
+            "EM ILYAS TAMI": 100000,
+            "KOMARUDIN": 100000,
+            "NUR HODIJAH": 0,
+            "DENI SAPUTRA": 150000,
+            "EFRIAWAN": 100000,
+            "SAEPUL FAHRI": 100000,
+            "FITRI APRILLIANA DEWI": 130000,
+            "MULYANA": 120000,
+            "IHWANUDIN": 120000,
+            "MUHAMAD JUN": 120000,
+            "MULYA": 120000,
+            "MUHDI": 120000,
+            "YAYAT RUHIYAT": 110000,
+            "AMIN SOBRI": 110000,
+            "FIKRI ALIYUDIN": 110000,
+            "IKHSAN ANUGRAH ILLAHI": 161500,
+            "MARIUS GANDARDO": 125000,
+            "SYEILA PUTRI UTAMI": 125000,
+            "TAUFIK ROHMAN": 140000,
+            "WANTO": 100000,
+            "SARNA": 100000,
+            "DEDE GUNAWAN": 100000,
+            "TRY HEYSA PEBRIAWAN": 100000,
+            "SEPTI AMELIA": 100000,
+            "ALVIANA": 100000,
+            "ALIYASIN": 100000,
+            "SYAIDINA UMAR": 100000,
+            "KOMET HENDRA": 100000,
+            "EGI FIARUCI": 120000,
+            "YOSPIN PRAMANA PUTRA": 110000,
+            "AHMAD NURIL": 110000,
+            "IRGI PURNAMA PUTRA": 120000,
+            "RIZAL DANUARTA": 110000,
+            "MAULANA FEBRIAN": 110000,
+            "MAD ROBI": 120000,
+            "ABDULAH": 120000,
+            "ANNISA NURAINI": 100000,
+            "DIDAH": 100000,
+            "SUKRI WIJAYA": 100000,
+            "RYAN AULIA": 100000,
+            "RENDI": 125000,
+            "RIO AHMAD": 100000,
+            "AHMAT RASSOKI": 110000,
+            "HERICCA UTAMA MULYA": 181923,
+            "FADHLY PULUNGAN": 100000,
+            "DICKY FAHROZI": 100000,
+            "WISNU NUGRAHA": 100000,
+            "PARIYADI": 100000,
+            "RUBAI": 100000,
+            "ALDIYANSAH": 100000,
+            "MAMIT": 100000
+        };
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        $('#nama_karyawan_manual').on('input', function() {
+            const name = $(this).val().toUpperCase().trim();
+            if (nameToWage.hasOwnProperty(name)) {
+                const wage = nameToWage[name];
+                if (wage > 0) {
+                    $('#upah_manual').val(formatRupiah(wage));
+                }
+            }
+        });
+
+        $('#upah_manual').on('input', function() {
+            let val = $(this).val().replace(/[^0-9]/g, '');
+            if (val !== "") {
+                $(this).val(formatRupiah(parseInt(val)));
+            }
+        });
+
         $('.select2-karyawan').select2({
             width: '100%',
             dropdownAutoWidth: true,

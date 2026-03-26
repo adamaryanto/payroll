@@ -143,6 +143,13 @@ if (isset($_GET['id'])) {
                             <?php echo $golongan ? $golongan : '-'; ?>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <label class="block text-sm font-semibold text-gray-500 mb-2">Upah Harian</label>
+                        <div class="px-4 py-3 bg-indigo-50 rounded-lg border border-indigo-100 text-indigo-700 font-bold">
+                            Rp <?php echo number_format($data['upah'] ?? 0, 0, ',', '.'); ?>
+                        </div>
+                    </div>
                 </div>
             </div>
 

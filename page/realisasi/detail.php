@@ -117,10 +117,8 @@ if (isset($_GET['id'])) {
     $globalDendaPulang = $dataDenda['denda_pulang'] ?? 0;
     $globalDendaTidakLengkap = $dataDenda['denda_tidak_lengkap'] ?? 0;
 
-    // Get Global Daily Wage as fallback for manual employees
-    $q_upah_global = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
-    $d_upah_global = $q_upah_global->fetch_assoc();
-    $default_upah = (float)($d_upah_global['upah_harian'] ?? 0);
+    // Get Global Daily Wage as fallback for manual employees (Hardcoded fallback)
+    $default_upah = 115000;
 
     // Tentukan data yang digunakan untuk kalkulasi potongan (Input ra_ atau Log Mesin)
     $jamMasukRealisasi = !empty($datadetail['ra_masuk']) ? $datadetail['ra_masuk'] : ($datadetailabsen['absen_masuk'] ?? '');
@@ -381,10 +379,8 @@ if (isset($_POST['simpan'])) {
         $tstatus_hadir = 'Hadir';
         // Kembalikan ke upah awal jika upah POST adalah 0 (misal kena override JS saat initial load)
         if ($tupah <= 0) {
-            // Re-fetch default_upah inside the POST block too
-            $q_upah_post = $koneksi->query("SELECT upah_harian FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
-            $d_upah_post = $q_upah_post->fetch_assoc();
-            $def_upah_post = (float)($d_upah_post['upah_harian'] ?? 0);
+            // Hardcoded fallback inside the POST block too
+            $def_upah_post = 115000;
 
             $upah_ref = ($datadetail['r_upah'] > 0) ? (float)$datadetail['r_upah'] : 
                        (!empty($datadetail['upah_master']) ? (float)$datadetail['upah_master'] : $def_upah_post);

@@ -148,7 +148,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <?php if (strtolower($role) != 'admin hr') { ?>
                   <li class="nav-item"><a href="?page=user" class="nav-link"><i class="fas fa-user-shield nav-icon"></i><p>User</p></a></li>
                   <?php } ?>
-                  <li class="nav-item"><a href="?page=upah" class="nav-link"><i class="fas fa-money-bill-wave nav-icon"></i><p>Master Upah</p></a></li>
                   <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="far fa-clock nav-icon"></i><p>Jadwal</p></a></li>
                   <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><p>Denda</p></a></li>
                 </ul>
@@ -227,7 +226,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "ubah") { include "page/karyawan/ubah.php"; } 
                     elseif ($aksi == "view") { include "page/karyawan/view.php"; } 
                     elseif ($aksi == "shift") { include "page/karyawan/shift.php"; } 
-                    elseif ($aksi == "upah") { include "page/karyawan/upah.php"; }
                   } else if ($page == 'bagian') {
                     if ($aksi == "") { include "page/bagian/bagian.php"; } 
                     elseif ($aksi == "hapus") { include "page/bagian/hapus.php"; } 
@@ -272,11 +270,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                       elseif ($aksi == "tambah") { include "page/user/tambah.php"; } 
                       elseif ($aksi == "ubah") { include "page/user/ubah.php"; } 
                     }
-                  } else if ($page == 'upah') {
-                    if ($aksi == "") { include "page/upah/upah.php"; } 
-                    elseif ($aksi == "hapus") { include "page/upah/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/upah/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/upah/ubah.php"; }
                   } else if ($page == 'sakit') {
                     if ($aksi == "") { include "page/siac/sakit/sakit.php"; } 
                     elseif ($aksi == "hapus") { include "page/siac/sakit/hapus.php"; } 

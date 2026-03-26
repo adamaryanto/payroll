@@ -94,12 +94,10 @@ $list_dept   = $koneksi->query("SELECT * FROM ms_departmen ORDER BY nama_departm
 $list_sub    = $koneksi->query("SELECT * FROM ms_sub_department ORDER BY nama_sub_department ASC");
 $list_jadwal = $koneksi->query("SELECT * FROM tb_jadwal ORDER BY id_jadwal ASC");
 
-// Upah global
-$q_upah = $koneksi->query("SELECT * FROM ms_upah ORDER BY id_upah DESC LIMIT 1");
-$global_upah = $q_upah->fetch_assoc();
-$g_harian   = $global_upah['upah_harian'] ?? 0;
-$g_mingguan = $global_upah['upah_mingguan'] ?? 0;
-$g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
+// Upah global (Deprecated - will be removed soon)
+$g_harian   = 0;
+$g_mingguan = 0;
+$g_bulanan  = 0;
 ?>
 
 <div class="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8 mt-4 sm:mt-10 mb-10">
@@ -142,6 +140,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                         data-jk='" . $row['jenis_kelamin'] . "' 
                         data-tgl='" . $row['tgl_aktif'] . "'
                         data-golongan='" . $row['label_gol'] . "'
+                        data-upah='" . $row['upah'] . "'
                         data-dept='" . ($row['id_departmen'] ?? '') . "'
                         data-sub='" . ($row['id_sub_department'] ?? '') . "'>" . $row['no_absen'] . " | " . $row['nama_karyawan'] . "</option>";
                             }
@@ -251,12 +250,7 @@ $g_bulanan  = $global_upah['upah_bulanan'] ?? 0;
                 return;
             }
 
-            var gol = $selected.data('golongan') || "";
-            var finalWage = 0;
-
-            if (gol.toLowerCase().includes("harian") || gol === "1") finalWage = globalRates.harian;
-            else if (gol.toLowerCase().includes("mingguan")) finalWage = globalRates.mingguan;
-            else if (gol.toLowerCase().includes("bulanan") || gol === "3") finalWage = globalRates.bulanan;
+            var finalWage = $selected.data('upah') || 0;
 
             $('#jk').val($selected.data('jk'));
             $('#tgl_aktif').val($selected.data('tgl'));
