@@ -1,12 +1,16 @@
 <?php
-$tampil = $koneksi->query("SELECT A.*, (SELECT SUM(total) FROM tb_boneless_detail WHERE id_boneless = A.id_boneless) as grand_total FROM tb_boneless A ORDER BY tgl DESC");
+$tampil = $koneksi->query("SELECT A.*, B.biaya_mobil,
+    (SELECT SUM(total) FROM tb_boneless_detail WHERE id_boneless = A.id_boneless) as total_item 
+    FROM tb_boneless A 
+    LEFT JOIN tb_biayamobil B ON A.id_biayamobil = B.id_biayamobil
+    ORDER BY tgl DESC");
 $ref = $_GET['ref'] ?? '';
 $view_param = isset($_GET['view']) ? '&view=1' : '';
 ?>
 
 <div class="container-fluid px-2 mt-4 mb-4">
     <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
-        
+
         <div class="border-b border-gray-100 py-4 px-4 md:px-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 bg-white">
             <div>
                 <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-truck-loading mr-2"></i>Data Boneless</h3>
@@ -16,9 +20,9 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                     <i class="fas fa-arrow-left mr-1.5"></i> Kembali
                 </a>
                 <?php if (!isset($_GET['view'])) : ?>
-                <a href="?page=boneless&aksi=tambah&ref=<?= $ref ?><?= $view_param ?>" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
-                    <i class="fas fa-plus mr-1.5"></i> Tambah Data
-                </a>
+                    <a href="?page=boneless&aksi=tambah&ref=<?= $ref ?><?= $view_param ?>" class="flex md:inline-flex justify-center items-center bg-blue-600 hover:bg-blue-700 text-white text-[15px] font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto">
+                        <i class="fas fa-plus mr-1.5"></i> Tambah Data
+                    </a>
                 <?php endif; ?>
             </div>
         </div>
@@ -31,7 +35,6 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase">No</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-center">Tanggal</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-center">Jumlah Mobil</th>
-                            <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-right">Biaya / Mobil</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-right">Total Biaya Boneless</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase">Keterangan</th>
                             <th class="py-3 px-4 text-xs font-bold text-gray-700 uppercase text-center">Aksi</th>
@@ -41,31 +44,38 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                         <?php
                         $no = 1;
                         while ($data = $tampil->fetch_assoc()) :
+                            $harga_master = $data['biaya_mobil'] ?? 0;
+                            $total_biaya_mobil = $data['jumlah_mobil'] * $harga_master;
+                            $grand_total_all = $data['total_item'] + $total_biaya_mobil;
+                            $biaya_per_mobil = ($data['jumlah_mobil'] > 0) ? ($grand_total_all / $data['jumlah_mobil']) : 0;
                         ?>
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td data-label="No" class="py-3 px-4 text-sm text-gray-700 font-medium md:font-normal"><?= $no++ ?></td>
                                 <td data-label="Tanggal" class="py-3 px-4 text-sm text-gray-900 font-bold md:text-center"><?= date('d-m-Y', strtotime($data['tgl'])) ?></td>
+
                                 <td data-label="Jumlah Mobil" class="py-3 px-4 text-sm text-gray-900 md:text-center font-bold">
-                                   <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-100">
-                                       <?= $data['jumlah_mobil'] ?> Unit
-                                   </span>
+                                    <span class="bg-amber-50 text-amber-700 px-3 py-1 rounded-full border border-amber-100">
+                                        <?= $data['jumlah_mobil'] ?> Unit
+                                    </span>
                                 </td>
-                                <?php 
-                                    $biaya_per_mobil = ($data['jumlah_mobil'] > 0) ? ($data['grand_total'] / $data['jumlah_mobil']) : 0; 
-                                ?>
-                                <td data-label="Biaya / Mobil" class="py-3 px-4 text-sm font-semibold text-gray-700 md:text-right">Rp <?= number_format($biaya_per_mobil, 0, ',', '.') ?></td>
-                                <td data-label="Total Biaya Boneless" class="py-3 px-4 text-sm font-bold text-blue-600 md:text-right">Rp <?= number_format($data['grand_total'], 0, ',', '.') ?></td>
+
+                                <td data-label="Total Biaya Boneless" class="py-3 px-4 text-sm font-bold text-blue-600 md:text-right">
+                                    Rp <?= number_format($grand_total_all, 0, ',', '.') ?>
+                                    <div class="text-[10px] text-gray-400 font-normal">
+                                        (Item: Rp <?= number_format($data['total_item'], 0, ',', '.') ?> + Mobil: Rp <?= number_format($total_biaya_mobil, 0, ',', '.') ?>)
+                                    </div>
+                                </td>
+
                                 <td data-label="Keterangan" class="py-3 px-4 text-sm text-gray-600 italic"><?= htmlspecialchars($data['keterangan']) ?: '-' ?></td>
-                                
                                 <td data-label="Aksi" class="py-3 px-4 md:text-center mt-2 md:mt-0 border-t border-gray-100 md:border-t-0">
                                     <div class="flex items-center md:justify-center gap-2 action-btn-group">
                                         <a href="?page=boneless&aksi=ubah&id=<?= $data['id_boneless'] ?>&ref=<?= $ref ?><?= $view_param ?>" class="p-2 md:p-1 md:px-3 text-blue-600 bg-blue-50 border border-blue-100 rounded hover:bg-blue-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center">
                                             <i class="fas fa-edit md:mr-1"></i> <span class="ml-1 md:inline">Lihat / Edit</span>
                                         </a>
                                         <?php if (!isset($_GET['view'])) : ?>
-                                        <a href="?page=boneless&aksi=hapus&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-rose-600 bg-rose-50 border border-rose-100 rounded hover:bg-rose-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center" onclick="return confirm('Hapus data ini? Semua rincian item juga akan terhapus.')">
-                                            <i class="fas fa-trash md:mr-1"></i> <span class="ml-1 md:inline">Hapus</span>
-                                        </a>
+                                            <a href="?page=boneless&aksi=hapus&id=<?= $data['id_boneless'] ?>" class="p-2 md:p-1 md:px-3 text-rose-600 bg-rose-50 border border-rose-100 rounded hover:bg-rose-600 hover:text-white transition-all text-xs font-bold flex justify-center items-center text-center" onclick="return confirm('Hapus data ini? Semua rincian item juga akan terhapus.')">
+                                                <i class="fas fa-trash md:mr-1"></i> <span class="ml-1 md:inline">Hapus</span>
+                                            </a>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -79,7 +89,7 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
 </div>
 
 <style>
-     /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
+    /* 1. Reset wrapper agar tidak menggunakan float bawaan DataTables */
     .dataTables_wrapper {
         display: block !important;
     }
@@ -191,20 +201,24 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
         .table-responsive {
             padding: 12px !important;
         }
-        
+
         #dataTables-example_wrapper .row:first-child {
             flex-direction: column !important;
             align-items: flex-start !important;
             gap: 15px;
         }
-        .dataTables_filter, .dataTables_length {
+
+        .dataTables_filter,
+        .dataTables_length {
             width: 100% !important;
             justify-content: flex-start !important;
         }
+
         .dataTables_filter input {
             width: 100% !important;
             max-width: 100% !important;
         }
+
         .dataTables_paginate {
             justify-content: center !important;
             flex-wrap: wrap;
@@ -216,25 +230,31 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
 
         .table-modern tbody tr {
             display: block;
-            margin-bottom: 1.5rem; /* Jarak antar kotak dilebarkan */
+            margin-bottom: 1.5rem;
+            /* Jarak antar kotak dilebarkan */
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 16px; /* Jarak padding ke dalam kotak dilebarkan */
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            padding: 16px;
+            /* Jarak padding ke dalam kotak dilebarkan */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
             background-color: #fff;
         }
 
         .table-modern tbody td {
             display: flex;
-            flex-direction: column; /* Label di atas, data di bawah (stacking) */
+            flex-direction: column;
+            /* Label di atas, data di bawah (stacking) */
             align-items: flex-start;
-            padding: 10px 0 !important; /* Jarak atas-bawah per baris dilebarkan */
+            padding: 10px 0 !important;
+            /* Jarak atas-bawah per baris dilebarkan */
             border: none !important;
             border-bottom: 1px dashed #e2e8f0 !important;
         }
+
         .table-modern tbody td:first-child {
             padding-top: 0 !important;
         }
+
         .table-modern tbody td:last-child {
             border-bottom: none !important;
             padding-bottom: 0 !important;
@@ -247,7 +267,8 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
             text-transform: uppercase;
             font-size: 11px;
             letter-spacing: 0.5px;
-            margin-bottom: 6px; /* Memberi jarak ke datanya */
+            margin-bottom: 6px;
+            /* Memberi jarak ke datanya */
             display: block;
             width: 100%;
         }
@@ -262,9 +283,12 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
             padding-top: 5px;
             justify-content: flex-start;
         }
-        .action-btn-group > a, .action-btn-group > div {
+
+        .action-btn-group>a,
+        .action-btn-group>div {
             flex: 0 0 auto;
         }
+
         .action-btn-group a {
             padding: 8px 12px !important;
             width: auto;
@@ -295,7 +319,7 @@ $view_param = isset($_GET['view']) ? '&view=1' : '';
                 }
             }
         });
-        
+
         // SweetAlert Delete Confirmation - Using delegation for DataTables compatibility
         $(document).on('click', '.btn-delete-boneless', function() {
             const id = $(this).data('id');

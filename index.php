@@ -150,6 +150,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <?php } ?>
                   <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="far fa-clock nav-icon"></i><p>Jadwal</p></a></li>
                   <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><p>Denda</p></a></li>
+                  <li class="nav-item"><a href="?page=boneless&aksi=master" class="nav-link"><i class="fas fa-car nav-icon"></i><p>Biaya Mobil</p></a></li>
                 </ul>
               </li>
               <?php } ?>
@@ -351,6 +352,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "hapus") { include "page/boneless/hapus.php"; } 
                     elseif ($aksi == "tambah") { include "page/boneless/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/boneless/ubah.php"; }
+                    elseif ($aksi == "master") { include "page/boneless/m_boneless.php"; }
                   }
                   ?>
                 </div>

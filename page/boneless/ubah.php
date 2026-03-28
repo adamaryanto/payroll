@@ -5,6 +5,10 @@ $id = $_GET['id'];
 $sql_header = $koneksi->query("SELECT * FROM tb_boneless WHERE id_boneless = '$id'");
 $header = $sql_header->fetch_assoc();
 
+$sql_master = $koneksi->query("SELECT biaya_mobil FROM tb_biayamobil LIMIT 1");
+$row_master = $sql_master->fetch_assoc();
+$harga_per_mobil = $row_master['biaya_mobil'] ?? 0;
+
 $sql_detail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id'");
 
 $simpan = @$_POST['simpan'];
@@ -96,9 +100,9 @@ if ($simpan) {
                                 <input type="number" name="jumlah_mobil" class="form-control" placeholder="0" required value="<?= $val_mobil ?>">
                             </div>
                             <div class="col-md-4 form-group">
-                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Biaya / Mobil</label>
-                                <div class="h-[38px] flex items-center px-3 bg-blue-50 border border-blue-200 rounded-lg font-bold text-blue-600 shadow-sm" id="costPerUnitHeader">
-                                    Rp 0
+                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Biaya / Mobil (Master)</label>
+                                <div id="costPerUnitHeader" data-base-cost="<?= $harga_per_mobil ?>" class="h-[38px] flex items-center px-3 bg-blue-50 border border-blue-200 rounded-lg font-bold text-blue-600 shadow-sm">
+                                    Rp <?= number_format($harga_per_mobil, 0, ',', '.') ?>
                                 </div>
                             </div>
                         </div>
@@ -118,41 +122,43 @@ if ($simpan) {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php 
-                                        $no = 1; 
-                                        while ($detail = $sql_detail->fetch_assoc()): 
+                                        <?php
+                                        $no = 1;
+                                        while ($detail = $sql_detail->fetch_assoc()):
                                             // Format nilai: jika 0 maka kosongkan string agar input tidak terisi '0'
                                             $val_qty = ($detail['qty'] == 0) ? "" : $detail['qty'];
                                             $val_harga = ($detail['harga'] == 0) ? "" : $detail['harga'];
                                             $val_total = ($detail['total'] == 0) ? "" : $detail['total'];
                                         ?>
-                                        <tr class="item-row">
-                                            <td class="text-center align-middle font-bold text-gray-400"><?= $no++ ?></td>
-                                            <td>
-                                                <input type="text" name="nama_item[]" class="form-control" value="<?= $detail['nama_item'] ?>" required>
-                                            </td>
-                                            <td>
-                                                <input type="number" step="0.01" name="qty[]" class="form-control text-center qty-input" value="<?= $val_qty ?>" placeholder="0.00">
-                                            </td>
-                                            <td>
-                                                <input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $val_harga ?>" required>
-                                            </td>
-                                            <td>
-                                                <input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 total-row-input" readonly value="<?= ($val_total === '') ? '0' : $val_total ?>">
-                                            </td>
-                                            <td class="text-center">
-                                                <button type="button" class="btn btn-xs btn-outline-danger remove-row"><i class="fas fa-times"></i></button>
-                                            </td>
-                                        </tr>
+                                            <tr class="item-row">
+                                                <td class="text-center align-middle font-bold text-gray-400"><?= $no++ ?></td>
+                                                <td>
+                                                    <input type="text" name="nama_item[]" class="form-control" value="<?= $detail['nama_item'] ?>" required>
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.01" name="qty[]" class="form-control text-center qty-input" value="<?= $val_qty ?>" placeholder="0.00">
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $val_harga ?>" required>
+                                                </td>
+                                                <td>
+                                                    <input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 total-row-input" readonly value="<?= ($val_total === '') ? '0' : $val_total ?>">
+                                                </td>
+                                                <td class="text-center">
+                                                    <button type="button" class="btn btn-xs btn-outline-danger remove-row"><i class="fas fa-times"></i></button>
+                                                </td>
+                                            </tr>
                                         <?php endwhile; ?>
                                     </tbody>
                                     <tfoot>
                                         <tr class="bg-gray-50 font-bold border-t-2 border-indigo-100">
                                             <td colspan="4" class="text-right py-4 uppercase text-xs md:text-sm tracking-wider text-gray-600">
                                                 Grand Total Boneless <br>
-                                                <span class="text-[11px] text-indigo-500 normal-case font-bold">Biaya per Mobil: <span id="costPerUnitDisplay">Rp 0</span></span>
+                                                <span class="text-[11px] text-indigo-500 normal-case font-bold">
+                                                    Total Biaya Mobil: <span id="totalHargaMobilDisplay">Rp 0</span>
+                                                </span>
                                             </td>
-                                            <td colspan="2" class="text-right py-4 text-xl text-indigo-700 font-extrabold" id="grandTotalDisplay">Rp 0</td>
+                                            <td colspan="2" class="text-right py-4 text-lg text-indigo-700 font-extrabold" id="grandTotalDisplay">Rp 0</td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -168,7 +174,7 @@ if ($simpan) {
                         </div>
 
                         <div class="mt-8 flex gap-3">
-                            <button type="submit" name="simpan" value="simpan" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md">
+                            <button type="submit" name="simpan" value="simpan" class="px-8 py-3 border-0 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md">
                                 <i class="fas fa-save mr-2"></i> Simpan Perubahan
                             </button>
                             <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors">
@@ -184,91 +190,111 @@ if ($simpan) {
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // 1. Definisi Elemen
         const tableBody = document.querySelector('#itemTable tbody');
         const addRowBtn = document.getElementById('addRow');
         const grandTotalDisplay = document.getElementById('grandTotalDisplay');
+        const jmlMobilInput = document.querySelector('input[name="jumlah_mobil"]');
+        const totalHargaMobilDisplay = document.getElementById('totalHargaMobilDisplay');
+        const costPerUnitHeader = document.getElementById('costPerUnitHeader');
+        const rkkSelect = document.getElementById('id_rkk_select');
+        const tglHidden = document.getElementById('tgl_hidden');
 
+        // 2. Fungsi Kalkulasi Utama
         function calculate() {
-            let grandTotal = 0;
+            let totalItemBoneless = 0;
             const rows = document.querySelectorAll('.item-row');
-            
+
+            // A. Hitung Total Rincian Item (Boneless)
             rows.forEach(row => {
                 const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
                 const price = parseFloat(row.querySelector('.harga-input').value) || 0;
-                const total = Math.round(qty * price);
-                
-                row.querySelector('.total-row-input').value = total;
-                grandTotal += total;
+                const totalRow = Math.round(qty * price);
+
+                row.querySelector('.total-row-input').value = totalRow;
+                totalItemBoneless += totalRow;
             });
 
-            grandTotalDisplay.innerText = 'Rp ' + grandTotal.toLocaleString('id-ID');
+            // B. Ambil Data Mobil & Master
+            const jmlMobil = parseFloat(jmlMobilInput.value) || 0;
+            const masterCost = parseFloat(costPerUnitHeader.getAttribute('data-base-cost')) || 0;
 
-            // Hitung Biaya per Mobil
-            const jmlMobil = parseFloat(document.querySelector('input[name="jumlah_mobil"]').value) || 0;
-            const costPerUnitDisplay = document.getElementById('costPerUnitDisplay');
-            const costPerUnitHeader = document.getElementById('costPerUnitHeader');
+            // C. Hitung Total Biaya Mobil (Jml x Master)
+            const totalBiayaMobil = jmlMobil * masterCost;
+            totalHargaMobilDisplay.innerText = 'Rp ' + totalBiayaMobil.toLocaleString('id-ID');
+
+            // D. GRAND TOTAL = Item + Biaya Mobil
+            const grandTotalKeseluruhan = totalItemBoneless + totalBiayaMobil;
+            grandTotalDisplay.innerText = 'Rp ' + grandTotalKeseluruhan.toLocaleString('id-ID');
+
+            // E. Update Tampilan Biaya per Mobil Real (Jika dibutuhkan di label)
             if (jmlMobil > 0) {
-                const cpu = Math.round(grandTotal / jmlMobil);
-                const formatted = 'Rp ' + cpu.toLocaleString('id-ID');
-                costPerUnitDisplay.innerText = formatted;
-                costPerUnitHeader.innerText = formatted;
-            } else {
-                costPerUnitDisplay.innerText = 'Rp 0';
-                costPerUnitHeader.innerText = 'Rp 0';
+                const cpu = Math.round(grandTotalKeseluruhan / jmlMobil);
+                // Jika ada elemen costPerUnitDisplay di footer, update di sini
+                const cpuDisplay = document.getElementById('costPerUnitDisplay');
+                if (cpuDisplay) cpuDisplay.innerText = 'Rp ' + cpu.toLocaleString('id-ID');
             }
         }
 
-        // Trigger calculate saat jumlah mobil berubah
-        document.querySelector('input[name="jumlah_mobil"]').addEventListener('input', calculate);
+        // 3. Event Listeners (Berdiri sendiri, bukan di dalam calculate)
 
+        // Input Jumlah Mobil
+        jmlMobilInput.addEventListener('input', calculate);
+
+        // Input di dalam tabel (Qty & Harga)
         tableBody.addEventListener('input', function(e) {
             if (e.target.classList.contains('qty-input') || e.target.classList.contains('harga-input')) {
                 calculate();
             }
         });
 
+        // Tambah Baris
         addRowBtn.addEventListener('click', function() {
             const rowCount = tableBody.querySelectorAll('tr').length + 1;
             const newRow = document.createElement('tr');
             newRow.className = 'item-row';
             newRow.innerHTML = `
-                <td class="text-center align-middle font-bold text-gray-400">${rowCount}</td>
-                <td><input type="text" name="nama_item[]" class="form-control" required></td>
-                <td><input type="number" step="0.01" name="qty[]" class="form-control text-center qty-input" placeholder="0.00"></td>
-                <td><input type="number" name="harga[]" class="form-control text-center harga-input" required></td>
-                <td><input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 total-row-input" readonly value="0"></td>
-                <td class="text-center align-middle"><button type="button" class="btn btn-xs btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>
-            `;
+            <td class="text-center align-middle font-bold text-gray-400">${rowCount}</td>
+            <td><input type="text" name="nama_item[]" class="form-control" required></td>
+            <td><input type="number" step="0.01" name="qty[]" class="form-control text-center qty-input" placeholder="0.00"></td>
+            <td><input type="number" name="harga[]" class="form-control text-center harga-input" required></td>
+            <td><input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 total-row-input" readonly value="0"></td>
+            <td class="text-center align-middle">
+                <button type="button" class="btn btn-xs btn-outline-danger remove-row"><i class="fas fa-times"></i></button>
+            </td>
+        `;
             tableBody.appendChild(newRow);
+            calculate(); // Hitung ulang setelah tambah baris
         });
 
+        // Hapus Baris
         tableBody.addEventListener('click', function(e) {
             if (e.target.closest('.remove-row')) {
                 const rows = tableBody.querySelectorAll('.item-row');
                 if (rows.length > 1) {
                     e.target.closest('tr').remove();
-                    calculate();
-                    
-                    // Re-index remaining rows
+
+                    // Re-index nomor baris
                     document.querySelectorAll('.item-row').forEach((row, index) => {
                         row.cells[0].innerText = index + 1;
                     });
+
+                    calculate();
                 } else {
                     alert('Minimal harus ada 1 baris.');
                 }
             }
         });
 
-        // Init
+        // Pilih Rencana (Sync Tanggal)
+        if (rkkSelect) {
+            rkkSelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                tglHidden.value = selectedOption.getAttribute('data-tgl') || '';
+            });
+        }
+
+        // 4. Jalankan Pertama Kali saat halaman dibuka
         calculate();
-
-        // Update hidden tgl based on selected RKK
-        const rkkSelect = document.getElementById('id_rkk_select');
-        const tglHidden = document.getElementById('tgl_hidden');
-
-        rkkSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            tglHidden.value = selectedOption.getAttribute('data-tgl') || '';
-        });
     });
 </script>
