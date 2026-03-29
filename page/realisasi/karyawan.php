@@ -24,8 +24,8 @@ if (isset($_POST['simpan_karyawan'])) {
     $upah        = !empty($_POST['upah']) ? floatval(str_replace(['Rp', '.', ' '], '', $_POST['upah'])) : 0;
     $id_dept     = $_POST['id_departmen'];
     $id_sub      = $_POST['id_sub_department'];
-    $id_os       = $_POST['id_os_dhk'] ?? 0;
-    $id_gol      = $_POST['id_golongan'] ?? 0;
+    $id_os       = intval($_POST['id_os_dhk'] ?? 0);
+    $id_gol      = intval($_POST['id_golongan'] ?? 0);
     $id_jadwal   = $_POST['id_jadwal'];
     $ra_masuk    = $_POST['ra_masuk'] ?: '00:00:00';
     $ra_keluar   = $_POST['ra_keluar'] ?: '00:00:00';
@@ -166,8 +166,8 @@ $default_upah = 115000;
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Penyedia OS/DHK <span class="text-rose-500">*</span></label>
-                            <select name="id_os_dhk" required class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Penyedia OS/DHK</label>
+                            <select name="id_os_dhk" class="select2-karyawan block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none">
                                 <option value="">- Pilih OS/DHK -</option>
                                 <?php while ($o = $list_os->fetch_assoc()) : ?>
                                     <option value="<?= $o['id_os_dhk']; ?>"><?= $o['OS_DHK']; ?></option>
@@ -175,8 +175,8 @@ $default_upah = 115000;
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Golongan <span class="text-rose-500">*</span></label>
-                            <select name="id_golongan" required class="block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Golongan</label>
+                            <select name="id_golongan" class="select2-karyawan block w-full px-4 py-3 border border-gray-300 rounded-2xl outline-none">
                                 <option value="">- Pilih Golongan -</option>
                                 <?php while ($g = $list_gol->fetch_assoc()) : ?>
                                     <option value="<?= $g['id_golongan']; ?>"><?= $g['golongan']; ?></option>
@@ -462,49 +462,118 @@ $default_upah = 115000;
             }
         });
 
-        $('.select2-karyawan').select2({
-            width: '100%',
-            dropdownAutoWidth: true,
-            containerCssClass: 'modern-select2'
+        $('.select2-karyawan').each(function() {
+            $(this).select2({
+                width: '100%',
+                // dropdownAutoWidth: true, <-- BARIS INI DIHAPUS
+                allowClear: true,
+                placeholder: $(this).find('option:first').text(),
+                containerCssClass: 'modern-select2'
+            });
         });
 
     });
 </script>
 
 <style>
-    /* Modern Select2 Styling */
-    .modern-select2.select2-container--default .select2-selection--single {
-        height: 52px !important;
-        padding: 10px 16px !important;
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 16px !important;
-        transition: all 0.2s !important;
+    /* 1. TAMPILAN SAAT TERTUTUP (INPUT CONTAINER) */
+    .select2-container {
+        width: 100% !important;
+    }
+    
+    .select2-container--default .select2-selection--single {
+        background-color: #ffffff;
+        border: 1px solid #d1d5db !important; /* Sesuai border-gray-300 */
+        border-radius: 1rem !important; /* Sesuai rounded-2xl */
+        height: 50px !important; /* Menyesuaikan py-3 Tailwind */
+        display: flex;
+        align-items: center;
+        outline: none;
+        transition: all 0.2s ease-in-out;
     }
 
-    .modern-select2.select2-container--default .select2-selection--single .select2-selection__rendered {
+    /* Efek Cincin Biru saat di-klik (Focus) */
+    .select2-container--default.select2-container--open .select2-selection--single,
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #3b82f6 !important; /* border-blue-500 */
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important; /* ring-blue-500 dengan opacity */
+    }
+
+    /* Teks yang Terpilih */
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        color: #374151 !important; /* text-gray-700 */
+        padding-left: 1rem !important; /* Sesuai px-4 */
+        padding-right: 2.5rem !important;
+        font-size: 0.875rem !important; /* text-sm */
         line-height: normal !important;
-        font-size: 15px !important;
-        font-weight: 500 !important;
-        color: #1e293b !important;
+        width: 100%;
     }
 
-    .modern-select2.select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 50px !important;
+    /* Posisi Panah Dropdown */
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 100% !important;
+        right: 0.75rem !important;
     }
 
+    /* Tombol Clear (Tanda X) */
+    .select2-container--default .select2-selection--single .select2-selection__clear {
+        height: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        margin-right: 1.5rem !important;
+        color: #9ca3af !important;
+        font-size: 1.25rem !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__clear:hover {
+        color: #ef4444 !important; /* Merah saat dihover */
+    }
+
+    /* 2. TAMPILAN SAAT TERBUKA (DROPDOWN MENU MELAYANG) */
     .select2-dropdown {
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 16px !important;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-        overflow: hidden !important;
+        background-color: white;
+        border: 1px solid #e5e7eb !important; /* border-gray-200 */
+        border-radius: 1rem !important; /* Tetap rounded-2xl */
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important; /* shadow-xl */
+        margin-top: 6px !important; /* Memberikan efek melayang (terpisah dari input) */
+        overflow: hidden;
+        z-index: 9999;
     }
 
+    /* Kolom Pencarian (Search Box) di dalam Dropdown */
+    .select2-search--dropdown {
+        padding: 0.75rem !important;
+    }
+    .select2-search--dropdown .select2-search__field {
+        border: 1px solid #d1d5db !important;
+        border-radius: 0.5rem !important; /* rounded-lg */
+        padding: 0.5rem 0.75rem !important;
+        outline: none !important;
+        font-size: 0.875rem !important;
+        transition: border-color 0.2s;
+    }
+    .select2-search--dropdown .select2-search__field:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 1px #3b82f6 !important;
+    }
+
+    /* Desain List Opsi (Option) */
     .select2-results__option {
-        padding: 10px 16px !important;
-        font-size: 14px !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.875rem !important;
+        color: #4b5563 !important; /* text-gray-600 */
+        transition: background-color 0.15s ease;
     }
 
-    .select2-results__option--highlighted {
-        background-color: #2563eb !important;
+    /* Opsi saat di-hover / disorot */
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #eff6ff !important; /* bg-blue-50 */
+        color: #1d4ed8 !important; /* text-blue-700 */
+        font-weight: 600;
+    }
+
+    /* Opsi yang sedang dipilih saat ini */
+    .select2-container--default .select2-results__option[aria-selected=true] {
+        background-color: #f3f4f6 !important; /* bg-gray-100 */
+        color: #111827 !important; /* text-gray-900 */
     }
 </style>

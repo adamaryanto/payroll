@@ -184,7 +184,10 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
                     $grand_karyawan++;
 
                     // Track Outsourcing categories dynamically
-                    $os_label = $data['label_os'] ?: $data['OS_DHK'];
+                    $os_label = $data['label_os'] ?: ($data['OS_DHK'] ?? '-'); 
+                    if (empty($os_label) || $os_label == '-') {
+                         $os_label = 'LAIN-LAIN / TANPA VENDOR';
+                    }
                     if (!isset($totals_by_os[$os_label])) {
                         $totals_by_os[$os_label] = 0;
                     }
@@ -204,8 +207,8 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
             echo "<tr>
                 <td style='text-align:center;'>{$no}</td>
                 <td style='text-align:left;'>{$nama_display}</td>
-                <td style='text-align:center;'>" . ($data['label_os'] ?: $data['OS_DHK']) . "</td>
-                <td style='text-align:center;'>" . ($data['label_gol'] ?: $data['golongan']) . "</td>
+                <td style='text-align:center;'>" . ($data['label_os'] ?: ($data['OS_DHK'] ?? '-')) . "</td>
+                <td style='text-align:center;'>" . ($data['label_gol'] ?: ($data['golongan'] ?? '-')) . "</td>
                 <td style='text-align:center;'>{$data['nama_sub_department']}</td>
                 <td style='text-align:center;'>{$disp_masuk}</td>
                 <td style='text-align:center;'>{$disp_keluar}</td>
@@ -264,6 +267,19 @@ $subquery_digantikan_oleh = "(SELECT K4.nama_karyawan
         ?>
             <tr style="font-weight:bold;">
                 <td style="width:300px; height:25px;">BIAYA TAGIHAN <?php echo $label; ?></td>
+                <td style="width:50px; text-align:center;">Rp</td>
+                <td style="width:250px; text-align:right;"><?php echo number_format($val, 0, ',', '.'); ?></td>
+            </tr>
+        <?php
+        }
+        
+        // Cek jika ada LAIN-LAIN / TANPA VENDOR
+        if (isset($totals_by_os['LAIN-LAIN / TANPA VENDOR'])) {
+            $val = $totals_by_os['LAIN-LAIN / TANPA VENDOR'];
+            $grand_tagihan += $val;
+            ?>
+            <tr style="font-weight:bold;">
+                <td style="width:300px; height:25px;">BIAYA TAGIHAN LAIN-LAIN / TANPA VENDOR</td>
                 <td style="width:50px; text-align:center;">Rp</td>
                 <td style="width:250px; text-align:right;"><?php echo number_format($val, 0, ',', '.'); ?></td>
             </tr>

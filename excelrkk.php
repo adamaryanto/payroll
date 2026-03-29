@@ -3,11 +3,22 @@ include "koneksi.php";
 
 $id = $_GET['id'];
 
-// 1. Ambil data Header RKK
-$queryInfo = $koneksi->query("SELECT tgl_rkk FROM tb_rkk WHERE id_rkk = '$id'");
+// 1. Ambil data Header RKK (Tambahkan status_rkk)
+$queryInfo = $koneksi->query("SELECT tgl_rkk, status_rkk FROM tb_rkk WHERE id_rkk = '$id'");
 $info = $queryInfo->fetch_assoc();
 $tanggal_sql = $info['tgl_rkk'] ?? '';
 $tanggal_file = $tanggal_sql ? date('d-m-Y', strtotime($tanggal_sql)) : 'TanpaTanggal';
+
+// Logika Stempel
+// Asumsi: nilai >= 2 berarti Approved, selain itu Unapproved
+$status_rkk = (int)($info['status_rkk'] ?? 0);
+if ($status_rkk >= 2) {
+    $teks_stempel = "APPROVED";
+    $warna_stempel = "#16a34a"; // Hijau
+} else {
+    $teks_stempel = "UNAPPROVED";
+    $warna_stempel = "#dc2626"; // Merah
+}
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Rencana_Upah_Cikupa_$tanggal_file.xls");
@@ -26,7 +37,7 @@ $id_boneless = $bonelessHeader['id_boneless'] ?? 0;
 $potong = (float)($bonelessHeader['jumlah_mobil'] ?? 0);
 $harga_master_saat_itu = (float)($bonelessHeader['biaya_mobil'] ?? 0); 
 
-$total_boneless = 0; // Pastikan nama variabel konsisten dengan tabel di bawah
+$total_boneless = 0;
 $boneless_details = [];
 if ($id_boneless > 0) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
@@ -115,7 +126,7 @@ foreach ($data_per_bagian as $nama_bagian => $karyawans) {
         </tr>";
         $no++;
     }
-    echo "</tbody></table>";
+    echo "</tbody></table><br>";
 }
 
 echo "<table border='1'>
@@ -140,7 +151,7 @@ echo "<br><table border='1' style='border-collapse:collapse;'>
     </tr>
     <tr style='background-color:#dbe5f1; font-weight:bold;'>
         <td colspan='6' align='center'>Biaya permobil</td>
-        <td align='right''>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
+        <td align='right'>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
     </tr>
 </table><br>";
 
@@ -181,3 +192,26 @@ echo "<table border='1' style='border-collapse:collapse;'>
         <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
     </tr>
 </table>";
+
+// --- CAP STEMPEL (DI KANAN BAWAH) ---
+// Memisahkan kolom kiri (kosong) dan kolom kanan agar rapi di Excel
+echo "<br><br><br>
+<table border='0' style='border-collapse:collapse; width:100%;'>
+    <tr>
+        <td colspan='7'></td> 
+        <td colspan='4' align='center' valign='middle'>
+            <div style='
+                color: $warna_stempel; 
+                border: 4px solid $warna_stempel; 
+                font-size: 22px; 
+                font-weight: bold; 
+                font-family: Arial, sans-serif; 
+                padding: 10px 20px;
+                display: inline-block;
+            '>
+                $teks_stempel
+            </div>
+        </td>
+    </tr>
+</table>";
+?>
