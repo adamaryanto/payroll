@@ -119,7 +119,7 @@ if ($simpan) {
                                     <thead class="bg-green-50">
                                         <tr>
                                             <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Nama Item</th>
+                                            <th>Nama Tim</th>
                                             <th style="width: 120px;">QTY</th>
                                             <th style="width: 150px;">Harga</th>
                                             <th style="width: 180px;">Total</th>
@@ -157,7 +157,7 @@ if ($simpan) {
                                     <thead class="bg-red-50">
                                         <tr>
                                             <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Nama Item</th>
+                                            <th>Nama Tim</th>
                                             <th style="width: 120px;">QTY</th>
                                             <th style="width: 150px;">Harga</th>
                                             <th style="width: 180px;">Total</th>

@@ -105,7 +105,7 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                                     <thead class="bg-green-50">
                                         <tr>
                                             <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Nama Item</th>
+                                            <th>Nama Tim</th>
                                             <th style="width: 150px;">QTY</th>
                                             <th style="width: 150px;">Harga</th>
                                             <th style="width: 180px;">Total</th>
@@ -140,7 +140,7 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                                     <thead class="bg-red-50">
                                         <tr>
                                             <th class="text-center" style="width: 50px;">#</th>
-                                            <th>Nama Item</th>
+                                            <th>Nama Tim</th>
                                             <th style="width: 150px;">QTY</th>
                                             <th style="width: 150px;">Harga</th>
                                             <th style="width: 180px;">Total</th>
