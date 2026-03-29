@@ -81,7 +81,8 @@ if (strtolower($_SESSION['role']) == "owner") {
                                             <i class="fas fa-eye mr-1"></i> Detail
                                         </a>
                                         <a href="excelrkk.php?id=<?php echo $data['id_rkk']; ?>"
-                                            class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors">
+                                            class="flex items-center px-3 py-2 text-[13px] md:text-[12px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white rounded border border-emerald-300 transition-colors btn-cetak-rkk"
+                                            data-boneless="<?= $data['jml_boneless']; ?>">
                                             <i class="fa fa-print mr-1"></i> Cetak
                                         </a>
                                         <?php if (strtolower($_SESSION['role']) == "owner" && $data['status_rkk'] < 2) : ?>
@@ -530,6 +531,21 @@ if (strtolower($_SESSION['role']) == "owner") {
 
         $('.dataTables_filter').addClass('mb-3');
         $('.dataTables_length').addClass('mb-3');
+    });
+
+    // Validasi khusus tombol Cetak
+    $(document).on('click', '.btn-cetak-rkk', function(e) {
+        const boneless = $(this).data('boneless');
+
+        if (boneless == 0) {
+            e.preventDefault(); // Menghentikan link agar tidak mendownload excel
+            Swal.fire({
+                icon: 'warning',
+                title: 'Boneless Belum Diinput',
+                text: 'Anda tidak dapat mencetak RKK karena data Boneless untuk tanggal ini belum diinput. Silakan input Boneless terlebih dahulu.',
+                confirmButtonColor: '#2563eb'
+            });
+        }
     });
 </script>
 
