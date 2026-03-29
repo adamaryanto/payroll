@@ -35,14 +35,20 @@ $queryBoneless = $koneksi->query("
 $bonelessHeader = $queryBoneless->fetch_assoc();
 $id_boneless = $bonelessHeader['id_boneless'] ?? 0;
 $potong = (float)($bonelessHeader['jumlah_mobil'] ?? 0);
-$harga_master_saat_itu = (float)($bonelessHeader['biaya_mobil'] ?? 0); 
+$harga_master_saat_itu = (float)($bonelessHeader['biaya_mobil'] ?? 0);
 
 $total_boneless = 0;
 $boneless_details = [];
 if ($id_boneless > 0) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
     while ($bd = $q_bd->fetch_assoc()) {
-        $total_boneless += (float)$bd['total'];
+        // LOGIKA PERBAIKAN: Cek jenis item
+        $val = (float)$bd['total'];
+        if ($bd['jenis'] == 'minus') {
+            $total_boneless -= $val; // Kurangi jika minus
+        } else {
+            $total_boneless += $val; // Tambah jika plus
+        }
         $boneless_details[] = $bd;
     }
 }
@@ -126,92 +132,102 @@ foreach ($data_per_bagian as $nama_bagian => $karyawans) {
         </tr>";
         $no++;
     }
-    echo "</tbody></table><br>";
+    echo "</tbody></table>";
 }
 
 echo "<table border='1'>
-    <tr style='background-color: #fbbf24; font-weight:bold;'>
+    <tr style='background-color: #203764; color:#fff; font-weight:bold;'>
         <td colspan='10' align='center' style='width: 800px;'>GRAND TOTAL UPAH (BIAYA PABRIK)</td>
         <td align='right' style='width: 100px;'>Rp " . number_format($total_upah_pabrik, 0, '.', ',') . "</td>
     </tr>
 </table><br>";
 
-// --- TABEL REKAP BIAYA ---
-$boneless_calculated = $harga_master_saat_itu * $potong; 
-$combined_total_new = $total_upah_pabrik + $boneless_calculated;
-$biaya_per_mobil_new = ($potong > 0) ? ($combined_total_new / $potong) : 0;
+// --- HITUNGAN REKAP BIAYA MOBIL DAN BONELESS ---
+// A. Hitung Selisih Boneless (Plus - Minus)
+$total_item_boneless = 0;
+if (!empty($boneless_details)) {
+    foreach ($boneless_details as $item) {
+        $val = (float)$item['total'];
+        if ($item['jenis'] == 'minus') {
+            $total_item_boneless -= $val;
+        } else {
+            $total_item_boneless += $val;
+        }
+    }
+}
 
+// B. Hitung Total Biaya Boneless (Master + Penyesuaian)
+$biaya_boneless_total = ($harga_master_saat_itu * $potong) + $total_item_boneless;
+
+// C. Hitung Grand Total (Upah Pabrik + Boneless Total)
+$grand_total_all = $total_upah_pabrik + $biaya_boneless_total;
+
+// D. Hitung Biaya Per Mobil (INI KUNCINYA)
+$biaya_per_mobil_final = ($potong > 0) ? ($grand_total_all / $potong) : 0;
+
+// E. Hitung Ulang Biaya X Mobil berdasarkan Biaya Per Mobil Final
+// Ini agar angka di tabel atas sinkron: (Biaya Per Mobil x Potong)
+$biaya_x_mobil_display = $biaya_per_mobil_final * $potong;
+
+// --- TABEL REKAP BIAYA ---
 echo "<br><table border='1' style='border-collapse:collapse;'>
-    <tr style='background-color:#dbe5f1; font-weight:bold;'>
+    <tr style='background-color:#B4C7E7; font-weight:bold;'>
         <th colspan='7'>REALISASI TOTAL REKAP BIAYA PABRIK CIKUPA " . date('d F Y', strtotime($tanggal_sql)) . "</th>
     </tr>
-    <tr style='background-color:#dbe5f1; font-weight:bold;'>
+    <tr style='background-color:#B4C7E7; font-weight:bold;'>
         <td colspan='6' align='center'>Biaya " . (int)$potong . " mobil</td>
-        <td align='right'>Rp " . number_format($boneless_calculated, 2, '.', ',') . "</td>
+        <td align='right'>Rp " . number_format($biaya_x_mobil_display, 2, '.', ',') . "</td>
     </tr>
-    <tr style='background-color:#dbe5f1; font-weight:bold;'>
+    <tr style='background-color:#B4C7E7; font-weight:bold;'>
         <td colspan='6' align='center'>Biaya permobil</td>
-        <td align='right'>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
+        <td align='right'>Rp " . number_format($biaya_per_mobil_final, 2, '.', ',') . "</td>
     </tr>
 </table><br>";
 
 // --- TABEL TIM BONELESS ---
 echo "<table border='1' style='border-collapse:collapse;'>
-    <thead><tr style='background-color:#dbe5f1; font-weight:bold;'><th colspan='7'>BAYARAN TIM BONELESS</th></tr></thead>
+    <thead><tr style='background-color:#B4C7E7; font-weight:bold;'><th colspan='7'>BAYARAN TIM BONELESS</th></tr></thead>
     <tbody>";
 $no_b = 1;
 if (!empty($boneless_details)) {
-    foreach ($boneless_details as $item) {
-        echo "<tr>
+    if (!empty($boneless_details)) {
+        foreach ($boneless_details as $item) {
+            $is_minus = ($item['jenis'] == 'minus');
+            $display_total = (float)$item['total'];
+
+            // --- LOGIKA GANTI 0 JADI STRIP ---
+            $qty_val = (float)($item['qty'] ?? 0);
+            $display_qty = ($qty_val == 0) ? "-" : number_format($qty_val, 1, '.', ',');
+            // ---------------------------------
+
+            $prefix = $is_minus ? "- " : "";
+            $style_color = $is_minus ? "color:red;" : "";
+
+            echo "<tr>
             <td align='center'>$no_b</td>
-            <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
-            <td align='right'>" . number_format((float)($item['qty'] ?? 0), 1, '.', ',') . "</td>
-            <td align='right'>Rp " . number_format((float)($item['total'] ?? 0), 2, '.', ',') . "</td>
+            <td colspan='4' style='font-weight:bold; $style_color'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='center'>$display_qty</td>
+            <td align='right' style='$style_color'>$prefix Rp " . number_format($display_total, 2, '.', ',') . "</td>
         </tr>";
-        $no_b++;
+            $no_b++;
+        }
     }
 } else {
-    echo "<tr><td colspan='7' align='center'>Data boneless tidak ditemukan untuk tanggal ini</td></tr>";
+    echo "<tr><td colspan='7' align='center'>Data tidak ditemukan</td></tr>";
 }
-echo "<tr style='font-weight:bold;'><td colspan='6' align='center'>TOTAL</td><td align='right'>Rp " . number_format($total_boneless, 2, '.', ',') . "</td></tr></tbody></table><br>";
+// Di sini $total_boneless sudah hasil (Plus - Minus) dari loop di atas
+echo "<tr style='font-weight:bold; background-color:#92D050;'><td colspan='6' align='center'>TOTAL AKHIR BONELESS</td><td align='right'>Rp " . number_format($total_boneless, 2, '.', ',') . "</td></tr></tbody></table><br>";
 
 // --- TABEL KUNING ---
-$boneless_calculated = $harga_master_saat_itu * $potong; 
-$combined_total_new = $total_upah_pabrik + $boneless_calculated;
-$biaya_per_mobil_new = ($potong > 0) ? ($combined_total_new / $potong) : 0;
-
 echo "<table border='1' style='border-collapse:collapse;'>
     <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
-        <th>BIAYA PABRIK</th><th>BONELESS</th><th>POTONG</th><th>TOTAL</th><th>Biaya Per mobil</th>
+        <th colspan='2'>BIAYA PABRIK</th><th colspan='2'>BONELESS</th><th>POTONG</th><th>TOTAL</th><th>Biaya Per mobil</th>
     </tr>
     <tr style='font-weight:bold; text-align:right;'>
-        <td align='center'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
-        <td align='center'>Rp " . number_format($boneless_calculated, 2, '.', ',') . "</td>
+        <td align='center' colspan='2'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
+        <td align='center' colspan='2'>Rp " . number_format($biaya_boneless_total, 2, '.', ',') . "</td>
         <td align='center'>" . (int)$potong . "</td>
-        <td align='center'>Rp " . number_format($combined_total_new, 2, '.', ',') . "</td>
-        <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
+        <td align='center'>Rp " . number_format($grand_total_all, 2, '.', ',') . "</td>
+        <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_final, 2, '.', ',') . "</td>
     </tr>
 </table>";
-
-// --- CAP STEMPEL (DI KANAN BAWAH) ---
-// Memisahkan kolom kiri (kosong) dan kolom kanan agar rapi di Excel
-echo "<br><br><br>
-<table border='0' style='border-collapse:collapse; width:100%;'>
-    <tr>
-        <td colspan='7'></td> 
-        <td colspan='4' align='center' valign='middle'>
-            <div style='
-                color: $warna_stempel; 
-                border: 4px solid $warna_stempel; 
-                font-size: 22px; 
-                font-weight: bold; 
-                font-family: Arial, sans-serif; 
-                padding: 10px 20px;
-                display: inline-block;
-            '>
-                $teks_stempel
-            </div>
-        </td>
-    </tr>
-</table>";
-?>

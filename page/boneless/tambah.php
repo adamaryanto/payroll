@@ -33,17 +33,13 @@ if ($simpan) {
             $hrg  = (float)($hargas[$i] ?: 0);
             $jenis = $koneksi->real_escape_string($jenis_items[$i]);
 
-            // Hapus kondisi 'if ($qty != 0)' agar item kosong tetap tersimpan sebagai draft di Edit
             if ($item != "") {
-                // Biarkan harga tetap positif di DB agar mudah dibaca, 
-                // biarkan logic total yang menentukan plus/minus
+                // MODIFIKASI: Simpan total sebagai nilai positif (absolute)
+                // Biarkan kolom 'jenis' yang menentukan apakah ini pengurang atau penambah
                 $ttl = $qty * $hrg;
-                if ($jenis == 'minus' && $ttl > 0) {
-                    $ttl = -$ttl; // Simpan total sebagai negatif jika jenisnya minus
-                }
 
                 $koneksi->query("INSERT INTO tb_boneless_detail (id_boneless, nama_item, qty, harga, total, jenis) 
-                         VALUES ('$id_header', '$item', '$qty', '$hrg', '$ttl', '$jenis')");
+                                 VALUES ('$id_header', '$item', '$qty', '$hrg', '$ttl', '$jenis')");
             }
         }
         echo '<!DOCTYPE html><html><head><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script></head><body>
@@ -121,11 +117,11 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                                         foreach ($default_plus as $name => $price): ?>
                                             <tr class="item-row row-plus">
                                                 <input type="hidden" name="jenis_item[]" value="plus">
-                                                <td class="text-center font-bold text-gray-400" data-label="#"><?= $no++ ?></td>
-                                                <td data-label="Nama Item"><input type="text" name="nama_item[]" class="form-control" value="<?= $name ?>" required></td>
-                                                <td data-label="QTY"><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
-                                                <td data-label="Harga"><input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $price ?>"></td>
-                                                <td data-label="Total"><input type="number" name="total[]" class="form-control text-right font-bold text-green-600 bg-green-50 total-row-input" readonly value="0"></td>
+                                                <td class="text-center font-bold text-gray-400"><?= $no++ ?></td>
+                                                <td><input type="text" name="nama_item[]" class="form-control" value="<?= $name ?>" required></td>
+                                                <td><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
+                                                <td><input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $price ?>"></td>
+                                                <td><input type="number" name="total[]" class="form-control text-right font-bold text-green-600 bg-green-50 total-row-input" readonly value="0"></td>
                                                 <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -156,11 +152,11 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                                         foreach ($default_minus as $name => $price): ?>
                                             <tr class="item-row row-minus">
                                                 <input type="hidden" name="jenis_item[]" value="minus">
-                                                <td class="text-center font-bold text-gray-400" data-label="#"><?= $no++ ?></td>
-                                                <td data-label="Nama Item"><input type="text" name="nama_item[]" class="form-control" value="<?= $name ?>" required></td>
-                                                <td data-label="QTY"><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
-                                                <td data-label="Harga"><input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $price ?>"></td>
-                                                <td data-label="Total"><input type="number" name="total[]" class="form-control text-right font-bold text-red-600 bg-red-50 total-row-input" readonly value="0"></td>
+                                                <td class="text-center font-bold text-gray-400"><?= $no++ ?></td>
+                                                <td><input type="text" name="nama_item[]" class="form-control" value="<?= $name ?>" required></td>
+                                                <td><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
+                                                <td><input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $price ?>"></td>
+                                                <td><input type="number" name="total[]" class="form-control text-right font-bold text-red-600 bg-red-50 total-row-input" readonly value="0"></td>
                                                 <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -209,20 +205,20 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
             const row = document.createElement('tr');
             row.className = `item-row row-${jenis}`;
             row.innerHTML = `
-        <input type="hidden" name="jenis_item[]" value="${jenis}">
-        <td class="text-center font-bold text-gray-400" data-label="#">-</td>
-        <td data-label="Nama Item"><input type="text" name="nama_item[]" class="form-control" required></td>
-        <td data-label="QTY"><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
-        <td data-label="Harga"><input type="number" name="harga[]" class="form-control text-center harga-input" value="0"></td>
-        <td data-label="Total"><input type="number" name="total[]" class="form-control text-right font-bold ${colorClass} total-row-input" readonly value="0"></td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row w-full"><i class="fas fa-times"></i></button></td>
-    `;
+                <input type="hidden" name="jenis_item[]" value="${jenis}">
+                <td class="text-center font-bold text-gray-400">-</td>
+                <td><input type="text" name="nama_item[]" class="form-control" required></td>
+                <td><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
+                <td><input type="number" name="harga[]" class="form-control text-center harga-input" value="0"></td>
+                <td><input type="number" name="total[]" class="form-control text-right font-bold ${colorClass} total-row-input" readonly value="0"></td>
+                <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row w-full"><i class="fas fa-times"></i></button></td>
+            `;
             tbody.appendChild(row);
         };
 
         window.calculate = function() {
-            let totalPlus = 0,
-                totalMinus = 0;
+            let totalPlus = 0;
+            let totalMinus = 0;
 
             document.querySelectorAll('.item-row').forEach(row => {
                 const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
@@ -230,14 +226,20 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                 const jenis = row.querySelector('input[name="jenis_item[]"]').value;
                 const total = Math.round(qty * price);
 
+                // Tampilkan total sebagai angka positif di baris tabel
                 row.querySelector('.total-row-input').value = total;
 
-                if (jenis === 'plus') totalPlus += total;
-                else totalMinus += total;
+                // Hitung ke Grand Total berdasarkan jenisnya
+                if (jenis === 'plus') {
+                    totalPlus += total;
+                } else {
+                    totalMinus += total;
+                }
             });
 
             const jmlMobil = parseFloat(document.querySelector('input[name="jumlah_mobil"]').value) || 0;
-            // Rumus: (Total Plus - Total Minus) + (Biaya Mobil)
+
+            // Logika Grand Total: (Nambah - Kurang) + (Biaya Mobil)
             const grandTotal = (totalPlus - totalMinus) + (jmlMobil * masterCost);
 
             document.getElementById('summaryGrandTotal').innerText = 'Rp ' + Math.round(grandTotal).toLocaleString('id-ID');
