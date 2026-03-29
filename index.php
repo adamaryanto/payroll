@@ -150,7 +150,7 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                   <?php } ?>
                   <li class="nav-item"><a href="?page=jadwal" class="nav-link"><i class="far fa-clock nav-icon"></i><p>Jadwal</p></a></li>
                   <li class="nav-item"><a href="?page=denda" class="nav-link"><i class="fas fa-exclamation-triangle nav-icon"></i><p>Denda</p></a></li>
-                  <li class="nav-item"><a href="?page=boneless&aksi=master" class="nav-link"><i class="fas fa-car nav-icon"></i><p>Biaya Mobil</p></a></li>
+                  <li class="nav-item"><a href="?page=boneless&aksi=master" class="nav-link"><i class="fas fa-car nav-icon"></i><p>Biaya Mobil Bonless</p></a></li>
                 </ul>
               </li>
               <?php } ?>
@@ -237,30 +237,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "hapus") { include "page/jadwal/hapus.php"; } 
                     elseif ($aksi == "tambah") { include "page/jadwal/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/jadwal/ubah.php"; }
-                  } else if ($page == 'subbagian') {
-                    if ($aksi == "hapus") { include "page/subbagian/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/subbagian/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/subbagian/ubah.php"; }
-                  } else if ($page == 'jabatan') {
-                    if ($aksi == "hapus") { include "page/jabatan/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/jabatan/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/jabatan/ubah.php"; }
-                  } else if ($page == 'agama') {
-                    if ($aksi == "hapus") { include "page/agama/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/agama/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/agama/ubah.php"; }
-                  } else if ($page == 'golongan') {
-                    if ($aksi == "hapus") { include "page/golongan/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/golongan/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/golongan/ubah.php"; }
-                  } else if ($page == 'statuskawin') {
-                    if ($aksi == "hapus") { include "page/statuskawin/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/statuskawin/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/statuskawin/ubah.php"; }
-                  } else if ($page == 'os_dhk') {
-                    if ($aksi == "hapus") { include "page/os_dhk/hapus.php"; } 
-                    elseif ($aksi == "tambah") { include "page/os_dhk/tambah.php"; } 
-                    elseif ($aksi == "ubah") { include "page/os_dhk/ubah.php"; }
                   } else if ($page == 'user') {
                     $id_edit = $_GET['id'] ?? '';
                     if (strtolower($role) == 'admin hr' && $id_edit != $_SESSION['iduser']) {
@@ -321,16 +297,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "cuti") { include "page/siac/cuti/cuti.php"; }
                   } elseif ($page == "") {
                     include "home.php";
-                  } else if ($page == 'dailyactivity') {
-                    if ($aksi == "") { include "page/dailyactivity/karyawan.php"; } 
-                    elseif ($aksi == "tambah") { include "page/dailyactivity/tambah.php"; } 
-                    elseif ($aksi == "list") { include "page/dailyactivity/listdaily.php"; }
-                  } else if ($page == 'dailyactivityvendor') {
-                    if ($aksi == "") { include "page/vendor/vendor.php"; } 
-                    elseif ($aksi == "tambah") { include "page/vendor/tambah.php"; }
-                  } else if ($page == 'report') {
-                    if ($aksi == "") { include "page/report/report.php"; } 
-                    elseif ($aksi == "daily") { include "page/report/Daily.php"; }
                   } else if ($page == 'realisasi') {
                     if (strtolower($role) == 'admin hr' && $aksi == 'detail') {
                         echo "<script>alert('Anda tidak memiliki akses ke halaman ini!'); window.location.href='index.php';</script>";

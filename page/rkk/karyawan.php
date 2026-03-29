@@ -1,89 +1,92 @@
 <?php
-// 1. Ambil ID RKK
+$alert = null;
+$redirect = null;
+
+// Ambil ID
 $idrkk = !empty($_REQUEST['id']) ? intval($_REQUEST['id']) : (!empty($_POST['id_rkk_hidden']) ? intval($_POST['id_rkk_hidden']) : 0);
 
-// Validasi: Gabisa tambah kalo status RKK >= 2
+// VALIDASI STATUS RKK
 if ($idrkk > 0) {
     $cek_rkk = $koneksi->query("SELECT status_rkk FROM tb_rkk WHERE id_rkk = '$idrkk'");
     $data_rkk = $cek_rkk->fetch_assoc();
+
     if ($data_rkk['status_rkk'] >= 2) {
-        echo '<!DOCTYPE html>
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        </head>
-        <body>
-            <script>
-                Swal.fire({
-                    icon: "error",
-                    title: "Akses Ditolak",
-                    text: "Tidak bisa menambah karyawan karena status RKK sudah Approved/Realized!",
-                    confirmButtonColor: "#2563eb",
-                    confirmButtonText: "Kembali"
-                }).then((result) => {
-                    window.location.href="?page=rkk";
-                });
-            </script>
-        </body>
-        </html>';
-        exit;
+        $alert = [
+            "icon" => "error",
+            "title" => "Akses Ditolak",
+            "text" => "Tidak bisa menambah karyawan karena status RKK sudah Approved/Realized!"
+        ];
+        $redirect = "?page=rkk&aksi=kelola&id=$idrkk";
     }
 }
 
-// 2. Logika Simpan
+// SIMPAN DATA
 if (isset($_POST['simpan_karyawan'])) {
+
     $id_rkk_fix = intval($_POST['id_rkk_hidden']);
     $id_dept    = $_POST['id_departmen'];
     $id_sub     = $_POST['id_sub_department'];
     $id_jadwal  = $_POST['id_jadwal'];
     $upah       = str_replace('.', '', $_POST['upah_manual']);
 
-    // 1. Logika Identifikasi
     $nama_manual = !empty($_POST['nama_karyawan_manual']) ? $koneksi->real_escape_string($_POST['nama_karyawan_manual']) : NULL;
     $idkaryawan  = !empty($_POST['id_karyawan']) ? $_POST['id_karyawan'] : 0;
 
-    // 2. Handle Tags untuk Dept & Sub
+    // HANDLE TAG DEPT
     if (!empty($id_dept) && !is_numeric($id_dept)) {
         $name_dept = $koneksi->real_escape_string($id_dept);
         $koneksi->query("INSERT INTO ms_departmen (nama_departmen) VALUES ('$name_dept')");
         $id_dept = $koneksi->insert_id;
     }
+
+    // HANDLE TAG SUB
     if (!empty($id_sub) && !is_numeric($id_sub)) {
         $name_sub = $koneksi->real_escape_string($id_sub);
-        $dept_id_val = is_numeric($id_dept) ? $id_dept : 0;
-        $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department, id_departmen) VALUES ('$name_sub', '$dept_id_val')");
+        $koneksi->query("INSERT INTO ms_sub_department (nama_sub_department, id_departmen) VALUES ('$name_sub', '$id_dept')");
         $id_sub = $koneksi->insert_id;
     }
 
-    // 3. Validasi & Simpan
+    // VALIDASI
     if (($idkaryawan != 0 || $nama_manual != NULL) && !empty($id_jadwal) && $id_rkk_fix > 0) {
 
-        $boleh_simpan = true;
-
-        // Cek Duplikat hanya untuk karyawan DB
+        // CEK DUPLIKAT
         if ($idkaryawan != 0) {
             $cek = $koneksi->query("SELECT id_karyawan FROM tb_rkk_detail WHERE id_rkk = '$id_rkk_fix' AND id_karyawan = '$idkaryawan'");
+
             if ($cek->num_rows > 0) {
-                $boleh_simpan = false;
-                echo "<script>alert('Karyawan ini sudah ada!');</script>";
+                $alert = [
+                    "icon" => "warning",
+                    "title" => "Oops...",
+                    "text" => "Karyawan ini sudah ada!"
+                ];
+                $redirect = "?page=rkk&aksi=karyawan&id=$id_rkk_fix";
             }
         }
 
-        if ($boleh_simpan) {
+        // SIMPAN
+        if (!$alert) {
             $val_manual = ($nama_manual == NULL) ? "NULL" : "'$nama_manual'";
 
             $query = "INSERT INTO tb_rkk_detail 
-                      (id_rkk, id_karyawan, nama_karyawan_manual, upah, id_departmen, id_sub_department, id_jadwal, status_rkk, 
-                       potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
-                      VALUES 
-                      ($id_rkk_fix, '$idkaryawan', $val_manual, '$upah', '$id_dept', '$id_sub', '$id_jadwal', 'Hadir', 
-                       '0', '0', '0', NOW())";
+            (id_rkk, id_karyawan, nama_karyawan_manual, upah, id_departmen, id_sub_department, id_jadwal, status_rkk, 
+             potongan_telat, potongan_istirahat, potongan_lainnya, tgl_updt) 
+            VALUES 
+            ($id_rkk_fix, '$idkaryawan', $val_manual, '$upah', '$id_dept', '$id_sub', '$id_jadwal', 'Hadir', 
+             '0', '0', '0', NOW())";
 
             if ($koneksi->query($query)) {
-                echo "<script>alert('Karyawan Berhasil Ditambahkan'); window.location.href = '?page=rkk&aksi=kelola&id=$id_rkk_fix';</script>";
-                exit;
+                $alert = [
+                    "icon" => "success",
+                    "title" => "Berhasil!",
+                    "text" => "Karyawan berhasil ditambahkan"
+                ];
+                $redirect = "?page=rkk&aksi=karyawan&id=$id_rkk_fix";
             } else {
-                echo "Error: " . $koneksi->error;
+                $alert = [
+                    "icon" => "error",
+                    "title" => "Error",
+                    "text" => $koneksi->error
+                ];
             }
         }
     }
@@ -216,7 +219,7 @@ $g_bulanan  = 0;
                     </div>
                     <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto order-1 sm:order-2">
                         <a href="?page=rkk&aksi=kelola&id=<?= $idrkk; ?>" class="flex justify-center items-center px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-bold rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition">
-                            Batal
+                            <i class="fas fa-arrow-left mr-2"></i>  Kembali
                         </a>
                         <button type="submit" name="simpan_karyawan" value="1" class="inline-flex items-center justify-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-xl shadow-md text-white bg-blue-600 hover:bg-blue-700 transition transform hover:-translate-y-0.5">
                             <i class="fas fa-save mr-2"></i> Simpan ke Daftar
@@ -227,6 +230,22 @@ $g_bulanan  = 0;
         </form>
     </div>
 </div>
+
+<?php if ($alert): ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+Swal.fire({
+    icon: "<?= $alert['icon'] ?>",
+    title: "<?= $alert['title'] ?>",
+    text: "<?= $alert['text'] ?>",
+    confirmButtonColor: "#2563eb"
+}).then(() => {
+    <?php if ($redirect): ?>
+        window.location.href = "<?= $redirect ?>";
+    <?php endif; ?>
+});
+</script>
+<?php endif; ?>
 
 <script>
     const globalRates = {

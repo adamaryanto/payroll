@@ -1,7 +1,28 @@
 <?php
 if (isset($_GET['id'])) {
-  $idrkk = $_GET['id'];
+  $idrkk = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
+  if ($idrkk <= 0) {
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: "error",
+                title: "ID Tidak Valid",
+                text: "ID RKK tidak ditemukan atau tidak sah!",
+                confirmButtonColor: "#2563eb"
+            }).then(() => {
+                window.location.href = "?page=rkk";
+            });
+        </script>
+    </body>
+    </html>';
+    exit;
+  }
   $tampildetail = $koneksi->query("select * from tb_rkk where id_rkk = '$idrkk' ");
   $datadetail = $tampildetail->fetch_assoc();
   $datatglrkk = $datadetail['tgl_rkk'];
@@ -118,19 +139,19 @@ if ($datastatusrkk == 3) {
       </div>
     </div>
 
-<div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
-    <div class="row">
+    <div class="p-4 md:p-5 bg-gray-50 border-b border-gray-100">
+      <div class="row">
         <div class="col-md-3 col-sm-12 mb-3 mb-md-0">
-            <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
-            <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
+          <label class="font-bold text-gray-700 text-sm">Tanggal:</label>
+          <input type="text" value="<?= date('d/m/Y', strtotime($datatglrkk)); ?>" readonly class="form-control text-base py-2" />
         </div>
-        
+
         <div class="col-md-9 col-sm-12 mb-3 mb-md-0">
-            <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
-            <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
+          <label class="font-bold text-gray-700 text-sm">Keterangan:</label>
+          <input type="text" value="<?= $dataketerangan; ?>" readonly class="form-control text-base py-2" />
         </div>
+      </div>
     </div>
-</div>
 
     <div class="p-0">
       <div class="table-responsive px-3 md:px-4 py-4">
@@ -206,7 +227,7 @@ if ($datastatusrkk == 3) {
                         class="px-3 py-2 text-sm font-bold text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white rounded border border-blue-300 transition-colors text-center w-full md:w-auto mb-1">
                         <i class="fas fa-eye mr-1"></i> Detail
                       </a>
-                      <?php endif; ?>
+                    <?php endif; ?>
                     <?php if ($datastatusrkk < 2) : ?>
                       <button type="button"
                         class="px-3 py-2 text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-600 hover:text-white rounded border border-rose-300 transition-colors text-center w-full md:w-auto mb-1 btn-delete-detail"
