@@ -166,7 +166,6 @@ $grand_total_all = $total_upah_pabrik + $biaya_boneless_total;
 $biaya_per_mobil_final = ($potong > 0) ? ($grand_total_all / $potong) : 0;
 
 // E. Hitung Ulang Biaya X Mobil berdasarkan Biaya Per Mobil Final
-// Ini agar angka di tabel atas sinkron: (Biaya Per Mobil x Potong)
 $biaya_x_mobil_display = $biaya_per_mobil_final * $potong;
 
 // --- TABEL REKAP BIAYA ---
