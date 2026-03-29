@@ -2,10 +2,11 @@
 $ref = $_GET['ref'] ?? 'boneless';
 $view_param = isset($_GET['view']) ? '&view=1' : '';
 $simpan = @$_POST['simpan'];
+
 // Ambil biaya per mobil dari database
 $ambil_biaya = $koneksi->query("SELECT id_biayamobil, biaya_mobil FROM tb_biayamobil LIMIT 1");
 $data_biaya = $ambil_biaya->fetch_assoc();
-$id_biaya_mobil = $data_biaya['id_biayamobil'] ?? 0; // Ambil ID-nya
+$id_biaya_mobil = $data_biaya['id_biayamobil'] ?? 0;
 $harga_per_mobil = $data_biaya['biaya_mobil'] ?? 0;
 
 if ($simpan) {
@@ -13,86 +14,70 @@ if ($simpan) {
     $jumlah_mobil = @$_POST['jumlah_mobil'];
     $keterangan = @$_POST['keterangan'];
     $id_rkk = @$_POST['id_rkk'];
-    $id_bm = @$_POST['id_biayamobil']; // Tangkap ID dari input hidden
+    $id_bm = @$_POST['id_biayamobil'];
 
-    // Update Query Insert Header (Tambahkan id_biayamobil)
+    // Insert Header
     $sql_header = $koneksi->query("INSERT INTO tb_boneless (id_rkk, id_biayamobil, tgl, jumlah_mobil, keterangan, tgl_updt) 
                                    VALUES ('$id_rkk', '$id_bm', '$tgl', '$jumlah_mobil', '$keterangan', NOW())");
     $id_header = $koneksi->insert_id;
 
     if ($id_header) {
-        // Insert Details
         $nama_items = $_POST['nama_item'];
-        $qtys = $_POST['qty'];
-        $hargas = $_POST['harga'];
-        $totals = $_POST['total'];
+        $qtys       = $_POST['qty'];
+        $hargas     = $_POST['harga'];
+        $jenis_items = $_POST['jenis_item'];
 
         for ($i = 0; $i < count($nama_items); $i++) {
             $item = $koneksi->real_escape_string($nama_items[$i]);
-            $qty = (float)($qtys[$i] ?: 0);
-            $hrg = (float)($hargas[$i] ?: 0);
-            $ttl = (float)($totals[$i] ?: 0);
+            $qty  = (float)($qtys[$i] ?: 0);
+            $hrg  = (float)($hargas[$i] ?: 0);
+            $jenis = $koneksi->real_escape_string($jenis_items[$i]);
 
-            if ($qty >= 0 || $ttl >= 0) {
-                $koneksi->query("INSERT INTO tb_boneless_detail (id_boneless, nama_item, qty, harga, total) VALUES ('$id_header', '$item', '$qty', '$hrg', '$ttl')");
+            // Hapus kondisi 'if ($qty != 0)' agar item kosong tetap tersimpan sebagai draft di Edit
+            if ($item != "") {
+                // Biarkan harga tetap positif di DB agar mudah dibaca, 
+                // biarkan logic total yang menentukan plus/minus
+                $ttl = $qty * $hrg;
+                if ($jenis == 'minus' && $ttl > 0) {
+                    $ttl = -$ttl; // Simpan total sebagai negatif jika jenisnya minus
+                }
+
+                $koneksi->query("INSERT INTO tb_boneless_detail (id_boneless, nama_item, qty, harga, total, jenis) 
+                         VALUES ('$id_header', '$item', '$qty', '$hrg', '$ttl', '$jenis')");
             }
         }
-
-        echo '<!DOCTYPE html>
-        <html>
-        <head>
-            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        </head>
-        <body>
+        echo '<!DOCTYPE html><html><head><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script></head><body>
             <script>
-                Swal.fire({
-                    icon: "success",
-                    title: "Berhasil",
-                    text: "Data Berhasil Disimpan",
-                    confirmButtonColor: "#2563eb",
-                    confirmButtonText: "OK"
-                }).then((result) => {
-                    window.location.href = "?page=boneless&ref=' . $ref . $view_param . '";
-                });
-            </script>
-        </body>
-        </html>';
+                Swal.fire({ icon: "success", title: "Berhasil", text: "Data Berhasil Disimpan", confirmButtonColor: "#2563eb" })
+                .then(() => { window.location.href = "?page=boneless&ref=' . $ref . $view_param . '"; });
+            </script></body></html>';
         exit;
     }
 }
 
-$default_items = [
-    "BORAS" => 800,
-    "BONELESS KEVIN" => 700,
-    "PAHA SP HOKA" => 500,
-    "SHILIN" => 500,
-    "CIMORY" => 500,
-    "PAHA SP SHIHLIN" => 500,
-    "TOM TOM" => 500
-];
-
-
+$default_plus = ["BORAS" => 800, "BONELESS KEVIN" => 700, "PAHA SP HOKA" => 500];
+$default_minus = ["SHILIN" => 500, "CIMORY" => 500];
 ?>
 
 <div class="container-fluid px-2 mt-4 mb-4">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card border-0 shadow-sm rounded-xl overflow-hidden bg-white">
-                <div class="border-b border-gray-100 py-4 px-4 md:px-5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div class="border-b border-gray-100 py-4 px-4 bg-white flex justify-between items-center">
                     <div class="flex items-center gap-3">
-                        <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors border border-gray-200">
+                        <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-50 text-gray-400 border border-gray-200">
                             <i class="fas fa-arrow-left text-xs"></i>
                         </a>
-                        <h3 class="text-xl font-bold m-0" style="color: #2563eb;"><i class="fas fa-plus mr-2"></i>Tambah Data Boneless</h3>
+                        <h3 class="text-xl font-bold m-0" style="color: #2563eb;">Tambah Data Boneless</h3>
                     </div>
-                    <div class="text-sm text-gray-500 font-medium bg-gray-50 px-3 py-1 rounded-md border border-gray-200 w-full md:w-auto mt-2 md:mt-0">Tanggal: <?= date('d-m-Y') ?></div>
                 </div>
 
                 <div class="p-4 md:p-5">
                     <form method="POST">
                         <input type="hidden" name="id_biayamobil" value="<?= $id_biaya_mobil ?>">
-                        <div class="row mb-2">
-                            <div class="col-md-4 form-group mb-3 md:mb-0">
+
+                        <div class="row mb-4">
+                            <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Rencana</label>
                                 <select name="id_rkk" id="id_rkk_select" class="form-control h-[42px]" required>
                                     <option value="">-- Pilih Rencana --</option>
@@ -110,83 +95,96 @@ $default_items = [
                                 <input type="number" name="jumlah_mobil" class="form-control h-[42px]" placeholder="0" required>
                             </div>
                             <div class="col-md-4 form-group">
-                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Biaya / Mobil (Master)</label>
-                                <div class="h-[42px] flex items-center px-3 bg-blue-50 border border-blue-200 rounded-lg font-bold text-blue-600 shadow-sm"
-                                    id="staticMasterDisplay">
-                                    Rp <?= number_format($harga_per_mobil, 0, ',', '.') ?>
+                                <label class="text-xs font-bold text-gray-700 uppercase mb-1">Biaya / Mobil (Lock)</label>
+                                <div class="h-[42px] flex items-center px-3 bg-gray-100 border border-gray-200 rounded-lg font-bold text-gray-600 shadow-sm">
+                                    <i class="fas fa-lock mr-2 text-gray-400"></i> Rp <?= number_format($harga_per_mobil, 0, ',', '.') ?>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mt-4 md:mt-6">
-                            <label class="text-xs font-bold text-gray-700 uppercase mb-3 block">Rincian Item Boneless</label>
-                            <div class="table-responsive px-0 md:px-1">
-                                <table class="table table-bordered table-hover shadow-sm table-form-mobile" id="itemTable">
-                                    <thead class="bg-gray-50">
+                        <div class="mt-4">
+                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block"><i class="fas fa-plus-circle mr-1"></i> Rincian Item Penambah (Plus)</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="tablePlus">
+                                    <thead class="bg-green-50">
                                         <tr>
-                                            <th class="py-2 text-center" style="width: 50px;">#</th>
-                                            <th class="py-2">Nama Item</th>
-                                            <th class="py-2 text-center" style="width: 150px;">QTY</th>
-                                            <th class="py-2 text-center" style="width: 150px;">Harga Satuan</th>
-                                            <th class="py-2 text-center" style="width: 180px;">Total</th>
-                                            <th class="py-2 text-center" style="width: 60px;"></th>
+                                            <th class="text-center" style="width: 50px;">#</th>
+                                            <th>Nama Item</th>
+                                            <th style="width: 150px;">QTY</th>
+                                            <th style="width: 150px;">Harga</th>
+                                            <th style="width: 180px;">Total</th>
+                                            <th style="width: 60px;"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php $no = 1;
-                                        foreach ($default_items as $name => $price): ?>
-                                            <tr class="item-row">
-                                                <td data-label="Baris Ke-" class="md:text-center align-middle font-bold text-gray-400 py-3 md:py-2"><?= $no++ ?></td>
-                                                <td data-label="Nama Item" class="py-3 md:py-2">
-                                                    <input type="text" name="nama_item[]" class="form-control input-modern" value="<?= $name ?>" required>
-                                                </td>
-                                                <td data-label="QTY" class="py-3 md:py-2">
-                                                    <input type="text" name="qty[]" class="form-control text-center input-modern qty-input" placeholder="10">
-                                                </td>
-                                                <td data-label="Harga Satuan" class="py-3 md:py-2">
-                                                    <input type="number" name="harga[]" class="form-control text-center input-modern harga-input" value="<?= $price ?>" required>
-                                                </td>
-                                                <td data-label="Total" class="py-3 md:py-2">
-                                                    <input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 bg-blue-50/50 input-modern total-row-input" readonly value="0">
-                                                </td>
-                                                <td data-label="Aksi" class="md:text-center align-middle py-3 md:py-2 border-t border-gray-100 md:border-t-0 mt-2 md:mt-0">
-                                                    <button type="button" class="btn btn-sm btn-outline-danger remove-row w-full md:w-auto py-2 md:py-1">
-                                                        <i class="fas fa-times md:mr-0 mr-1"></i> <span class="md:hidden font-bold">Hapus Baris Ini</span>
-                                                    </button>
-                                                </td>
+                                        foreach ($default_plus as $name => $price): ?>
+                                            <tr class="item-row row-plus">
+                                                <input type="hidden" name="jenis_item[]" value="plus">
+                                                <td class="text-center font-bold text-gray-400" data-label="#"><?= $no++ ?></td>
+                                                <td data-label="Nama Item"><input type="text" name="nama_item[]" class="form-control" value="<?= $name ?>" required></td>
+                                                <td data-label="QTY"><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
+                                                <td data-label="Harga"><input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $price ?>"></td>
+                                                <td data-label="Total"><input type="number" name="total[]" class="form-control text-right font-bold text-green-600 bg-green-50 total-row-input" readonly value="0"></td>
+                                                <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
-                                    <tfoot>
-                                        <tr class="bg-gray-50 font-bold border-t-2 border-indigo-100">
-                                            <td colspan="4" class="text-right py-4 uppercase text-xs md:text-sm tracking-wider text-gray-600">
-                                                Grand Total Boneless <br>
-                                                <span id="costPerUnitHeader" data-base-cost="<?= $harga_per_mobil ?>" class="text-[11px] text-indigo-500 normal-case font-bold">
-                                                    Total Harga Mobil: <span id="totalHargaMobilDisplay" class="text-blue-600">Rp 0</span>
-                                                </span>
-                                            </td>
-                                            <td colspan="2" class="md:text-right text-center py-4 text-lg md:text-lg text-indigo-700 font-extrabold" id="grandTotalDisplay">Rp 0</td>
-                                        </tr>
-                                    </tfoot>
                                 </table>
+                                <button type="button" onclick="addNewRow('tablePlus', 'plus')" class="btn btn-sm btn-outline-success font-bold"><i class="fas fa-plus mr-1"></i> Tambah Item Plus</button>
                             </div>
-                            <button type="button" id="addRow" class="btn btn-sm btn-outline-primary mt-3 md:mt-2 w-full md:w-auto py-2 md:py-1 font-bold">
-                                <i class="fas fa-plus mr-1"></i> Tambah Baris Baru
-                            </button>
+                        </div>
+
+                        <hr class="my-5 border-gray-200">
+
+                        <div class="mt-4">
+                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block"><i class="fas fa-minus-circle mr-1"></i> Rincian Item Pengurang (Minus)</label>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="tableMinus">
+                                    <thead class="bg-red-50">
+                                        <tr>
+                                            <th class="text-center" style="width: 50px;">#</th>
+                                            <th>Nama Item</th>
+                                            <th style="width: 150px;">QTY</th>
+                                            <th style="width: 150px;">Harga</th>
+                                            <th style="width: 180px;">Total</th>
+                                            <th style="width: 60px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php $no = 1;
+                                        foreach ($default_minus as $name => $price): ?>
+                                            <tr class="item-row row-minus">
+                                                <input type="hidden" name="jenis_item[]" value="minus">
+                                                <td class="text-center font-bold text-gray-400" data-label="#"><?= $no++ ?></td>
+                                                <td data-label="Nama Item"><input type="text" name="nama_item[]" class="form-control" value="<?= $name ?>" required></td>
+                                                <td data-label="QTY"><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
+                                                <td data-label="Harga"><input type="number" name="harga[]" class="form-control text-center harga-input" value="<?= $price ?>"></td>
+                                                <td data-label="Total"><input type="number" name="total[]" class="form-control text-right font-bold text-red-600 bg-red-50 total-row-input" readonly value="0"></td>
+                                                <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row"><i class="fas fa-times"></i></button></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                <button type="button" onclick="addNewRow('tableMinus', 'minus')" class="btn btn-sm btn-outline-danger font-bold"><i class="fas fa-plus mr-1"></i> Tambah Item Minus</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-extrabold text-gray-800 uppercase">Grand Total Akhir</span>
+                                <span class="text-xl font-black text-indigo-700" id="summaryGrandTotal">Rp 0</span>
+                            </div>
                         </div>
 
                         <div class="form-group mt-6">
-                            <label class="text-xs font-bold text-gray-700 uppercase mb-1">Keterangan (Opsional)</label>
-                            <textarea name="keterangan" class="form-control" rows="3" placeholder="Tambahkan catatan jika ada..."></textarea>
+                            <label class="text-xs font-bold text-gray-700 uppercase mb-1">Keterangan</label>
+                            <textarea name="keterangan" class="form-control" rows="3"></textarea>
                         </div>
 
-                        <div class="mt-8 flex flex-col md:flex-row gap-3">
-                            <button type="submit" name="simpan" value="simpan" class="w-full md:w-auto px-8 py-3 border-0 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors shadow-md text-center">
-                                <i class="fas fa-save mr-2"></i> Simpan Boneless
-                            </button>
-                            <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="w-full md:w-auto px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold hover:bg-gray-200 transition-colors text-center border border-gray-200">
-                                Kembali
-                            </a>
+                        <div class="mt-8 flex gap-3">
+                            <button type="submit" name="simpan" value="simpan" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700">Simpan Data</button>
+                            <a href="?page=boneless" class="px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold border border-gray-200">Batal</a>
                         </div>
                     </form>
                 </div>
@@ -194,6 +192,73 @@ $default_items = [
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const masterCost = <?= (float)$harga_per_mobil ?>;
+        const idRkkSelect = document.getElementById('id_rkk_select');
+        const tglHidden = document.getElementById('tgl_hidden');
+
+        idRkkSelect.addEventListener('change', function() {
+            tglHidden.value = this.options[this.selectedIndex].getAttribute('data-tgl') || '';
+        });
+
+        window.addNewRow = function(tableId, jenis) {
+            const tbody = document.querySelector(`#${tableId} tbody`);
+            const colorClass = jenis === 'plus' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+            const row = document.createElement('tr');
+            row.className = `item-row row-${jenis}`;
+            row.innerHTML = `
+        <input type="hidden" name="jenis_item[]" value="${jenis}">
+        <td class="text-center font-bold text-gray-400" data-label="#">-</td>
+        <td data-label="Nama Item"><input type="text" name="nama_item[]" class="form-control" required></td>
+        <td data-label="QTY"><input type="number" step="any" name="qty[]" class="form-control text-center qty-input" value=""></td>
+        <td data-label="Harga"><input type="number" name="harga[]" class="form-control text-center harga-input" value="0"></td>
+        <td data-label="Total"><input type="number" name="total[]" class="form-control text-right font-bold ${colorClass} total-row-input" readonly value="0"></td>
+        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger remove-row w-full"><i class="fas fa-times"></i></button></td>
+    `;
+            tbody.appendChild(row);
+        };
+
+        window.calculate = function() {
+            let totalPlus = 0,
+                totalMinus = 0;
+
+            document.querySelectorAll('.item-row').forEach(row => {
+                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+                const price = parseFloat(row.querySelector('.harga-input').value) || 0;
+                const jenis = row.querySelector('input[name="jenis_item[]"]').value;
+                const total = Math.round(qty * price);
+
+                row.querySelector('.total-row-input').value = total;
+
+                if (jenis === 'plus') totalPlus += total;
+                else totalMinus += total;
+            });
+
+            const jmlMobil = parseFloat(document.querySelector('input[name="jumlah_mobil"]').value) || 0;
+            // Rumus: (Total Plus - Total Minus) + (Biaya Mobil)
+            const grandTotal = (totalPlus - totalMinus) + (jmlMobil * masterCost);
+
+            document.getElementById('summaryGrandTotal').innerText = 'Rp ' + Math.round(grandTotal).toLocaleString('id-ID');
+        };
+
+        document.addEventListener('input', e => {
+            if (e.target.classList.contains('qty-input') || e.target.classList.contains('harga-input') || e.target.name === 'jumlah_mobil') {
+                calculate();
+            }
+        });
+
+        document.addEventListener('click', e => {
+            if (e.target.closest('.remove-row')) {
+                e.target.closest('tr').remove();
+                calculate();
+            }
+        });
+
+        calculate();
+    });
+</script>
 
 <style>
     /* Styling agar input form terlihat rapi */
@@ -274,130 +339,3 @@ $default_items = [
         }
     }
 </style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const tableBody = document.querySelector('#itemTable tbody');
-        const addRowBtn = document.getElementById('addRow');
-        const grandTotalDisplay = document.getElementById('grandTotalDisplay');
-        const jmlMobilInput = document.querySelector('input[name="jumlah_mobil"]');
-        const headerBox = document.getElementById('costPerUnitHeader');
-        const footerDisplay = document.getElementById('costPerUnitDisplay');
-        const masterCost = parseFloat(headerBox.getAttribute('data-base-cost')) || 0;
-
-        function calculate() {
-            let totalBoneless = 0;
-            const rows = document.querySelectorAll('.item-row');
-
-            // Elemen-elemen display
-            const currentCpuHeader = document.getElementById('currentCpuHeader');
-            const totalHargaMobilDisplay = document.getElementById('totalHargaMobilDisplay'); // Elemen baru
-            const grandTotalDisplay = document.getElementById('grandTotalDisplay');
-
-            // 1. Hitung total item belanjaan (Boneless)
-            rows.forEach(row => {
-                const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
-                const price = parseFloat(row.querySelector('.harga-input').value) || 0;
-                const totalRow = Math.round(qty * price);
-                row.querySelector('.total-row-input').value = totalRow;
-                totalBoneless += totalRow;
-            });
-
-            // 2. Ambil data pendukung
-            const jmlMobil = parseFloat(jmlMobilInput.value) || 0;
-            // Pastikan ID 'costPerUnitHeader' sesuai dengan yang ada di HTML data-base-cost
-            const masterCost = parseFloat(document.getElementById('costPerUnitHeader').getAttribute('data-base-cost')) || 0;
-
-            // 3. Hitung TOTAL HARGA MOBIL (Jumlah Mobil x Harga Master)
-            const totalHargaMobil = jmlMobil * masterCost;
-
-            // Update display Total Harga Mobil di span
-            totalHargaMobilDisplay.innerText = 'Rp ' + totalHargaMobil.toLocaleString('id-ID');
-
-            // 4. Hitung GRAND TOTAL (Boneless + Total Harga Mobil)
-            const grandTotalKeseluruhan = totalBoneless + totalHargaMobil;
-            grandTotalDisplay.innerText = 'Rp ' + grandTotalKeseluruhan.toLocaleString('id-ID');
-
-            // 5. Update Biaya Per Mobil (Current Status)
-            if (jmlMobil > 0) {
-                const cpu = Math.round(grandTotalKeseluruhan / jmlMobil);
-                const formatted = 'Rp ' + cpu.toLocaleString('id-ID');
-
-                currentCpuHeader.innerText = formatted;
-
-                // Beri warna merah jika melebihi Master
-                if (cpu > masterCost) {
-                    currentCpuHeader.classList.add('text-rose-600');
-                } else {
-                    currentCpuHeader.classList.remove('text-rose-600');
-                }
-            } else {
-                currentCpuHeader.innerText = 'Rp ' + masterCost.toLocaleString('id-ID');
-                currentCpuHeader.classList.remove('text-rose-600');
-            }
-        }
-
-        // Event Listener untuk input jumlah mobil
-        jmlMobilInput.addEventListener('input', calculate);
-
-        // Event Delegation untuk input di dalam tabel (Qty & Harga)
-        tableBody.addEventListener('input', function(e) {
-            if (e.target.classList.contains('qty-input') || e.target.classList.contains('harga-input')) {
-                calculate();
-            }
-        });
-
-        // Tambah Baris Baru
-        addRowBtn.addEventListener('click', function() {
-            const rowCount = tableBody.querySelectorAll('tr.item-row').length + 1;
-            const newRow = document.createElement('tr');
-            newRow.className = 'item-row hover:bg-gray-50 transition-colors';
-
-            newRow.innerHTML = `
-            <td data-label="Baris Ke-" class="md:text-center align-middle font-bold text-gray-400 py-3 md:py-2">${rowCount}</td>
-            <td data-label="Nama Item" class="py-3 md:py-2"><input type="text" name="nama_item[]" class="form-control input-modern" required></td>
-            <td data-label="QTY" class="py-3 md:py-2"><input type="text" name="qty[]" class="form-control text-center input-modern qty-input" placeholder="10"></td>
-            <td data-label="Harga Satuan" class="py-3 md:py-2"><input type="number" name="harga[]" class="form-control text-center input-modern harga-input" required></td>
-            <td data-label="Total" class="py-3 md:py-2"><input type="number" name="total[]" class="form-control text-right font-bold text-blue-600 bg-blue-50/50 input-modern total-row-input" readonly value="0"></td>
-            <td data-label="Aksi" class="md:text-center align-middle py-3 md:py-2 border-t border-gray-100 md:border-t-0 mt-2 md:mt-0">
-                <button type="button" class="btn btn-sm btn-outline-danger remove-row w-full md:w-auto py-2 md:py-1">
-                    <i class="fas fa-times md:mr-0 mr-1"></i> <span class="md:hidden font-bold">Hapus Baris Ini</span>
-                </button>
-            </td>
-        `;
-            tableBody.appendChild(newRow);
-            calculate(); // Recalculate after adding
-        });
-
-        // Hapus Baris
-        tableBody.addEventListener('click', function(e) {
-            if (e.target.closest('.remove-row')) {
-                const rows = tableBody.querySelectorAll('.item-row');
-                if (rows.length > 1) {
-                    e.target.closest('tr').remove();
-
-                    // Re-index nomor baris
-                    document.querySelectorAll('.item-row').forEach((row, index) => {
-                        row.cells[0].childNodes[0].nodeValue = index + 1;
-                    });
-
-                    calculate();
-                } else {
-                    alert('Minimal harus ada 1 baris.');
-                }
-            }
-        });
-
-        // Update hidden tgl berdasarkan RKK yang dipilih
-        const rkkSelect = document.getElementById('id_rkk_select');
-        const tglHidden = document.getElementById('tgl_hidden');
-
-        rkkSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            tglHidden.value = selectedOption.getAttribute('data-tgl') || '';
-        });
-
-        // Jalankan kalkulasi pertama kali saat halaman dimuat
-        calculate();
-    });
-</script>
