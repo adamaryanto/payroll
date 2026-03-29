@@ -63,7 +63,7 @@ if ($simpan) {
 
 $default_items = [
     "BORAS" => 800,
-    "BONLESS KEVIN" => 700,
+    "BONELESS KEVIN" => 700,
     "PAHA SP HOKA" => 500,
     "SHILIN" => 500,
     "CIMORY" => 500,

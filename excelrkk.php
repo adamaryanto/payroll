@@ -15,22 +15,28 @@ header("Pragma: no-cache");
 header("Expires: 0");
 
 // 2. Data Boneless
-$queryBoneless = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal_sql'");
+$queryBoneless = $koneksi->query("
+    SELECT b.*, bm.biaya_mobil 
+    FROM tb_boneless b
+    LEFT JOIN tb_biayamobil bm ON b.id_biayamobil = bm.id_biayamobil
+    WHERE b.tgl = '$tanggal_sql'
+");
 $bonelessHeader = $queryBoneless->fetch_assoc();
 $id_boneless = $bonelessHeader['id_boneless'] ?? 0;
-$potong = $bonelessHeader['jumlah_mobil'] ?? 0;
+$potong = (float)($bonelessHeader['jumlah_mobil'] ?? 0);
+$harga_master_saat_itu = (float)($bonelessHeader['biaya_mobil'] ?? 0); 
 
-$total_boneless = 0;
+$total_boneless = 0; // Pastikan nama variabel konsisten dengan tabel di bawah
 $boneless_details = [];
 if ($id_boneless > 0) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
     while ($bd = $q_bd->fetch_assoc()) {
-        $total_boneless += $bd['total'];
+        $total_boneless += (float)$bd['total'];
         $boneless_details[] = $bd;
     }
 }
 
-// 3. Query Karyawan - JOIN ke ms_sub_department & perbaikan kolom jadwal
+// 3. Query Karyawan
 $sql = "SELECT 
             IF(RD.id_karyawan = 0, RD.nama_karyawan_manual, K.nama_karyawan) as nama_karyawan, 
             O.OS_DHK as label_os, 
@@ -58,19 +64,19 @@ $result = $koneksi->query($sql);
 $data_per_bagian = [];
 $total_upah_pabrik = 0;
 while ($row = $result->fetch_assoc()) {
-    $data_per_bagian[$row['bagian']][] = $row;
-    $total_upah_pabrik += $row['upah'];
+    $data_per_bagian[$row['bagian'] ?? 'LAINNYA'][] = $row;
+    $total_upah_pabrik += (float)($row['upah'] ?? 0);
 }
 
 // --- OUTPUT EXCEL ---
-echo "<table><tr><td colspan='10' style='text-align:center; font-weight:bold;'>JIKALAU NAMA YANG TERTERA DIABSEN TELAT MAKA AKAN DIPOTONG RP 25.000 <br> MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td></tr></table>";
+echo "<table><tr><td colspan='11' style='text-align:center; font-weight:bold;'>JIKALAU NAMA YANG TERTERA DIABSEN TELAT MAKA AKAN DIPOTONG <span style='color:red;'>RP 25.000</span> <br> MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td></tr></table>";
 
-
+// Looping cetak tabel per bagian
 foreach ($data_per_bagian as $nama_bagian => $karyawans) {
     echo "<table border='1'>
     <thead>
         <tr style='background-color: #1e3a8a; font-weight:bold;'>
-            <th colspan='11' style='text-align:center; color: #fff;'>" . strtoupper($nama_bagian) . "</th>
+            <th colspan='11' style='text-align:center; color: #fff;'>" . strtoupper($nama_bagian ?? '') . "</th>
         </tr>
         <tr style='background-color: #f2f2f2;'>
             <th rowspan='2'>No</th>
@@ -93,73 +99,85 @@ foreach ($data_per_bagian as $nama_bagian => $karyawans) {
 
     $no = 1;
     foreach ($karyawans as $k) {
-        $jam_kerja = $k['jam_masuk'] . " - " . $k['jam_keluar'];
+        $jam_kerja = ($k['jam_masuk'] ?? '') . " - " . ($k['jam_keluar'] ?? '');
         echo "<tr>
             <td align='center'>$no</td>
-            <td>" . strtoupper($k['nama_karyawan']) . "</td>
-            <td align='center'>" . $k['label_os'] . "</td>
-            <td align='center'>" . $k['label_gol'] . "</td>
+            <td>" . strtoupper($k['nama_karyawan'] ?? '') . "</td>
+            <td align='center'>" . ($k['label_os'] ?? '') . "</td>
+            <td align='center'>" . ($k['label_gol'] ?? '') . "</td>
             <td>" . ($k['posisi'] ?? '-') . "</td>
             <td align='center'>$jam_kerja</td>
-            <td align='center'>" . $k['jam_masuk'] . "</td>
-            <td align='center'>" . $k['istirahat_keluar'] . "</td>
-            <td align='center'>" . $k['istirahat_masuk'] . "</td>
-            <td align='center'>" . $k['jam_keluar'] . "</td>
-            <td align='right'>" . number_format($k['upah'], 0, '.', ',') . "</td>
+            <td align='center'>" . ($k['jam_masuk'] ?? '') . "</td>
+            <td align='center'>" . ($k['istirahat_keluar'] ?? '') . "</td>
+            <td align='center'>" . ($k['istirahat_masuk'] ?? '') . "</td>
+            <td align='center'>" . ($k['jam_keluar'] ?? '') . "</td>
+            <td align='right'>Rp " . number_format((float)($k['upah'] ?? 0), 0, '.', ',') . "</td>
         </tr>";
         $no++;
     }
     echo "</tbody></table>";
 }
 
+echo "<table border='1'>
+    <tr style='background-color: #fbbf24; font-weight:bold;'>
+        <td colspan='10' align='center' style='width: 800px;'>GRAND TOTAL UPAH (BIAYA PABRIK)</td>
+        <td align='right' style='width: 100px;'>Rp " . number_format($total_upah_pabrik, 0, '.', ',') . "</td>
+    </tr>
+</table><br>";
+
 // --- TABEL REKAP BIAYA ---
-$combined_total = $total_upah_pabrik + $total_boneless;
-$biaya_per_mobil_actual = ($potong > 0) ? ($combined_total / $potong) : 0;
+$boneless_calculated = $harga_master_saat_itu * $potong; 
+$combined_total_new = $total_upah_pabrik + $boneless_calculated;
+$biaya_per_mobil_new = ($potong > 0) ? ($combined_total_new / $potong) : 0;
 
 echo "<br><table border='1' style='border-collapse:collapse;'>
     <tr style='background-color:#dbe5f1; font-weight:bold;'>
         <th colspan='7'>REALISASI TOTAL REKAP BIAYA PABRIK CIKUPA " . date('d F Y', strtotime($tanggal_sql)) . "</th>
     </tr>
     <tr style='background-color:#dbe5f1; font-weight:bold;'>
-        <td colspan='6' align='center'>Biaya $potong mobil</td>
-        <td align='right'>Rp " . number_format($combined_total, 2, '.', ',') . "</td>
+        <td colspan='6' align='center'>Biaya " . (int)$potong . " mobil</td>
+        <td align='right'>Rp " . number_format($boneless_calculated, 2, '.', ',') . "</td>
     </tr>
     <tr style='background-color:#dbe5f1; font-weight:bold;'>
         <td colspan='6' align='center'>Biaya permobil</td>
-        <td align='right'>Rp " . number_format($biaya_per_mobil_actual, 2, '.', ',') . "</td>
+        <td align='right''>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
     </tr>
 </table><br>";
 
 // --- TABEL TIM BONELESS ---
 echo "<table border='1' style='border-collapse:collapse;'>
-    <thead><tr style='background-color:#dbe5f1; font-weight:bold;'><th colspan='7'>BAYARAN TIM BONLESS</th></tr></thead>
+    <thead><tr style='background-color:#dbe5f1; font-weight:bold;'><th colspan='7'>BAYARAN TIM BONELESS</th></tr></thead>
     <tbody>";
 $no_b = 1;
-foreach ($boneless_details as $item) {
-    echo "<tr>
-        <td align='center'>$no_b</td>
-        <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item']) . "</td>
-        <td align='right'>" . number_format($item['qty'], 1, '.', ',') . "</td>
-        <td align='right'>Rp " . number_format($item['total'], 2, '.', ',') . "</td>
-    </tr>";
-    $no_b++;
+if (!empty($boneless_details)) {
+    foreach ($boneless_details as $item) {
+        echo "<tr>
+            <td align='center'>$no_b</td>
+            <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='right'>" . number_format((float)($item['qty'] ?? 0), 1, '.', ',') . "</td>
+            <td align='right'>Rp " . number_format((float)($item['total'] ?? 0), 2, '.', ',') . "</td>
+        </tr>";
+        $no_b++;
+    }
+} else {
+    echo "<tr><td colspan='7' align='center'>Data boneless tidak ditemukan untuk tanggal ini</td></tr>";
 }
 echo "<tr style='font-weight:bold;'><td colspan='6' align='center'>TOTAL</td><td align='right'>Rp " . number_format($total_boneless, 2, '.', ',') . "</td></tr></tbody></table><br>";
 
 // --- TABEL KUNING ---
-$boneless_calculated = $harga_per_mobil * $potong;
+$boneless_calculated = $harga_master_saat_itu * $potong; 
 $combined_total_new = $total_upah_pabrik + $boneless_calculated;
 $biaya_per_mobil_new = ($potong > 0) ? ($combined_total_new / $potong) : 0;
 
 echo "<table border='1' style='border-collapse:collapse;'>
     <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
-        <th>BIAYA PABRIK</th><th>BONELESS (Master x Mobil)</th><th>POTONG</th><th>TOTAL</th><th>Biaya Per mobil</th>
+        <th>BIAYA PABRIK</th><th>BONELESS</th><th>POTONG</th><th>TOTAL</th><th>Biaya Per mobil</th>
     </tr>
     <tr style='font-weight:bold; text-align:right;'>
-        <td>" . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
-        <td>" . number_format($boneless_calculated, 2, '.', ',') . "</td>
-        <td align='center'>$potong</td>
-        <td>" . number_format($combined_total_new, 2, '.', ',') . "</td>
-        <td style='background-color:white;'>Rp" . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
+        <td align='center'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
+        <td align='center'>Rp " . number_format($boneless_calculated, 2, '.', ',') . "</td>
+        <td align='center'>" . (int)$potong . "</td>
+        <td align='center'>Rp " . number_format($combined_total_new, 2, '.', ',') . "</td>
+        <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_new, 2, '.', ',') . "</td>
     </tr>
 </table>";
