@@ -85,13 +85,13 @@ WHERE A.id_rkk = '$idrkk'
 if ($datastatusrkk == 3) {
   $status = "Hidden";
 } elseif ($datastatusrkk == 2) {
-  if ($_SESSION['role'] != "owner") {
+  if ($_SESSION['role'] != "Owner") {
     $status = "Hidden";
   } else {
     $status = "";
   }
 } elseif ($datastatusrkk == 1) {
-  if ($_SESSION['role'] != "owner") {
+  if ($_SESSION['role'] != "Owner") {
     $status = "Hidden";
   } else {
     $status = "";
@@ -111,10 +111,10 @@ if ($datastatusrkk == 3) {
         <a href="?page=rkk" class="inline-flex items-center bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center">
           <i class="fas fa-arrow-left mr-1.5"></i> Kembali
         </a>
-        <?php if ($_SESSION['role'] == "owner") : ?>
+        <?php if ($_SESSION['role'] == "Owner") : ?>
           <?php if ($datastatusrkk == 1 || $datastatusrkk == 0) : ?>
             <button type="button"
-              class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
+              class="inline-flex items-center border-0 bg-emerald-600 hover:bg-emerald-700 text-white text-[14px] md:text-base font-medium py-2 px-4 rounded shadow-sm transition-colors w-full md:w-auto justify-center btn-header-action"
               data-id="<?= $idrkk; ?>"
               data-action="app"
               data-text="Approve Rencana Kerja ini?">
@@ -247,6 +247,20 @@ if ($datastatusrkk == 3) {
     </div>
   </div>
 </div>
+
+<?php var_dump($datastatusrkk); ?>
+<?php var_dump($_SESSION['role']); ?>
+
+<?php if (isset($_GET['msg'])): ?>
+  <script>
+    Swal.fire({
+      icon: '<?= $_GET['msg'] == "deleted" ? "success" : ($_GET['msg'] == "approved" ? "success" : ($_GET['msg'] == "unapproved" ? "info" : "error")) ?>',
+      title: '<?= $_GET['msg'] == "deleted" ? "Berhasil!" : ($_GET['msg'] == "approved" ? "Approved!" : ($_GET['msg'] == "unapproved" ? "Dibatalkan!" : "Gagal!")) ?>',
+      text: '<?= $_GET['msg'] == "deleted" ? "Data berhasil dihapus" : ($_GET['msg'] == "approved" ? "RKK berhasil di-approve" : ($_GET['msg'] == "unapproved" ? "Approve berhasil dibatalkan" : "Terjadi kesalahan")) ?>',
+      confirmButtonColor: '#2563eb'
+    });
+  </script>
+<?php endif; ?>
 
 <style>
   /* Card Styling */
@@ -495,6 +509,7 @@ if ($datastatusrkk == 3) {
       });
     });
 
+
     // SweetAlert Delete Detail Action
     $(document).on('click', '.btn-delete-detail', function() {
       const id = $(this).data('id');
@@ -502,8 +517,8 @@ if ($datastatusrkk == 3) {
       const name = $(this).data('name');
 
       Swal.fire({
-        title: 'Apakah anda yakin?',
-        text: "Data rencana kerja untuk " + name + " akan dihapus!",
+        title: 'Yakin hapus?',
+        html: `<b>${name}</b> akan dihapus permanen!`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#e11d48',
