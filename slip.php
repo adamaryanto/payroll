@@ -60,13 +60,15 @@ $sql = "SELECT
     jd.jam_keluar,
     jd.istirahat_masuk,
     jd.istirahat_keluar,
-    rd.status_rkk
+    rd.status_rkk,
+    os.OS_DHK
 FROM tb_realisasi_detail r
 JOIN ms_karyawan k ON r.id_karyawan = k.id_karyawan
 LEFT JOIN ms_jabatan j ON k.id_jabatan = j.id_jabatan
 LEFT JOIN ms_departmen d ON k.id_departmen = d.id_departmen
 LEFT JOIN tb_jadwal jd ON r.id_jadwal = jd.id_jadwal
 LEFT JOIN tb_rkk_detail rd ON r.id_rkk_detail = rd.id_rkk_detail
+LEFT JOIN ms_os_dhk os ON k.id_os_dhk = os.id_os_dhk
 WHERE r.id_karyawan = '$id_karyawan'
   AND r.tgl_realisasi_detail BETWEEN '$tanggal_mulai' AND '$tanggal_akhir'
 ORDER BY r.tgl_realisasi_detail ASC
@@ -85,7 +87,7 @@ echo '
 
     <td colspan="8" style="font-weight:bold; text-align:center; font-size:14pt;">SLIP UPAH</td>
 
-    <td colspan="3" rowspan="2" style="font-weight:bold; text-align:center; vertical-align:middle;">OUTSOURCING : DHK</td>
+    <td colspan="3" rowspan="2" style="font-weight:bold; text-align:center; vertical-align:middle;">OUTSOURCING : ' . ($row1['OS_DHK'] ?? '-') . '</td>
 </tr>
 
 <tr>
@@ -107,7 +109,7 @@ echo '
 
     <th>Karyawan Setuju</th>
     <th>OS</th>
-    <th>HRD DHK</th>
+    <th>HRD ' . ($row1['OS_DHK'] ?? 'DHK') . '</th>
 </tr>
 ';
 if($result->num_rows > 0) {
