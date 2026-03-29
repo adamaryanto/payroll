@@ -248,9 +248,6 @@ if ($datastatusrkk == 3) {
   </div>
 </div>
 
-<?php var_dump($datastatusrkk); ?>
-<?php var_dump($_SESSION['role']); ?>
-
 <?php if (isset($_GET['msg'])): ?>
   <script>
     Swal.fire({
