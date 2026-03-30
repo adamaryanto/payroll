@@ -226,7 +226,6 @@ if ($_SESSION['iduser'] != "" && $_SESSION['nama'] != "") {
                     elseif ($aksi == "tambah") { include "page/karyawan/tambah.php"; } 
                     elseif ($aksi == "ubah") { include "page/karyawan/ubah.php"; } 
                     elseif ($aksi == "view") { include "page/karyawan/view.php"; } 
-                    elseif ($aksi == "shift") { include "page/karyawan/shift.php"; } 
                   } else if ($page == 'bagian') {
                     if ($aksi == "") { include "page/bagian/bagian.php"; } 
                     elseif ($aksi == "hapus") { include "page/bagian/hapus.php"; } 
