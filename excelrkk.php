@@ -8,11 +8,17 @@ $queryInfo = $koneksi->query("SELECT tgl_rkk, status_rkk FROM tb_rkk WHERE id_rk
 $info = $queryInfo->fetch_assoc();
 $tanggal_sql = $info['tgl_rkk'] ?? '';
 $tanggal_file = $tanggal_sql ? date('d-m-Y', strtotime($tanggal_sql)) : 'TanpaTanggal';
+$status_rkk = $info['status_rkk'] ?? 0;
 
 header("Content-Type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Rencana_Upah_Cikupa_$tanggal_file.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
+
+// LOGIKA STEMPEL STATUS
+$is_approved = ($status_rkk >= 2 || strtolower((string)$status_rkk) === 'approved' || strtolower((string)$status_rkk) === 'approve');
+$stamp_text = $is_approved ? "APPROVED" : "UNAPPROVED";
+$stamp_color = $is_approved ? "#008000" : "#FF0000";
 
 // 2. Data Boneless
 $queryBoneless = $koneksi->query("
@@ -31,8 +37,9 @@ $boneless_details = [];
 if ($id_boneless > 0) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
     while ($bd = $q_bd->fetch_assoc()) {
-        // LOGIKA PERBAIKAN: Cek jenis item
-        $val = (float)$bd['total'];
+        // FIX: Gunakan abs() agar terhindar dari double negatif
+        $val = abs((float)$bd['total']);
+        
         if ($bd['jenis'] == 'minus') {
             $total_boneless -= $val; // Kurangi jika minus
         } else {
@@ -132,9 +139,9 @@ echo "<table border='1'>
 </table><br>";
 
 // --- HITUNGAN REKAP BIAYA MOBIL DAN BONELESS ---
-// A. Biaya Boneless Rencana (Murni dari Master)
-// Di RKK, kita cukup hitung: Jumlah Mobil * Harga Master saat itu
-$biaya_boneless_total = $harga_master_saat_itu * $potong;
+// A. Biaya Boneless Rencana (Murni dari Master + Penyesuaian Item)
+// Di RKK, kita hitung: (Jumlah Mobil * Harga Master) + Penyesuaian (Plus/Minus)
+$biaya_boneless_total = ($harga_master_saat_itu * $potong) + $total_boneless;
 
 // B. Hitung Grand Total (Upah Pabrik + Boneless Rencana)
 $grand_total_all = $total_upah_pabrik + $biaya_boneless_total;
@@ -175,21 +182,36 @@ echo "<table border='1' style='border-collapse:collapse;'>
     <tbody>";
 
 $no_b = 1;
+$subtotal_boneless_items = 0;
 if (!empty($boneless_details)) {
     foreach ($boneless_details as $item) {
         $is_minus = ($item['jenis'] == 'minus');
-        $harga_satuan = (float)($item['harga'] ?? 0);
+        $harga_satuan = abs((float)($item['harga'] ?? 0)); // FIX: Mencegah double minus dari DB
+
+        if ($is_minus) {
+            $subtotal_boneless_items -= $harga_satuan;
+        } else {
+            $subtotal_boneless_items += $harga_satuan;
+        }
 
         $style_color = $is_minus ? "color:red;" : "";
-        $prefix = $is_minus ? "(Pengurangan) " : "";
+        $simbol_minus = $is_minus ? "- " : ""; // FIX: Tanda minus saja, tanpa "(Pengurangan)"
 
         echo "<tr>
             <td align='center'>$no_b</td>
-            <td colspan='5' style='font-weight:bold; $style_color'>" . $prefix . strtoupper($item['nama_item'] ?? '') . "</td>
-            <td align='right' style='$style_color'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+            <td colspan='5' style='font-weight:bold; $style_color'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='right' style='$style_color'>Rp {$simbol_minus}" . number_format($harga_satuan, 2, '.', ',') . "</td>
         </tr>";
         $no_b++;
     }
+
+    // Tampilkan Subtotal
+    $style_subtotal = ($subtotal_boneless_items < 0) ? "color:red;" : "";
+    $simbol_subtotal = ($subtotal_boneless_items < 0) ? "- " : "";
+    echo "<tr style='background-color:#f2f2f2; font-weight:bold;'>
+        <td colspan='6' align='center'>SUBTOTAL ESTIMASI BONELESS</td>
+        <td align='right' style='$style_subtotal'>Rp {$simbol_subtotal}" . number_format(abs($subtotal_boneless_items), 2, '.', ',') . "</td>
+    </tr>";
 } else {
     echo "<tr><td colspan='7' align='center'>Tidak ada rincian item rencana</td></tr>";
 }
@@ -197,15 +219,33 @@ if (!empty($boneless_details)) {
 echo "</tbody></table><br>";
 
 // --- TABEL KUNING (HASIL AKHIR) ---
+$style_boneless_tot = ($biaya_boneless_total < 0) ? "color:red;" : "";
+$simbol_boneless_tot = ($biaya_boneless_total < 0) ? "- " : "";
+
 echo "<table border='1' style='border-collapse:collapse;'>
     <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
         <th colspan='2'>BIAYA PABRIK</th><th colspan='2'>BONELESS (RENCANA)</th><th>POTONG</th><th>TOTAL</th><th>Biaya Per mobil</th>
     </tr>
     <tr style='font-weight:bold; text-align:right;'>
         <td align='center' colspan='2'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
-        <td align='center' colspan='2'>Rp " . number_format($biaya_boneless_total, 2, '.', ',') . "</td>
+        <td align='center' colspan='2' style='$style_boneless_tot'>Rp {$simbol_boneless_tot}" . number_format(abs($biaya_boneless_total), 2, '.', ',') . "</td>
         <td align='center'>" . (int)$potong . "</td>
         <td align='center'>Rp " . number_format($grand_total_all, 2, '.', ',') . "</td>
         <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_final, 2, '.', ',') . "</td>
+    </tr>
+</table><br><br>";
+
+// --- POSISI STEMPEL DI BAWAH KIRI ---
+echo "<table border='0'>
+    <tr>
+        <td width='30'></td> <td style='padding: 20px;'>
+            <table border='1' style='border-collapse:collapse; border: 4px solid $stamp_color; transform: rotate(-15deg); -webkit-transform: rotate(-15deg); -ms-transform: rotate(-15deg);'>
+                <tr>
+                    <td align='center' style='font-size:24px; font-weight:bold; color:$stamp_color; padding:5px 30px;'>
+                        $stamp_text
+                    </td>
+                </tr>
+            </table>
+        </td>
     </tr>
 </table>";

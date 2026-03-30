@@ -14,9 +14,13 @@ $tanggal_sql = $tanggal_raw ? date('Y-m-d', strtotime($tanggal_raw)) : '';
 header("Content-type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Laporan_Realisasi_Upah_$tanggal.xls");
 echo "<meta charset='UTF-8'>";
+
+// LOGIKA STEMPEL STATUS
+$is_approved = ($status_realisasi >= 2 || strtolower((string)$status_realisasi) === 'approved' || strtolower((string)$status_realisasi) === 'approve');
+$stamp_text = $is_approved ? "APPROVED" : "UNAPPROVED";
+$stamp_color = $is_approved ? "#008000" : "#FF0000"; // Hijau untuk Approve, Merah untuk Unapproved
 ?>
 
-<!-- HEADER EXCEL -->
 <table border="0">
     <tr>
         <th colspan="14" style="text-align:center; font-size:20px; font-weight:bold;">LAPORAN REALISASI UPAH</th>
@@ -27,7 +31,7 @@ echo "<meta charset='UTF-8'>";
         </th>
     </tr>
     <tr>
-        <td colspan="14" style="text-align:center; color:red; font-weight:bold;">JIKALAU NAMA YANG TERTERA DIABSEN TELAT MAKA AKAN DIPOTONG RP 25.000</td>
+        <td colspan="14" style="text-align:center; color:red; font-weight:bold; padding-top:10px;">JIKALAU NAMA YANG TERTERA DIABSEN TELAT MAKA AKAN DIPOTONG RP 25.000</td>
     </tr>
     <tr>
         <td colspan="14" style="text-align:center;">MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td>
@@ -37,7 +41,6 @@ echo "<meta charset='UTF-8'>";
     </tr>
 </table>
 
-<!-- ABSENSI DAN UPAH KARYAWAN -->
 <table border="1" style="border-collapse:collapse;">
     <tbody>
         <?php
@@ -128,7 +131,6 @@ echo "<meta charset='UTF-8'>";
 </table>
 
 <br>
-<!-- LOGIKA BONELESS & REKAP-->
 <?php
 $total_boneless_final = 0;
 $boneless_items = [];
@@ -137,10 +139,14 @@ $b_head = $q_b->fetch_assoc();
 if ($b_head) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '" . $b_head['id_boneless'] . "'");
     while ($bd = $q_bd->fetch_assoc()) {
+        
+        // FIX: Gunakan abs() agar terhindar dari double negatif jika angka di database di-input minus
+        $nilai_total = abs($bd['total']); 
+        
         if (($bd['jenis'] ?? '') == 'minus') {
-            $total_boneless_final -= $bd['total'];
+            $total_boneless_final -= $nilai_total;
         } else {
-            $total_boneless_final += $bd['total'];
+            $total_boneless_final += $nilai_total;
         }
         $boneless_items[] = $bd;
     }
@@ -158,7 +164,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
             <table border="1" style="border-collapse:collapse;">
                 <thead>
                     <tr style="background-color: #dbe5f1; font-weight: bold;">
-                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSORCHING CIKUPA <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th></th>
+                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSORCHING CIKUPA <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
                     </tr>
                     <tr style="background-color: #e5e7eb; font-weight: bold;">
                         <th width="150">KATEGORI OS</th>
@@ -174,7 +180,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     ?>
                         <tr>
                             <td style="font-weight: bold;"><?php echo $label; ?></td>
-                            <td align="right" style='mso-number-format:\"\#\,\#\#0\";'>
+                            <td align="right" style='mso-number-format:"\#\,\#\#0";'>
                                 Rp <?php echo number_format($total_per_label, 0, ',', '.'); ?>
                             </td>
                         </tr>
@@ -200,11 +206,16 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                 foreach ($boneless_items as $item) {
                     $is_minus = (($item['jenis'] ?? '') == 'minus');
                     $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
+                    
+                    // FIX Tampilan: Memastikan format UI tidak dobel minus
+                    $nilai_tampil = abs($item['total']);
+                    $simbol_minus = $is_minus ? "- " : "";
+
                     echo "<tr>
                         <td align='center'>$no_b</td>
                         <td style='" . ($is_minus ? "color:red;" : "") . "'>" . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp " . number_format($item['total'], 2, '.', ',') . "</td>
+                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp {$simbol_minus}" . number_format($nilai_tampil, 2, '.', ',') . "</td>
                     </tr>";
                     $no_b++;
                 }
@@ -213,8 +224,10 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     <td colspan="3" align="center">TOTAL AKHIR BONELESS</td>
                     <td align="right" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
                         Rp <?php
-                            $fmt_bone = number_format($total_boneless_final, 2, '.', ',');
-                            echo ($total_boneless_final < 0) ? str_replace('-', '', $fmt_bone) . " (minus)" : $fmt_bone;
+                            // FIX Tampilan Grand Total Boneless
+                            $fmt_bone = number_format(abs($total_boneless_final), 2, '.', ',');
+                            // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
+                            echo ($total_boneless_final < 0) ? "- " . $fmt_bone : $fmt_bone;
                             ?>
                     </td>
                 </tr>
@@ -258,13 +271,31 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : 'black'; ?>;">
                         Rp <?php
-                            $fmt_bone_kuning = number_format($total_boneless_final, 2, '.', ',');
-                            echo ($total_boneless_final < 0) ? str_replace('-', '', $fmt_bone_kuning) . " (minus)" : $fmt_bone_kuning;
+                            // FIX Tampilan Total kuning
+                            $fmt_bone_kuning = number_format(abs($total_boneless_final), 2, '.', ',');
+                            // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
+                            echo ($total_boneless_final < 0) ? "- " . $fmt_bone_kuning : $fmt_bone_kuning;
                             ?>
                     </td>
                     <td align="center"><?php echo (int)$potong; ?></td>
                     <td align="center">Rp <?php echo number_format($grand_total_all, 2, '.', ','); ?></td>
                     <td align="center" style="background-color:white;">Rp <?php echo number_format($biaya_per_mobil, 2, '.', ','); ?></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<br>
+
+<table border="0">
+    <tr>
+        <td width="30"></td> <td>
+            <table border="1" style="border-collapse:collapse; border: 4px solid <?php echo $stamp_color; ?>;">
+                <tr>
+                    <td align="center" style="font-size:24px; font-weight:bold; color:<?php echo $stamp_color; ?>; padding:5px 30px;">
+                        <?php echo $stamp_text; ?>
+                    </td>
                 </tr>
             </table>
         </td>

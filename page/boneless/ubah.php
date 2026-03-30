@@ -128,7 +128,7 @@ if ($simpan) {
                                     </thead>
                                     <tbody>
                                         <?php $no_p = 1;
-                                        foreach ($details as $row): if ($row['jenis'] == 'plus'): ?>
+                                        foreach ($details as $row): if (isset($row['jenis']) && $row['jenis'] == 'plus'): ?>
                                                 <tr class="item-row row-plus">
                                                     <td class="text-center font-bold text-gray-300"><?= $no_p++ ?></td>
                                                     <td>
@@ -166,7 +166,7 @@ if ($simpan) {
                                     </thead>
                                     <tbody>
                                         <?php $no_m = 1;
-                                        foreach ($details as $row): if ($row['jenis'] == 'minus'): ?>
+                                        foreach ($details as $row): if (isset($row['jenis']) && $row['jenis'] == 'minus'): ?>
                                                 <tr class="item-row row-minus">
                                                     <td class="text-center font-bold text-gray-300"><?= $no_m++ ?></td>
                                                     <td>
