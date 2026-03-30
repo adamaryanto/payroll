@@ -113,7 +113,7 @@ if ($simpan) {
                         </div>
 
                         <div class="mt-4">
-                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block">Item Penambah (Plus)</label>
+                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block">Tim Penambah (Plus)</label>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="tablePlus">
                                     <thead class="bg-green-50">
@@ -151,7 +151,7 @@ if ($simpan) {
                         <hr class="my-5 border-gray-200">
 
                         <div class="mt-4">
-                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block">Item Pengurang (Minus)</label>
+                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block">Tim Pengurang (Minus)</label>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="tableMinus">
                                     <thead class="bg-red-50">
@@ -199,8 +199,7 @@ if ($simpan) {
                         </div>
 
                         <div class="mt-8 flex gap-3">
-                            <button type="submit" name="simpan" value="simpan" class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700">Simpan Perubahan</button>
-                            <a href="?page=boneless&ref=<?= $ref ?><?= $view_param ?>" class="px-8 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold border">Batal</a>
+                            <button type="submit" name="simpan" value="simpan" class="px-4 py-2 border-0 bg-indigo-600 text-white rounded-lg font-bold shadow-md hover:bg-indigo-700"><i class="fas fa-save md:mr-2"></i>Simpan Perubahan</button>
                         </div>
                     </form>
                 </div>
