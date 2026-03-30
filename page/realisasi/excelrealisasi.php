@@ -3,397 +3,270 @@ include "../../koneksi.php";
 
 $id = isset($_GET['id']) ? $_GET['id'] : '';
 
-// 1. Ambil data tanggal berdasarkan ID
-$queryInfo = $koneksi->query("
-SELECT 
-R.tgl_realisasi,
-R.jam_kerja,
-J.jam_masuk,
-J.jam_keluar,
-R.status_realisasi
-FROM tb_realisasi R
-LEFT JOIN tb_realisasi_detail RD ON R.id_realisasi = RD.id_realisasi
-LEFT JOIN tb_jadwal J ON RD.id_jadwal = J.id_jadwal
-WHERE R.id_realisasi = '$id'
-LIMIT 1
-");
+// 1. Ambil data info utama
+$queryInfo = $koneksi->query("SELECT tgl_realisasi, status_realisasi, jam_kerja FROM tb_realisasi WHERE id_realisasi = '$id'");
 $info = $queryInfo->fetch_assoc();
 $tanggal_raw = $info ? $info['tgl_realisasi'] : '';
 $status_realisasi = $info['status_realisasi'] ?? 0;
 $tanggal = $tanggal_raw ? date('d-m-Y', strtotime($tanggal_raw)) : 'TanpaTanggal';
 $tanggal_sql = $tanggal_raw ? date('Y-m-d', strtotime($tanggal_raw)) : '';
 
-// 2. Gunakan variabel $tanggal untuk nama file
 header("Content-type: application/vnd.ms-excel");
 header("Content-Disposition: attachment; filename=Laporan_Realisasi_Upah_$tanggal.xls");
 echo "<meta charset='UTF-8'>";
-
-// Subqueries for replacement info
-$subquery_menggantikan = "(SELECT K3.nama_karyawan 
-         FROM tb_rkk_update U1 
-         JOIN tb_rkk_update U2 ON U1.id_rkk_detail = U2.id_rkk_detail 
-         JOIN ms_karyawan K3 ON U2.id_karyawan = K3.id_karyawan 
-         JOIN tb_rkk_detail RD2 ON U1.id_rkk_detail = RD2.id_rkk_detail
-         WHERE U1.id_karyawan = A.id_karyawan 
-         AND U1.status = 'Pengganti' 
-         AND U2.status = 'Digantikan' 
-         AND RD2.id_rkk = RD.id_rkk
-         LIMIT 1)";
-
-$subquery_digantikan_oleh = "(SELECT K4.nama_karyawan 
-         FROM tb_rkk_update U3 
-         JOIN tb_rkk_update U4 ON U3.id_rkk_detail = U4.id_rkk_detail 
-         JOIN ms_karyawan K4 ON U4.id_karyawan = K4.id_karyawan 
-         WHERE U3.id_rkk_detail = A.id_rkk_detail 
-         AND U3.status = 'Digantikan' 
-         AND U4.status = 'Pengganti' 
-         LIMIT 1)";
 ?>
 
+<!-- HEADER EXCEL -->
+<table border="0">
+    <tr>
+        <th colspan="14" style="text-align:center; font-size:20px; font-weight:bold;">LAPORAN REALISASI UPAH</th>
+    </tr>
+    <tr>
+        <th colspan="14" style="text-align:center; font-size:16px;">
+            Tanggal Realisasi: <?php echo $tanggal_raw ? date('d/m/Y', strtotime($tanggal_raw)) : '-'; ?>
+        </th>
+    </tr>
+    <tr>
+        <td colspan="14" style="text-align:center; color:red; font-weight:bold;">JIKALAU NAMA YANG TERTERA DIABSEN TELAT MAKA AKAN DIPOTONG RP 25.000</td>
+    </tr>
+    <tr>
+        <td colspan="14" style="text-align:center;">MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td>
+    </tr>
+    <tr>
+        <td colspan="14" style="height:15px;"></td>
+    </tr>
+</table>
+
+<!-- ABSENSI DAN UPAH KARYAWAN -->
 <table border="1" style="border-collapse:collapse;">
-    <thead>
-        <tr>
-            <th colspan="22" style="text-align:center; font-size:20px; font-weight:bold;">
-                LAPORAN REALISASI UPAH
-            </th>
-        </tr>
-        <tr>
-            <th colspan="22" style="text-align:center; font-size:16px;">
-                Tanggal Realisasi: <?php echo $info['tgl_realisasi'] ? date('d/m/Y', strtotime($info['tgl_realisasi'])) : '-'; ?> |
-                <?php echo $info['jam_masuk'] . " / " . $info['jam_keluar']; ?>
-            </th>
-        </tr>
-        <tr><td colspan="22" style="text-align:center;">JIKALAU NAMA TERTERA DI ABSEN TETAPI TIDAK HADIR MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
-        <tr><td colspan="22" style="text-align:center;">JIKALAU ISTIRAHAT KURANG DARI JAM 12:00 DAN MASUK SETELAH ISTIRAHAT LEBIH DARI JAM 13:00 MAKA KENA POTONG SEBESAR RP.50,000!!!</td></tr>
-        <tr><td colspan="22" style="text-align:center;">MASUK JAM 07:00 ISTIRAHAT JAM 11:50 MASUK JAM 10:00 ISTIRAHAT JAM 13:00.</td></tr>
-        <tr><td colspan="22" style="text-align:center;">MASUK JAM 09:00-10:00 ISTIRAHAT JAM 13:00 MASUK JAM ISTIRAHAT JAM 14:00</td></tr>
-        <?php
-        $q_denda = $koneksi->query("SELECT * FROM tb_denda LIMIT 1");
-        $d_denda = $q_denda->fetch_assoc();
-        $globalDendaMasuk = $d_denda['denda_masuk'] ?? 0;
-        $globalDendaIstirahatAwal = $d_denda['denda_istirahat_keluar'] ?? 0;
-        $globalDendaIstirahatTelat = $d_denda['denda_istirahat_masuk'] ?? 0;
-        $globalDendaPulang = $d_denda['denda_pulang'] ?? 0;
-        $globalDendaTidakLengkap = $d_denda['denda_tidak_lengkap'] ?? 0;
-        ?>
-    </thead>
     <tbody>
         <?php
         $grand_total = 0;
         $grand_karyawan = 0;
-        $totals_by_os = []; // Dynamic array for OS/DHK totals
+        $totals_by_os = [];
 
-        // 1. Ambil list departemen yang hanya ada di realisasi ini
         $sqlDept = $koneksi->query("SELECT DISTINCT D.* FROM ms_departmen D 
                                      JOIN tb_realisasi_detail AD ON AD.id_realisasi = '$id'
                                      LEFT JOIN tb_rkk_detail RD ON AD.id_rkk_detail = RD.id_rkk_detail
                                      WHERE D.id_departmen = COALESCE(NULLIF(AD.id_departmen, 0), RD.id_departmen)
                                      ORDER BY D.id_departmen ASC");
+
         while ($dept = $sqlDept->fetch_assoc()) {
             $id_dept = $dept['id_departmen'];
 
-            // 2. Tampilkan Header Departemen
             echo "<tr>
-                    <td colspan='22' style='background-color:#1e3a8a; color:white; font-weight:bold; padding:10px;'>
-                        DEPARTEMEN: " . strtoupper($dept['nama_departmen']) . "
+                    <td colspan='14' align='center' style='background-color:#1e3a8a; color:white; font-weight:bold;'>
+                        " . strtoupper($dept['nama_departmen'] ?? '') . "
                     </td>
                   </tr>";
 
-            // 3. Header Kolom
             echo "<tr>
-            <th style='background:#e5e7eb; text-align:center;'>No</th>
-            <th style='background:#e5e7eb; text-align:center;'>Nama Sesuai KTP</th>
-            <th style='background:#e5e7eb; text-align:center;'>OS/DHK</th>
-            <th style='background:#e5e7eb; text-align:center;'>Golongan</th>
-            <th style='background:#e5e7eb; text-align:center;'>Posisi</th>
-            <th style='background:#e5e7eb; text-align:center;'>Absen Masuk</th>
-            <th style='background:#e5e7eb; text-align:center;'>Absen Keluar</th>
-            <th style='background:#e5e7eb; text-align:center;'>Absen Istirahat Keluar</th>
-            <th style='background:#e5e7eb; text-align:center;'>Absen Istirahat Masuk</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Masuk</th>
-            <th style='background:#e5e7eb; text-align:center;'>Istirahat</th>
-            <th style='background:#e5e7eb; text-align:center;'>Jam Pulang</th>
-            <th style='background:#e5e7eb; text-align:center;'>Hasil Kerja</th>
-            <th style='background:#e5e7eb; text-align:center;'>Upah</th>
-            <th style='background:#e5e7eb; text-align:center;'>Pot. Telat</th>
-            <th style='background:#e5e7eb; text-align:center;'>Pot. Ist. Awal</th>
-            <th style='background:#e5e7eb; text-align:center;'>Pot. Ist. Telat</th>
-            <th style='background:#e5e7eb; text-align:center;'>Pot. Pulang</th>
-            <th style='background:#e5e7eb; text-align:center;'>Pot. Tidak Lengkap</th>
-            <th style='background:#e5e7eb; text-align:center;'>Pot. Lainnya</th>
-            <th style='background:#e5e7eb; text-align:center;'>Lembur</th>
-            <th style='background:#e5e7eb; text-align:center;'>Upah Dibayar</th>
-                  </tr>";
+                <th style='background:#e5e7eb;'>No</th>
+                <th style='background:#e5e7eb;'>NAMA SESUAI KTP</th>
+                <th style='background:#e5e7eb;'>OS/DHK</th>
+                <th style='background:#e5e7eb;'>GOLONGAN</th>
+                <th style='background:#e5e7eb;'>POSISI</th>
+                <th style='background:#e5e7eb;'>JAM KERJA</th>
+                <th style='background:#e5e7eb;'>JAM MASUK</th>
+                <th style='background:#e5e7eb;'>ISTIRAHAT MASUK</th>
+                <th style='background:#e5e7eb;'>JAM PULANG</th>
+                <th style='background:#e5e7eb;'>HASIL KERJA</th>
+                <th style='background:#e5e7eb;'>UPAH</th>
+                <th style='background:#e5e7eb;'>POTONGAN</th>
+                <th style='background:#e5e7eb;'>LEMBUR</th>
+                <th style='background:#e5e7eb;'>UPAH DIBAYAR</th>
+            </tr>";
 
-            // 4. Ambil data karyawan di departemen ini saja
-            $tampil = $koneksi->query("SELECT 
-            A.*, 
-            IF(A.id_karyawan = 0, '-', B.no_absen) as no_absen,
-            IF(A.id_karyawan = 0, A.nama_karyawan_manual, B.nama_karyawan) as nama_karyawan, 
-            O.OS_DHK as label_os,
-            G.golongan as label_gol,
-            D.nama_departmen, 
-            S.nama_sub_department, 
-            A.r_upah as upah,
-            J.jam_masuk, J.jam_keluar, J.istirahat_masuk, J.istirahat_keluar,
-            RD.status_rkk,
-            $subquery_menggantikan as menggantikan,
-            $subquery_digantikan_oleh as digantikan_oleh
-            FROM tb_realisasi_detail A 
-            LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
-            LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
-            LEFT JOIN ms_departmen D ON COALESCE(NULLIF(A.id_departmen, 0), RD.id_departmen) = D.id_departmen
-            LEFT JOIN ms_sub_department S ON COALESCE(NULLIF(A.id_sub_department, 0), RD.id_sub_department) = S.id_sub_department
-            LEFT JOIN ms_os_dhk O ON COALESCE(NULLIF(A.id_os_dhk, 0), B.id_os_dhk) = O.id_os_dhk
-            LEFT JOIN ms_golongan G ON COALESCE(NULLIF(A.id_golongan, 0), B.id_golongan) = G.id_golongan
-            LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
-            WHERE A.id_realisasi = '$id' 
-            AND COALESCE(NULLIF(A.id_departmen, 0), RD.id_departmen) = '$id_dept'");
+            $tampil = $koneksi->query("SELECT A.*, IF(A.id_karyawan = 0, A.nama_karyawan_manual, B.nama_karyawan) as nama_karyawan, 
+                O.OS_DHK as label_os, G.golongan as label_gol, S.nama_sub_department as posisi, J.jam_masuk as j_masuk
+                FROM tb_realisasi_detail A 
+                LEFT JOIN ms_karyawan B ON A.id_karyawan = B.id_karyawan
+                LEFT JOIN tb_rkk_detail RD ON A.id_rkk_detail = RD.id_rkk_detail
+                LEFT JOIN ms_os_dhk O ON COALESCE(NULLIF(A.id_os_dhk, 0), B.id_os_dhk) = O.id_os_dhk
+                LEFT JOIN ms_golongan G ON COALESCE(NULLIF(A.id_golongan, 0), B.id_golongan) = G.id_golongan
+                LEFT JOIN ms_sub_department S ON COALESCE(NULLIF(A.id_sub_department, 0), RD.id_sub_department) = S.id_sub_department
+                LEFT JOIN tb_jadwal J ON A.id_jadwal = J.id_jadwal
+                WHERE A.id_realisasi = '$id' AND COALESCE(NULLIF(A.id_departmen, 0), RD.id_departmen) = '$id_dept'");
 
             $no = 1;
-            $total = 0;
-            $jml_karyawan = 0;
             while ($data = $tampil->fetch_assoc()) {
-                // Ambil denda dari database langsung (sudah akurat dan mencakup log cross-midnight)
-                $potTelatValue = $data['r_potongan_telat'] ?? 0;
-                $potIstirahatAwal = $data['r_potongan_istirahat_awal'] ?? 0;
-                $potIstirahatTelat = $data['r_potongan_istirahat_telat'] ?? 0;
-                $potPulangValue = $data['r_potongan_pulang'] ?? 0;
-                $potTidakLengkapValue = $data['r_potongan_tidak_lengkap'] ?? 0;
+                $total_potongan = ($data['r_potongan_telat'] ?? 0) + ($data['r_potongan_istirahat_awal'] ?? 0) +
+                    ($data['r_potongan_istirahat_telat'] ?? 0) + ($data['r_potongan_pulang'] ?? 0) +
+                    ($data['r_potongan_tidak_lengkap'] ?? 0) + ($data['r_potongan_lainnya'] ?? 0);
 
-                $potongan = $potTelatValue + $potIstirahatAwal + $potIstirahatTelat + $data['r_potongan_lainnya'] + $potPulangValue + $potTidakLengkapValue;
+                $upah_dibayar = ($data['r_upah'] ?? 0) - $total_potongan + ($data['lembur'] ?? 0);
 
-                $lembur = $data['lembur'] ?? 0;
-
-                if (!empty($data['digantikan_oleh']) || $data['status_rkk'] == 'Tidak Hadir') {
-                    $data['upah'] = 0;
-                    $potTelatValue = 0;
-                    $potIstirahatValue = 0;
-                    $potExtraValue = 0;
-                    $data['r_potongan_lainnya'] = 0;
-                    $potongan = 0;
-                    $lembur = 0;
-                }
-
-                $upah_dibayar = $data['upah'] - $potongan + $lembur;
-                $total += $upah_dibayar;
                 $grand_total += $upah_dibayar;
+                $grand_karyawan++;
 
-                if (empty($data['digantikan_oleh']) && $data['status_rkk'] != 'Tidak Hadir') {
-                    $jml_karyawan++;
-                    $grand_karyawan++;
+                $os_label = $data['label_os'] ?: 'LAIN-LAIN';
+                $totals_by_os[$os_label] = ($totals_by_os[$os_label] ?? 0) + $upah_dibayar;
 
-                    // Track Outsourcing categories dynamically
-                    $os_label = $data['label_os'] ?: ($data['OS_DHK'] ?? '-'); 
-                    if (empty($os_label) || $os_label == '-') {
-                         $os_label = 'LAIN-LAIN / TANPA VENDOR';
-                    }
-                    if (!isset($totals_by_os[$os_label])) {
-                        $totals_by_os[$os_label] = 0;
-                    }
-                    $totals_by_os[$os_label] += $upah_dibayar;
-                }
-
-                $nama_display = $data['nama_karyawan'] .
-                    (!empty($data['menggantikan']) ? " (Menggantikan " . $data['menggantikan'] . ")" : "") .
-                    (!empty($data['menggantikan']) && !empty($data['digantikan_oleh']) ? " &" : "") .
-                    (!empty($data['digantikan_oleh']) ? " (Digantikan oleh " . $data['digantikan_oleh'] . ")" : "");
-
-                    $disp_masuk = (!empty($data['ra_masuk']) && $data['ra_masuk'] != '00:00:00') ? $data['ra_masuk'] : '';
-                $disp_keluar = (!empty($data['ra_keluar']) && $data['ra_keluar'] != '00:00:00') ? $data['ra_keluar'] : '';
-                $disp_ist_keluar = (!empty($data['ra_istirahat_keluar']) && $data['ra_istirahat_keluar'] != '00:00:00') ? $data['ra_istirahat_keluar'] : '';
-                $disp_ist_masuk = (!empty($data['ra_istirahat_masuk']) && $data['ra_istirahat_masuk'] != '00:00:00') ? $data['ra_istirahat_masuk'] : '';
-
-            echo "<tr>
-                <td style='text-align:center;'>{$no}</td>
-                <td style='text-align:left;'>{$nama_display}</td>
-                <td style='text-align:center;'>" . ($data['label_os'] ?: ($data['OS_DHK'] ?? '-')) . "</td>
-                <td style='text-align:center;'>" . ($data['label_gol'] ?: ($data['golongan'] ?? '-')) . "</td>
-                <td style='text-align:center;'>{$data['nama_sub_department']}</td>
-                <td style='text-align:center;'>{$disp_masuk}</td>
-                <td style='text-align:center;'>{$disp_keluar}</td>
-                <td style='text-align:center;'>{$disp_ist_keluar}</td>
-                <td style='text-align:center;'>{$disp_ist_masuk}</td>
-                <td style='text-align:center;'>{$data['r_jam_masuk']}</td>
-                <td style='text-align:center;'>{$data['r_istirahat_keluar']} / {$data['r_istirahat_masuk']}</td>
-                <td style='text-align:center;'>{$data['r_jam_keluar']}</td>
-                <td style='text-align:center;'>{$data['hasil_kerja']}</td>
-         <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$data['upah']}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potTelatValue}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potIstirahatAwal}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potIstirahatTelat}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potPulangValue}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$potTidakLengkapValue}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$data['r_potongan_lainnya']}</td>
-    <td style='text-align:right; mso-number-format:\"\#\,\#\#0\";'>{$lembur}</td>
-    
-    <td style='text-align:right; font-weight:bold; mso-number-format:\"\#\,\#\#0\";'>{$upah_dibayar}</td>
+                echo "<tr>
+                    <td align='center'>$no</td>
+                    <td>" . strtoupper($data['nama_karyawan'] ?? '') . "</td>
+                    <td align='center'>{$data['label_os']}</td>
+                    <td align='center'>{$data['label_gol']}</td>
+                    <td>{$data['posisi']}</td>
+                    <td align='center'>{$data['j_masuk']}</td>
+                    <td align='center'>" . ($data['ra_masuk'] != '00:00:00' ? $data['ra_masuk'] : '') . "</td>
+                    <td align='center'>" . ($data['ra_istirahat_masuk'] != '00:00:00' ? $data['ra_istirahat_masuk'] : '') . "</td>
+                    <td align='center'>" . ($data['ra_keluar'] != '00:00:00' ? $data['ra_keluar'] : '') . "</td>
+                    <td align='center'>{$data['hasil_kerja']}</td>
+                    <td align='right' style='mso-number-format:\"\#\,\#\#0\";'>{$data['r_upah']}</td>
+                    <td align='right' style='mso-number-format:\"\#\,\#\#0\"; color:red;'>" . ($total_potongan > 0 ? $total_potongan : "-") . "</td>
+                    <td align='right' style='mso-number-format:\"\#\,\#\#0\";'>{$data['lembur']}</td>
+                    <td align='right' style='font-weight:bold; mso-number-format:\"\#\,\#\#0\";'>$upah_dibayar</td>
                 </tr>";
                 $no++;
             }
-            echo "<tr>
-            <td colspan='22' style='background:#f1f5f9; font-weight:bold; text-align:right;'>
-            TOTAL UPAH ($jml_karyawan Karyawan) | Rp " . number_format($total, 0, ",", ".") . "
-            </td>
-            </tr>";
-
-            // pemisah antar departemen
-            echo "<tr><td colspan='22' style='height:20px;'></td></tr>";
         }
-        echo "<tr>
-        <td colspan='22' style='background:#1e3a8a; color:white; font-weight:bold; font-size:16px; text-align:right; padding:10px;'>
-        GRAND TOTAL UPAH ($grand_karyawan Karyawan) | Rp " . number_format($grand_total, 0, ",", ".") . "
-        </td>
-        </tr>";
+        // GRAND TOTAL UPAH
+        echo "<tr><td colspan='14' style='background:#203764; color:white; font-weight:bold; text-align:right; padding:10px;'>GRAND TOTAL UPAH ($grand_karyawan Karyawan) | Rp " . number_format($grand_total, 0, ",", ".") . "</td></tr>";
         ?>
     </tbody>
+</table>
+
+<br>
+<!-- LOGIKA BONELESS & REKAP-->
+<?php
+$total_boneless_final = 0;
+$boneless_items = [];
+$q_b = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal_sql'");
+$b_head = $q_b->fetch_assoc();
+if ($b_head) {
+    $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '" . $b_head['id_boneless'] . "'");
+    while ($bd = $q_bd->fetch_assoc()) {
+        if (($bd['jenis'] ?? '') == 'minus') {
+            $total_boneless_final -= $bd['total'];
+        } else {
+            $total_boneless_final += $bd['total'];
+        }
+        $boneless_items[] = $bd;
+    }
+}
+$potong = $b_head['jumlah_mobil'] ?? 0;
+$grand_total_all = $grand_total + $total_boneless_final;
+$biaya_per_mobil = ($potong > 0) ? ($grand_total_all / $potong) : 0;
+$biaya_x_mobil_display = $biaya_per_mobil * $potong;
+?>
+
+<table border="0">
+    <tr>
+        <td width="30"></td>
+        <td valign="top">
+            <table border="1" style="border-collapse:collapse;">
+                <thead>
+                    <tr style="background-color: #dbe5f1; font-weight: bold;">
+                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSORCHING CIKUPA <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th></th>
+                    </tr>
+                    <tr style="background-color: #e5e7eb; font-weight: bold;">
+                        <th width="150">KATEGORI OS</th>
+                        <th width="200">TOTAL UPAH DIBAYAR</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sqlOS = $koneksi->query("SELECT OS_DHK FROM ms_os_dhk ORDER BY id_os_dhk ASC");
+                    while ($rowOS = $sqlOS->fetch_assoc()):
+                        $label = $rowOS['OS_DHK'];
+                        $total_per_label = isset($totals_by_os[$label]) ? $totals_by_os[$label] : 0;
+                    ?>
+                        <tr>
+                            <td style="font-weight: bold;"><?php echo $label; ?></td>
+                            <td align="right" style='mso-number-format:\"\#\,\#\#0\";'>
+                                Rp <?php echo number_format($total_per_label, 0, ',', '.'); ?>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+                <tfoot>
+                    <tr style="background-color: #203764; color: white; font-weight: bold;">
+                        <td>GRAND TOTAL</td>
+                        <td align="right">Rp <?php echo number_format($grand_total, 0, ',', '.'); ?></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </td>
+
+        <td width="50"></td>
+        <td valign="top">
+            <table border="1" style="border-collapse:collapse;">
+                <tr style="background-color:#dbe5f1; font-weight:bold;">
+                    <th colspan="4">BAYARAN TIM BONELESS</th>
+                </tr>
+                <?php
+                $no_b = 1;
+                foreach ($boneless_items as $item) {
+                    $is_minus = (($item['jenis'] ?? '') == 'minus');
+                    $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
+                    echo "<tr>
+                        <td align='center'>$no_b</td>
+                        <td style='" . ($is_minus ? "color:red;" : "") . "'>" . strtoupper($item['nama_item']) . "</td>
+                        <td align='center'>$qty_disp</td>
+                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp " . number_format($item['total'], 2, '.', ',') . "</td>
+                    </tr>";
+                    $no_b++;
+                }
+                ?>
+                <tr style="font-weight:bold;">
+                    <td colspan="3" align="center">TOTAL AKHIR BONELESS</td>
+                    <td align="right" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
+                        Rp <?php
+                            $fmt_bone = number_format($total_boneless_final, 2, '.', ',');
+                            echo ($total_boneless_final < 0) ? str_replace('-', '', $fmt_bone) . " (minus)" : $fmt_bone;
+                            ?>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 </table>
 
 <br><br>
-<table border="1" style="border-collapse:collapse; width:600px;">
-    <thead>
-        <tr style="background-color:#dbe5f1; font-weight:bold;">
-            <th colspan="3" style="height:30px; font-size:14px; text-align:center;">REALISASI TOTAL REKAP OUTSOURCING CIKUPA <?php echo date('d/m/Y', strtotime($info['tgl_realisasi'])); ?></th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        $grand_tagihan = 0;
-        $q_os = $koneksi->query("SELECT OS_DHK FROM ms_os_dhk ORDER BY id_os_dhk ASC");
-        while ($d_os = $q_os->fetch_assoc()) {
-            $label = $d_os['OS_DHK'];
-            $val = $totals_by_os[$label] ?? 0;
-            $grand_tagihan += $val;
-        ?>
-            <tr style="font-weight:bold;">
-                <td style="width:300px; height:25px;">BIAYA TAGIHAN <?php echo $label; ?></td>
-                <td style="width:50px; text-align:center;">Rp</td>
-                <td style="width:250px; text-align:right;"><?php echo number_format($val, 0, ',', '.'); ?></td>
-            </tr>
-        <?php
-        }
-        
-        // Cek jika ada LAIN-LAIN / TANPA VENDOR
-        if (isset($totals_by_os['LAIN-LAIN / TANPA VENDOR'])) {
-            $val = $totals_by_os['LAIN-LAIN / TANPA VENDOR'];
-            $grand_tagihan += $val;
-            ?>
-            <tr style="font-weight:bold;">
-                <td style="width:300px; height:25px;">BIAYA TAGIHAN LAIN-LAIN / TANPA VENDOR</td>
-                <td style="width:50px; text-align:center;">Rp</td>
-                <td style="width:250px; text-align:right;"><?php echo number_format($val, 0, ',', '.'); ?></td>
-            </tr>
-        <?php
-        }
-        ?>
-        <tr style="background-color:yellow; font-weight:bold;">
-            <td style="height:30px; font-size:16px;">Rp</td>
-            <td colspan="2" style="text-align:right; font-size:16px;"><?php echo number_format($grand_tagihan, 0, ',', '.'); ?></td>
-        </tr>
-    </tbody>
-</table>
 
-<?php
-// 3. Ambil data Boneless untuk tanggal yang sama
-$queryBoneless = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal_sql'");
-$bonelessHeader = $queryBoneless->fetch_assoc();
-
-if ($bonelessHeader) {
-    $id_boneless = $bonelessHeader['id_boneless'];
-    $queryBonelessDetail = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
-
-    echo "<br><br>";
-    echo "<table border='1' style='border-collapse:collapse; width:900px;'>
-            <thead>
-                <tr>
-                    <th colspan='4' style='background-color:#4f81bd; color:white; text-align:center; font-weight:bold; height:30px; font-size:14px;'>
-                        DETAIL BONELESS - " . date('d/m/Y', strtotime($tanggal)) . "
-                    </th>
-                </tr>
-                <tr style='background-color:#dbe5f1; font-weight:bold;'>
-                    <th style='width:50px;'>No</th>
-                    <th style='width:400px;'>Nama Item</th>
-                    <th style='width:150px;'>Qty / Harga</th>
-                    <th style='width:200px;'>Total</th>
-                </tr>
-            </thead>
-            <tbody>";
-
-    $no_b = 1;
-    $total_boneless = 0;
-    while ($item = $queryBonelessDetail->fetch_assoc()) {
-        $total_boneless += $item['total'];
-        echo "<tr>
-                <td style='text-align:center;'>$no_b</td>
-                <td>" . strtoupper($item['nama_item']) . "</td>
-                <td style='text-align:center;'>" . number_format($item['qty'], 1, ',', '.') . " x Rp" . number_format($item['harga'], 0, ',', '.') . "</td>
-                <td style='text-align:right;'>Rp " . number_format($item['total'], 0, ',', '.') . "</td>
-              </tr>";
-        $no_b++;
-    }
-
-    echo "      <tr style='font-weight:bold; background-color:#f1f5f9;'>
-                    <td colspan='3' style='text-align:center;'>TOTAL BONELESS</td>
-                    <td style='text-align:right;'>Rp " . number_format($total_boneless, 0, ',', '.') . "</td>
-                </tr>
-            </tbody>
-          </table>";
-
-    // Summary Table
-    $biaya_pabrik = $grand_total;
-    $potong = $bonelessHeader['jumlah_mobil'];
-    $combined_total = $biaya_pabrik + $total_boneless;
-    $biaya_per_mobil = ($potong > 0) ? ($combined_total / $potong) : 0;
-
-    echo "<br><br>
-    <table border='1' style='border-collapse:collapse;'>
-        <thead>
-            <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
-                <th style='width:250px; height:25px;'>BIAYA PABRIK</th>
-                <th style='width:100px;'></th>
-                <th style='width:100px;'></th>
-                <th style='width:150px;'>BONLESS</th>
-                <th style='width:150px;'>POTONG</th>
-                <th style='width:200px;'>TOTAL</th>
-                <th style='width:250px;'>Biaya Per mobil</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr style='font-weight:bold; text-align:center; height:30px; font-size:14px;'>
-                <td style='text-align:right;'>" . number_format($biaya_pabrik, 2, ',', '.') . "</td>
-                <td></td>
-                <td></td>
-                <td style='text-align:right;'>" . number_format($total_boneless, 2, ',', '.') . "</td>
-                <td>$potong</td>
-                <td style='text-align:right;'>" . number_format($combined_total, 2, ',', '.') . "</td>
-                <td style='text-align:right;'>Rp" . number_format($biaya_per_mobil, 2, ',', '.') . "</td>
-            </tr>
-        </tbody>
-    </table>";
-}
-
-// ----------------------------------------------------
-// Stampel Miring untuk Excel menggunakan mso-rotate
-// ----------------------------------------------------
-$stamp_text = ($status_realisasi >= 2) ? "APPROVED" : "UNAPPROVED";
-$stamp_color = ($status_realisasi >= 2) ? "#059669" : "#dc2626";
-
-echo "<br><br>
-<table border='0' style='border-collapse: collapse;'>
+<table border="0">
     <tr>
-        <td style='width: 20px;'></td> <td style='
-            mso-rotate: 15; /* Mengatur kemiringan di Excel */
-            font-family: \"Courier New\", Courier, monospace;
-            font-weight: 900;
-            font-size: 26px;
-            color: {$stamp_color};
-            text-align: center;
-            vertical-align: middle;
-            height: 100px; /* Ruang untuk teks miring agar tidak terpotong */
-            white-space: nowrap;
-        '>
-            [[ {$stamp_text} ]]
+        <td width="30"></td>
+        <td valign="top">
+            <table border="1" style="border-collapse:collapse;">
+                <tr style="background-color:#dbe5f1; font-weight:bold;">
+                    <th colspan="2">REALISASI TOTAL REKAP BIAYA PABRIK CIKUPA <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
+                </tr>
+                <tr style="font-weight:bold;">
+                    <td>Biaya <?php echo (int)$potong; ?> mobil</td>
+                    <td align="right">Rp <?php echo number_format($biaya_x_mobil_display, 2, '.', ','); ?></td>
+                </tr>
+                <tr style="font-weight:bold;">
+                    <td>Biaya permobil</td>
+                    <td align="right">Rp <?php echo number_format($biaya_per_mobil, 2, '.', ','); ?></td>
+                </tr>
+            </table>
+        </td>
+
+        <td width="50"></td>
+        <td valign="top">
+            <table border="1" style="border-collapse:collapse;">
+                <tr style="background-color:yellow; font-weight:bold; text-align:center;">
+                    <th>BIAYA PABRIK</th>
+                    <th>BONELESS</th>
+                    <th>POTONG</th>
+                    <th>TOTAL</th>
+                    <th>Biaya Per mobil</th>
+                </tr>
+                <tr style="font-weight:bold; text-align:right;">
+                    <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
+                    <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : 'black'; ?>;">
+                        Rp <?php
+                            $fmt_bone_kuning = number_format($total_boneless_final, 2, '.', ',');
+                            echo ($total_boneless_final < 0) ? str_replace('-', '', $fmt_bone_kuning) . " (minus)" : $fmt_bone_kuning;
+                            ?>
+                    </td>
+                    <td align="center"><?php echo (int)$potong; ?></td>
+                    <td align="center">Rp <?php echo number_format($grand_total_all, 2, '.', ','); ?></td>
+                    <td align="center" style="background-color:white;">Rp <?php echo number_format($biaya_per_mobil, 2, '.', ','); ?></td>
+                </tr>
+            </table>
         </td>
     </tr>
-</table>";
-?>
+</table>
