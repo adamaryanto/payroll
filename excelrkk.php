@@ -124,7 +124,7 @@ foreach ($data_per_bagian as $nama_bagian => $karyawans) {
             <td align='center'>" . ($k['istirahat_keluar'] ?? '') . "</td>
             <td align='center'>" . ($k['istirahat_masuk'] ?? '') . "</td>
             <td align='center'>" . ($k['jam_keluar'] ?? '') . "</td>
-            <td align='right'>Rp " . number_format((float)($k['upah'] ?? 0), 0, '.', ',') . "</td>
+            <td align='right'>Rp " . number_format((float)($k['upah'] ?? 0), 2, '.', ',') . "</td>
         </tr>";
         $no++;
     }
@@ -134,14 +134,15 @@ foreach ($data_per_bagian as $nama_bagian => $karyawans) {
 echo "<table border='1'>
     <tr style='background-color: #203764; color:#fff; font-weight:bold;'>
         <td colspan='10' align='center' style='width: 800px;'>GRAND TOTAL UPAH (BIAYA PABRIK)</td>
-        <td align='right' style='width: 100px;'>Rp " . number_format($total_upah_pabrik, 0, '.', ',') . "</td>
+        <td align='right' style='width: 100px;'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
     </tr>
 </table><br>";
 
-// --- HITUNGAN REKAP BIAYA MOBIL DAN BONELESS ---
 // A. Biaya Boneless Rencana (Murni dari Master + Penyesuaian Item)
-// Di RKK, kita hitung: (Jumlah Mobil * Harga Master) + Penyesuaian (Plus/Minus)
-$biaya_boneless_total = ($harga_master_saat_itu * $potong) + $total_boneless;
+// Di RKK, kita hitung: (Jumlah Mobil * Harga Master)
+$biaya_mobil_pure = ($harga_master_saat_itu * $potong);
+// Penyesuaian (Plus/Minus) tim boneless ditambahkan ke total akhir
+$biaya_boneless_total = $biaya_mobil_pure + $total_boneless;
 
 // B. Hitung Grand Total (Upah Pabrik + Boneless Rencana)
 $grand_total_all = $total_upah_pabrik + $biaya_boneless_total;
@@ -195,12 +196,12 @@ if (!empty($boneless_details)) {
         }
 
         $style_color = $is_minus ? "color:red;" : "";
-        $simbol_minus = $is_minus ? "- " : ""; // FIX: Tanda minus saja, tanpa "(Pengurangan)"
+        $label_prefix = $is_minus ? "(Pengurangan) " : "";
 
         echo "<tr>
             <td align='center'>$no_b</td>
-            <td colspan='5' style='font-weight:bold; $style_color'>" . strtoupper($item['nama_item'] ?? '') . "</td>
-            <td align='right' style='$style_color'>Rp {$simbol_minus}" . number_format($harga_satuan, 2, '.', ',') . "</td>
+            <td colspan='5' style='font-weight:bold; $style_color'>{$label_prefix}" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='right' style='$style_color'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
         </tr>";
         $no_b++;
     }
@@ -219,8 +220,8 @@ if (!empty($boneless_details)) {
 echo "</tbody></table><br>";
 
 // --- TABEL KUNING (HASIL AKHIR) ---
-$style_boneless_tot = ($biaya_boneless_total < 0) ? "color:red;" : "";
-$simbol_boneless_tot = ($biaya_boneless_total < 0) ? "- " : "";
+$style_boneless_pure = ($biaya_mobil_pure < 0) ? "color:red;" : "";
+$simbol_boneless_pure = ($biaya_mobil_pure < 0) ? "- " : "";
 
 echo "<table border='1' style='border-collapse:collapse;'>
     <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
@@ -228,7 +229,7 @@ echo "<table border='1' style='border-collapse:collapse;'>
     </tr>
     <tr style='font-weight:bold; text-align:right;'>
         <td align='center' colspan='2'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
-        <td align='center' colspan='2' style='$style_boneless_tot'>Rp {$simbol_boneless_tot}" . number_format(abs($biaya_boneless_total), 2, '.', ',') . "</td>
+        <td align='center' colspan='2' style='$style_boneless_pure'>Rp {$simbol_boneless_pure}" . number_format(abs($biaya_mobil_pure), 2, '.', ',') . "</td>
         <td align='center'>" . (int)$potong . "</td>
         <td align='center'>Rp " . number_format($grand_total_all, 2, '.', ',') . "</td>
         <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_final, 2, '.', ',') . "</td>

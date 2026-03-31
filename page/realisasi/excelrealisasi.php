@@ -74,10 +74,10 @@ $stamp_color = $is_approved ? "#008000" : "#FF0000"; // Hijau untuk Approve, Mer
                 <th style='background:#e5e7eb;'>ISTIRAHAT MASUK</th>
                 <th style='background:#e5e7eb;'>JAM PULANG</th>
                 <th style='background:#e5e7eb;'>HASIL KERJA</th>
-                <th style='background:#e5e7eb;'>UPAH</th>
-                <th style='background:#e5e7eb;'>POTONGAN</th>
-                <th style='background:#e5e7eb;'>LEMBUR</th>
-                <th style='background:#e5e7eb;'>UPAH DIBAYAR</th>
+                <th style='background:#e5e7eb;'>UPAH (Rp)</th>
+                <th style='background:#e5e7eb;'>POTONGAN (Rp)</th>
+                <th style='background:#e5e7eb;'>LEMBUR (Rp)</th>
+                <th style='background:#e5e7eb;'>UPAH DIBAYAR (Rp)</th>
             </tr>";
 
             $tampil = $koneksi->query("SELECT A.*, IF(A.id_karyawan = 0, A.nama_karyawan_manual, B.nama_karyawan) as nama_karyawan, 
@@ -116,16 +116,16 @@ $stamp_color = $is_approved ? "#008000" : "#FF0000"; // Hijau untuk Approve, Mer
                     <td align='center'>" . ($data['ra_istirahat_masuk'] != '00:00:00' ? $data['ra_istirahat_masuk'] : '') . "</td>
                     <td align='center'>" . ($data['ra_keluar'] != '00:00:00' ? $data['ra_keluar'] : '') . "</td>
                     <td align='center'>{$data['hasil_kerja']}</td>
-                    <td align='right' style='mso-number-format:\"\#\,\#\#0\";'>{$data['r_upah']}</td>
-                    <td align='right' style='mso-number-format:\"\#\,\#\#0\"; color:red;'>" . ($total_potongan > 0 ? $total_potongan : "-") . "</td>
-                    <td align='right' style='mso-number-format:\"\#\,\#\#0\";'>{$data['lembur']}</td>
-                    <td align='right' style='font-weight:bold; mso-number-format:\"\#\,\#\#0\";'>$upah_dibayar</td>
+                    <td align='right' style='mso-number-format:\"\#\,\#\#0\.00\";'>Rp " . number_format($data['r_upah'] ?? 0, 2, '.', ',') . "</td>
+                    <td align='right' style='mso-number-format:\"\#\,\#\#0\.00\"; color:red;'>" . ($total_potongan > 0 ? "Rp " . number_format($total_potongan, 2, '.', ',') : "-") . "</td>
+                    <td align='right' style='mso-number-format:\"\#\,\#\#0\.00\";'>Rp " . number_format($data['lembur'] ?? 0, 2, '.', ',') . "</td>
+                    <td align='right' style='font-weight:bold; mso-number-format:\"\#\,\#\#0\.00\";'>Rp " . number_format($upah_dibayar, 2, '.', ',') . "</td>
                 </tr>";
                 $no++;
             }
         }
         // GRAND TOTAL UPAH
-        echo "<tr><td colspan='14' style='background:#203764; color:white; font-weight:bold; text-align:right; padding:10px;'>GRAND TOTAL UPAH ($grand_karyawan Karyawan) | Rp " . number_format($grand_total, 0, ",", ".") . "</td></tr>";
+        echo "<tr><td colspan='14' style='background:#203764; color:white; font-weight:bold; text-align:right; padding:10px;'>GRAND TOTAL UPAH ($grand_karyawan Karyawan) | Rp " . number_format($grand_total, 2, '.', ',') . "</td></tr>";
         ?>
     </tbody>
 </table>
@@ -164,7 +164,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
             <table border="1" style="border-collapse:collapse;">
                 <thead>
                     <tr style="background-color: #dbe5f1; font-weight: bold;">
-                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSORCHING CIKUPA <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
+                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSORCHING  <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
                     </tr>
                     <tr style="background-color: #e5e7eb; font-weight: bold;">
                         <th width="150">KATEGORI OS</th>
@@ -180,8 +180,8 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     ?>
                         <tr>
                             <td style="font-weight: bold;"><?php echo $label; ?></td>
-                            <td align="right" style='mso-number-format:"\#\,\#\#0";'>
-                                Rp <?php echo number_format($total_per_label, 0, ',', '.'); ?>
+                            <td align="right">
+                                Rp <?php echo number_format($total_per_label, 2, '.', ','); ?>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -189,7 +189,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                 <tfoot>
                     <tr style="background-color: #203764; color: white; font-weight: bold;">
                         <td>GRAND TOTAL</td>
-                        <td align="right">Rp <?php echo number_format($grand_total, 0, ',', '.'); ?></td>
+                        <td align="right">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     </tr>
                 </tfoot>
             </table>
@@ -206,16 +206,14 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                 foreach ($boneless_items as $item) {
                     $is_minus = (($item['jenis'] ?? '') == 'minus');
                     $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
-                    
-                    // FIX Tampilan: Memastikan format UI tidak dobel minus
+                    $label_prefix = $is_minus ? "(Pengurangan) " : "";
                     $nilai_tampil = abs($item['total']);
-                    $simbol_minus = $is_minus ? "- " : "";
 
                     echo "<tr>
                         <td align='center'>$no_b</td>
-                        <td style='" . ($is_minus ? "color:red;" : "") . "'>" . strtoupper($item['nama_item']) . "</td>
+                        <td style='" . ($is_minus ? "color:red;" : "") . "'>{$label_prefix}" . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp {$simbol_minus}" . number_format($nilai_tampil, 2, '.', ',') . "</td>
+                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp " . number_format($nilai_tampil, 2, '.', ',') . "</td>
                     </tr>";
                     $no_b++;
                 }
@@ -244,7 +242,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
         <td valign="top">
             <table border="1" style="border-collapse:collapse;">
                 <tr style="background-color:#dbe5f1; font-weight:bold;">
-                    <th colspan="2">REALISASI TOTAL REKAP BIAYA PABRIK CIKUPA <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
+                    <th colspan="2">REALISASI TOTAL REKAP BIAYA PABRIK <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
                 </tr>
                 <tr style="font-weight:bold;">
                     <td>Biaya <?php echo (int)$potong; ?> mobil</td>
