@@ -39,7 +39,7 @@ if ($id_boneless > 0) {
     while ($bd = $q_bd->fetch_assoc()) {
         // FIX: Gunakan abs() agar terhindar dari double negatif
         $val = abs((float)$bd['total']);
-        
+
         if ($bd['jenis'] == 'minus') {
             $total_boneless -= $val; // Kurangi jika minus
         } else {
@@ -169,10 +169,23 @@ echo "<br><table border='1' style='border-collapse:collapse;'>
 </table><br>";
 
 // --- TABEL TIM BONELESS ---
+
+$data_dengan_mesin = []; // Untuk jenis 'minus'
+$data_tanpa_mesin = [];  // Untuk jenis 'plus'
+
+foreach ($boneless_details as $item) {
+    if ($item['jenis'] == 'minus') {
+        $data_dengan_mesin[] = $item;
+    } else {
+        $data_tanpa_mesin[] = $item;
+    }
+}
+
+// --- TABEL A: DENGAN MESIN (MINUS) ---
 echo "<table border='1' style='border-collapse:collapse;'>
     <thead>
-        <tr style='background-color:#B4C7E7; font-weight:bold;'>
-            <th colspan='7'>ESTIMASI BIAYA BONELESS</th>
+        <tr style='background-color:red; color:white; font-weight:bold;'>
+            <th colspan='7'>ESTIMASI BIAYA BONELESS - DENGAN MESIN</th>
         </tr>
         <tr style='background-color:#f2f2f2; font-weight:bold;'>
             <th width='30'>No</th>
@@ -182,41 +195,64 @@ echo "<table border='1' style='border-collapse:collapse;'>
     </thead>
     <tbody>";
 
-$no_b = 1;
-$subtotal_boneless_items = 0;
-if (!empty($boneless_details)) {
-    foreach ($boneless_details as $item) {
-        $is_minus = ($item['jenis'] == 'minus');
-        $harga_satuan = abs((float)($item['harga'] ?? 0)); // FIX: Mencegah double minus dari DB
-
-        if ($is_minus) {
-            $subtotal_boneless_items -= $harga_satuan;
-        } else {
-            $subtotal_boneless_items += $harga_satuan;
-        }
-
-        $style_color = $is_minus ? "color:red;" : "";
-        $label_prefix = $is_minus ? "(Pengurangan) " : "";
+$no_m = 1;
+$subtotal_mesin = 0;
+if (!empty($data_dengan_mesin)) {
+    foreach ($data_dengan_mesin as $item) {
+        $harga_satuan = abs((float)$item['harga']);
+        $subtotal_mesin -= $harga_satuan;
 
         echo "<tr>
-            <td align='center'>$no_b</td>
-            <td colspan='5' style='font-weight:bold; $style_color'>{$label_prefix}" . strtoupper($item['nama_item'] ?? '') . "</td>
-            <td align='right' style='$style_color'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+            <td align='center'>$no_m</td>
+            <td colspan='5' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
         </tr>";
-        $no_b++;
+        $no_m++;
     }
-
-    // Tampilkan Subtotal
-    $style_subtotal = ($subtotal_boneless_items < 0) ? "color:red;" : "";
-    $simbol_subtotal = ($subtotal_boneless_items < 0) ? "- " : "";
     echo "<tr style='background-color:#f2f2f2; font-weight:bold;'>
-        <td colspan='6' align='center'>SUBTOTAL ESTIMASI BONELESS</td>
-        <td align='right' style='$style_subtotal'>Rp {$simbol_subtotal}" . number_format(abs($subtotal_boneless_items), 2, '.', ',') . "</td>
+        <td colspan='6' align='center'>SUBTOTAL DENGAN MESIN</td>
+        <td align='right'>Rp " . number_format(abs($subtotal_mesin), 2, '.', ',') . "</td>
     </tr>";
 } else {
-    echo "<tr><td colspan='7' align='center'>Tidak ada rincian item rencana</td></tr>";
+    echo "<tr><td colspan='7' align='center'>Tidak ada data Dengan Mesin</td></tr>";
 }
+echo "</tbody></table><br>";
 
+// --- TABEL B: TANPA MESIN (PLUS) ---
+echo "<table border='1' style='border-collapse:collapse;'>
+    <thead>
+        <tr style='background-color:#C6E0B4; font-weight:bold;'>
+            <th colspan='7'>ESTIMASI BIAYA BONELESS - TANPA MESIN</th>
+        </tr>
+        <tr style='background-color:#f2f2f2; font-weight:bold;'>
+            <th width='30'>No</th>
+            <th colspan='5'>NAMA TIM</th>
+            <th width='150'>HARGA SATUAN</th>
+        </tr>
+    </thead>
+    <tbody>";
+
+$no_p = 1;
+$subtotal_tanpa_mesin = 0;
+if (!empty($data_tanpa_mesin)) {
+    foreach ($data_tanpa_mesin as $item) {
+        $harga_satuan = abs((float)$item['harga']);
+        $subtotal_tanpa_mesin += $harga_satuan;
+
+        echo "<tr>
+            <td align='center'>$no_p</td>
+            <td colspan='5' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+        </tr>";
+        $no_p++;
+    }
+    echo "<tr style='background-color:#f2f2f2; font-weight:bold;'>
+        <td colspan='6' align='center'>SUBTOTAL TANPA MESIN</td>
+        <td align='right'>Rp " . number_format($subtotal_tanpa_mesin, 2, '.', ',') . "</td>
+    </tr>";
+} else {
+    echo "<tr><td colspan='7' align='center'>Tidak ada data Tanpa Mesin</td></tr>";
+}
 echo "</tbody></table><br>";
 
 // --- TABEL KUNING (HASIL AKHIR) ---
