@@ -15,32 +15,44 @@ if ($rkk_d) {
     $rkk_status = $rkk_d['status_rkk'];
 
     // Ambil ID Boneless utama
-    $bnl_q = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE id_rkk = '$rkk_id' LIMIT 1");
+    $bnl_q = $koneksi->query("SELECT A.id_boneless, A.jumlah_mobil, B.biaya_mobil 
+        FROM tb_boneless A 
+        LEFT JOIN tb_biayamobil B ON A.id_biayamobil = B.id_biayamobil 
+        WHERE A.id_rkk = '$rkk_id' LIMIT 1");
     $bnl_d = $bnl_q->fetch_assoc();
     $boneless_id = $bnl_d['id_boneless'] ?? '';
+    $jumlah_mobil = $bnl_d['jumlah_mobil'] ?? 0;
+    $biaya_mobil = $bnl_d['biaya_mobil'] ?? 0;
 
     // Inisialisasi variabel penampung
     $total_boneless_plus = 0;
     $total_boneless_minus = 0;
+    $total_boneless_item = 0;
+    $total_boneless_rencana = 0;
 
     if ($boneless_id) {
-        // Hitung TOTAL dari tb_boneless_detail berdasarkan JENIS
         $query_detail = $koneksi->query("SELECT 
-    SUM(CASE WHEN jenis = 'plus' THEN total ELSE 0 END) as total_plus,
-    SUM(CASE WHEN jenis = 'minus' THEN total ELSE 0 END) as total_minus
-    FROM tb_boneless_detail 
-    WHERE id_boneless = '$boneless_id'");
+            SUM(total) as total_akhir,
+            SUM(CASE WHEN jenis = 'plus' THEN total ELSE 0 END) as total_plus,
+            SUM(CASE WHEN jenis = 'minus' THEN total ELSE 0 END) as total_minus
+            FROM tb_boneless_detail 
+            WHERE id_boneless = '$boneless_id'");
 
         $data_detail = $query_detail->fetch_assoc();
+        $total_boneless_item = $data_detail['total_akhir'] ?? 0;
         $total_boneless_plus = $data_detail['total_plus'] ?? 0;
         $total_boneless_minus = $data_detail['total_minus'] ?? 0;
+
+        // Total Rencana Boneless (Mobil + Plus - Minus)
+        $total_boneless_rencana = ($jumlah_mobil * $biaya_mobil) + $total_boneless_plus - $total_boneless_minus;
+
         // Tanpa Mesin = Nilai Base + Biaya Plus (Beban manual)
         $tampilan_tanpa_mesin = $rkk_terbaru + $total_boneless_plus;
 
         // Dengan Mesin = Nilai Base - Biaya Minus (Efisiensi mesin)
         $tampilan_dengan_mesin = $rkk_terbaru - $total_boneless_minus;
 
-        // Total Penghematan (Selisih antara kondisi termahal dan termurah)
+        // Total Penghematan
         $total_hemat = $tampilan_tanpa_mesin - $tampilan_dengan_mesin;
     }
 } else {
@@ -51,6 +63,12 @@ if ($rkk_d) {
     $rkk_status = '';
     $rkk_tgl = '';
     $boneless_id = '';
+    $jumlah_mobil = 0;
+    $biaya_mobil = 0;
+    $total_boneless_item = 0;
+    $total_boneless_rencana = 0;
+    $total_boneless_plus = 0;
+    $total_boneless_minus = 0;
 }
 
 // Realisasi Upah Terbaru
@@ -120,9 +138,10 @@ if ($real_d) {
                         <i class="far fa-calendar-plus text-xl"></i>
                     </div>
                     <div class="text-center w-full">
-                        <h3 class="text-sm font-medium text-slate-500 mb-3">Rencana Upah (<?php echo date('d-m-Y', strtotime($rkk_tgl)); ?>)</h3>
+                        <h3 class="text-sm font-medium text-slate-500 mb-4">Rencana Upah (<?php echo date('d-m-Y', strtotime($rkk_tgl)); ?>)</h3>
 
-                        <div class="grid grid-cols-1 gap-3 mb-4">
+                        <!-- Comparison Section -->
+                        <div class="grid grid-cols-1 gap-3 mb-5">
                             <div class="p-3 bg-rose-50 rounded-xl border border-rose-100">
                                 <span class="text-[10px] uppercase font-bold text-rose-400 block mb-1">Tanpa Mesin Boneless</span>
                                 <div class="text-xl font-bold text-rose-700">
@@ -130,7 +149,7 @@ if ($real_d) {
                                 </div>
                             </div>
 
-                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 relative overflow-hidden">
                                 <span class="text-[10px] uppercase font-bold text-emerald-500 block mb-1">Dengan Mesin Boneless</span>
                                 <div class="text-2xl font-bold text-slate-800 tracking-tight">
                                     Rp <?php echo number_format($tampilan_dengan_mesin, 0, ',', '.'); ?>
@@ -142,12 +161,33 @@ if ($real_d) {
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="flex flex-row justify-center border-t border-b border-slate-100 py-3 mb-5">
-                        <div class="flex-1">
-                            <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Total Pekerja</div>
-                            <div class="text-sm font-medium text-slate-700 mt-0.5"><?php echo number_format($rkk_jmlkaryawan, 0, ',', '.'); ?> Orang</div>
+                        <!-- Breakdown Section -->
+                        <div class="grid grid-cols-2 gap-2 mb-5 px-1">
+                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
+                                <span class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Upah Pabrik</span>
+                                <div class="text-sm font-bold text-slate-700">
+                                    Rp <?php echo number_format($rkk_terbaru, 0, ',', '.'); ?>
+                                </div>
+                            </div>
+                            <div class="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">
+                                <span class="text-[9px] uppercase font-bold text-blue-500 block mb-1">Rencana Boneless</span>
+                                <div class="text-sm font-bold text-blue-600">
+                                    Rp <?php echo number_format($total_boneless_rencana, 0, ',', '.'); ?>
+                                </div>
+                                <span class="text-[8px] text-blue-400 mt-0.5 block font-medium">(Item + Biaya Mobil)</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-row justify-center border-t border-b border-slate-100 py-3 mb-5">
+                            <div class="flex-1">
+                                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Info Tambahan</div>
+                                <div class="text-sm font-medium text-slate-700 mt-0.5">
+                                    <i class="fas fa-users mr-1.5 text-slate-400"></i> <?php echo number_format($rkk_jmlkaryawan, 0, ',', '.'); ?> Orang
+                                    <span class="mx-2 text-slate-200">|</span>
+                                    <i class="fas fa-car mr-1.5 text-slate-400"></i> <?php echo $jumlah_mobil; ?> Mobil
+                                </div>
+                            </div>
                         </div>
                     </div>
 
