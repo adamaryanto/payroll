@@ -14,8 +14,13 @@ if($rkk_d) {
     $rkk_id = $rkk_d['id_rkk'] ?? '';
     $rkk_status = $rkk_d['status_rkk'] ?? '';
     $rkk_tgl = $rkk_d['tgl_rkk'] ?? '';
+    
+    // Fetch Boneless ID for this date
+    $bnl_q = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE tgl = '$rkk_tgl' LIMIT 1");
+    $bnl_d = $bnl_q->fetch_assoc();
+    $boneless_id = $bnl_d['id_boneless'] ?? '';
 } else {
-    $rkk_terbaru = 0; $rkk_jamkerja = ''; $rkk_jmlkaryawan = 0; $rkk_id = ''; $rkk_status = ''; $rkk_tgl = '';
+    $rkk_terbaru = 0; $rkk_jamkerja = ''; $rkk_jmlkaryawan = 0; $rkk_id = ''; $rkk_status = ''; $rkk_tgl = ''; $boneless_id = '';
 }
 
 // Realisasi Upah Terbaru
@@ -87,11 +92,6 @@ if($real_d) {
           
           <div class="flex flex-row space-x-2 sm:space-x-6 mb-5 justify-center border-t border-b border-slate-100 py-3">
               <div class="flex-1">
-                  <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Jam Kerja</div>
-                  <div class="text-sm font-medium text-slate-700 mt-0.5"><?php echo htmlspecialchars($rkk_jamkerja); ?></div>
-              </div>
-              <div class="w-px bg-slate-100"></div>
-              <div class="flex-1">
                   <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Total Pekerja</div>
                   <div class="text-sm font-medium text-slate-700 mt-0.5"><?php echo number_format($rkk_jmlkaryawan,0,',','.'); ?> Orang</div>
               </div>
@@ -150,9 +150,18 @@ if($real_d) {
           </div>
           
           <div class="flex flex-row gap-2 mt-1 justify-center">
-              <a href="?page=rkk&aksi=kelola&id=<?php echo $rkk_id; ?>" class="px-4 py-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg text-sm font-medium transition-colors flex items-center justify-center flex-1">
-                  Detail <i class="fas fa-chevron-right ml-1 text-[10px]"></i>
+              <a href="?page=rkk&aksi=kelola&id=<?php echo $rkk_id; ?>" class="px-4 py-2 text-slate-600 hover:text-brand-600 hover:bg-brand-50 border border-slate-200 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center flex-1">
+                  <i class="fas fa-list-ul mr-1.5 text-[10px]"></i> Detail RKK
               </a>
+              <?php if($boneless_id) { ?>
+              <a href="?page=boneless&aksi=ubah&id=<?php echo $boneless_id; ?>&ref=home" class="px-3 py-2 text-blue-600 hover:bg-blue-50 rounded-lg text-xs font-semibold marker:transition-colors flex items-center justify-center border border-blue-100 flex-1">
+                  <i class="fas fa-edit mr-1.5 text-[10px]"></i> Show Boneless
+              </a>
+              <?php } else { ?>
+              <a href="?page=boneless&aksi=tambah&tgl=<?php echo $rkk_tgl; ?>&ref=home" class="px-3 py-2 text-slate-400 hover:bg-slate-50 rounded-lg text-xs font-semibold marker:transition-colors flex items-center justify-center border border-slate-200 flex-1">
+                  <i class="fas fa-plus mr-1.5 text-[10px]"></i> Add Boneless
+              </a>
+              <?php } ?>
           </div>
       </div>
 
@@ -169,11 +178,6 @@ if($real_d) {
           </div>
           
           <div class="flex flex-row space-x-2 sm:space-x-6 mb-5 justify-center border-t border-b border-slate-100 py-3">
-              <div class="flex-1">
-                  <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Jam Kerja</div>
-                  <div class="text-sm font-medium text-slate-700 mt-0.5"><?php echo htmlspecialchars($real_jamkerja); ?></div>
-              </div>
-              <div class="w-px bg-slate-100"></div>
               <div class="flex-1">
                   <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Total Pekerja</div>
                   <div class="text-sm font-medium text-slate-700 mt-0.5"><?php echo number_format($real_jmlkaryawan,0,',','.'); ?> Orang</div>
@@ -203,8 +207,8 @@ if($real_d) {
           </div>
           
           <div class="flex flex-row gap-2 mt-1 justify-center">
-              <a href="?page=realisasi&aksi=kelola&id=<?php echo $real_id; ?>" class="px-4 py-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg text-sm font-medium transition-colors flex items-center justify-center flex-1">
-                  Detail <i class="fas fa-chevron-right ml-1 text-[10px]"></i>
+              <a href="?page=realisasi&aksi=kelola&id=<?php echo $real_id; ?>" class="px-4 py-2 text-slate-600 hover:text-brand-600 hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center flex-1">
+                  <i class="fas fa-clipboard-list mr-1.5 text-[10px]"></i> Detail Realisasi
               </a>
           </div>
       </div>

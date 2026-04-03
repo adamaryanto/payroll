@@ -1,8 +1,12 @@
 <?php
+$tgl_filter = $_GET['tgl'] ?? '';
+$where_tgl = $tgl_filter ? " WHERE A.tgl = '".$koneksi->real_escape_string($tgl_filter)."' " : "";
+
 $tampil = $koneksi->query("SELECT A.*, B.biaya_mobil,
     (SELECT SUM(total) FROM tb_boneless_detail WHERE id_boneless = A.id_boneless) as total_item 
     FROM tb_boneless A 
     LEFT JOIN tb_biayamobil B ON A.id_biayamobil = B.id_biayamobil
+    $where_tgl
     ORDER BY tgl DESC");
 $ref = $_GET['ref'] ?? '';
 $view_param = isset($_GET['view']) ? '&view=1' : '';
