@@ -99,7 +99,7 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                         </div>
 
                         <div class="mt-4">
-                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block"><i class="fas fa-plus-circle mr-1"></i> Rincian Tim Penambah (Plus)</label>
+                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block"><i class="fas fa-plus-circle mr-1"></i> Tim Tanpa Mesin Boneless</label>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="tablePlus">
                                     <thead class="bg-green-50">
@@ -134,7 +134,7 @@ $default_minus = ["SHILIN" => 500, "CIMORY" => 500];
                         <hr class="my-5 border-gray-200">
 
                         <div class="mt-4">
-                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block"><i class="fas fa-minus-circle mr-1"></i> Rincian Tim Pengurang (Minus)</label>
+                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block"><i class="fas fa-minus-circle mr-1"></i>Tim Dengan Mesin Boneless</label>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="tableMinus">
                                     <thead class="bg-red-50">

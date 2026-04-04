@@ -113,7 +113,7 @@ if ($simpan) {
                         </div>
 
                         <div class="mt-4">
-                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block">Tim Penambah (Plus)</label>
+                            <label class="text-xs font-bold text-green-700 uppercase mb-3 block">Tim Tanpa Mesin Boneless</label>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="tablePlus">
                                     <thead class="bg-green-50">
@@ -151,7 +151,7 @@ if ($simpan) {
                         <hr class="my-5 border-gray-200">
 
                         <div class="mt-4">
-                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block">Tim Pengurang (Minus)</label>
+                            <label class="text-xs font-bold text-red-700 uppercase mb-3 block">Tim Dengan Mesin Boneless</label>
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="tableMinus">
                                     <thead class="bg-red-50">
