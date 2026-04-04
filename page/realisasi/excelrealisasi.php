@@ -133,24 +133,27 @@ $stamp_color = $is_approved ? "#008000" : "#FF0000"; // Hijau untuk Approve, Mer
 <br>
 <?php
 $total_boneless_final = 0;
-$boneless_items = [];
+$data_dengan_mesin = []; // Jenis 'minus'
+$data_tanpa_mesin = [];  // Jenis 'plus'
+
 $q_b = $koneksi->query("SELECT * FROM tb_boneless WHERE tgl = '$tanggal_sql'");
 $b_head = $q_b->fetch_assoc();
+
 if ($b_head) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '" . $b_head['id_boneless'] . "'");
     while ($bd = $q_bd->fetch_assoc()) {
-        
-        // FIX: Gunakan abs() agar terhindar dari double negatif jika angka di database di-input minus
-        $nilai_total = abs($bd['total']); 
-        
+        $nilai_total = abs((float)$bd['total']);
+
         if (($bd['jenis'] ?? '') == 'minus') {
             $total_boneless_final -= $nilai_total;
+            $data_dengan_mesin[] = $bd;
         } else {
             $total_boneless_final += $nilai_total;
+            $data_tanpa_mesin[] = $bd;
         }
-        $boneless_items[] = $bd;
     }
 }
+
 $potong = $b_head['jumlah_mobil'] ?? 0;
 $grand_total_all = $grand_total + $total_boneless_final;
 $biaya_per_mobil = ($potong > 0) ? ($grand_total_all / $potong) : 0;
@@ -164,7 +167,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
             <table border="1" style="border-collapse:collapse;">
                 <thead>
                     <tr style="background-color: #dbe5f1; font-weight: bold;">
-                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSORCHING  <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
+                        <th colspan="2" style="text-align: center;">REALISASI TOTAL REKAP OUTSOURCING <br> <?php echo date('d F Y', strtotime($tanggal_sql)); ?></th>
                     </tr>
                     <tr style="background-color: #e5e7eb; font-weight: bold;">
                         <th width="150">KATEGORI OS</th>
@@ -176,13 +179,11 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     $sqlOS = $koneksi->query("SELECT OS_DHK FROM ms_os_dhk ORDER BY id_os_dhk ASC");
                     while ($rowOS = $sqlOS->fetch_assoc()):
                         $label = $rowOS['OS_DHK'];
-                        $total_per_label = isset($totals_by_os[$label]) ? $totals_by_os[$label] : 0;
+                        $total_per_label = $totals_by_os[$label] ?? 0;
                     ?>
                         <tr>
                             <td style="font-weight: bold;"><?php echo $label; ?></td>
-                            <td align="right">
-                                Rp <?php echo number_format($total_per_label, 2, '.', ','); ?>
-                            </td>
+                            <td align="right">Rp <?php echo number_format($total_per_label, 2, '.', ','); ?></td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -196,35 +197,70 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
         </td>
 
         <td width="50"></td>
+
         <td valign="top">
             <table border="1" style="border-collapse:collapse;">
-                <tr style="background-color:#dbe5f1; font-weight:bold;">
-                    <th colspan="4">BAYARAN TIM BONELESS</th>
+                <tr style="background-color:#C6E0B4; font-weight:bold;">
+                    <th colspan="4">BAYARAN TIM BONELESS - TANPA MESIN</th>
                 </tr>
                 <?php
-                $no_b = 1;
-                foreach ($boneless_items as $item) {
-                    $is_minus = (($item['jenis'] ?? '') == 'minus');
+                $no_p = 1;
+                $subtotal_tanpa = 0;
+                foreach ($data_tanpa_mesin as $item) {
+                    $nilai = abs((float)$item['total']);
+                    $subtotal_tanpa += $nilai;
                     $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
-                    $label_prefix = $is_minus ? "(Pengurangan) " : "";
-                    $nilai_tampil = abs($item['total']);
-
                     echo "<tr>
-                        <td align='center'>$no_b</td>
-                        <td style='" . ($is_minus ? "color:red;" : "") . "'>{$label_prefix}" . strtoupper($item['nama_item']) . "</td>
+                        <td align='center'>$no_p</td>
+                        <td>" . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp " . number_format($nilai_tampil, 2, '.', ',') . "</td>
+                        <td align='right'>Rp " . number_format($nilai, 2, '.', ',') . "</td>
                     </tr>";
-                    $no_b++;
+                    $no_p++;
                 }
                 ?>
-                <tr style="font-weight:bold;">
-                    <td colspan="3" align="center">TOTAL AKHIR BONELESS</td>
-                    <td align="right" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
+                <tr style="font-weight:bold; background-color:#f2f2f2;">
+                    <td colspan="3" align="center">SUBTOTAL TANPA MESIN</td>
+                    <td align="right">Rp <?php echo number_format($subtotal_tanpa, 2, '.', ','); ?></td>
+                </tr>
+            </table>
+
+            <br>
+
+            <table border="1" style="border-collapse:collapse;">
+                <tr style="background-color:#F8CBAD; font-weight:bold;">
+                    <th colspan="4">BAYARAN TIM BONELESS - DENGAN MESIN</th>
+                </tr>
+                <?php
+                $no_m = 1;
+                $subtotal_mesin = 0;
+                foreach ($data_dengan_mesin as $item) {
+                    $nilai = abs((float)$item['total']);
+                    $subtotal_mesin -= $nilai;
+                    $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
+                    echo "<tr>
+                        <td align='center'>$no_m</td>
+                        <td style='color:red;'> " . strtoupper($item['nama_item']) . "</td>
+                        <td align='center'>$qty_disp</td>
+                        <td align='right'>Rp " . number_format($nilai, 2, '.', ',') . "</td>
+                    </tr>";
+                    $no_m++;
+                }
+                ?>
+                <tr style="font-weight:bold; background-color:#f2f2f2;">
+                    <td colspan="3" align="center">SUBTOTAL DENGAN MESIN</td>
+                    <td align="right" style="color:red;">Rp <?php echo number_format(abs($subtotal_mesin), 2, '.', ','); ?></td>
+                </tr>
+            </table>
+
+            <br>
+
+            <table border="1" style="border-collapse:collapse; width:100%;">
+                <tr style="font-weight:bold; background-color: #ffff00;">
+                    <td align="center">TOTAL AKHIR BONELESS (NET)</td>
+                    <td width="150" align="right" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
                         Rp <?php
-                            // FIX Tampilan Grand Total Boneless
                             $fmt_bone = number_format(abs($total_boneless_final), 2, '.', ',');
-                            // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
                             echo ($total_boneless_final < 0) ? "- " . $fmt_bone : $fmt_bone;
                             ?>
                     </td>
@@ -288,7 +324,8 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
 
 <table border="0">
     <tr>
-        <td width="30"></td> <td>
+        <td width="30"></td>
+        <td>
             <table border="1" style="border-collapse:collapse; border: 4px solid <?php echo $stamp_color; ?>;">
                 <tr>
                     <td align="center" style="font-size:24px; font-weight:bold; color:<?php echo $stamp_color; ?>; padding:5px 30px;">
