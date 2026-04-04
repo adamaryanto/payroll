@@ -16,25 +16,8 @@ if ($status == "unapp" || $status == "unpro") {
 }
 
 if ($sql) {
-    echo '<!DOCTYPE html>
-    <html>
-    <head>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    </head>
-    <body>
-        <script>
-            Swal.fire({
-                icon: "success",
-                title: "Berhasil",
-                text: "Status Berhasil Di Perbarui",
-                confirmButtonColor: "#2563eb",
-                confirmButtonText: "OK"
-            }).then((result) => {
-                window.location.href = "?page=realisasi";
-            });
-        </script>
-    </body>
-    </html>';
+    $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
+
+    echo "<script>window.location.href='$prev_url';</script>";
     exit;
 }
-?>

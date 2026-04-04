@@ -72,9 +72,13 @@ if ($rkk_d) {
 }
 
 // Realisasi Upah Terbaru
-$where_real = (strtolower($role) == 'owner' || strtolower($role) == 'admin master') ? "" : " WHERE status_realisasi > 0 ";
-$real_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_realisasi_detail) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as jml, (SELECT SUM(r_upah) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as ttl FROM tb_realisasi A $where_real ORDER BY tgl_realisasi DESC, id_realisasi DESC LIMIT 1");
+$real_q = $koneksi->query("SELECT A.*, 
+    (SELECT COUNT(id_realisasi_detail) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as jml, 
+    (SELECT SUM(r_upah) FROM tb_realisasi_detail WHERE id_realisasi = A.id_realisasi) as ttl 
+    FROM tb_realisasi A 
+    ORDER BY tgl_realisasi DESC, id_realisasi DESC LIMIT 1");
 $real_d = $real_q->fetch_assoc();
+
 if ($real_d) {
     $real_terbaru = $real_d['ttl'] ?? 0;
     $real_jamkerja = $real_d['jam_kerja'] ?? '';
@@ -97,7 +101,7 @@ if ($real_d) {
         <div class="row mb-2">
             <div class="col-sm-6">
                 <h1 class="m-0 text-2xl font-bold text-slate-800 tracking-tight">Dashboard Overview</h1>
-                <p class="text-sm text-slate-500 mt-1">Payroll & HR System Analytics</p>
+                <p class="text-sm text-slate-500 mt-1">HRIS & Payroll Management System</p>
             </div>
             <div class="col-sm-6 mt-3 sm:mt-0">
                 <ol class="breadcrumb float-sm-right bg-transparent text-sm p-0 m-0">
@@ -112,178 +116,271 @@ if ($real_d) {
 <section class="content px-4 pb-6">
     <div class="container-fluid">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md relative text-center">
-
-                <div class="flex flex-col items-center justify-center mb-4">
-                    <div class="p-3 bg-brand-50 rounded-full text-brand-500 mb-3 inline-flex items-center justify-center">
-                        <i class="fas fa-users text-xl"></i>
+            <!-- Total Karyawan -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col text-slate-800 relative overflow-hidden">
+                <div class="flex flex-col items-center text-center mb-5">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-2 border border-blue-100">
+                        <i class="fas fa-users text-xl text-blue-600"></i>
                     </div>
-                    <div>
-                        <h3 class="text-sm font-medium text-slate-500 mb-1">Total Karyawan</h3>
-                        <div class="text-3xl font-bold text-slate-800 tracking-tight"><?php echo number_format($jmlkaryawan, 0, ',', '.'); ?> Orang</div>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Total Karyawan</h3>
+                </div>
+
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="text-[12px] text-slate-400 font-bold uppercase tracking-tighter">Keseluruhan Jumlah Karyawan</span>
+                    <div class="text-2xl font-black text-slate-800">
+                        <?php echo number_format($jmlkaryawan, 0, ',', '.'); ?> <span class="text-sm font-medium text-slate-500">Orang</span>
                     </div>
                 </div>
 
-                <a href="?page=karyawan" class="mt-auto px-4 py-2.5 sm:py-2 bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-800 rounded-lg text-sm font-medium transition-colors text-center">
-                    Lihat Karyawan
-                </a>
+                <div class="mt-auto pt-6">
+                    <a href="?page=karyawan" class="flex items-center justify-center w-full px-4 py-3 bg-slate-50 text-blue-600 border border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-sm font-bold transition-all shadow-sm">
+                        <i class="fas fa-list-ul mr-2"></i> Lihat Daftar Karyawan
+                    </a>
+                </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md text-center relative">
-
-                <div class="flex flex-col items-center justify-center mb-4">
-                    <div class="p-3 bg-orange-50 rounded-full text-orange-500 mb-3 inline-flex items-center justify-center">
-                        <i class="far fa-calendar-plus text-xl"></i>
+            <!-- Recana Upah -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col text-slate-800 relative overflow-hidden">
+                <div class="flex flex-col items-center text-center mb-5">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-2 border border-blue-100">
+                        <i class="far fa-calendar-plus text-xl text-blue-600"></i>
                     </div>
-                    <div class="text-center w-full">
-                        <h3 class="text-sm font-medium text-slate-500 mb-4">Rencana Upah (<?php echo date('d-m-Y', strtotime($rkk_tgl)); ?>)</h3>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Rencana Upah (<?php echo date('d-m-Y', strtotime($rkk_tgl)); ?>)</h3>
+                </div>
 
-                        <!-- Comparison Section -->
-                        <div class="grid grid-cols-1 gap-3 mb-5">
-                            <div class="p-3 bg-rose-50 rounded-xl border border-rose-100">
-                                <span class="text-[10px] uppercase font-bold text-rose-400 block mb-1">Tanpa Mesin Boneless</span>
-                                <div class="text-xl font-bold text-rose-700">
-                                    Rp <?php echo number_format($tampilan_tanpa_mesin, 0, ',', '.'); ?>
-                                </div>
-                            </div>
-
-                            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100 relative overflow-hidden">
-                                <span class="text-[10px] uppercase font-bold text-emerald-500 block mb-1">Dengan Mesin Boneless</span>
-                                <div class="text-2xl font-bold text-slate-800 tracking-tight">
-                                    Rp <?php echo number_format($tampilan_dengan_mesin, 0, ',', '.'); ?>
-                                </div>
-                                <?php if ($total_hemat > 0): ?>
-                                    <div class="text-[11px] font-semibold text-emerald-600 mt-1">
-                                        <i class="fas fa-magic mr-1"></i> Hemat: Rp <?php echo number_format($total_hemat, 0, ',', '.'); ?>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- Breakdown Section -->
-                        <div class="grid grid-cols-2 gap-2 mb-5 px-1">
-                            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-100">
-                                <span class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Upah Pabrik</span>
-                                <div class="text-sm font-bold text-slate-700">
-                                    Rp <?php echo number_format($rkk_terbaru, 0, ',', '.'); ?>
-                                </div>
-                            </div>
-                            <div class="p-2.5 bg-blue-50/50 rounded-lg border border-blue-100">
-                                <span class="text-[9px] uppercase font-bold text-blue-500 block mb-1">Rencana Boneless</span>
-                                <div class="text-sm font-bold text-blue-600">
-                                    Rp <?php echo number_format($total_boneless_rencana, 0, ',', '.'); ?>
-                                </div>
-                                <span class="text-[8px] text-blue-400 mt-0.5 block font-medium">(Item + Biaya Mobil)</span>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-row justify-center border-t border-b border-slate-100 py-3 mb-5">
-                            <div class="flex-1">
-                                <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Info Tambahan</div>
-                                <div class="text-sm font-medium text-slate-700 mt-0.5">
-                                    <i class="fas fa-users mr-1.5 text-slate-400"></i> <?php echo number_format($rkk_jmlkaryawan, 0, ',', '.'); ?> Orang
-                                    <span class="mx-2 text-slate-200">|</span>
-                                    <i class="fas fa-car mr-1.5 text-slate-400"></i> <?php echo $jumlah_mobil; ?> Mobil
-                                </div>
-                            </div>
-                        </div>
+                <div class="space-y-3 mb-4">
+                    <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-100">
+                        <span class="text-[12px] text-rose-400 font-bold uppercase tracking-tighter">Tanpa Mesin Boneless</span>
+                        <div class="text-lg font-bold text-rose-700">Rp <?php echo number_format($tampilan_tanpa_mesin, 0, ',', '.'); ?></div>
                     </div>
 
-                    <div class="flex flex-row gap-2 mt-auto">
-                        <a href="excelrkk.php?id=<?php echo $rkk_id; ?>" class="px-2 py-2 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors flex items-center justify-center flex-1">
-                            <i class="fas fa-print mr-2"></i> Cetak
-                        </a>
+                    <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <span class="text-[12px] text-emerald-500 font-bold uppercase tracking-tighter">Dengan Mesin Boneless</span>
+                        <div class="text-lg font-black text-emerald-700 tracking-tight">Rp <?php echo number_format($tampilan_dengan_mesin, 0, ',', '.'); ?></div>
+                        <?php if ($total_hemat > 0): ?>
+                            <div class="text-[10px] mt-1 font-bold bg-emerald-500 text-white inline-flex items-center px-2 py-0.5 rounded-full shadow-sm">
+                                ✨ Hemat: Rp <?php echo number_format($total_hemat, 0, ',', '.'); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
 
-                        <?php if ($rkk_status == "0") {
-                            if (strtolower($role) == 'owner') { ?>
-                                <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app" onclick="return confirm('Approve?');" class="px-2 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.5] uppercase">
-                                    <i class="fas fa-check-circle mr-2"></i> Approve
-                                </a>
-                            <?php } else { ?>
-                                <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro" onclick="return confirm('Propose?');" class="px-2 py-2 bg-amber-500 text-white rounded-lg text-sm font-bold hover:bg-amber-600 transition-colors flex items-center justify-center flex-[1.5] uppercase">
-                                    <i class="fas fa-paper-plane mr-2"></i> Propose
-                                </a>
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-100">
+                        <span class="text-[12px] text-slate-400 uppercase font-bold block mb-0.5">Upah Pabrik</span>
+                        <div class="text-xs font-bold text-slate-700">Rp <?php echo number_format($rkk_terbaru, 0, ',', '.'); ?></div>
+                    </div>
+                    <div class="p-2 bg-slate-50 rounded-lg border border-slate-100 text-right">
+                        <span class="text-[12px] text-slate-400 uppercase font-bold block mb-0.5">Rencana Boneless</span>
+                        <div class="text-xs font-bold text-slate-700">Rp <?php echo number_format($total_boneless_rencana, 0, ',', '.'); ?></div>
+                    </div>
+                </div>
+
+                <div class="flex justify-center py-3 mb-5 text-[12px] font-bold text-slate-700 bg-slate-50/50 rounded-lg">
+                    <span><i class="fas fa-users mr-1"></i><?php echo number_format($rkk_jmlkaryawan, 0, ',', '.'); ?> Orang</span>
+                    <span class="mx-3 opacity-30">|</span>
+                    <span><i class="fas fa-car mr-1"></i> <?php echo $jumlah_mobil; ?> Mobil</span>
+                </div>
+
+                <!-- Button Rencana -->
+                <div class="mt-auto flex flex-col gap-2">
+                    <div class="flex gap-2 w-full">
+                        <?php
+                        $role_lower = strtolower($role);
+
+                        // Tombol CETAK: Muncul jika BUKAN Owner, ATAU jika Owner saat status >= 1
+                        if ($role_lower != 'owner' || ($role_lower == 'owner' && $rkk_status >= "1")) { ?>
+                            <a href="excelrkk.php?id=<?php echo $rkk_id; ?>"
+                                class="flex-1 py-2.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-[10px] font-black text-center uppercase transition-all duration-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 flex items-center justify-center">
+                                <i class="fas fa-print mr-1"></i> CETAK
+                            </a>
                             <?php }
-                        } elseif ($rkk_status == "1") { ?>
-                            <a href="?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro" class="px-2 py-2 bg-rose-500 text-white rounded-lg text-sm font-bold flex-[1.5] uppercase">
-                                <i class="fas fa-undo mr-2"></i> Unpropose
-                            </a>
-                        <?php } else { ?>
-                            <div class="px-2 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-100 flex-[1.5] uppercase cursor-default flex items-center justify-center">
-                                <i class="fas fa-check-double mr-2"></i> Approved
+
+                        if ($rkk_status == "0") {
+                            // === STATUS DRAFT (0) ===
+                            if ($role_lower != 'owner') { ?>
+                                <button type="button"
+                                    onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro', 'Ajukan rencana upah ini ke Owner?', 'Propose Data', 'question')"
+                                    class="flex-1 py-2.5 bg-amber-400 text-amber-950 rounded-xl text-[10px] font-black text-center uppercase shadow-lg transition-all hover:bg-amber-300 flex items-center justify-center border-none cursor-pointer">
+                                    <i class="fas fa-paper-plane mr-1"></i> PROPOSE
+                                </button>
+                            <?php }
+                        } elseif ($rkk_status == "1") {
+                            // === STATUS PROPOSED (1) === 
+                            if ($role_lower != 'owner') { ?>
+                                <button type="button"
+                                    onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro', 'Batalkan pengajuan rencana upah ini?', 'Unpropose', 'warning')"
+                                    class="flex-1 py-2.5 bg-rose-500 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg transition-all hover:bg-rose-600 flex items-center justify-center border-none cursor-pointer">
+                                    <i class="fas fa-undo mr-1"></i> UNPROPOSE
+                                </button>
+                            <?php }
+
+                            if ($role_lower == 'owner' || $role_lower == 'admin master') { ?>
+                                <button type="button"
+                                    onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app', 'Setujui rencana upah untuk periode ini?', 'Approve Rencana', 'success')"
+                                    class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 flex items-center justify-center border-none cursor-pointer">
+                                    <i class="fas fa-check-circle mr-1"></i> APPROVE
+                                </button>
+                            <?php }
+                        } else { ?>
+                            <div class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black text-center uppercase tracking-tighter flex items-center justify-center">
+                                <i class="fas fa-check-double mr-1"></i> APPROVED
                             </div>
                         <?php } ?>
                     </div>
 
-                    <div class="flex flex-row gap-2 mt-2">
-                        <a href="?page=rkk&aksi=kelola&id=<?php echo $rkk_id; ?>" class="px-3 py-2 text-slate-600 hover:text-brand-600 hover:bg-brand-50 border border-slate-200 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center flex-1">
-                            <i class="fas fa-list-ul mr-1.5 text-[10px]"></i> Detail RKK
-                        </a>
-
-                        <?php if ($boneless_id) { ?>
-                            <a href="?page=boneless&aksi=ubah&id=<?php echo $boneless_id; ?>&ref=home" class="px-3 py-2 text-blue-600 hover:bg-blue-50 border border-blue-100 bg-blue-50 rounded-lg text-xs font-semibold flex items-center justify-center flex-1">
-                                <i class="fas fa-edit mr-1.5 text-[10px]"></i> Show Boneless
+                    <div class="flex gap-2">
+                        <?php if (!($role_lower == 'owner' && $rkk_status == "0")) { ?>
+                            <a href="?page=rkk&aksi=kelola&id=<?php echo $rkk_id; ?>" class="flex-1 py-2.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold text-center transition-all duration-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 flex items-center justify-center">
+                                <i class="fas fa-list-ul mr-1"></i> DETAIL RKK
                             </a>
+                            <?php if ($boneless_id) { ?>
+                                <a href="?page=boneless&aksi=ubah&id=<?php echo $boneless_id; ?>&ref=home" class="flex-1 py-2.5 bg-slate-100 text-blue-700 border border-slate-200 rounded-xl text-xs font-bold text-center transition-all duration-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 flex items-center justify-center">
+                                    <i class="fas fa-edit mr-1"></i> SHOW BONELESS
+                                </a>
+                            <?php } ?>
                         <?php } else { ?>
-                            <a href="?page=boneless&aksi=tambah&tgl=<?php echo $rkk_tgl; ?>&ref=home" class="px-3 py-2 text-slate-400 hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold flex items-center justify-center flex-1">
-                                <i class="fas fa-plus mr-1.5 text-[10px]"></i> Add Boneless
-                            </a>
-                        <?php } ?>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex flex-col justify-between transition-all duration-200 hover:shadow-md relative text-center">
-
-                <div class="flex flex-col items-center justify-center mb-4">
-                    <div class="p-3 bg-emerald-50 rounded-full text-emerald-500 mb-3 inline-flex items-center justify-center">
-                        <i class="fas fa-check-double text-xl"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-medium text-slate-500 mb-1">Realisasi Upah (<?php echo date('d-m-Y', strtotime($real_tgl)); ?>)</h3>
-                        <div class="text-3xl font-bold text-slate-800 tracking-tight">Rp <?php echo number_format($real_terbaru, 0, ',', '.'); ?></div>
-                    </div>
-                </div>
-
-                <div class="flex flex-row space-x-2 sm:space-x-6 mb-5 justify-center border-t border-b border-slate-100 py-3">
-                    <div class="flex-1">
-                        <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Total Pekerja</div>
-                        <div class="text-sm font-medium text-slate-700 mt-0.5"><?php echo number_format($real_jmlkaryawan, 0, ',', '.'); ?> Orang</div>
-                    </div>
-                </div>
-
-                <div class="flex flex-row gap-1.5 sm:gap-2 mt-auto justify-center">
-                    <a href="excelrealisasi.php?id=<?php echo $real_id; ?>" class="px-1.5 py-2 sm:px-4 border border-slate-200 text-slate-600 rounded-lg text-sm font-medium hover:bg-slate-50 hover:text-slate-800 transition-colors flex items-center justify-center flex-1 tracking-tight sm:tracking-normal">
-                        <i class="fas fa-file-invoice-dollar mr-1 sm:mr-2"></i> Payroll
-                    </a>
-
-                    <?php if ($real_status == 0) { ?>
-                        <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" onclick="return confirm('Apakah Anda yakin ingin Approve Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-700 transition-colors flex items-center justify-center flex-[1.2] shadow-sm uppercase tracking-tight sm:tracking-normal">
-                            <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Approve
-                        </a>
-                        <?php } elseif ($real_status == 2) {
-                        if (strtolower($role) == 'owner' || strtolower($role) == 'admin master') { ?>
-                            <a href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=unapp" onclick="return confirm('Apakah Anda yakin ingin Unapprove Realisasi Upah ini?');" class="px-1.5 py-2 sm:px-4 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors flex items-center justify-center flex-[1.2] uppercase tracking-tighter shadow-sm">
-                                <i class="fas fa-undo mr-1 sm:mr-2"></i> Unapprove
-                            </a>
-                        <?php } else { ?>
-                            <div class="px-1.5 py-2 sm:px-4 bg-emerald-50 text-emerald-700 rounded-lg text-[13px] sm:text-sm font-bold flex items-center justify-center flex-[1.2] cursor-default border border-emerald-100 uppercase tracking-tighter">
-                                <i class="fas fa-check-double mr-1 sm:mr-2"></i> Approved
+                            <div class="flex-1 py-2.5 bg-slate-50 text-slate-400 border border-dashed border-slate-200 rounded-xl text-xs font-medium text-center flex items-center justify-center italic">
+                                <i class="fas fa-clock mr-1.5"></i> Menunggu Usulan Staff
                             </div>
                         <?php } ?>
-                    <?php } ?>
-                </div>
-
-                <div class="flex flex-row gap-2 mt-1 justify-center">
-                    <a href="?page=realisasi&aksi=kelola&id=<?php echo $real_id; ?>" class="px-4 py-2 text-slate-600 hover:text-brand-600 hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center flex-1">
-                        <i class="fas fa-clipboard-list mr-1.5 text-[10px]"></i> Detail Realisasi
-                    </a>
+                    </div>
                 </div>
             </div>
 
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                function handleAction(url, message, title, iconType) {
+                    Swal.fire({
+                        title: title,
+                        text: message,
+                        icon: iconType, // 'success', 'warning', 'question', dll
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563eb', // Blue-600
+                        cancelButtonColor: '#64748b', // Slate-500
+                        confirmButtonText: 'Ya, Lanjutkan!',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true,
+                        customClass: {
+                            popup: 'rounded-3xl' // Biar estetik sesuai UI kamu
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Tampilkan loading agar user tahu proses berjalan
+                            Swal.fire({
+                                title: 'Sedang Memproses...',
+                                allowOutsideClick: false,
+                                didOpen: () => {
+                                    Swal.showLoading()
+                                }
+                            });
+                            // Eksekusi perpindahan halaman
+                            window.location.href = url;
+                        }
+                    })
+                }
+            </script>
+
+            <!-- Realisasi Upah -->
+            <div class="bg-white rounded-2xl shadow-xl p-6 flex flex-col text-slate-800 relative overflow-hidden">
+                <div class="flex flex-col items-center text-center mb-5">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-2 border border-blue-100">
+                        <i class="fas fa-check-double text-xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Realisasi Upah (<?php echo date('d-m-Y', strtotime($real_tgl)); ?>)</h3>
+                </div>
+
+                <div class="space-y-3 mb-3">
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-[12px] text-slate-400 font-bold uppercase tracking-tighter">Total Biaya</span>
+                        <div class="text-2xl font-black text-slate-800">
+                            Rp <?php echo number_format($real_terbaru, 0, ',', '.'); ?>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                        <span class="text-[12px] text-slate-400 font-bold uppercase tracking-tighter">Total Pekerja</span>
+                        <div class="text-2xl font-black text-slate-800">
+                            <?php echo number_format($real_jmlkaryawan, 0, ',', '.'); ?> Orang
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-auto flex flex-col gap-2">
+                    <div class="flex gap-2 w-full">
+                        <?php
+                        $role_lower = strtolower($role);
+                        $is_petinggi = ($role_lower == 'owner' || $role_lower == 'admin master');
+
+                        // PAYROLL: Aktif jika (Approved) ATAU (Owner/Admin Master)
+                        if ($real_status == "2" || $is_petinggi) { ?>
+                            <a href="excelrealisasi.php?id=<?php echo $real_id; ?>" class="flex-1 py-2.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-[10px] font-black text-center uppercase transition-all duration-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 flex items-center justify-center">
+                                <i class="fas fa-file-invoice-dollar mr-1"></i> Payroll
+                            </a>
+                        <?php } else { ?>
+                            <div class="flex-1 py-2.5 bg-slate-50 text-slate-300 border border-dashed border-slate-200 rounded-xl text-[10px] font-bold text-center uppercase flex items-center justify-center cursor-not-allowed">
+                                <i class="fas fa-lock mr-1"></i> Payroll
+                            </div>
+                        <?php } ?>
+
+                        <?php
+                        // STATUS APPROVE / TOMBOL
+                        if ($real_status == "0" || $real_status == "1") {
+                            if ($is_petinggi) { ?>
+                                <button type="button" onclick="confirmApprove(this)" data-href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all border-none flex items-center justify-center">
+                                    <i class="fas fa-check-circle mr-1"></i> APPROVE
+                                </button>
+                            <?php } else { ?>
+                                <div class="flex-1 py-2.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl text-[9px] font-black text-center uppercase flex items-center justify-center tracking-tighter">
+                                    <i class="fas fa-hourglass-half mr-1"></i> MENUNGGU PERSETUJUAN
+                                </div>
+                            <?php } ?>
+                        <?php } else { ?>
+                            <div class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black text-center uppercase tracking-tighter flex items-center justify-center shadow-lg shadow-emerald-100">
+                                <i class="fas fa-check-double mr-1.5"></i> APPROVED
+                            </div>
+                        <?php } ?>
+                    </div>
+
+                    <div class="mt-auto">
+                        <?php
+                        // DETAIL REALISASI: Aktif jika (Approved) ATAU (Owner/Admin Master)
+                        if ($real_status == "2" || $is_petinggi) { ?>
+                            <a href="?page=realisasi&aksi=kelola&id=<?php echo $real_id; ?>"
+                                class="flex items-center justify-center w-full px-4 py-3 bg-slate-50 text-blue-600 border border-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 rounded-xl text-sm font-bold transition-all shadow-sm">
+                                <i class="fas fa-clipboard-list mr-2"></i> Detail Realisasi
+                            </a>
+                        <?php } else { ?>
+                            <div class="flex items-center justify-center w-full px-4 py-3 bg-slate-50/50 text-slate-300 border border-dashed border-slate-200 rounded-xl text-xs font-medium italic cursor-not-allowed">
+                                <i class="fas fa-lock mr-2"></i> Detail terkunci (Menunggu Approve)
+                            </div>
+                        <?php } ?>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                function confirmApprove(button) {
+                    const url = button.getAttribute('data-href');
+                    Swal.fire({
+                        title: 'Konfirmasi Approve?',
+                        text: "Data yang sudah di-approve akan mengunci detail realisasi.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563eb',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Ya, Approve!',
+                        cancelButtonText: 'Batal',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = url;
+                        }
+                    });
+                }
+            </script>
         </div>
     </div>
 </section>
