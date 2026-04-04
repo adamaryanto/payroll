@@ -1,9 +1,9 @@
 <?php
 
-    $id = $_GET ['id'];
-    $status = $_GET ['iddetail'];
+$id = $_GET['id'];
+$status = $_GET['iddetail'];
 
-if($status == "pro"){
+if ($status == "pro") {
     // Validasi Boneless: Ambil tgl_rkk dari RKK
     $cek_rkk = $koneksi->query("SELECT tgl_rkk FROM tb_rkk WHERE id_rkk = '$id'");
     $data_rkk = $cek_rkk->fetch_assoc();
@@ -16,12 +16,14 @@ if($status == "pro"){
 
     if ($jml == 0) {
         $pesan = "Tidak bisa propose data! Silakan tambahkan data karyawan terlebih dahulu.";
-        ?>
+?>
         <!DOCTYPE html>
         <html>
+
         <head>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         </head>
+
         <body>
             <script>
                 Swal.fire({
@@ -31,26 +33,29 @@ if($status == "pro"){
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 }).then((result) => {
-                    window.location.href="?page=rkk";
+                    window.location.href = "?page=rkk";
                 });
             </script>
         </body>
+
         </html>
-        <?php
+    <?php
         exit;
     }
 
     // Cek apakah ada data Boneless untuk RKK ini (Specific by ID)
     $cek_boneless = $koneksi->query("SELECT id_boneless FROM tb_boneless WHERE id_rkk = '$id'");
-    
+
     if ($cek_boneless->num_rows == 0) {
         $pesan = "Tidak bisa propose data! Silakan lengkapi data Boneless untuk tanggal " . date('d/m/Y', strtotime($tgl_rkk)) . " terlebih dahulu.";
-        ?>
+    ?>
         <!DOCTYPE html>
         <html>
+
         <head>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         </head>
+
         <body>
             <script>
                 Swal.fire({
@@ -60,51 +65,38 @@ if($status == "pro"){
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 }).then((result) => {
-                    window.location.href="?page=rkk";
+                    window.location.href = "?page=rkk";
                 });
             </script>
         </body>
+
         </html>
-        <?php
+    <?php
         exit;
     }
 
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 1 where id_rkk = '$id' ");
-    if($sql) {
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        </head>
-        <body>
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'Status Berhasil Di Perbarui',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'Selesai'
-                }).then((result) => {
-                    window.location.href='?page=rkk';
-                });
-            </script>
-        </body>
-        </html>";
+    if ($sql) {
+        $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
+
+        echo "<script>window.location.href='$prev_url';</script>";
         exit;
     }
-}elseif ($status == "app") {
+} elseif ($status == "app") {
     // Cek jumlah karyawan sebelum approve
     $cek_jml = $koneksi->query("SELECT COUNT(id_rkk_detail) as jml FROM tb_rkk_detail WHERE id_rkk = '$id' AND status_rkk != 'Digantikan'");
     $data_jml = $cek_jml->fetch_assoc();
     $jml = $data_jml['jml'];
 
     if ($jml == 0) {
-        ?>
+    ?>
         <!DOCTYPE html>
         <html>
+
         <head>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         </head>
+
         <body>
             <script>
                 Swal.fire({
@@ -114,12 +106,13 @@ if($status == "pro"){
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 }).then((result) => {
-                    window.location.href="?page=rkk";
+                    window.location.href = "?page=rkk";
                 });
             </script>
         </body>
+
         </html>
-        <?php
+    <?php
         exit;
     }
 
@@ -128,12 +121,14 @@ if($status == "pro"){
     if ($cek_boneless->num_rows == 0) {
         $cek_rkk = $koneksi->query("SELECT tgl_rkk FROM tb_rkk WHERE id_rkk = '$id'");
         $tgl_rkk = $cek_rkk->fetch_assoc()['tgl_rkk'];
-        ?>
+    ?>
         <!DOCTYPE html>
         <html>
+
         <head>
             <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         </head>
+
         <body>
             <script>
                 Swal.fire({
@@ -143,92 +138,39 @@ if($status == "pro"){
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'OK'
                 }).then((result) => {
-                    window.location.href="?page=rkk";
+                    window.location.href = "?page=rkk";
                 });
             </script>
         </body>
+
         </html>
-        <?php
+<?php
         exit;
     }
 
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 2 where id_rkk = '$id' ");
-    if($sql) {
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        </head>
-        <body>
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'Status Berhasil Di Perbarui',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'Selesai'
-                }).then((result) => {
-                    window.location.href='?page=rkk';
-                });
-            </script>
-        </body>
-        </html>";
+    if ($sql) {
+        $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
+
+        echo "<script>window.location.href='$prev_url';</script>";
         exit;
     }
-    
-}elseif ($status == "unpro") {
+} elseif ($status == "unpro") {
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 0 where id_rkk = '$id' ");
-    if($sql) {
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        </head>
-        <body>
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'Status Berhasil Di Perbarui',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'Selesai'
-                }).then((result) => {
-                    window.location.href='?page=rkk';
-                });
-            </script>
-        </body>
-        </html>";
+    if ($sql) {
+        $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
+
+        echo "<script>window.location.href='$prev_url';</script>";
         exit;
     }
-    
-}elseif ($status == "unapp") {
+} elseif ($status == "unapp") {
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 1 where id_rkk = '$id' ");
-    if($sql) {
-        echo "<!DOCTYPE html>
-        <html>
-        <head>
-            <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11'></script>
-        </head>
-        <body>
-            <script>
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil',
-                    text: 'Status Berhasil Di Perbarui',
-                    confirmButtonColor: '#2563eb',
-                    confirmButtonText: 'Selesai'
-                }).then((result) => {
-                    window.location.href='?page=rkk';
-                });
-            </script>
-        </body>
-        </html>";
+    if ($sql) {
+        $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
+
+        echo "<script>window.location.href='$prev_url';</script>";
         exit;
     }
-    
 }
 
- 
-
 ?>
-
