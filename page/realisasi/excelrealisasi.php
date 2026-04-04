@@ -205,7 +205,8 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                 $no_b = 1;
                 foreach ($boneless_items as $item) {
                     $is_minus = (($item['jenis'] ?? '') == 'minus');
-                    $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
+                    $qty_val = (float)($item['qty'] ?? 0);
+                    $qty_disp = ($qty_val == 0) ? "-" : (floor($qty_val) == $qty_val ? number_format($qty_val, 0, '.', ',') : number_format($qty_val, 1, '.', ','));
                     $label_prefix = $is_minus ? "(Pengurangan) " : "";
                     $nilai_tampil = abs($item['total']);
 
@@ -213,7 +214,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                         <td align='center'>$no_b</td>
                         <td style='" . ($is_minus ? "color:red;" : "") . "'>{$label_prefix}" . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp " . number_format($nilai_tampil, 2, '.', ',') . "</td>
+                        <td align='right' style='" . ($is_minus ? "color:red;" : "") . "'>Rp " . (floor($nilai_tampil) == $nilai_tampil ? number_format($nilai_tampil, 0, '.', ',') : number_format($nilai_tampil, 2, '.', ',')) . "</td>
                     </tr>";
                     $no_b++;
                 }
@@ -222,8 +223,9 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     <td colspan="3" align="center">TOTAL AKHIR BONELESS</td>
                     <td align="right" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
                         Rp <?php
-                            // FIX Tampilan Grand Total Boneless
-                            $fmt_bone = number_format(abs($total_boneless_final), 2, '.', ',');
+                            // Dynamic decimal formatting: Hide .00 for integers
+                            $val_bone = abs($total_boneless_final);
+                            $fmt_bone = (floor($val_bone) == $val_bone) ? number_format($val_bone, 0, '.', ',') : number_format($val_bone, 2, '.', ',');
                             // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
                             echo ($total_boneless_final < 0) ? "- " . $fmt_bone : $fmt_bone;
                             ?>
@@ -269,8 +271,9 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : 'black'; ?>;">
                         Rp <?php
-                            // FIX Tampilan Total kuning
-                            $fmt_bone_kuning = number_format(abs($total_boneless_final), 2, '.', ',');
+                            // Dynamic decimal formatting: Hide .00 for integers
+                            $val_bone_kuning = abs($total_boneless_final);
+                            $fmt_bone_kuning = (floor($val_bone_kuning) == $val_bone_kuning) ? number_format($val_bone_kuning, 0, '.', ',') : number_format($val_bone_kuning, 2, '.', ',');
                             // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
                             echo ($total_boneless_final < 0) ? "- " . $fmt_bone_kuning : $fmt_bone_kuning;
                             ?>
