@@ -17,7 +17,27 @@ if ($status == "unapp" || $status == "unpro") {
 
 if ($sql) {
     $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
-
-    echo "<script>window.location.href='$prev_url';</script>";
+?>
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+    <body>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: 'Status realisasi upah berhasil diperbarui.',
+                confirmButtonColor: '#2563eb',
+                confirmButtonText: 'OK',
+                customClass: { popup: 'rounded-3xl' }
+            }).then((result) => {
+                window.location.href = '<?= $prev_url ?>';
+            });
+        </script>
+    </body>
+    </html>
+<?php
     exit;
 }

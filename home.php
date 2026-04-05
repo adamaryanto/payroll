@@ -1,10 +1,31 @@
 <?php
+function tgl_indo($tanggal){
+    if (empty($tanggal)) return '-';
+	$bulan = array (
+		1 =>   'Januari',
+		'Februari',
+		'Maret',
+		'April',
+		'Mei',
+		'Juni',
+		'Juli',
+		'Agustus',
+		'September',
+		'Oktober',
+		'November',
+		'Desember'
+	);
+	$pecahkan = explode('-', date('Y-m-d', strtotime($tanggal)));
+ 
+	return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
+}
+
 $tampildetail = $koneksi->query("select COUNT(id_karyawan) as jmlkaryawan from ms_karyawan ");
 $datadetail = $tampildetail->fetch_assoc();
 $jmlkaryawan = $datadetail['jmlkaryawan'];
 
 // Rencana Upah Terbaru
-$where_rkk = (strtolower($role) == 'owner' || strtolower($role) == 'admin master') ? "" : " WHERE status_rkk > 0 ";
+$where_rkk = (strtolower($role) == 'owner') ? " WHERE status_rkk > 0 " : "";
 $rkk_q = $koneksi->query("SELECT A.*, (SELECT COUNT(id_rkk_detail) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as jml, (SELECT SUM(upah) FROM tb_rkk_detail WHERE id_rkk = A.id_rkk AND status_rkk != 'Digantikan') as ttl FROM tb_rkk A $where_rkk ORDER BY tgl_rkk DESC, id_rkk DESC LIMIT 1");
 $rkk_d = $rkk_q->fetch_assoc();
 if ($rkk_d) {
@@ -29,6 +50,9 @@ if ($rkk_d) {
     $total_boneless_minus = 0;
     $total_boneless_item = 0;
     $total_boneless_rencana = 0;
+    $tampilan_tanpa_mesin = $rkk_terbaru;
+    $tampilan_dengan_mesin = $rkk_terbaru;
+    $total_hemat = 0;
 
     if ($boneless_id) {
         $query_detail = $koneksi->query("SELECT 
@@ -69,6 +93,9 @@ if ($rkk_d) {
     $total_boneless_rencana = 0;
     $total_boneless_plus = 0;
     $total_boneless_minus = 0;
+    $tampilan_tanpa_mesin = 0;
+    $tampilan_dengan_mesin = 0;
+    $total_hemat = 0;
 }
 
 // Realisasi Upah Terbaru
@@ -149,8 +176,13 @@ if ($real_d) {
                     </div>
                     <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">Rencana Upah</h3>
                     <p class="text-xs font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full inline-block">
-                        <?php echo date('d-m-Y', strtotime($rkk_tgl)); ?>
+                        <?php echo tgl_indo($rkk_tgl); ?>
                     </p>
+                    <?php if (!empty($rkk_d['keterangan'])): ?>
+                        <p class="mt-2 text-xs font-medium text-slate-500 italic max-w-full" title="<?php echo $rkk_d['keterangan']; ?>">
+                            "<?php echo $rkk_d['keterangan']; ?>"
+                        </p>
+                    <?php endif; ?>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 mb-4">
@@ -183,7 +215,7 @@ if ($real_d) {
                 </div>
 
                 <div class="flex justify-between items-center px-4 py-3 mb-5 text-[11px] font-bold text-slate-600 bg-slate-50/50 rounded-xl border border-slate-100">
-                    <span><i class="fas fa-users mr-1.5 text-slate-400"></i><?php echo number_format($rkk_jmlkaryawan, 0, ',', '.'); ?> Org</span>
+                    <span><i class="fas fa-users mr-1.5 text-slate-400"></i><?php echo number_format($rkk_jmlkaryawan, 0, ',', '.'); ?> Orang</span>
                     <span class="w-px h-3 bg-slate-200"></span>
                     <span><i class="fas fa-car mr-1.5 text-slate-400"></i> <?php echo $jumlah_mobil; ?> Mobil</span>
                 </div>
@@ -200,34 +232,43 @@ if ($real_d) {
                             </a>
                         <?php }
 
-                        if ($rkk_status == "0") {
-                            if ($role_lower != 'owner') { ?>
+                        if ($rkk_status < 2) { 
+                            if ($rkk_status == "0") { ?>
                                 <button type="button"
                                     onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=pro', 'Ajukan rencana upah ini ke Owner?', 'Propose Data', 'question')"
                                     class="flex-1 py-2.5 bg-amber-400 text-amber-950 rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-amber-100 transition-all hover:bg-amber-300 flex items-center justify-center border-none cursor-pointer">
                                     <i class="fas fa-paper-plane mr-1.5 text-xs"></i> PROPOSE
                                 </button>
-                            <?php }
-                        } elseif ($rkk_status == "1") {
-                            if ($role_lower != 'owner') { ?>
-                                <button type="button"
-                                    onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro', 'Batalkan pengajuan rencana upah ini?', 'Unpropose', 'warning')"
-                                    class="flex-1 py-2.5 bg-rose-500 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-rose-100 transition-all hover:bg-rose-600 flex items-center justify-center border-none cursor-pointer">
-                                    <i class="fas fa-undo mr-1.5 text-xs"></i> UNPROPOSE
-                                </button>
-                            <?php }
-                            if ($role_lower == 'owner' || $role_lower == 'admin master') { ?>
+                            <?php } elseif ($rkk_status == "1") { 
+                                if ($role_lower != 'owner') { ?>
+                                    <button type="button"
+                                        onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unpro', 'Batalkan pengajuan rencana upah ini?', 'Unpropose', 'warning')"
+                                        class="flex-1 py-2.5 bg-rose-500 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-rose-100 transition-all hover:bg-rose-600 flex items-center justify-center border-none cursor-pointer">
+                                        <i class="fas fa-undo mr-1.5 text-xs"></i> UNPROPOSE
+                                    </button>
+                                <?php }
+                            } ?>
+
+                            <?php if ($role_lower == 'owner' || $role_lower == 'admin master' || $role_lower == 'kepala pabrik') { ?>
                                 <button type="button"
                                     onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=app', 'Setujui rencana upah untuk periode ini?', 'Approve Rencana', 'success')"
                                     class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-blue-100 transition-all hover:bg-blue-700 flex items-center justify-center border-none cursor-pointer">
                                     <i class="fas fa-check-circle mr-1.5 text-xs"></i> APPROVE
                                 </button>
                             <?php }
-                        } else { ?>
-                            <div class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black text-center uppercase flex items-center justify-center border border-emerald-400 shadow-lg shadow-emerald-50">
-                                <i class="fas fa-check-double mr-1.5 text-xs"></i> APPROVED
-                            </div>
-                        <?php } ?>
+                        } else { 
+                            if ($role_lower == 'owner' || $role_lower == 'admin master') { ?>
+                                <button type="button"
+                                    onclick="handleAction('?page=rkk&aksi=accept&id=<?php echo $rkk_id; ?>&iddetail=unapp', 'Batalkan status approve untuk rencana upah ini?', 'Unapprove Rencana', 'warning')"
+                                    class="flex-1 py-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-black text-center uppercase hover:bg-rose-100 transition-all flex items-center justify-center cursor-pointer">
+                                    <i class="fas fa-undo mr-1.5 text-xs"></i> UNAPPROVE
+                                </button>
+                            <?php } else { ?>
+                                <div class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black text-center uppercase flex items-center justify-center border border-emerald-400 shadow-lg shadow-emerald-50">
+                                    <i class="fas fa-check-double mr-1.5 text-xs"></i> APPROVED
+                                </div>
+                            <?php }
+                        } ?>
                     </div>
 
                     <div class="flex gap-2">
@@ -257,8 +298,13 @@ if ($real_d) {
                     </div>
                     <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-1">Realisasi Upah</h3>
                     <p class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full inline-block">
-                        <?php echo date('d-m-Y', strtotime($real_tgl)); ?>
+                        <?php echo tgl_indo($real_tgl); ?>
                     </p>
+                    <?php if (!empty($real_d['keterangan'])): ?>
+                        <p class="mt-2 text-xs font-medium text-slate-500 italic max-w-full" title="<?php echo $real_d['keterangan']; ?>">
+                            "<?php echo $real_d['keterangan']; ?>"
+                        </p>
+                    <?php endif; ?>
                 </div>
 
                 <div class="space-y-3 mb-6">
@@ -270,7 +316,7 @@ if ($real_d) {
                     </div>
 
                     <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tight block mb-1">Total SDM</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-tight block mb-1">Total Karyawan</span>
                         <div class="text-2xl font-black text-slate-800 tracking-tight">
                             <?php echo number_format($real_jmlkaryawan, 0, ',', '.'); ?> <span class="text-sm font-medium text-slate-500">Orang</span>
                         </div>
@@ -281,7 +327,7 @@ if ($real_d) {
                     <div class="flex gap-2 w-full">
                         <?php
                         $role_lower = strtolower($role);
-                        $is_petinggi = ($role_lower == 'owner' || $role_lower == 'admin master');
+                        $is_petinggi = ($role_lower == 'owner' || $role_lower == 'admin master' || $role_lower == 'kepala pabrik');
 
                         if ($real_status == "2" || $is_petinggi) { ?>
                             <a href="excelrealisasi.php?id=<?php echo $real_id; ?>" class="flex-1 py-2.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-[10px] font-black text-center uppercase hover:bg-slate-200 transition-all flex items-center justify-center">
@@ -293,7 +339,7 @@ if ($real_d) {
                             </div>
                         <?php }
 
-                        if ($real_status == "0" || $real_status == "1") {
+                        if ($real_status < 2) {
                             if ($is_petinggi) { ?>
                                 <button type="button" onclick="confirmApprove(this)" data-href="?page=realisasi&aksi=accept&id=<?php echo $real_id; ?>&iddetail=app" class="flex-1 py-2.5 bg-blue-600 text-white rounded-xl text-[10px] font-black text-center uppercase shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all border-none flex items-center justify-center cursor-pointer">
                                     <i class="fas fa-check-circle mr-1.5 text-xs"></i> APPROVE
@@ -302,12 +348,20 @@ if ($real_d) {
                                 <div class="flex-1 py-2.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-xl text-[9px] font-black text-center uppercase flex items-center justify-center">
                                     <i class="fas fa-hourglass-half mr-1 text-xs"></i> WAITING
                                 </div>
-                            <?php } ?>
-                        <?php } else { ?>
-                            <div class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black text-center uppercase flex items-center justify-center shadow-lg shadow-emerald-50">
-                                <i class="fas fa-check-double mr-1.5 text-xs"></i> APPROVED
-                            </div>
-                        <?php } ?>
+                            <?php }
+                        } else { 
+                            if ($is_petinggi) { ?>
+                                <button type="button" 
+                                    onclick="handleAction('?page=realisasi&aksi=unapprove&id=<?php echo $real_id; ?>&iddetail=unapp', 'Batalkan status approve untuk realisasi ini?', 'Unapprove Realisasi', 'warning')" 
+                                    class="flex-1 py-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-[10px] font-black text-center uppercase hover:bg-rose-100 transition-all flex items-center justify-center cursor-pointer">
+                                    <i class="fas fa-undo mr-1.5 text-xs"></i> UNAPPROVE
+                                </button>
+                            <?php } else { ?>
+                                <div class="flex-1 py-2.5 bg-emerald-500 text-white rounded-xl text-[10px] font-black text-center uppercase flex items-center justify-center shadow-lg shadow-emerald-50">
+                                    <i class="fas fa-check-double mr-1.5 text-xs"></i> APPROVED
+                                </div>
+                            <?php }
+                        } ?>
                     </div>
 
                     <?php if ($real_status == "2" || $is_petinggi) { ?>
@@ -384,4 +438,4 @@ if ($real_d) {
             }
         });
     }
-</script>
+</script>

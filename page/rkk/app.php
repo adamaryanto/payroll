@@ -78,8 +78,28 @@ if ($status == "pro") {
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 1 where id_rkk = '$id' ");
     if ($sql) {
         $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
-
-        echo "<script>window.location.href='$prev_url';</script>";
+?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Propose',
+                    text: 'Rencana Upah berhasil diajukan ke Owner.',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'OK',
+                    customClass: { popup: 'rounded-3xl' }
+                }).then((result) => {
+                    window.location.href = '<?= $prev_url ?>';
+                });
+            </script>
+        </body>
+        </html>
+<?php
         exit;
     }
 } elseif ($status == "app") {
@@ -148,27 +168,87 @@ if ($status == "pro") {
         exit;
     }
 
-    $sql =   $koneksi->query("update tb_rkk set status_rkk = 2 where id_rkk = '$id' ");
+    $sql = $koneksi->query("update tb_rkk set status_rkk = 2 where id_rkk = '$id' ");
     if ($sql) {
         $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
-
-        echo "<script>window.location.href='$prev_url';</script>";
+?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Approve',
+                    text: 'Rencana Upah berhasil disetujui.',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'OK',
+                    customClass: { popup: 'rounded-3xl' }
+                }).then((result) => {
+                    window.location.href = '<?= $prev_url ?>';
+                });
+            </script>
+        </body>
+        </html>
+<?php
         exit;
     }
 } elseif ($status == "unpro") {
-    $sql =   $koneksi->query("update tb_rkk set status_rkk = 0 where id_rkk = '$id' ");
+    $sql = $koneksi->query("update tb_rkk set status_rkk = 0 where id_rkk = '$id' ");
     if ($sql) {
         $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
-
-        echo "<script>window.location.href='$prev_url';</script>";
+?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Unpropose',
+                    text: 'Pengajuan Rencana Upah telah dibatalkan.',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'OK',
+                    customClass: { popup: 'rounded-3xl' }
+                }).then((result) => {
+                    window.location.href = '<?= $prev_url ?>';
+                });
+            </script>
+        </body>
+        </html>
+<?php
         exit;
     }
 } elseif ($status == "unapp") {
     $sql =   $koneksi->query("update tb_rkk set status_rkk = 1 where id_rkk = '$id' ");
     if ($sql) {
         $prev_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '?page=rkk';
-
-        echo "<script>window.location.href='$prev_url';</script>";
+?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        </head>
+        <body>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Unapprove',
+                    text: 'Status persetujuan Rencana Upah telah dibatalkan.',
+                    confirmButtonColor: '#2563eb',
+                    confirmButtonText: 'OK',
+                    customClass: { popup: 'rounded-3xl' }
+                }).then((result) => {
+                    window.location.href = '<?= $prev_url ?>';
+                });
+            </script>
+        </body>
+        </html>
+<?php
         exit;
     }
 }
