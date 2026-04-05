@@ -189,7 +189,8 @@ echo "<table border='1' style='border-collapse:collapse;'>
         </tr>
         <tr style='background-color:#f2f2f2; font-weight:bold;'>
             <th width='30'>No</th>
-            <th colspan='5'>NAMA TIM</th>
+            <th colspan='4'>NAMA TIM</th>
+            <th width='80'>QTY</th>
             <th width='150'>HARGA SATUAN</th>
         </tr>
     </thead>
@@ -204,7 +205,8 @@ if (!empty($data_dengan_mesin)) {
 
         echo "<tr>
             <td align='center'>$no_m</td>
-            <td colspan='5' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='center'>" . ($item['qty'] > 0 ? (floor($item['qty']) == $item['qty'] ? number_format($item['qty'], 0, '.', ',') : number_format($item['qty'], 1, '.', ',')) : '-') . "</td>
             <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
         </tr>";
         $no_m++;
@@ -216,7 +218,32 @@ if (!empty($data_dengan_mesin)) {
 } else {
     echo "<tr><td colspan='7' align='center'>Tidak ada data Dengan Mesin</td></tr>";
 }
-echo "</tbody></table><br>";
+echo "</tbody></table>";
+
+// YELLOW SUMMARY FOR DENGAN MESIN
+echo "<br><table border='1' style='border-collapse:collapse; width:100%;'>
+    <tr style='background-color:red; color:white; font-weight:bold; text-align:center;'>
+        <th colspan='5'>DENGAN MESIN BONLES</th>
+    </tr>
+    <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
+        <th>BIAYA PABRIK</th>
+        <th>BONELESS</th>
+        <th>POTONG</th>
+        <th>TOTAL</th>
+        <th>Biaya Per mobil</th>
+    </tr>
+    <tr style='font-weight:bold; text-align:center;'>
+        <td align='center'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
+        <td align='center' style='color:red;'>Rp " . number_format(abs($biaya_mobil_pure), 2, '.', ',') . "</td>
+        <td align='center'>" . (int)$potong . "</td>
+        <td align='center' style='color:red;'>
+            Rp " . number_format($total_upah_pabrik + $biaya_mobil_pure + $subtotal_mesin, 2, '.', ',') . "
+        </td>
+        <td align='center' style='color:red;'>
+            Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $biaya_mobil_pure + $subtotal_mesin) / $potong, 2, '.', ',') : '0.00') . "
+        </td>
+    </tr>
+</table><br>";
 
 // --- TABEL B: TANPA MESIN (PLUS) ---
 echo "<table border='1' style='border-collapse:collapse;'>
@@ -226,7 +253,8 @@ echo "<table border='1' style='border-collapse:collapse;'>
         </tr>
         <tr style='background-color:#f2f2f2; font-weight:bold;'>
             <th width='30'>No</th>
-            <th colspan='5'>NAMA TIM</th>
+            <th colspan='4'>NAMA TIM</th>
+            <th width='80'>QTY</th>
             <th width='150'>HARGA SATUAN</th>
         </tr>
     </thead>
@@ -241,7 +269,8 @@ if (!empty($data_tanpa_mesin)) {
 
         echo "<tr>
             <td align='center'>$no_p</td>
-            <td colspan='5' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='center'>" . ($item['qty'] > 0 ? (floor($item['qty']) == $item['qty'] ? number_format($item['qty'], 0, '.', ',') : number_format($item['qty'], 1, '.', ',')) : '-') . "</td>
             <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
         </tr>";
         $no_p++;
@@ -253,7 +282,32 @@ if (!empty($data_tanpa_mesin)) {
 } else {
     echo "<tr><td colspan='7' align='center'>Tidak ada data Tanpa Mesin</td></tr>";
 }
-echo "</tbody></table><br>";
+echo "</tbody></table>";
+
+// YELLOW SUMMARY FOR TANPA MESIN
+echo "<br><table border='1' style='border-collapse:collapse; width:100%;'>
+    <tr style='background-color:red; color:white; font-weight:bold; text-align:center;'>
+        <th colspan='5'>TANPA MESIN BONLES</th>
+    </tr>
+    <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
+        <th>BIAYA PABRIK</th>
+        <th>BONELESS</th>
+        <th>POTONG</th>
+        <th>TOTAL</th>
+        <th>Biaya Per mobil</th>
+    </tr>
+    <tr style='font-weight:bold; text-align:center;'>
+        <td align='center'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
+        <td align='center'>Rp " . number_format($biaya_mobil_pure, 2, '.', ',') . "</td>
+        <td align='center'>" . (int)$potong . "</td>
+        <td align='center'>
+            Rp " . number_format($total_upah_pabrik + $biaya_mobil_pure + $subtotal_tanpa_mesin, 2, '.', ',') . "
+        </td>
+        <td align='center'>
+            Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $biaya_mobil_pure + $subtotal_tanpa_mesin) / $potong, 2, '.', ',') : '0.00') . "
+        </td>
+    </tr>
+</table><br>";
 
 // --- TABEL KUNING (HASIL AKHIR) ---
 $style_boneless_pure = ($biaya_mobil_pure < 0) ? "color:red;" : "";

@@ -1,11 +1,15 @@
 <?php
 $ref = $_GET['ref'] ?? 'boneless';
 $view_param = isset($_GET['view']) ? '&view=1' : '';
-$id = $_GET['id'];
+$id = $_GET['id'] ?? '';
 
 // 1. Ambil Data Header
-$sql_header = $koneksi->query("SELECT * FROM tb_boneless WHERE id_boneless = '$id'");
-$header = $sql_header->fetch_assoc();
+if ($id) {
+    $sql_header = $koneksi->query("SELECT * FROM tb_boneless WHERE id_boneless = '$id'");
+    $header = $sql_header->fetch_assoc();
+} else {
+    $header = null;
+}
 
 // 2. Ambil Biaya Mobil (Master)
 $sql_master = $koneksi->query("SELECT biaya_mobil FROM tb_biayamobil LIMIT 1");
@@ -89,20 +93,27 @@ if ($simpan) {
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Data Rencana (Locked)</label>
                                 <?php
-                                $id_rkk_saved = $header['id_rkk'];
-                                $sql_rkk_fixed = $koneksi->query("SELECT * FROM tb_rkk WHERE id_rkk = '$id_rkk_saved'");
-                                $row_fixed = $sql_rkk_fixed->fetch_assoc();
-                                $display_rencana = date('d-m-Y', strtotime($row_fixed['tgl_rkk'])) . ' - ' . $row_fixed['keterangan'];
+                                $id_rkk_saved = $header['id_rkk'] ?? 0;
+                                $display_rencana = "Data Rencana Tidak Ditemukan";
+                                
+                                if ($id_rkk_saved > 0) {
+                                    $sql_rkk_fixed = $koneksi->query("SELECT * FROM tb_rkk WHERE id_rkk = '$id_rkk_saved'");
+                                    if ($row_fixed = $sql_rkk_fixed->fetch_assoc()) {
+                                        $tgl_rkk = $row_fixed['tgl_rkk'] ?? '';
+                                        $ket_rkk = $row_fixed['keterangan'] ?? '';
+                                        $display_rencana = ($tgl_rkk ? date('d-m-Y', strtotime($tgl_rkk)) : '-') . ' - ' . $ket_rkk;
+                                    }
+                                }
                                 ?>
                                 <div class="h-[42px] flex items-center px-3 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-600">
-                                    <i class="fas fa-lock mr-2 opacity-50"></i> <?= $display_rencana ?>
+                                    <i class="fas fa-lock mr-2 opacity-50"></i> <?= htmlspecialchars($display_rencana) ?>
                                 </div>
                                 <input type="hidden" name="id_rkk" value="<?= $id_rkk_saved ?>">
-                                <input type="hidden" name="tgl" value="<?= $header['tgl'] ?>">
+                                <input type="hidden" name="tgl" value="<?= $header['tgl'] ?? '' ?>">
                             </div>
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Jumlah Mobil (Potong)</label>
-                                <input type="number" name="jumlah_mobil" class="form-control h-[42px]" value="<?= $header['jumlah_mobil'] ?>" required>
+                                <input type="number" name="jumlah_mobil" class="form-control h-[42px]" value="<?= $header['jumlah_mobil'] ?? 0 ?>" required>
                             </div>
                             <div class="col-md-4 form-group">
                                 <label class="text-xs font-bold text-gray-700 uppercase mb-1">Biaya / Mobil (Lock)</label>
@@ -195,7 +206,7 @@ if ($simpan) {
 
                         <div class="form-group mt-6">
                             <label class="text-xs font-bold text-gray-700 uppercase mb-1">Keterangan</label>
-                            <textarea name="keterangan" class="form-control" rows="3"><?= $header['keterangan'] ?></textarea>
+                            <textarea name="keterangan" class="form-control" rows="3"><?= $header['keterangan'] ?? '' ?></textarea>
                         </div>
 
                         <div class="mt-8 flex gap-3">
