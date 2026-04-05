@@ -37,17 +37,21 @@ $boneless_details = [];
 if ($id_boneless > 0) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '$id_boneless'");
     while ($bd = $q_bd->fetch_assoc()) {
-        // FIX: Gunakan abs() agar terhindar dari double negatif
-        $val = abs((float)$bd['total']);
+        $qty_val_rkk = (float)($bd['qty'] ?? 0);
+        $qty_mul_rkk = $qty_val_rkk; // Hanya hitung jika ada qty (0 jika kosong)
+        $nilai_satuan = abs((float)$bd['harga']); 
+        $nilai_total_item = $nilai_satuan * $qty_mul_rkk;
 
         if ($bd['jenis'] == 'minus') {
-            $total_boneless -= $val; // Kurangi jika minus
+            $total_boneless -= $nilai_total_item;
         } else {
-            $total_boneless += $val; // Tambah jika plus
+            $total_boneless += $nilai_total_item;
         }
         $boneless_details[] = $bd;
     }
 }
+$data_dengan_mesin = array_filter($boneless_details, function($item) { return $item['jenis'] == 'minus'; });
+$data_tanpa_mesin = array_filter($boneless_details, function($item) { return $item['jenis'] == 'plus'; });
 
 // 3. Query Karyawan
 $sql = "SELECT 
@@ -189,9 +193,10 @@ echo "<table border='1' style='border-collapse:collapse;'>
         </tr>
         <tr style='background-color:#f2f2f2; font-weight:bold;'>
             <th width='30'>No</th>
-            <th colspan='4'>NAMA TIM</th>
+            <th colspan='3'>NAMA TIM</th>
             <th width='80'>QTY</th>
-            <th width='150'>HARGA SATUAN</th>
+            <th width='120'>HARGA SATUAN</th>
+            <th width='120'>TOTAL</th>
         </tr>
     </thead>
     <tbody>";
@@ -200,14 +205,19 @@ $no_m = 1;
 $subtotal_mesin = 0;
 if (!empty($data_dengan_mesin)) {
     foreach ($data_dengan_mesin as $item) {
+        $qty_val = (float)($item['qty'] ?? 0);
+        $qty_mul = $qty_val;
         $harga_satuan = abs((float)$item['harga']);
-        $subtotal_mesin -= $harga_satuan;
+        $total_line = $harga_satuan * $qty_mul;
+        
+        $subtotal_mesin -= $total_line;
 
         echo "<tr>
             <td align='center'>$no_m</td>
-            <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
-            <td align='center'>" . ($item['qty'] > 0 ? (floor($item['qty']) == $item['qty'] ? number_format($item['qty'], 0, '.', ',') : number_format($item['qty'], 1, '.', ',')) : '-') . "</td>
+            <td colspan='3' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='center'>" . ($qty_val > 0 ? (floor($qty_val) == $qty_val ? number_format($qty_val, 0, '.', ',') : number_format($qty_val, 1, '.', ',')) : '-') . "</td>
             <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+            <td align='right'>Rp " . number_format($total_line, 2, '.', ',') . "</td>
         </tr>";
         $no_m++;
     }
@@ -253,9 +263,10 @@ echo "<table border='1' style='border-collapse:collapse;'>
         </tr>
         <tr style='background-color:#f2f2f2; font-weight:bold;'>
             <th width='30'>No</th>
-            <th colspan='4'>NAMA TIM</th>
+            <th colspan='3'>NAMA TIM</th>
             <th width='80'>QTY</th>
-            <th width='150'>HARGA SATUAN</th>
+            <th width='120'>HARGA SATUAN</th>
+            <th width='120'>TOTAL</th>
         </tr>
     </thead>
     <tbody>";
@@ -264,14 +275,19 @@ $no_p = 1;
 $subtotal_tanpa_mesin = 0;
 if (!empty($data_tanpa_mesin)) {
     foreach ($data_tanpa_mesin as $item) {
+        $qty_val = (float)($item['qty'] ?? 0);
+        $qty_mul = $qty_val;
         $harga_satuan = abs((float)$item['harga']);
-        $subtotal_tanpa_mesin += $harga_satuan;
+        $total_line = $harga_satuan * $qty_mul;
+
+        $subtotal_tanpa_mesin += $total_line;
 
         echo "<tr>
             <td align='center'>$no_p</td>
-            <td colspan='4' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
-            <td align='center'>" . ($item['qty'] > 0 ? (floor($item['qty']) == $item['qty'] ? number_format($item['qty'], 0, '.', ',') : number_format($item['qty'], 1, '.', ',')) : '-') . "</td>
+            <td colspan='3' style='font-weight:bold;'>" . strtoupper($item['nama_item'] ?? '') . "</td>
+            <td align='center'>" . ($qty_val > 0 ? (floor($qty_val) == $qty_val ? number_format($qty_val, 0, '.', ',') : number_format($qty_val, 1, '.', ',')) : '-') . "</td>
             <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+            <td align='right'>Rp " . number_format($total_line, 2, '.', ',') . "</td>
         </tr>";
         $no_p++;
     }

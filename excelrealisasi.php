@@ -149,13 +149,16 @@ $biaya_mobil_pure = $potong * $biaya_mobil_master;
 if ($b_head) {
     $q_bd = $koneksi->query("SELECT * FROM tb_boneless_detail WHERE id_boneless = '" . $b_head['id_boneless'] . "'");
     while ($bd = $q_bd->fetch_assoc()) {
-        $nilai_total = abs((float)$bd['total']);
+        $qty_val_root = (float)($bd['qty'] ?? 0);
+        $qty_mul_root = $qty_val_root;
+        $nilai_satuan = abs((float)$bd['harga']); 
+        $nilai_total_item = $nilai_satuan * $qty_mul_root;
 
         if (($bd['jenis'] ?? '') == 'minus') {
-            $total_boneless_final -= $nilai_total;
+            $total_boneless_final -= $nilai_total_item;
             $data_dengan_mesin[] = $bd;
         } else {
-            $total_boneless_final += $nilai_total;
+            $total_boneless_final += $nilai_total_item;
             $data_tanpa_mesin[] = $bd;
         }
     }
@@ -205,33 +208,39 @@ $grand_total_all = $grand_total + $total_boneless_final;
         <td valign="top">
             <table border="1" style="border-collapse:collapse;">
                 <tr style="background-color:#C6E0B4; font-weight:bold;">
-                    <th colspan="4">BAYARAN TIM BONELESS - TANPA MESIN</th>
+                    <th colspan="5">BAYARAN TIM BONELESS - TANPA MESIN</th>
                 </tr>
                 <tr style="background-color:#f2f2f2; font-weight:bold; text-align:center;">
                     <th width="30">No</th>
                     <th>NAMA TIM</th>
                     <th width="80">QTY</th>
                     <th width="120">HARGA SATUAN</th>
+                    <th width="120">TOTAL</th>
                 </tr>
                 <?php
                 $no_p = 1;
                 $subtotal_tanpa = 0;
                 foreach ($data_tanpa_mesin as $item) {
-                    $nilai = abs((float)$item['total']);
-                    $subtotal_tanpa += $nilai;
                     $qty_val = (float)($item['qty'] ?? 0);
+                    $qty_mul = $qty_val;
+                    $harga_satuan = abs((float)$item['harga']);
+                    $total_line = $harga_satuan * $qty_mul;
+                    
+                    $subtotal_tanpa += $total_line;
+                    
                     $qty_disp = ($qty_val == 0) ? "-" : (floor($qty_val) == $qty_val ? number_format($qty_val, 0, '.', ',') : number_format($qty_val, 1, '.', ','));
                     echo "<tr>
                         <td align='center'>$no_p</td>
                         <td>" . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right'>Rp " . number_format($nilai, 2, '.', ',') . "</td>
+                        <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+                        <td align='right'>Rp " . number_format($total_line, 2, '.', ',') . "</td>
                     </tr>";
                     $no_p++;
                 }
                 ?>
                 <tr style="font-weight:bold; background-color:#f2f2f2;">
-                    <td colspan="3" align="center">SUBTOTAL TANPA MESIN</td>
+                    <td colspan="4" align="center">SUBTOTAL TANPA MESIN</td>
                     <td align="right">Rp <?php echo number_format($subtotal_tanpa, 2, '.', ','); ?></td>
                 </tr>
             </table>
@@ -259,32 +268,39 @@ $grand_total_all = $grand_total + $total_boneless_final;
 
             <table border="1" style="border-collapse:collapse;">
                 <tr style="background-color:#F8CBAD; font-weight:bold;">
-                    <th colspan="4">BAYARAN TIM BONELESS - DENGAN MESIN</th>
+                    <th colspan="5">BAYARAN TIM BONELESS - DENGAN MESIN</th>
                 </tr>
                 <tr style="background-color:#f2f2f2; font-weight:bold; text-align:center;">
                     <th width="30">No</th>
                     <th>NAMA TIM</th>
                     <th width="80">QTY</th>
                     <th width="120">HARGA SATUAN</th>
+                    <th width="120">TOTAL</th>
                 </tr>
                 <?php
                 $no_m = 1;
                 $subtotal_mesin = 0;
                 foreach ($data_dengan_mesin as $item) {
-                    $nilai = abs((float)$item['total']);
-                    $subtotal_mesin -= $nilai;
-                    $qty_disp = ($item['qty'] == 0) ? "-" : number_format($item['qty'], 1, '.', ',');
+                    $qty_val = (float)($item['qty'] ?? 0);
+                    $qty_mul = $qty_val;
+                    $harga_satuan = abs((float)$item['harga']);
+                    $total_line = $harga_satuan * $qty_mul;
+                    
+                    $subtotal_mesin -= $total_line;
+                    
+                    $qty_disp = ($qty_val == 0) ? "-" : (floor($qty_val) == $qty_val ? number_format($qty_val, 0, '.', ',') : number_format($qty_val, 1, '.', ','));
                     echo "<tr>
                         <td align='center'>$no_m</td>
                         <td style='color:red;'> " . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right'>Rp " . number_format($nilai, 2, '.', ',') . "</td>
+                        <td align='right'>Rp " . number_format($harga_satuan, 2, '.', ',') . "</td>
+                        <td align='right'>Rp " . number_format($total_line, 2, '.', ',') . "</td>
                     </tr>";
                     $no_m++;
                 }
                 ?>
                 <tr style="font-weight:bold; background-color:#f2f2f2;">
-                    <td colspan="3" align="center">SUBTOTAL DENGAN MESIN</td>
+                    <td colspan="4" align="center">SUBTOTAL DENGAN MESIN</td>
                     <td align="right" style="color:red;">Rp <?php echo number_format(abs($subtotal_mesin), 2, '.', ','); ?></td>
                 </tr>
             </table>
