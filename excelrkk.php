@@ -247,10 +247,10 @@ echo "<br><table border='1' style='border-collapse:collapse; width:100%;'>
         <td align='center' style='color:red;'>Rp " . number_format(abs($biaya_mobil_pure), 2, '.', ',') . "</td>
         <td align='center'>" . (int)$potong . "</td>
         <td align='center' style='color:red;'>
-            Rp " . number_format($total_upah_pabrik + $biaya_mobil_pure + $subtotal_mesin, 2, '.', ',') . "
+            Rp " . number_format($total_upah_pabrik + $subtotal_mesin, 2, '.', ',') . "
         </td>
         <td align='center' style='color:red;'>
-            Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $biaya_mobil_pure + $subtotal_mesin) / $potong, 2, '.', ',') : '0.00') . "
+            Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $subtotal_mesin) / $potong, 2, '.', ',') : '0.00') . "
         </td>
     </tr>
 </table><br>";
@@ -317,10 +317,10 @@ echo "<br><table border='1' style='border-collapse:collapse; width:100%;'>
         <td align='center'>Rp " . number_format($biaya_mobil_pure, 2, '.', ',') . "</td>
         <td align='center'>" . (int)$potong . "</td>
         <td align='center'>
-            Rp " . number_format($total_upah_pabrik + $biaya_mobil_pure + $subtotal_tanpa_mesin, 2, '.', ',') . "
+            Rp " . number_format($total_upah_pabrik + $subtotal_tanpa_mesin, 2, '.', ',') . "
         </td>
         <td align='center'>
-            Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $biaya_mobil_pure + $subtotal_tanpa_mesin) / $potong, 2, '.', ',') : '0.00') . "
+            Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $subtotal_tanpa_mesin) / $potong, 2, '.', ',') : '0.00') . "
         </td>
     </tr>
 </table><br>";
@@ -331,14 +331,17 @@ $simbol_boneless_pure = ($biaya_mobil_pure < 0) ? "- " : "";
 
 echo "<table border='1' style='border-collapse:collapse;'>
     <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
+        <th colspan='7'>HASIL AKHIR (GRAND TOTAL RENCANA)</th>
+    </tr>
+    <tr style='background-color:yellow; font-weight:bold; text-align:center;'>
         <th colspan='2'>BIAYA PABRIK</th><th colspan='2'>BONELESS (RENCANA)</th><th>POTONG</th><th>TOTAL</th><th>Biaya Per mobil</th>
     </tr>
     <tr style='font-weight:bold; text-align:right;'>
         <td align='center' colspan='2'>Rp " . number_format($total_upah_pabrik, 2, '.', ',') . "</td>
         <td align='center' colspan='2' style='$style_boneless_pure'>Rp {$simbol_boneless_pure}" . number_format(abs($biaya_mobil_pure), 2, '.', ',') . "</td>
         <td align='center'>" . (int)$potong . "</td>
-        <td align='center'>Rp " . number_format($grand_total_all, 2, '.', ',') . "</td>
-        <td align='center' style='background-color:white;'>Rp " . number_format($biaya_per_mobil_final, 2, '.', ',') . "</td>
+        <td align='center'>Rp " . number_format($total_upah_pabrik + $total_boneless, 2, '.', ',') . "</td>
+        <td align='center' style='background-color:white;'>Rp " . (($potong > 0) ? number_format(($total_upah_pabrik + $total_boneless) / $potong, 2, '.', ',') : '0.00') . "</td>
     </tr>
 </table><br><br>";
 

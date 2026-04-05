@@ -259,8 +259,8 @@ $grand_total_all = $grand_total + $total_boneless_final;
                     <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     <td align="center">Rp <?php echo number_format($biaya_mobil_pure, 2, '.', ','); ?></td>
                     <td align="center"><?php echo (int)$potong; ?></td>
-                    <td align="center">Rp <?php echo number_format($grand_total + $biaya_mobil_pure + $subtotal_tanpa, 2, '.', ','); ?></td>
-                    <td align="center">Rp <?php echo ($potong > 0) ? number_format(($grand_total + $biaya_mobil_pure + $subtotal_tanpa) / $potong, 2, '.', ',') : '0.00'; ?></td>
+                    <td align="center">Rp <?php echo number_format($grand_total + $subtotal_tanpa, 2, '.', ','); ?></td>
+                    <td align="center">Rp <?php echo ($potong > 0) ? number_format(($grand_total + $subtotal_tanpa) / $potong, 2, '.', ',') : '0.00'; ?></td>
                 </tr>
             </table>
 
@@ -319,38 +319,14 @@ $grand_total_all = $grand_total + $total_boneless_final;
                     <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     <td align="center" style="color:red;">Rp <?php echo number_format($biaya_mobil_pure, 2, '.', ','); ?></td>
                     <td align="center"><?php echo (int)$potong; ?></td>
-                    <td align="center" style="color:red;">Rp <?php echo number_format($grand_total + $biaya_mobil_pure + $subtotal_mesin, 2, '.', ','); ?></td>
-                    <td align="center" style="color:red;">Rp <?php echo ($potong > 0) ? number_format(($grand_total + $biaya_mobil_pure + $subtotal_mesin) / $potong, 2, '.', ',') : '0.00'; ?></td>
+                    <td align="center" style="color:red;">Rp <?php echo number_format($grand_total + $subtotal_mesin, 2, '.', ','); ?></td>
+                    <td align="center" style="color:red;">Rp <?php echo ($potong > 0) ? number_format(($grand_total + $subtotal_mesin) / $potong, 2, '.', ',') : '0.00'; ?></td>
                 </tr>
             </table>
 
             <br>
 
-            <table border="1" style="border-collapse:collapse; width:100%;">
-                <tr style="background-color:yellow; font-weight:bold; text-align:center;">
-                    <th colspan="5">REKAP BONELESS (NET)</th>
-                </tr>
-                <tr style="background-color:yellow; font-weight:bold; text-align:center;">
-                    <th>BIAYA PABRIK</th>
-                    <th>BONELESS</th>
-                    <th>POTONG</th>
-                    <th>TOTAL</th>
-                    <th>Biaya Per mobil</th>
-                </tr>
-                <tr style="font-weight:bold; text-align:right;">
-                    <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
-                    <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
-                        Rp <?php echo number_format($biaya_mobil_pure, 2, '.', ','); ?>
-                    </td>
-                    <td align="center"><?php echo (int)$potong; ?></td>
-                    <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
-                        Rp <?php echo number_format($grand_total + $biaya_mobil_pure + $total_boneless_final, 2, '.', ','); ?>
-                    </td>
-                    <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
-                        Rp <?php echo ($potong > 0) ? number_format(($grand_total + $biaya_mobil_pure + $total_boneless_final) / $potong, 2, '.', ',') : '0.00'; ?>
-                    </td>
-                </tr>
-            </table>
+            <!-- TABLE Summary NET dihapus -->
         </td>
     </tr>
 </table>
@@ -385,6 +361,9 @@ $grand_total_all = $grand_total + $total_boneless_final;
         <td width="30"></td>
         <td>
             <table border="1" style="border-collapse:collapse; background-color:yellow; font-weight:bold; text-align:center;">
+                <tr style="background-color:yellow; font-weight:bold; text-align:center;">
+                    <th colspan="5">HASIL AKHIR (GRAND TOTAL REALISASI)</th>
+                </tr>
                 <tr style="font-size:14px; height:30px;">
                     <th width="200">BIAYA PABRIK</th>
                     <th width="200">BONELESS</th>
@@ -395,15 +374,11 @@ $grand_total_all = $grand_total + $total_boneless_final;
                 <tr style="height:35px;">
                     <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : 'black'; ?>;">
-                        Rp <?php
-                            $val_bone_kuning = abs($total_boneless_final);
-                            $fmt_bone_kuning = number_format($val_bone_kuning, 2, '.', ',');
-                            echo ($total_boneless_final < 0) ? "- " . $fmt_bone_kuning : $fmt_bone_kuning;
-                            ?>
+                        Rp <?php echo number_format($biaya_mobil_pure, 2, '.', ','); ?>
                     </td>
                     <td align="center"><?php echo (int)$potong; ?></td>
-                    <td align="center">Rp <?php echo number_format($grand_total_all, 2, '.', ','); ?></td>
-                    <td align="center" style="background-color:white;">Rp <?php echo number_format($biaya_per_mobil, 2, '.', ','); ?></td>
+                    <td align="center">Rp <?php echo number_format($grand_total + $total_boneless_final, 2, '.', ','); ?></td>
+                    <td align="center" style="background-color:white;">Rp <?php echo ($potong > 0) ? number_format(($grand_total + $total_boneless_final) / $potong, 2, '.', ',') : '0.00'; ?></td>
                 </tr>
             </table>
         </td>
