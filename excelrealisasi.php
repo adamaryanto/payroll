@@ -215,7 +215,7 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                         <td align='center'>$no_p</td>
                         <td>" . strtoupper($item['nama_item']) . "</td>
                         <td align='center'>$qty_disp</td>
-                        <td align='right'>Rp " . (floor($nilai) == $nilai ? number_format($nilai, 0, '.', ',') : number_format($nilai, 2, '.', ',')) . "</td>
+                        <td align='right'>Rp " . number_format($nilai, 2, '.', ',') . "</td>
                     </tr>";
                     $no_p++;
                 }
@@ -261,10 +261,8 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     <td align="center">TOTAL AKHIR BONELESS (NET)</td>
                     <td width="150" align="right" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : '#008000'; ?>;">
                         Rp <?php
-                            // Dynamic decimal formatting: Hide .00 for integers
                             $val_bone = abs($total_boneless_final);
-                            $fmt_bone = (floor($val_bone) == $val_bone) ? number_format($val_bone, 0, '.', ',') : number_format($val_bone, 2, '.', ',');
-                            // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
+                            $fmt_bone = number_format($val_bone, 2, '.', ',');
                             echo ($total_boneless_final < 0) ? "- " . $fmt_bone : $fmt_bone;
                             ?>
                     </td>
@@ -309,10 +307,8 @@ $biaya_x_mobil_display = $biaya_per_mobil * $potong;
                     <td align="center">Rp <?php echo number_format($grand_total, 2, '.', ','); ?></td>
                     <td align="center" style="color: <?php echo ($total_boneless_final < 0) ? 'red' : 'black'; ?>;">
                         Rp <?php
-                            // Dynamic decimal formatting: Hide .00 for integers
                             $val_bone_kuning = abs($total_boneless_final);
-                            $fmt_bone_kuning = (floor($val_bone_kuning) == $val_bone_kuning) ? number_format($val_bone_kuning, 0, '.', ',') : number_format($val_bone_kuning, 2, '.', ',');
-                            // Tulisan (minus) dihapus, hanya menyisakan tanda minus "-"
+                            $fmt_bone_kuning = number_format($val_bone_kuning, 2, '.', ',');
                             echo ($total_boneless_final < 0) ? "- " . $fmt_bone_kuning : $fmt_bone_kuning;
                             ?>
                     </td>
